@@ -7,6 +7,7 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     finance_service_ok = fields.Boolean(string='Revenue M - Analysis')
+    nk_service= fields.Boolean(string='NK Service')
     product_id = fields.Many2one('product.product', string='Product', store=True)
     allowed_users_ids = fields.Many2many(comodel_name='res.users',  relation='product_template_allowed_user_rel', string='Allowed Users', column1='product_tmpl_id',column2='user_id')
     need_approved = fields.Boolean(string='Need to be approved')
