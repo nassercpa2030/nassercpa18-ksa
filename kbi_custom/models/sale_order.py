@@ -276,7 +276,7 @@ class SaleOrder ( models.Model ) :
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type'  )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
-                                            domain="[('plan_id', '=', project_type_id)]" , required=True ,
+                                            domain="[('plan_id', '=', project_type_id)]" , 
                                             compute='_compute_analytic_account_id' , readonly=False , store=True )
     approve_uid = fields.Many2one ( 'res.users' , string='Approve User' , )
     approve_date = fields.Datetime ( string='Approve Date' )
