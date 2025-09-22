@@ -23,7 +23,7 @@ class SaleOrder ( models.Model ) :
     close_entry_year = fields.Integer ( string="Close Entry Year" , readonly=False )
     date = fields.Datetime ( string='Date' )
     sequence = fields.Integer ( string='Sequence' , )
-    report_id = fields.Many2one ( 'product.report.template' , string='Report' , required=True ,
+    report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
                                   domain="[('id', 'in', exist_report_ids)]" )
     x_studio_contract_service = fields.Many2one(comodel_name='product.product' , string="Contract_service")
     report_template_id = fields.Many2one ( comodel_name='ir.actions.report' , string='Report Template' ,
