@@ -87,7 +87,7 @@ class SaleOrder ( models.Model ) :
          ('cancel' , 'Cancelled') , ('archive2025' , 'Archive2025') , ('sale' , 'Sales Order')] , store=True, readonly=False )
     project_id = fields.Many2one ( 'project.project' , string="المشروع" )
     auto_code = fields.Char ( string="Auto Code" , readonly=False ,store=True )
-    x_studio_auto_code =fields.Char ( string="Auto Code_printing" ,related='auto_code',readonly=False,,store=True )
+    x_studio_auto_code =fields.Char ( string="Auto Code_printing" ,related='auto_code',readonly=False,store=True )
     assigned_to = fields.Many2one ( 'res.users' , string="Assigned To" )
     ass_to = fields.Float ( string="Ass_to" )
     ass_from = fields.Float ( string="Ass_from" )
