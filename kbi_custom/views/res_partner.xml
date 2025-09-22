@@ -1,0 +1,53 @@
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="kbi_custom.view_res_partner_form_inherit">
+            <field name="name">kbi_custom.view.res.partner.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='vat']" position="before">
+                            <field name="is_broker"/>
+                           <field name="number_700" style ="font-weight:bold; font-size:14px;"/>
+                   
+                            <field name='nationality' modifiers="{'invisible': [('is_broker', '=', True)]}"/>
+                            <field name="agreement_id" modifiers="{'invisible': [('is_broker', '=', True)]}"/>
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="kbi_custom.view_res_partner_sa_form_inherit">
+            <field name="name">kbi_custom.view.res.partner.sa.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="l10n_sa_edi.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='l10n_sa_additional_identification_scheme']" position="attributes">
+                            <attribute name="modifiers">{'invisible': [('is_broker', '=', True)]}</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='l10n_sa_additional_identification_number']" position="attributes">
+                            <attribute name="modifiers">{'invisible': [('is_broker', '=', True)]}</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='vat']" position="attributes">
+                            <attribute name="modifiers">{'invisible': [('is_broker', '=', True)]}</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="kbi_custom.view_res_partner_address_form_inherit">
+            <field name="name">kbi_custom.view.res.partner.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="l10n_sa_edi.sa_partner_address_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='city']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='city']" position="before">
+                    <field name="state_id"  />
+                    <field name="city_id" placeholder="City" class="o_address_city"
+                           modifiers="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

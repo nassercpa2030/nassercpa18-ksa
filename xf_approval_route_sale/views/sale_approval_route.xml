@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="sale_order_approval_form" model="ir.ui.view">
+            <field name="name">sale.order.approval.form</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="model">sale.order</field>
+            <field name="arch" type="xml">
+
+                <!-- تعديل زر الغاء -->
+                <xpath expr="//button[@name='action_cancel']" position="attributes">
+                    <attribute name="modifiers">{'invisible': ['|', ('state', 'not in', ['draft', 'sent', 'to approve', 'sale']), ('id', '=', False)]}</attribute>
+                </xpath>
+
+                <!-- زر الموافقة -->
+                <xpath expr="//button[@name='action_cancel']" position="before">
+                    <button name="button_approve" type="object" class="oe_highlight"
+                            string="Approve Order"
+                            modifiers="{'invisible':[('is_current_approver', '!=', True)], 'states': {'to approve': [('readonly', False)]}}"/>
+                </xpath>
+
+                <!-- الحقول الجديدة -->
+                <xpath expr="//field[@name='payment_term_id']" position="after">
+                    <field name="use_approval_route" invisible="1"/>
+                    <field name="approval_route_id"/>
+                </xpath>
+
+                <!-- صفحة Notebook للمراحل -->
+                <xpath expr="//notebook" position="inside">
+                    <page name="approval_route" string="Approval Route"
+                          modifiers="{'invisible':[('state', 'in', ['draft','sent']), ('approval_route_id', '=', False)]}">
+                        <field name="approval_route_stage_ids"/>
+                        <field name="is_current_approver" invisible="1"/>
+                    </page>
+                </xpath>
+
+            </field>
+        </record>
+    </data>
+</odoo>

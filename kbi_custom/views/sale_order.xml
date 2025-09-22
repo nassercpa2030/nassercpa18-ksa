@@ -1,0 +1,227 @@
+<odoo>
+    <data>
+
+        <!-- Inherit Sale Order Form (Approval + Custom Fields) -->
+        <record model="ir.ui.view" id="kbi_custom.view_order_form_approve_inherit">
+            <field name="name">kbi_custom.view.order.form.approve.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="xf_approval_route_sale.sale_order_approval_form"/>
+            <field name="arch" type="xml">
+                <!-- Modify attributes of approval_route_id -->
+                <xpath expr="//field[@name='approval_route_id']" position="attributes">
+                    <attribute name="modifiers">{'invisible':[('use_approval_route','=','no')],'required':[('use_approval_route','=','required')],'readonly':[('can_edit_approve','=',False)]}</attribute>
+                    <attribute name="force_save">1</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Inherit Sale Order Form (Buttons + Custom Fields) -->
+        <record model="ir.ui.view" id="kbi_custom.view_order_form_inherit">
+            <field name="name">kbi_custom.view.order.form.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+
+                <!-- Buttons -->
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button class="oe_stat_button" name="action_open_payment" type="object" icon="fa-money">
+                        <field name="payment_count" widget="statinfo" string="Payments"/>
+                    </button>
+                    <button class="oe_stat_button" name="action_open_broker_bill" type="object" icon="fa-pencil-square-o">
+                        <field name="broker_invoiced_amount" widget="statinfo" string="Broker Bills"/>
+                    </button>
+                </xpath>
+
+                <!-- Header -->
+                <xpath expr="//header" position="inside">
+                    <field name="is_current_approver"/>
+                    <button name="action_open_reject_sale_wizard" type="object" string="Reject Order"
+                        class="btn btn-danger"
+                        modifiers="{'invisible':['|', ('is_current_approver', '!=', True)]}"/>
+                    <button name="action_open_print_sale_wizard" type="object" class="oe_highlight" string="Print Offer/Contract"
+                        modifiers="{'invisible':[('state','in',['cancel','rejected'])]}"/>
+                </xpath>
+
+                <!-- Validity Date Required -->
+                <xpath expr="//sheet//field[@name='validity_date']" position="attributes">
+                    <attribute name="modifiers">{'required':[('state','not in',['sale','done'])]}</attribute>
+                </xpath>
+
+                <!-- Custom Fields after partner_shipping_id -->
+                <xpath expr="//sheet//field[@name='partner_shipping_id']" position="after">
+                    <field name="can_edit_analytic" invisible="1"/>
+                    <field name="project_stage_id"/>
+                    <field name="project_type_id" string="Department"/>
+                    <field name="project_budget" modifiers="{'readonly':[('state','!=','draft')]}"/>
+                    <field name="project_name" string="Contract Name"/>
+                    <field name="x_studio_contract_service" style="font-size:14px; font-weight:bold;"/>
+                    <field name="project_code" string="Code"/>
+                    <field name="multi_service"/>
+                    <field name="multi_years"/>
+                    <field name="multi_years_no"/>
+                    <field name="close_entry_date"/>
+                    <field name="close_entry_year"/>
+                    <field name="unpaid_total"/>
+                    <field name="paid_total"/>
+                    <field name="paid_percent"/>
+                    <field name="user_id"/>
+                    <field name="team_id"/>
+                    <field name="assigned_to"/>
+                    <field name="ass_from"/>
+                    <field name="ass_to_percentage"/>
+                    <field name="ass_to"/>
+                    <field name="analytic_account_id"/>
+                    <field name="agreement_id"/>
+                    <field name="broker_id" modifiers="{'invisible':[('state','not in',['sale','done'])]}"/>
+                    <field name="broker_amount"/>
+                    <field name="auditor" />
+                    <field name="broker_invoiced_amount" force_save="1" modifiers="{'invisible':[('state','not in',['sale','done'])]}"/>
+                    <field name="broker_uninvoiced_amount" force_save="1" modifiers="{'invisible':[('state','not in',['sale','done'])]}"/>
+                </xpath>
+
+                <!-- Payment Term Fields -->
+                <xpath expr="//sheet//field[@name='payment_term_id']" position="after">
+                    <field name="user_id"/>
+                    <field name="team_id"/>
+                    <field name="contract_date"/>
+                 
+                    <field name="audit_date" modifiers="{'readonly':[('from_crm','=',True)]}"/>
+                    <field name="account_year" modifiers="{'readonly':[('from_crm','=',True)]}"/>
+                    <field name="from_crm" invisible="1"/>
+                    <field name="contract_signature"/>
+                </xpath>
+
+                <!-- Hide some fields in order_line -->
+                <xpath expr="//field[@name='order_line']/list/field[@name='product_uom']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/list/field[@name='product_uom_qty']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/list/field[@name='name']" position="after">
+                    <field name="working_days"/>
+                    <field name="finance_service_ok" invisible="1"/>
+                    <field name="downpayment_ok" invisible="1"/>
+                    <field name="public_name" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/list/field[@name='product_id']" position="attributes">
+                    <attribute name="domain">['&amp;',('sale_ok', '=', True),'|',('finance_service_ok', '=', True),('downpayment_ok', '=', True), '|', ('company_id', '=', False),('company_id', '=', company_id)]</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/list/field[@name='product_template_id']" position="attributes">
+                    <attribute name="domain">['&amp;',('sale_ok', '=', True),'|',('finance_service_ok', '=', True),('downpayment_ok', '=', True)]</attribute>
+                </xpath>
+
+                <!-- First Payment & Totals -->
+<xpath expr="//div[@name='button_box']" position="before">
+    <div class="row">
+        <div class="col">
+            <label for="first_payment_id" string="First Payment"/>
+            <field name="first_payment_id"/>
+        </div>
+        <div class="col">
+            <label for="unpaid_total" string="Unpaid"/>
+            <field name="unpaid_total"/>
+        </div>
+        <div class="col">
+            <label for="paid_total" string="Paid"/>
+            <field name="paid_total"/>
+        </div>
+        <div class="col">
+            <label for="paid_percent" string="% Paid"/>
+            <field name="paid_percent"/>
+        </div>
+    </div>
+</xpath>
+
+
+                <!-- Reject Info -->
+                <xpath expr="//notebook" position="before">
+                    <group string="Reject Info" modifiers="{'invisible':[('state','!=','rejected')]}">
+                        <group>
+                            <field name="approve_uid" string="Reject By" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="approve_date" string="Reject Date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group modifiers="{'invisible':[('state','!=','rejected')]}">
+                        <field name="reject_reason" readonly="1"/>
+                    </group>
+                </xpath>
+
+                <!-- Extra Pages -->
+                <xpath expr="//notebook/page[last()]" position="after">
+                    <page string="Multi Audit Years">
+                        <group>
+                            <field name="sign_qrcode" widget="image"/>
+                        </group>
+                    </page>
+                    <page string="Print History">
+                        <field name="print_history_ids" readonly="1" force_save="1">
+                            <list>
+                                <field name="sale_id" invisible="1"/>
+                                <field name="user_id"/>
+                                <field name="date"/>
+                                <field name="sequence"/>
+                                <field name="report_id"/>
+                                <field name="report_template_id"/>
+                            </list>
+                        </field>
+                    </page>
+                    <page string="Sign">
+                        <group>
+                            <group>
+                                <field name="sign_qrcode" widget="image"/>
+                            </group>
+                            <group>
+                                <field name="uuid" readonly="1"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record model="ir.ui.view" id="kbi_custom.sale_order_view_search_inherit_quotation_inherit">
+            <field name="name">kbi_custom.sale_order.view.search.quotation.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+            <field name="arch" type="xml">
+                <xpath expr="." position="inside">
+                    <field name="project_type_id"/>
+                    <field name="project_name"/>
+                    <field name="project_code"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Print Wizard -->
+        <record model="ir.ui.view" id="kbi_custom.view_sale_order_print_wizard">
+            <field name="name">kbi_custom.view.sale.order.print.wizard</field>
+            <field name="model">sale.order.print.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="sale_id" modifiers="{'invisible':[('from_crm','=',False)]}" options="{'no_open': True, 'no_create': True}"/>
+                                <field name="report_id" modifiers="{'readonly':[('sale_id','=',False)]}" options="{'no_open': True, 'no_create': True}"/>
+                            </group>
+                            <group>
+                                <field name="from_crm" invisible="1"/>
+                                <field name="exist_sale_ids" invisible="1"/>
+                                <field name="exist_report_ids" invisible="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button string="Print" name="print_report" type="object" class="oe_highlight"/>
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

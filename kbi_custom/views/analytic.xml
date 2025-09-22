@@ -1,0 +1,27 @@
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="kbi_custom.account_analytic_plan_form_view_inherit">
+            <field name="name">kbi_custom.account.analytic.plan.form.view.inherit</field>
+            <field name="model">account.analytic.plan</field>
+            <field name="inherit_id" ref="analytic.account_analytic_plan_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[last()]" position="after">
+                    <page string="Approval Routes">
+                        <field name="approval_route_ids"/>
+                    </page>
+                    <page string="Broker">
+                        <field name="broker_ids">
+                            <list editable="bottom">
+                               
+                                
+                                
+                               
+                            </list>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

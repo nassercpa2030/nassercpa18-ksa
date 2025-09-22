@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_xf_approval_route_base" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.approval.route.base</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <!-- أضف الـ block داخل الـ form مباشرة -->
+            <xpath expr="//form" position="inside">
+                <group string="Approval Settings" groups="xf_approval_route_base.group_approval_route_manager">
+
+                    <group string="Roles">
+                        <field name="approval_role_count"/>
+                        <button name="%(xf_approval_route_base.approval_role_form_act_window)d"
+                                type="action" string="Add Approval Role"/>
+                        <button name="%(xf_approval_route_base.approval_role_act_window)d"
+                                type="action" string="Manage Approval Roles"/>
+                    </group>
+
+                    <group string="Routes">
+                        <field name="approval_route_count"/>
+                        <button name="%(xf_approval_route_base.approval_route_form_act_window)d"
+                                type="action" string="Add Approval Route"/>
+                        <button name="%(xf_approval_route_base.approval_route_act_window)d"
+                                type="action" string="Manage Approval Routes"/>
+                    </group>
+
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Action لفتح الإعدادات -->
+    <record id="action_approval_route_base_configuration" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'xf_approval_route_base'}</field>
+    </record>
+</odoo>
