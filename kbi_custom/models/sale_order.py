@@ -45,7 +45,7 @@ class SaleOrder ( models.Model ) :
     project_name = fields.Char ( string='Project Name' )
     project_code = fields.Char ( string='Project Code' )
     contract_signature = fields.Boolean ( "Contract Signature" )
-    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' , required=True )
+    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
                                             domain="[('plan_id', '=', project_type_id)]" ,
                                             compute='_compute_analytic_account_id' , readonly=False , store=True )
@@ -273,7 +273,7 @@ class SaleOrder ( models.Model ) :
     project_name = fields.Char ( string='Project Name' )
     project_code = fields.Char ( string='Project Code' )
     contract_signature = fields.Boolean ( "Contract Signature" )
-    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' , required=True )
+    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type'  )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
                                             domain="[('plan_id', '=', project_type_id)]" , required=True ,
                                             compute='_compute_analytic_account_id' , readonly=False , store=True )
