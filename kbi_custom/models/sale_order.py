@@ -241,7 +241,7 @@ class SaleOrder ( models.Model ) :
         return {
             'name' : 'Create Payment' ,
             'type' : 'ir.actions.act_window' ,
-            'view_mode' : 'tree,form' ,
+            'view_mode' : 'list,form' ,
             'res_model' : 'account.payment' ,
             'domain' : [('sale_order_ids' , 'in' , self.ids)] ,
             'context' : {
