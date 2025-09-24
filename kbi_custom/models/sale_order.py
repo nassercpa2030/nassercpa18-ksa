@@ -23,7 +23,7 @@ class SaleOrder ( models.Model ) :
     close_entry_year = fields.Integer ( string="Close Entry Year" , readonly=False )
     date = fields.Datetime ( string='Date' )
     review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Manager',readonly=False ,domain =[('hr.employee.job_title' , '=' , 'مدير مراجعة')])
-    user_id=fields.Many2one(related='review_manager_id','User')
+    user_id=fields.Many2one(related='review_manager_id',string='User')
     sequence = fields.Integer ( string='Sequence' , )
     report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
                                   domain="[('id', 'in', exist_report_ids)]" )
