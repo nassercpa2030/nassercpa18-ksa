@@ -22,6 +22,7 @@ class SaleOrder ( models.Model ) :
     close_entry_date = fields.Date ( string="Close Entry Date" , readonly=True )
     close_entry_year = fields.Integer ( string="Close Entry Year" , readonly=False )
     date = fields.Datetime ( string='Date' )
+    user_id = fields.Many2one ( comodel_name='hr.employee' , string='User',domain =[('hr.employee.job_title' , '=' , 'مدير مراجعة')])
     sequence = fields.Integer ( string='Sequence' , )
     report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
                                   domain="[('id', 'in', exist_report_ids)]" )
@@ -536,7 +537,7 @@ class SaleOrderPrintHistory ( models.Model ) :
     _order = 'date , sequence, sale_id desc'
 
     sale_id = fields.Many2one ( comodel_name='sale.order' , string='Sale Order' )
-    user_id = fields.Many2one ( comodel_name='hr.employee' , string='User',domain =[('hr.employee.job_title' , '=' , 'مدير مراجعة')])
+    user_id = fields.Many2one ( comodel_name='res.users' , string='User')
     date = fields.Datetime ( string='Date' , )
     sequence = fields.Integer ( string='Sequence' , )
     report_id = fields.Many2one ( comodel_name='product.report.template' , string='Report' , )
