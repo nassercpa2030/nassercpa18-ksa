@@ -6,13 +6,14 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='category_id']" position="after">
-                     <field name="is_broker"/>
-                     <field name="number_700" style ="font-weight:bold; font-size:14px;"/>
-                </xpath>
-                <xpath expr="//field[@name='vat']" position="before">
+                <!--xpath expr="//field[@name='category_id']" position="after">
+                     
+                </xpath-->
+                <xpath expr="//field[@name='partner_vat_placeholder']" position="after">
                    
                             <field name='nationality' modifiers="{'invisible': [('is_broker', '=', True)]}"/>
+                            <field name="is_broker"/>
+                            <field name="number_700" style ="font-weight:bold; font-size:14px;"/>
                             <field name="agreement_id" modifiers="{'invisible': [('is_broker', '=', True)]}"/>
                 </xpath>
             </field>
