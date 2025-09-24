@@ -24,7 +24,7 @@ class SaleOrder ( models.Model ) :
     date = fields.Datetime ( string='Date' )
     #review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Manager',readonly=False ,domain =[('job_id' , '=' , 'مدير مراجعة')])
     review_manager_id=fields.Many2one(comodel_name='res.users',string='Manager',readonly=False )
-    user_id=fields.Many2one('res.users',related='review_manager_id',string='User',readonly=False)
+    user_id=fields.Many2one(related='review_manager_id',string='User',readonly=False)
     sequence = fields.Integer ( string='Sequence' , )
     report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
                                   domain="[('id', 'in', exist_report_ids)]" )
