@@ -65,11 +65,7 @@
                     <field name="paid_total"/>
                     <field name="paid_percent"/>
                     <!--field name="user_id"/>
-                    <field name="team_id"/-->
-                    <field name="assigned_to"/>
-                    <field name="ass_from"/>
-                    <field name="ass_to_percentage"/>
-                    <field name="ass_to"/>
+                    <field name="team_id"/-->           
                     <field name="analytic_account_id"/>
                     <field name="agreement_id"/>
                     <field name="broker_id" modifiers="{'invisible':[('state','not in',['sale','done'])]}"/>
@@ -81,10 +77,13 @@
 
                 <!-- Payment Term Fields -->
                 <xpath expr="//sheet//field[@name='payment_term_id']" position="after">
-                    <field name="review_manager_id"/>
+                    <field name="user_id"/>
                     <field name="team_id"/>
                     <field name="contract_date"/>
-                 
+                    <field name="review_manager_id"/> 
+                     <field name="ass_from"/>
+                    <field name="ass_to"/>
+                    <field name="ass_to_percentage"/>
                     <field name="audit_date" modifiers="{'readonly':[('from_crm','=',True)]}"/>
                     <field name="account_year" modifiers="{'readonly':[('from_crm','=',True)]}"/>
                     <field name="from_crm" invisible="1"/>
