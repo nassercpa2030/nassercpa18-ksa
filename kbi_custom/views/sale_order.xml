@@ -78,7 +78,7 @@
                 <!-- Payment Term Fields -->
                 <xpath expr="//sheet//field[@name='payment_term_id']" position="after">
                     <field name="user_id"/>
-                    <field name="team_id"/>
+                    <!--field name="team_id"/-->
                     <field name="contract_date"/>
                     <field name="review_manager_id"/> 
                      <field name="ass_from"/>
