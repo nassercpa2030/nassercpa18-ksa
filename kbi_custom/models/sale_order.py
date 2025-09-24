@@ -38,7 +38,7 @@ class SaleOrder ( models.Model ) :
     paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count" )
     unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count" )
     paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" )
-    auditor=fields.Many2one(string="Auditor" , comodel_name="hr.employee",domain=[('job_id' ,'!=,'مدير مراجعة')])
+    auditor=fields.Many2one(string="Auditor" , comodel_name="hr.employee",domain =[('job_id' , '!=' , 'مدير مراجعة')])
     
     # payment_count = fields.Integer(compute='_compute_payment_count')
     # paid_total = fields.Float(compute='_compute_payment_count')
