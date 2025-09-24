@@ -127,7 +127,7 @@
         </div>
         <div class="col">
             <label for="paid_percent" string="% Paid"/>
-            <field name="paid_percent"/>
+            <field name="paid_percent" widget="percentage" readonly="1"/>
         </div>
     </div>
 </xpath>
