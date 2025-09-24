@@ -114,20 +114,20 @@
 <xpath expr="//div[@name='button_box']" position="before">
     <div class="row">
         <div class="col">
-            <label for="first_payment_date" string="First Payment"/>
-            <field name="first_payment_date: "/>
+            <label for="first_payment_date" string="First Payment: "/>
+            <field name="first_payment_date"/>
         </div>
         <div class="col">
-            <label for="unpaid_total" string="Unpaid"/>
-            <field name="unpaid_total: " widget="monetary"  readonly="1"/>
+            <label for="unpaid_total" string="Unpaid: "/>
+            <field name="unpaid_total" widget="monetary"  readonly="1"/>
         </div>
         <div class="col">
-            <label for="paid_total" string="Paid"/>
-            <field name="paid_total: " widget="monetary"  readonly="1"/>
+            <label for="paid_total" string="Paid: "/>
+            <field name="paid_total" widget="monetary"  readonly="1"/>
         </div>
         <div class="col">
-            <label for="paid_percent" string="% Paid"/>
-            <field name="paid_percent: "  readonly="1"/>
+            <label for="paid_percent" string="% Paid: "/>
+            <field name="paid_percent"  readonly="1"/>
         </div>
     </div>
 </xpath>
