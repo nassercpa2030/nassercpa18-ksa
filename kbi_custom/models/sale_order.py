@@ -394,7 +394,7 @@ class SaleOrder ( models.Model ) :
         return {
             'type' : 'ir.actions.act_window' ,
             'name' : 'Broker Bill' ,
-            'view_mode' : 'tree,form' ,
+            'view_mode' : 'list,form' ,
             'res_model' : 'account.move' ,
             'target' : 'current' ,
             'domain' : [('broker_sale_id' , '=' , self.id) , ('is_broker_move' , '=' , True)] ,
@@ -536,9 +536,10 @@ class SaleOrderPrintHistory ( models.Model ) :
     _order = 'date , sequence, sale_id desc'
 
     sale_id = fields.Many2one ( comodel_name='sale.order' , string='Sale Order' )
-    user_id = fields.Many2one ( comodel_name='res.users' , string='User' )
+    user_id = fields.Many2one ( comodel_name='hr.employee' , string='User',domain =[('hr.employee.job_title' , '=' , 'مدير مراجعة')])
     date = fields.Datetime ( string='Date' , )
     sequence = fields.Integer ( string='Sequence' , )
     report_id = fields.Many2one ( comodel_name='product.report.template' , string='Report' , )
     report_template_id = fields.Many2one ( comodel_name='ir.actions.report' , string='Report Template' ,
                                            related="report_id.report_template_id" )
+
