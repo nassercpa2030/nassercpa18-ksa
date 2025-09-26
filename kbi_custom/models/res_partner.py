@@ -32,3 +32,35 @@ class ResPartner ( models.Model ) :
             if rec.number_700 and not re.match ( pattern , rec.number_700 ) :
                 raise ValidationError ( "You must enter numbers only and start with 7" )
 
+    def action_merge_duplicates(self) :
+        """
+        دمج كل الشركاء المكررة في سجل واحد عند الضغط على الزر
+        """
+        # حصر جميع أسماء الشركات المكررة
+        self.env.cr.execute ( """
+            SELECT name, MIN(id) as main_id
+            FROM res_partner
+            WHERE active = TRUE
+            GROUP BY name
+            HAVING COUNT(*) > 1
+        """ )
+        duplicates = self.env.cr.dictfetchall ()
+
+        for d in duplicates :
+            name = d['name']
+            main_id = d['main_id']
+
+            # كل السجلات المكررة ما عدا الرئيسي
+            dup_partners = self.env['res.partner'].search ( [('name' , '=' , name) , ('id' , '!=' , main_id)] )
+
+            for dup in dup_partners :
+                # تحديث المراجع في الجداول الرئيسية
+                self.env['account.move'].search ( [('partner_id' , '=' , dup.id)] ).write ( {'partner_id' : main_id} )
+                self.env['sale.order'].search ( [('partner_id' , '=' , dup.id)] ).write ( {'partner_id' : main_id} )
+                self.env['purchase.order'].search ( [('partner_id' , '=' , dup.id)] ).write ( {'partner_id' : main_id} )
+                # حذف السجل المكرر بعد الدمج
+                dup.unlink ()
+
+        return True
+
+
