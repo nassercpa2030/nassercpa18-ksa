@@ -34,33 +34,37 @@ class ResPartner ( models.Model ) :
 
     def action_merge_specific_duplicates(self) :
         """
-               دمج كل الشركاء المكررة في Delivery Address فقط عند الضغط على الزر
-               """
-        # الحصول على أسماء مكررة في Delivery Address
+        دمج كل الشركاء المكررة بناءً على الاسم فقط.
+        السجل الأول يصبح الرئيسي، والباقي يتم دمجهم فيه.
+        """
+        # الحصول على الأسماء المكررة
         self._cr.execute ( """
-                   SELECT name
-                   FROM res_partner
-                   WHERE type='delivery' AND active=TRUE
-                   GROUP BY name
-                   HAVING COUNT(*) > 1
-               """ )
+            SELECT name
+            FROM res_partner
+            WHERE active=TRUE
+            GROUP BY name
+            HAVING COUNT(*) > 1
+        """ )
         duplicate_names = [row[0] for row in self._cr.fetchall ()]
         if not duplicate_names :
             return {'type' : 'ir.actions.act_window_close'}
 
         for name in duplicate_names :
-            partners = self.env['res.partner'].search (
-                [('type' , '=' , 'delivery') , ('name' , '=' , name) , ('active' , '=' , True)] )
-            main_partner = partners[0]
+            # جميع الشركاء بنفس الاسم
+            partners = self.env['res.partner'].search ( [('name' , '=' , name) , ('active' , '=' , True)] )
+            main_partner = partners[0]  # السجل الرئيسي
             for dup in partners[1 :] :
-                # تحديث المراجع
+                # تحديث كل المراجع على السجل الرئيسي
                 self.env['account.move'].search ( [('partner_id' , '=' , dup.id)] ).write (
                     {'partner_id' : main_partner.id} )
                 self.env['sale.order'].search ( [('partner_id' , '=' , dup.id)] ).write (
                     {'partner_id' : main_partner.id} )
                 self.env['purchase.order'].search ( [('partner_id' , '=' , dup.id)] ).write (
                     {'partner_id' : main_partner.id} )
+                # نقل الـ child partners إذا وجدت
+                dup.child_ids.write ( {'parent_id' : main_partner.id} )
                 # حذف السجل المكرر
                 dup.unlink ()
 
         return {'type' : 'ir.actions.act_window_close'}
+
