@@ -83,4 +83,4 @@ class ResPartner ( models.Model ) :
                 # حذف السجل المكرر بعد الدمج
                 dup.unlink ()
 
-        return True
+        return {'type': 'ir.actions.act_window_close'}
