@@ -34,45 +34,25 @@ class ResPartner ( models.Model ) :
 
     def action_merge_specific_duplicates(self) :
         """
-        دمج الشركاء المكررة فقط للأسماء اللي سببت خطأ Multiple Matches في Invoice Address
-        """
-        # قائمة الأسماء اللي فيها مشكلة
-        duplicate_names = [
-            "شركة المتحدون العرب للخدمات اللوجستية" ,
-            "شركة سام العربية للمقاولات" ,
-            "شركة الزمردة للمعادن الثمينة" ,
-            "جناح الصرح للسياحة والسفر شركة شخص واحد" ,
-            "شركة مزايا حلوة المحدودة شخص واحد" ,
-            "شركة اوفا المحدودة" ,
-            "شركة صرح الأسس للمقاولات شخص واحد" ,
-            "شركة انجاز الاقتصادية التجارية" ,
-            "مكتب علي احمد عيسي ال زواد للاستشارات الهندسية" ,
-            "شركة لعبتي للمرح لالعاب الاطفال شركة شخص واحد" ,
-            "شركة شواهد الابداع للمقاولات شخص واحد" ,
-            "شركة أركان اللحوم لأم الحمام للحوم الطازجة" ,
-            "شركة ال ظبية للمقاولات المحدودة" ,
-            "شركة قمر العروبة المحدودة" ,
-            "شركة حلول اكن للاستشارات الهندسية" ,
-            "شركة نجم الشبكات للاتصالات وتقنية المعلومات" ,
-            "شركة ركاز البيطرية" ,
-            "شركة حزام كوم التجارية" ,
-            "شركة انجزني العربية للتسويق" ,
-            "شركة ابناء محمد عوض سرورالحربي" ,
-            "مؤسسةمركز دان لطب الاسنان" ,
-            "شركة مسكن العربية للاستثمار والتطوير العقاري" ,
-            # ... أضف باقي الأسماء اللي ظهرت في الخطأ
-        ]
+               دمج كل الشركاء المكررة في Delivery Address فقط عند الضغط على الزر
+               """
+        # الحصول على أسماء مكررة في Delivery Address
+        self._cr.execute ( """
+                   SELECT name
+                   FROM res_partner
+                   WHERE type='delivery' AND active=TRUE
+                   GROUP BY name
+                   HAVING COUNT(*) > 1
+               """ )
+        duplicate_names = [row[0] for row in self._cr.fetchall ()]
+        if not duplicate_names :
+            return {'type' : 'ir.actions.act_window_close'}
 
         for name in duplicate_names :
-            # حصر السجل الرئيسي
-            main_partner = self.env['res.partner'].search ( [('name' , '=' , name)] , order='id ASC' , limit=1 )
-            if not main_partner :
-                continue
-
-            # باقي السجلات المكررة
-            dup_partners = self.env['res.partner'].search ( [('name' , '=' , name) , ('id' , '!=' , main_partner.id)] )
-
-            for dup in dup_partners :
+            partners = self.env['res.partner'].search (
+                [('type' , '=' , 'delivery') , ('name' , '=' , name) , ('active' , '=' , True)] )
+            main_partner = partners[0]
+            for dup in partners[1 :] :
                 # تحديث المراجع
                 self.env['account.move'].search ( [('partner_id' , '=' , dup.id)] ).write (
                     {'partner_id' : main_partner.id} )
@@ -80,7 +60,7 @@ class ResPartner ( models.Model ) :
                     {'partner_id' : main_partner.id} )
                 self.env['purchase.order'].search ( [('partner_id' , '=' , dup.id)] ).write (
                     {'partner_id' : main_partner.id} )
-                # حذف السجل المكرر بعد الدمج
+                # حذف السجل المكرر
                 dup.unlink ()
 
-        return {'type': 'ir.actions.act_window_close'}
+        return {'type' : 'ir.actions.act_window_close'}
