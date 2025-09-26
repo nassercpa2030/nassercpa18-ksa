@@ -32,35 +32,55 @@ class ResPartner ( models.Model ) :
             if rec.number_700 and not re.match ( pattern , rec.number_700 ) :
                 raise ValidationError ( "You must enter numbers only and start with 7" )
 
-    def action_merge_duplicates(self) :
+    def action_merge_specific_duplicates(self) :
         """
-        دمج كل الشركاء المكررة في سجل واحد عند الضغط على الزر
+        دمج الشركاء المكررة فقط للأسماء اللي سببت خطأ Multiple Matches في Invoice Address
         """
-        # حصر جميع أسماء الشركات المكررة
-        self.env.cr.execute ( """
-            SELECT name, MIN(id) as main_id
-            FROM res_partner
-            WHERE active = TRUE
-            GROUP BY name
-            HAVING COUNT(*) > 1
-        """ )
-        duplicates = self.env.cr.dictfetchall ()
+        # قائمة الأسماء اللي فيها مشكلة
+        duplicate_names = [
+            "شركة المتحدون العرب للخدمات اللوجستية" ,
+            "شركة سام العربية للمقاولات" ,
+            "شركة الزمردة للمعادن الثمينة" ,
+            "جناح الصرح للسياحة والسفر شركة شخص واحد" ,
+            "شركة مزايا حلوة المحدودة شخص واحد" ,
+            "شركة اوفا المحدودة" ,
+            "شركة صرح الأسس للمقاولات شخص واحد" ,
+            "شركة انجاز الاقتصادية التجارية" ,
+            "مكتب علي احمد عيسي ال زواد للاستشارات الهندسية" ,
+            "شركة لعبتي للمرح لالعاب الاطفال شركة شخص واحد" ,
+            "شركة شواهد الابداع للمقاولات شخص واحد" ,
+            "شركة أركان اللحوم لأم الحمام للحوم الطازجة" ,
+            "شركة ال ظبية للمقاولات المحدودة" ,
+            "شركة قمر العروبة المحدودة" ,
+            "شركة حلول اكن للاستشارات الهندسية" ,
+            "شركة نجم الشبكات للاتصالات وتقنية المعلومات" ,
+            "شركة ركاز البيطرية" ,
+            "شركة حزام كوم التجارية" ,
+            "شركة انجزني العربية للتسويق" ,
+            "شركة ابناء محمد عوض سرورالحربي" ,
+            "مؤسسةمركز دان لطب الاسنان" ,
+            "شركة مسكن العربية للاستثمار والتطوير العقاري" ,
+            # ... أضف باقي الأسماء اللي ظهرت في الخطأ
+        ]
 
-        for d in duplicates :
-            name = d['name']
-            main_id = d['main_id']
+        for name in duplicate_names :
+            # حصر السجل الرئيسي
+            main_partner = self.env['res.partner'].search ( [('name' , '=' , name)] , order='id ASC' , limit=1 )
+            if not main_partner :
+                continue
 
-            # كل السجلات المكررة ما عدا الرئيسي
-            dup_partners = self.env['res.partner'].search ( [('name' , '=' , name) , ('id' , '!=' , main_id)] )
+            # باقي السجلات المكررة
+            dup_partners = self.env['res.partner'].search ( [('name' , '=' , name) , ('id' , '!=' , main_partner.id)] )
 
             for dup in dup_partners :
-                # تحديث المراجع في الجداول الرئيسية
-                self.env['account.move'].search ( [('partner_id' , '=' , dup.id)] ).write ( {'partner_id' : main_id} )
-                self.env['sale.order'].search ( [('partner_id' , '=' , dup.id)] ).write ( {'partner_id' : main_id} )
-                self.env['purchase.order'].search ( [('partner_id' , '=' , dup.id)] ).write ( {'partner_id' : main_id} )
+                # تحديث المراجع
+                self.env['account.move'].search ( [('partner_id' , '=' , dup.id)] ).write (
+                    {'partner_id' : main_partner.id} )
+                self.env['sale.order'].search ( [('partner_id' , '=' , dup.id)] ).write (
+                    {'partner_id' : main_partner.id} )
+                self.env['purchase.order'].search ( [('partner_id' , '=' , dup.id)] ).write (
+                    {'partner_id' : main_partner.id} )
                 # حذف السجل المكرر بعد الدمج
                 dup.unlink ()
 
         return True
-
-
