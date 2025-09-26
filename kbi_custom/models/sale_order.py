@@ -18,6 +18,7 @@ class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
     contract_date = fields.Date ( string='Contract Date' , readonly=False )
+    partner_shipping_id = fields.Many2one(string='Delivery Address',required=False, readonly=False)
     audit_date = fields.Date ( string='Audit Date' , readonly=False )
     close_entry_date = fields.Date ( string="Close Entry Date" , readonly=True )
     close_entry_year = fields.Integer ( string="Close Entry Year" , readonly=False )
