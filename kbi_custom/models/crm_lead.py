@@ -122,7 +122,7 @@ class CrmLead(models.Model):
         ('b','إيرادات إلي 200 مليون ريال'),
         ('bbb','إيرادات أكبر من 200 مليون ريال'),
         ('bb','إيرادات من 0 إلي مليون ريال'),
-        ('cc','إيرادات أكبر من 1 بليون ريال')]وstring="( تصنيف حجم العميل ) / Size of Revenu ",store=True)
+        ('cc','إيرادات أكبر من 1 بليون ريال')],string="( تصنيف حجم العميل ) / Size of Revenu ",store=True)
     classification_key_code = fields.Char( string="Classification Code", compute="_compute_classification_key_code", store=True)
     building_number = fields.Char(string='Building Number', related='partner_id.l10n_sa_edi_building_number', readonly=False)
     polt_number = fields.Char(string='Plot Number', related='partner_id.l10n_sa_edi_plot_identification', readonly=False)
