@@ -13,7 +13,7 @@ class ProjectProject(models.Model):
 
     has_closed_entry = fields.Boolean(string='Has Closed Entry', default=False)
     code = fields.Char(string='Code')
-    sale_person= fields.Text(string="Salesperson",readonly=False)
+    sale_person2= fields.Text(string="Salesperson",readonly=False)
     contract_name = fields.Char(string='Contract Name')
     financial_period_date = fields.Date(string='Financial Period Date')
     stage_name = fields.Char(string='Stage Name', related='stage_id.name', store=False)
