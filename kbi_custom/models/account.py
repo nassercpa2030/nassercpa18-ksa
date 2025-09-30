@@ -15,6 +15,7 @@ class AccountMove ( models.Model ) :
         store=True ,
         readonly=False
     )
+    sale_order_test=fields.Char(string="Sale Order Refrence", readonly=False,Required=False)
 
     def action_post(self):
         # ترحيل الفواتير فورًا مع تجاوز جميع تحقق E-Invoicing
