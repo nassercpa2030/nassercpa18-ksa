@@ -83,6 +83,7 @@ class CrmLead(models.Model):
     unit_price = fields.Float(string='Unit Price')
     tax_ids = fields.Many2many('account.tax', string='Taxes')
     allow_create_agreement = fields.Boolean(string='Allow Create Agreement', related="stage_id.allow_create_agreement")
+    accual_customer=fields.Boolean(string="Verfied Customer" ,readonly=False, required=False)
     name= fields.Char(string="Opportunity" ,required=False ,readonly=False )
 
     # customer_info
