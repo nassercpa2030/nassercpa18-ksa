@@ -42,7 +42,7 @@ class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
     email_from_required = fields.Boolean(string='Is Email Required', related="stage_id.email_from_required")
-    company_name=fields.Char(string='Company Name',required=False,readonly=False)
+    company_name_new=fields.Char(string='Company Name',required=False,readonly=False)
     phone_required = fields.Boolean(string='Is Phone Required', related="stage_id.phone_required")
     street_required = fields.Boolean(string='Is Street Required', related="stage_id.street_required")
     street2_required = fields.Boolean(string='Is Street2 Required', related="stage_id.street2_required")
