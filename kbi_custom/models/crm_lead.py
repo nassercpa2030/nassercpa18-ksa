@@ -85,7 +85,7 @@ class CrmLead(models.Model):
 
     # customer_info
     partner_id = fields.Many2one(
-        'res.partner', string='Customer', check_company=True, index=True, tracking=10, required=True,
+        'res.partner', string='Customer', check_company=True, index=True, tracking=10,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         help="Linked partner (optional). Usually created when converting the lead. You can find a partner by its Name, TIN, Email or Internal Reference.")
     email_from = fields.Char('Email', tracking=True, index='trigram', related='partner_id.email', readonly=False)
