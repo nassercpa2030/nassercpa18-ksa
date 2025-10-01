@@ -36,7 +36,7 @@
                     <page string="Analytic Accounts" modifiers="{'invisible': [('finance_service_ok', '=', False)]}" >
 
                         <field name="product_analytic_ids">
-                            <list editable="bottom">
+                            <list editable="bottom" readonly=False>
                                
                                 <field name="product_id" invisible="1"/>
                                 <field name="analytic_plan_id"/>
