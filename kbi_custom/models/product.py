@@ -42,6 +42,7 @@ class ProductAnalyticAccount(models.Model):
     _name = 'product.analytic.account'
 
     product_tmpl_id = fields.Many2one('product.template', string='Product Template')
-    product_id = fields.Many2one('product.product', string='Product', related='product_tmpl_id.product_variant_id')
+   # product_id = fields.Many2one('product.product', string='Product', related='product_tmpl_id.product_variant_id')
+    product_id = fields.Many2one('product.product', string='Product')
     analytic_plan_id = fields.Many2one('account.analytic.plan', string='Analytic Plan', required=True,readony=False)
     analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account', required=True,readonly=False, domain="[('plan_id', '=', analytic_plan_id)]")
