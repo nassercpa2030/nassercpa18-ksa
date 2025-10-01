@@ -16,7 +16,7 @@ class ProductTemplate(models.Model):
     analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account', required=False, domain="[('plan_id', '=', analytic_plan_id)]")
     report_template_ids = fields.One2many(comodel_name='product.report.template', inverse_name="product_tmpl_id", string='Report Templates')
     report_template_id = fields.Many2one('ir.actions.report', string='Report Template', required=True)
-    product_analytic_ids = fields.Many2many(comodel_name='product.analytic.account', inverse_name='product_tmpl_id', string='Products')
+    product_analytic_ids = fields.One2many(comodel_name='product.analytic.account', inverse_name='product_tmpl_id', string='Products')
     public_name = fields.Char(string='Public Name')
     super_report_user_ids = fields.Many2many(comodel_name='res.users', string='Super Report Users')
 class ProductProduct(models.Model):
@@ -25,7 +25,7 @@ class ProductProduct(models.Model):
     finance_service_ok = fields.Boolean(string='Revenue M - Analysis', related='product_tmpl_id.finance_service_ok')
     downpayment_ok = fields.Boolean(string='Downpayment Service', related='product_tmpl_id.downpayment_ok')
     report_template_ids = fields.One2many(comodel_name='product.report.template', string='Report Templates',inverse_name="product_id", related='product_tmpl_id.report_template_ids')
-    product_analytic_ids = fields.Many2many(comodel_name='product.analytic.account', inverse_name='product_id', string='Products', related='product_tmpl_id.product_analytic_ids')
+    product_analytic_ids = fields.One2many(comodel_name='product.analytic.account', inverse_name='product_id', string='Products', related='product_tmpl_id.product_analytic_ids')
     public_name = fields.Char(string='Public Name', related='product_tmpl_id.public_name')
     super_report_user_ids = fields.Many2many(comodel_name='res.users', string='Super Report Users', related='product_tmpl_id.super_report_user_ids')
 
