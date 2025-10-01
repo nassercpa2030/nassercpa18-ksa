@@ -32,18 +32,6 @@
                             </list>
                         </field>
                     </page>
-                        <page string="Analytic Accounts test" modifiers="{'invisible': [('finance_service_ok', '=', False)]}" groups="kbi_custom.can_add_print_template">
-                       
-                        <field name="report_template_ids">
-                            <list editable="bottom">
-                                  <field name="product_id" />
-                                <field name="analytic_plan_id"/>
-                                <field name="analytic_account_id"/>
-                                <field name="allowed_users_ids" widget="many2many_tags"/>
-                              
-                            </list>
-                        </field>
-                    </page>
                     <page string="Analytic Accounts" modifiers="{'invisible': [('finance_service_ok', '=', False)]}" >
                         <field name="product_analytic_ids">
                             <list editable="bottom">                               
