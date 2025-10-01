@@ -18,20 +18,21 @@ class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
     contract_date = fields.Date ( string='Contract Date' , readonly=False )
-    partner_shipping_id = fields.Many2one(string='Delivery Address',required=False, readonly=False)
-    archived_sale=fields.Boolean('Archived' ,readonly=False,required=False, default=False)
-    amount_tax=fields.Float("Taxes",readonly=False ,required=False)
+    partner_shipping_id = fields.Many2one ( string='Delivery Address' , required=False , readonly=False )
+    archived_sale = fields.Boolean ( 'Archived' , readonly=False , required=False , default=False )
+    amount_tax = fields.Float ( "Taxes" , readonly=False , required=False )
     audit_date = fields.Date ( string='Audit Date' , readonly=False )
     close_entry_date = fields.Date ( string="Close Entry Date" , readonly=True )
     close_entry_year = fields.Integer ( string="Close Entry Year" , readonly=False )
     date = fields.Datetime ( string='Date' )
-    review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Assigned To',readonly=False ,domain =[('job_id' , '=' , 'مدير مراجعة')])
-    #review_manager_id=fields.Many2one(comodel_name='res.users',string='Manager',readonly=False )
-    user_id=fields.Many2one('res.users',string='User',readonly=False)
+    review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Assigned To' , readonly=False ,
+                                          domain=[('job_id' , '=' , 'مدير مراجعة')] )
+    # review_manager_id=fields.Many2one(comodel_name='res.users',string='Manager',readonly=False )
+    user_id = fields.Many2one ( 'res.users' , string='User' , readonly=False )
     sequence = fields.Integer ( string='Sequence' , )
     report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
                                   domain="[('id', 'in', exist_report_ids)]" )
-    x_studio_contract_service = fields.Many2one(comodel_name='product.product' , string="Contract_service")
+    x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="Contract_service" )
     report_template_id = fields.Many2one ( comodel_name='ir.actions.report' , string='Report Template' ,
                                            related="report_id.report_template_id" )
     account_year = fields.Integer ( string='Year' , required=True , default=lambda self : fields.Date.today ().year )
@@ -41,8 +42,9 @@ class SaleOrder ( models.Model ) :
     paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count" )
     unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count" )
     paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" )
-    auditor=fields.Many2one(string="Auditor" , comodel_name="hr.employee",domain =[('job_id' , '!=' , 'مدير مراجعة')])
-    
+    auditor = fields.Many2one ( string="Auditor" , comodel_name="hr.employee" ,
+                                domain=[('job_id' , '!=' , 'مدير مراجعة')] )
+
     # payment_count = fields.Integer(compute='_compute_payment_count')
     # paid_total = fields.Float(compute='_compute_payment_count')
     # unpaid_total = fields.Float(compute='_compute_payment_count')
@@ -88,12 +90,14 @@ class SaleOrder ( models.Model ) :
     ] , string="Project Files State" , store=True )
     # identifying new variable not signed by _customer
     state = fields.Selection (
-        [('customer_notsigned' , 'NOT_Customer_Signed') , ('done' , 'Locked') , ('archive2024' , 'Archive2024') ,('to approve' , 'To Approve') ,
+        [('customer_notsigned' , 'NOT_Customer_Signed') , ('done' , 'Locked') , ('archive2024' , 'Archive2024') ,
+         ('to approve' , 'To Approve') ,
          ('draft' , 'Quotation') , ('archived' , 'Archived') ,
-         ('cancel' , 'Cancelled') , ('archive2025' , 'Archive2025') , ('sale' , 'Sales Order')] , store=True, readonly=False )
+         ('cancel' , 'Cancelled') , ('archive2025' , 'Archive2025') , ('sale' , 'Sales Order')] , store=True ,
+        readonly=False )
     project_id = fields.Many2one ( 'project.project' , string="المشروع" )
-    auto_code = fields.Char ( string="Auto Code" , readonly=False ,store=True )
-    x_studio_auto_code =fields.Char ( string="Auto Code_printing" ,related='auto_code',readonly=False,store=True )
+    auto_code = fields.Char ( string="Auto Code" , readonly=False , store=True )
+    x_studio_auto_code = fields.Char ( string="Auto Code_printing" , related='auto_code' , readonly=False , store=True )
     assigned_to = fields.Many2one ( 'res.users' , string="Assigned To" )
     ass_to = fields.Float ( string="Ass_to" )
     ass_from = fields.Float ( string="Ass_from" )
@@ -107,7 +111,8 @@ class SaleOrder ( models.Model ) :
     mulit_year_price1 = fields.Float ( string="Price1" , readonly=False )
     mulit_year_price2 = fields.Float ( string="Price2" , readonly=False )
     mulit_year_price3 = fields.Float ( string="Price3" , readonly=False )
-    partner_id= fields.Many2one(string="Customer",comodel_name="res.partner",strore=True ,required=False,readonly=False)
+    partner_id = fields.Many2one ( string="Customer" , comodel_name="res.partner" , strore=True , required=False ,
+                                   readonly=False )
     customer_english_name = fields.Char ( string="Customer_English_Name" , related="partner_id.name_english" ,
                                           store=True )
 
@@ -203,9 +208,9 @@ class SaleOrder ( models.Model ) :
     def _compute_amount_due(self) :
         for rec in self :
             if rec.unpaid_total != 0 :
-                 rec.amount_due = rec.unpaid_total - rec.paid_total
-            else  :
-                rec.amount_due =0
+                rec.amount_due = rec.unpaid_total - rec.paid_total
+            else :
+                rec.amount_due = 0
 
     @api.onchange ( 'partner_id' )
     def _onchange_agreement_id(self) :
@@ -251,7 +256,7 @@ class SaleOrder ( models.Model ) :
             'res_model' : 'account.payment' ,
             'domain' : [('sale_order_id' , 'in' , self.ids)] ,
             'context' : {
-                'default_sale_order_ids' :self.id,
+                'default_sale_order_ids' : self.id ,
                 'default_partner_id' : self.partner_id.id ,
                 'default_payment_type' : 'inbound' ,
                 'default_from_sale' : True ,
@@ -277,13 +282,13 @@ class SaleOrder ( models.Model ) :
     # unpaid_total = fields.Float(compute='_compute_payment_count')
     # paid_percent = fields.Float(compute='_compute_payment_count')
     project_budget = fields.Float ( string='Project Budget' , copy=False )
-    amount_due = fields.Float ( string='Amount Due', compute="_compute_amount_due" )
+    amount_due = fields.Float ( string='Amount Due' , compute="_compute_amount_due" )
     project_name = fields.Char ( string='Project Name' )
     project_code = fields.Char ( string='Project Code' )
     contract_signature = fields.Boolean ( "Contract Signature" )
-    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type'  )
+    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
-                                            domain="[('plan_id', '=', project_type_id)]" , 
+                                            domain="[('plan_id', '=', project_type_id)]" ,
                                             compute='_compute_analytic_account_id' , readonly=False , store=True )
     approve_uid = fields.Many2one ( 'res.users' , string='Approve User' , )
     approve_date = fields.Datetime ( string='Approve Date' )
@@ -431,7 +436,39 @@ class SaleOrder ( models.Model ) :
                 } )
 
         # فتح شاشة المشاريع المرتبطة
-        return self.action_view_project_ids ()
+        return self.action_update_and_open_projects ()
+
+    def action_update_and_open_projects(self) :
+        self.ensure_one ()  # التأكد أن المستخدم ضغط على سجل واحد
+
+        # البحث عن المشروع المرتبط بهذا السجل
+        project = self.project_id
+        if not project :
+            return {
+                'type' : 'ir.actions.client' ,
+                'tag' : 'display_notification' ,
+                'params' : {
+                    'title' : 'تنبيه' ,
+                    'message' : 'لا يوجد مشروع مرتبط بهذا الطلب.' ,
+                    'type' : 'warning' ,
+                    'sticky' : False ,
+                }
+            }
+
+        # تحديث نسبة الدفع
+        project.write ( {
+            'paid_percent' : self.paid_percent or 0.0
+        } )
+
+        # فتح المشروع المرتبط
+        return {
+            'name' : 'Project' ,
+            'type' : 'ir.actions.act_window' ,
+            'res_model' : 'project.project' ,
+            'view_mode' : 'form' ,
+            'res_id' : project.id ,
+            'target' : 'current' ,  # 'new' لفتح نافذة منبثقة
+        }
 
     def get_print_sequence(self) :
         for rec in self :
@@ -542,10 +579,9 @@ class SaleOrderPrintHistory ( models.Model ) :
     _order = 'date , sequence, sale_id desc'
 
     sale_id = fields.Many2one ( comodel_name='sale.order' , string='Sale Order' )
-    user_id = fields.Many2one ( comodel_name='res.users' , string='User')
+    user_id = fields.Many2one ( comodel_name='res.users' , string='User' )
     date = fields.Datetime ( string='Date' , )
     sequence = fields.Integer ( string='Sequence' , )
     report_id = fields.Many2one ( comodel_name='product.report.template' , string='Report' , )
     report_template_id = fields.Many2one ( comodel_name='ir.actions.report' , string='Report Template' ,
                                            related="report_id.report_template_id" )
-
