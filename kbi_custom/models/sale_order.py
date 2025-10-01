@@ -118,6 +118,21 @@ class SaleOrder ( models.Model ) :
 
     project_ids = fields.Many2many ( 'project.project' , 'sale_order_project_rel' , 'sale_order_id' , 'project_id' ,
                                      string='Projects' )
+    project_count = fields.Integer (
+        string="Project Count" ,
+        compute="_compute_project_count" ,
+        store=True
+    )
+
+    @api.depends ( 'project_ids' )
+    def _compute_project_count(self) :
+        for order in self :
+            order.project_count = len ( order.project_ids )
+
+    @api.depends ( 'project_ids' )
+    def _compute_project_count(self) :
+        for order in self :
+            order.project_count = len ( order.project_ids )
 
     def action_set_not_custom_signed(self) :
         for order in self :
