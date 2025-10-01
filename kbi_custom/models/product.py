@@ -12,7 +12,7 @@ class ProductTemplate(models.Model):
     allowed_users_ids = fields.Many2many(comodel_name='res.users',  relation='product_template_allowed_user_rel', string='Allowed Users', column1='product_tmpl_id',column2='user_id')
     need_approved = fields.Boolean(string='Need to be approved')
     downpayment_ok = fields.Boolean(string='Downpayment Service')
-    analytic_plan_id = fields.Many2one('account.analytic.plan', string='Analytic Plan', required=Flase)
+    analytic_plan_id = fields.Many2one('account.analytic.plan', string='Analytic Plan', required=False)
     analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account', required=False, domain="[('plan_id', '=', analytic_plan_id)]")
     report_template_ids = fields.One2many(comodel_name='product.report.template', inverse_name="product_tmpl_id", string='Report Templates')
     report_template_id = fields.Many2one('ir.actions.report', string='Report Template', required=True)
