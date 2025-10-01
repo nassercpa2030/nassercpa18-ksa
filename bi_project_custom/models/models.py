@@ -17,7 +17,7 @@ class ProjectProject(models.Model):
     contract_name = fields.Char(string='Contract Name')
     financial_period_date = fields.Date(string='Financial Period Date')
     stage_name = fields.Char(string='Stage Name', related='stage_id.name', store=False)
-    sale_order_id = fields.Many2one('sale.order', string="Sales Order",store=True,ondelete='set null')
+    sale_order_id = fields.Many2one(commodel_name='sale.order', string="Sales Order",store=True,ondelete='set null')
     # adding field close_type
     close_type = fields.Text (string="Close Type", default="قيد إغلاق مؤجل",readonly=True)
     # إضافة حقل paid_percent محسوب بناءً على paid_percent في sale_order
