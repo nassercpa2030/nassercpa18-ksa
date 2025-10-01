@@ -19,6 +19,7 @@ class SaleOrder ( models.Model ) :
 
     contract_date = fields.Date ( string='Contract Date' , readonly=False )
     partner_shipping_id = fields.Many2one(string='Delivery Address',required=False, readonly=False)
+    archived_sale=fields.Boolean('Archived' ,readonly=False,required=False)
     amount_tax=fields.Float("Taxes",readonly=False ,required=False)
     audit_date = fields.Date ( string='Audit Date' , readonly=False )
     close_entry_date = fields.Date ( string="Close Entry Date" , readonly=True )
