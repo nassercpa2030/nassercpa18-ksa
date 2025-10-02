@@ -18,6 +18,8 @@ class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
     contract_date = fields.Date ( string='Contract Date' , readonly=False )
+    project_file_state_test=fields.Char("Project File State Demo",readonly=False,required=False)
+    project_stage_test=fields.Char("Project Stage Demo",readonly=False,required=False)
     partner_shipping_id = fields.Many2one ( string='Delivery Address' , required=False , readonly=False )
     archived_sale = fields.Boolean ( 'Archived' , readonly=False , required=False , default=False )
     amount_tax = fields.Float ( "Taxes" , readonly=False , required=False )
