@@ -24,7 +24,7 @@ class ResPartner ( models.Model ) :
     name_english = fields.Char ( String="English name" , readonly=False , store=True )
     partner_vat_placeholder = fields.Char ( string="Vat Number" , readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
-    l10n_sa_additional_identification_number=fields.Char(string="CR number" ,readonly=False,store=True)
+    #l10n_sa_additional_identification_number=fields.Char(string="CR number" ,readonly=False,store=True)
 
     @api.constrains ( 'number_700' )
     def _check700_number(self) :
