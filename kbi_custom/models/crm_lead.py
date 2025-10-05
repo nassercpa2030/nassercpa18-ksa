@@ -42,6 +42,7 @@ class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
     email_from_required = fields.Boolean(string='Is Email Required', related="stage_id.email_from_required")
+    classification_key_code = fields.Char( string="Classification Key Code (Dummy)", compute="_compute_classification_key_code", store=True)
     company_name_new=fields.Char(string='Company Name New',required=False,readonly=False)
     phone_required = fields.Boolean(string='Is Phone Required', related="stage_id.phone_required")
     street_required = fields.Boolean(string='Is Street Required', related="stage_id.street_required")
@@ -126,7 +127,7 @@ class CrmLead(models.Model):
         ('bbb','إيرادات أكبر من 200 مليون ريال'),
         ('bb','إيرادات من 0 إلي مليون ريال'),
         ('cc','إيرادات أكبر من 1 بليون ريال')],string="( تصنيف حجم العميل ) / Size of Revenu ",store=True)
-    classification_key_code = fields.Char( string="Classification Key Code (Dummy)", compute="_compute_classification_key_code", store=True)
+
     building_number = fields.Char(string='Building Number', related='partner_id.l10n_sa_edi_building_number', readonly=False)
     polt_number = fields.Char(string='Plot Number', related='partner_id.l10n_sa_edi_plot_identification', readonly=False)
     vat_number = fields.Char(string='VAT Number', related='partner_id.vat', readonly=False)
