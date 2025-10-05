@@ -25,6 +25,7 @@ class CrmStage(models.Model):
     project_type_id_required = fields.Boolean(string='Is Analytic Plan Required')
     allow_create_agreement = fields.Boolean(string='Allow Create Agreement')
     allowed_users_ids = fields.Many2many(comodel_name='res.users', string='Allowed Users')
+    accual_customer=fields.Boolean(string="Verfied Customer" ,readonly=False, required=False)
 
     rout_rule_ids = fields.One2many(comodel_name='crm.stage.route.rule', inverse_name='stage_id')
 
@@ -382,6 +383,7 @@ class CrmLeadLine(models.Model):
     product_uom_id = fields.Many2one('uom.uom', string='UOM', required=False)
     unit_price = fields.Float(string='Unit Price', required=False)
     tax_ids = fields.Many2many('account.tax', string='Taxes')
+    accual_customer=fields.Boolean(string="Verfied Customer" ,readonly=False, required=False)
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
