@@ -25,7 +25,7 @@ class ResPartner ( models.Model ) :
     partner_vat_placeholder = fields.Char ( string="Vat Number" , readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
     #l10n_sa_additional_identification_number=fields.Char(string="CR number" ,readonly=False,store=True)
-
+    property_account_payable_id = fields.Many2one(commodel_name="account.account",store=True,readonly=False,string='Account Payable', default=lambda self: self.env['account.account'].search([('code', '=', '21011001')], limit=1).id)
     @api.constrains ( 'number_700' )
     def _check700_number(self) :
         pattern = r'^7\d*$'
