@@ -184,6 +184,19 @@ class SaleOrder ( models.Model ) :
                 }
             }
 
+    @api.onchange ( 'number_700_sale' , 'cr_number_sale' )
+    def _onchange_customer_by_number(self) :
+        """تحديث العميل تلقائيًا بناءً على الرقم المدخل"""
+        for order in self :
+            partner = False
+            if order.number_700_sale :
+                partner = self.env['res.partner'].search ( [('number_700' , '=' , order.number_700_sale)] , limit=1 )
+            if not partner and order.cr_number_sale :
+                partner = self.env['res.partner'].search ( [('cr_number' , '=' , order.cr_number_sale)] , limit=1 )
+
+            if partner :
+                order.partner_id = partner.id
+
     @api.depends ( 'project_ids' )
     def _compute_project_files_state(self) :
         for order in self :
