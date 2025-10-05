@@ -192,7 +192,7 @@ class SaleOrder ( models.Model ) :
             if order.number_700_sale :
                 partner = self.env['res.partner'].search ( [('number_700' , '=' , order.number_700_sale)] , limit=1 )
             if not partner and order.cr_number_sale :
-                partner = self.env['res.partner'].search ( [('cr_number' , '=' , order.cr_number_sale)] , limit=1 )
+                partner = self.env['res.partner'].search ( [('l10n_sa_additional_identification_number' , '=' , order.cr_number_sale)] , limit=1 )
 
             if partner :
                 order.partner_id = partner.id
