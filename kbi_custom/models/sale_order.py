@@ -83,8 +83,8 @@ class SaleOrder ( models.Model ) :
     reject_reason = fields.Text ( string='Reject Reason' )
     broker_id = fields.Many2one ( comodel_name='res.partner' , string='Salesperson' ,
                                   domain="[('is_broker', '=', True)]" )
-    number_700_sale =fields.Char(commodel_name='res.partner',inverse_name='number_700',string="700 Number",readonly=False,required=True)
-    cr_number_sale =fields.Char(commodel_name='res.partner',inverse_name='l10n_sa_additional_identification_number',string="Customer CR Number",readonly=False)
+    number_700_sale =fields.Char(commodel_name='res.partner',inverse_name='number_700',string="700 Number",readonly=False,required=True,store=True)
+    cr_number_sale =fields.Char(commodel_name='res.partner',inverse_name='l10n_sa_additional_identification_number',string="Customer CR Number",readonly=False,store=True)
     broker_amount = fields.Float ( string='Broker Amount' , tracking=True )
     broker_invoiced_amount = fields.Float ( string='Broker Paid Amount' , compute="_compute_broker_invoiced_amount" )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
@@ -137,7 +137,7 @@ class SaleOrder ( models.Model ) :
     partner_id = fields.Many2one ( string="Customer" , comodel_name="res.partner" , strore=True , required=False ,
                                    readonly=False )
     customer_english_name = fields.Char ( string="Customer_English_Name" , related="partner_id.name_english" ,
-                                          store=True )
+                                          store=True ,readonly=False)
 
     project_ids = fields.Many2many ( 'project.project' , 'sale_order_project_rel' , 'sale_order_id' , 'project_id' ,
                                      string='Projects' )
