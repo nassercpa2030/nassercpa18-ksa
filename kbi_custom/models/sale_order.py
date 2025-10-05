@@ -18,24 +18,27 @@ class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
     contract_date = fields.Date ( string='Contract Date' , readonly=False )
-    project_file_state_test=fields.Char("Project File State Demo",readonly=False,required=False,store=True)
-    project_stage_test=fields.Char("Project Stage Demo",readonly=False,required=False,store=True)
-    first_payment_date_test=fields.Date(string="First Payment Test",readonly=False,required=False,store=True)
-    first_payment_test2=fields.Boolean(string="first Payment amount test",readonly=False,required=False,store=True)
-    first_payment_original=fields.Float(string="first_payment_original",readonly=False,required=False,store=True)
-    first_payment_journal_test = fields.Char('First Payment Journal Name',readonly=False,store=True)
-    unpaid_total_refrence = fields.Float('unpaid_total_refrence',store=True,readonly=False)
-    paid_total_refrence = fields.Float('paid_total_refrence',store=True,readonly=False)
-    paid_percentage_refrence= fields.Float('paid_percentage_refrence',store=True,readonly=False)
-    customer_English_name_refrence=fields.Char('customer_English_name_refrence',readonly=False,store=True)
-    close_entry_date_refrence = fields.Date(string="close_entry_date_refrence",readonly=False,required=False,store=True)
-    invoice_status_refrence = fields.Char('invoice_status_refrence',readonly=False,required=False,store=True)
-    project_budget_refrence= fields.Float('project_budget_refrence',store=True,readonly=False)
-    payment_count_reference=fields.Integer('payment_count_reference',store=True,readonly=False)
-    customer_test_refrence=fields.Char('customer_test_refrence',store=True,readonly=False)
-    order_line_total_refrence=fields.Float('order_line_total_refrence',store=True,readonly=False)
-    order_line_subtotal_refrence=fields.Float('order_line_subtotal_refrence',store=True,readonly=False)
-    qrcode_refrence=fields.Binary('QR refrence',store=True,readonly=False)
+    project_file_state_test = fields.Char ( "Project File State Demo" , readonly=False , required=False , store=True )
+    project_stage_test = fields.Char ( "Project Stage Demo" , readonly=False , required=False , store=True )
+    first_payment_date_test = fields.Date ( string="First Payment Test" , readonly=False , required=False , store=True )
+    first_payment_test2 = fields.Boolean ( string="first Payment amount test" , readonly=False , required=False ,
+                                           store=True )
+    first_payment_original = fields.Float ( string="first_payment_original" , readonly=False , required=False ,
+                                            store=True )
+    first_payment_journal_test = fields.Char ( 'First Payment Journal Name' , readonly=False , store=True )
+    unpaid_total_refrence = fields.Float ( 'unpaid_total_refrence' , store=True , readonly=False )
+    paid_total_refrence = fields.Float ( 'paid_total_refrence' , store=True , readonly=False )
+    paid_percentage_refrence = fields.Float ( 'paid_percentage_refrence' , store=True , readonly=False )
+    customer_English_name_refrence = fields.Char ( 'customer_English_name_refrence' , readonly=False , store=True )
+    close_entry_date_refrence = fields.Date ( string="close_entry_date_refrence" , readonly=False , required=False ,
+                                              store=True )
+    invoice_status_refrence = fields.Char ( 'invoice_status_refrence' , readonly=False , required=False , store=True )
+    project_budget_refrence = fields.Float ( 'project_budget_refrence' , store=True , readonly=False )
+    payment_count_reference = fields.Integer ( 'payment_count_reference' , store=True , readonly=False )
+    customer_test_refrence = fields.Char ( 'customer_test_refrence' , store=True , readonly=False )
+    order_line_total_refrence = fields.Float ( 'order_line_total_refrence' , store=True , readonly=False )
+    order_line_subtotal_refrence = fields.Float ( 'order_line_subtotal_refrence' , store=True , readonly=False )
+    qrcode_refrence = fields.Binary ( 'QR refrence' , store=True , readonly=False )
     partner_shipping_id = fields.Many2one ( string='Delivery Address' , required=False , readonly=False )
     archived_sale = fields.Boolean ( 'Archived' , readonly=False , required=False , default=False )
     amount_tax = fields.Float ( "Taxes" , readonly=False , required=False )
@@ -164,6 +167,20 @@ class SaleOrder ( models.Model ) :
                 order.project_ids.stage_id = stage.id
             else :
                 raise ValidationError ( _ ( "لا يوجد مشروع مرتبط بهذا الطلب لتحديث مرحلته." ) )
+
+    def action_confirm(self) :
+        for order in self :
+            order.state = 'to approve'
+            return {
+                'type' : 'ir.actions.client' ,
+                'tag' : 'display_notification' ,
+                'params' : {
+                    'title' : _ ( 'تم التنفيذ' ) ,
+                    'message' : _ ( 'العقد تم عمله بإنتظار السداد' ) ,
+                    'type' : 'success' ,  # ممكن success, warning, danger, info
+                    'sticky' : False ,  # لو True الرسالة تفضل لحد ما المستخدم يقفلها
+                }
+            }
 
     @api.depends ( 'project_ids' )
     def _compute_project_files_state(self) :
