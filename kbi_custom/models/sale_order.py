@@ -83,6 +83,8 @@ class SaleOrder ( models.Model ) :
     reject_reason = fields.Text ( string='Reject Reason' )
     broker_id = fields.Many2one ( comodel_name='res.partner' , string='Salesperson' ,
                                   domain="[('is_broker', '=', True)]" )
+    number_700_sale =fields.Char(commodel_name='res.partner',inverse_name='number_700',sring="700 Number',readonly=False,required=True)
+    cr_number_sale =fields.Char(commodel_name='res.partner',inverse_name='l10n_sa_additional_identification_number',sring="Customer CR Number',readonly=False)
     broker_amount = fields.Float ( string='Broker Amount' , tracking=True )
     broker_invoiced_amount = fields.Float ( string='Broker Paid Amount' , compute="_compute_broker_invoiced_amount" )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
