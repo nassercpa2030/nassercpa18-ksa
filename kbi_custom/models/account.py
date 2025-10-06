@@ -66,7 +66,7 @@ class AccountPayment ( models.Model ) :
         'sale.order' , string='Sale Order' , domain="[('partner_id','=',partner_id)]"
     )
     sale_order_ids = fields.One2many (
-        'account.payment.sale' , 'payment_id' , string='Lines'
+        comodel_name='account.payment.sale' , inverse_name='payment_id' , string='Lines'
     )
     multi_sale = fields.Boolean ( string='Multi Sale' , default=False )
     from_sale = fields.Boolean ( string='From Sale' , default=False )
