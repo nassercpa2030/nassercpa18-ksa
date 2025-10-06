@@ -71,6 +71,7 @@ class AccountPayment ( models.Model ) :
     multi_sale = fields.Boolean ( string='Multi Sale' , default=False )
     from_sale = fields.Boolean ( string='From Sale' , default=False )
     amount = fields.Monetary ( currency_field='currency_id' , store=True )
+    display_name=fields.Char( readonly=False,store=True)
 
     # تحديث amount بناءً على sale_order_ids بدون loop
     @api.onchange ( 'sale_order_ids' )
