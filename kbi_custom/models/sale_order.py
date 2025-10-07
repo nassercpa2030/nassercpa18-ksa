@@ -416,7 +416,7 @@ class SaleOrder ( models.Model ) :
     amount_due = fields.Float ( string='Amount Due' , compute="_compute_amount_due" )
     project_name = fields.Char ( string='Project Name' )
     project_code = fields.Char ( string='Project Code' )
-    invoice_ids=fields.One2many('account.move',compute="_compute_invoice_ids",readonly=False,store=True,string="Invoices")
+    invoice_ids=fields.One2many('account.move',compute="_compute_invoice_ids",readonly=True,store=True,string="Invoices")
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
