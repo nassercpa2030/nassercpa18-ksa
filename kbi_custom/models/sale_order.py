@@ -149,7 +149,7 @@ class SaleOrder ( models.Model ) :
     )
 
     @api.depends ( 'name' )
-    def _compute_invoice_ids(self) :
+    def _compute_invoices(self) :
         for order in self :
             extra_invoices = self.env['account.move'].search ( [
                 ('invoice_origin' , '=' , False) ,
@@ -409,7 +409,7 @@ class SaleOrder ( models.Model ) :
     project_name = fields.Char ( string='Project Name' )
     project_code = fields.Char ( string='Project Code' )
     #invoice_ids=fields.Many2many('account.move',compute="_compute_invoice_ids",readonly=True,store=True,string="Invoices")
-    invoice_count_odoo16=fields.Integer(compute=_compute_invoice_ids,store=False)
+    invoice_count_odoo16=fields.Integer(compute=_compute_invoices,store=False)
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
