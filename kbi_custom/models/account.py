@@ -16,6 +16,7 @@ class AccountMove ( models.Model ) :
         readonly=False
     )
     sale_order_test=fields.Char(string="Sale Order Refrence", readonly=False,Required=False)
+    sale_order_id = fields.Many2one ( 'sale.order' , string='Sale Order' , domain="[('partner_id','=',partner_id)]" )
 
     def action_post(self):
         # ترحيل الفواتير فورًا مع تجاوز جميع تحقق E-Invoicing
