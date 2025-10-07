@@ -187,13 +187,21 @@ class SaleOrder ( models.Model ) :
 
     def action_view_invoice(self , invoices=False) :
         if not invoices :
-            #invoices = self.mapped ( 'invoice_ids' )
-           # invoices = self.env['account.move'].search ( [('sale_order_test' , '=' , self.name)] )
-            invoices = self.env['account.move'].search([
-                             ('sale_order_test', 'ilike', self.name.strip()),   # بحث غير حساس للحروف
-                             ('move_type', '=', 'out_invoice')          # فقط الفواتير الصادرة
-                          ])
+            # 1- الفواتير المرتبطة عادي بالـ invoice_ids
+            invoices = self.mapped ( 'invoice_ids' )
+
+            # 2- الفواتير اللي فيها قيمة في sale_order_test = self.name
+            extra_invoices = self.env['account.move'].search ( [
+                ('sale_order_test' , 'ilike' , self.name.strip ()) ,
+                ('move_type' , '=' , 'out_invoice')
+            ] )
+
+            # 3- دمج الاثنين مع إزالة التكرار
+            invoices = invoices | extra_invoices
+
+        # جلب الـ action الافتراضي للفواتير الصادرة
         action = self.env['ir.actions.actions']._for_xml_id ( 'account.action_move_out_invoice_type' )
+
         if len ( invoices ) > 1 :
             action['domain'] = [('id' , 'in' , invoices.ids)]
         elif len ( invoices ) == 1 :
@@ -206,6 +214,7 @@ class SaleOrder ( models.Model ) :
         else :
             action = {'type' : 'ir.actions.act_window_close'}
 
+        # تحضير context للفواتير الجديدة
         context = {
             'default_move_type' : 'out_invoice' ,
         }
@@ -213,12 +222,13 @@ class SaleOrder ( models.Model ) :
             context.update ( {
                 'default_partner_id' : self.partner_id.id ,
                 'default_partner_shipping_id' : self.partner_shipping_id.id ,
-                'default_invoice_payment_term_id' : self.payment_term_id.id or self.partner_id.property_payment_term_id.id or
-                                                    self.env['account.move'].default_get (
-                                                        ['invoice_payment_term_id'] ).get (
-                                                        'invoice_payment_term_id' ) ,
+                'default_invoice_payment_term_id' : self.payment_term_id.id
+                                                    or self.partner_id.property_payment_term_id.id
+                                                    or self.env['account.move'].default_get (
+                    ['invoice_payment_term_id'] ).get ( 'invoice_payment_term_id' ) ,
                 'default_invoice_origin' : self.name ,
             } )
+
         action['context'] = context
         return action
 
