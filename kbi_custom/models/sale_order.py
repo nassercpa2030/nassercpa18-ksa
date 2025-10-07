@@ -188,7 +188,11 @@ class SaleOrder ( models.Model ) :
     def action_view_invoice(self , invoices=False) :
         if not invoices :
             #invoices = self.mapped ( 'invoice_ids' )
-            invoices = self.env['account.move'].search ( [('sale_order_test' , '=' , self.name)] )
+           # invoices = self.env['account.move'].search ( [('sale_order_test' , '=' , self.name)] )
+            invoices = self.env['account.move'].search([
+                             ('sale_order_test', 'ilike', self.name),   # بحث غير حساس للحروف
+                             ('move_type', '=', 'out_invoice')          # فقط الفواتير الصادرة
+                          ])
         action = self.env['ir.actions.actions']._for_xml_id ( 'account.action_move_out_invoice_type' )
         if len ( invoices ) > 1 :
             action['domain'] = [('id' , 'in' , invoices.ids)]
