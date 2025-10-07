@@ -148,6 +148,7 @@ class SaleOrder ( models.Model ) :
         store=True
     )
 
+    @api.depends ( 'name' )  # يعتمد على اسم الـ Sale Order
     def _compute_invoice_ids(self) :
         for order in self :
             extra_invoices = self.env['account.move'].search ( [
@@ -155,9 +156,8 @@ class SaleOrder ( models.Model ) :
                 ('sale_order_test' , '=' , order.name) ,
                 ('move_type' , '=' , 'out_invoice')
             ] )
-
-            # دمج الفواتير
-            order.invoice_count_odoo16 =  len(extra_invoices)
+            # تسجيل العدد وليس السجلات نفسها
+            order.invoice_count_odoo16 = len ( extra_invoices )
 
     @api.depends ( 'project_ids' )
     def _compute_project_count(self) :
@@ -410,7 +410,7 @@ class SaleOrder ( models.Model ) :
     project_name = fields.Char ( string='Project Name' )
     project_code = fields.Char ( string='Project Code' )
     #invoice_ids=fields.Many2many('account.move',compute="_compute_invoice_ids",readonly=True,store=True,string="Invoices")
-    invoice_count_odoo16=fields.Integer(compute=_compute_invoice_ids,readonly=False,store=False)
+    invoice_count_odoo16=fields.Integer(compute=_compute_invoice_ids,store=False)
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
