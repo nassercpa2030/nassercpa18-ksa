@@ -15,17 +15,36 @@ class AccountMove ( models.Model ) :
         store=True ,
         readonly=False
     )
-    sale_order_test=fields.Char(string="Sale Order Refrence", readonly=False,Required=False)
-    sale_order_id = fields.Many2one ( 'sale.order' , string='Sale Order' , domain="[('partner_id','=',partner_id)]",store=True )
+    sale_order_test = fields.Char ( string="Sale Order Refrence" , readonly=False , Required=False )
+    sale_order_id = fields.Many2one ( 'sale.order' , string='Sale Order' , domain="[('partner_id','=',partner_id)]" )
 
-    def action_post(self):
+    def action_post(self) :
         # ترحيل الفواتير فورًا مع تجاوز جميع تحقق E-Invoicing
-        self.with_context(disable_sa_edi_checks=True)._post(soft=False)
+        self.with_context ( disable_sa_edi_checks=True )._post ( soft=False )
         # لو هناك أي wizard تلقائي للفواتير، نعرضه
-        if autopost_bills_wizard := self._show_autopost_bills_wizard():
+        if autopost_bills_wizard := self._show_autopost_bills_wizard () :
             return autopost_bills_wizard
         return True
-    
+
+    @api.onchange ( 'sale_order_id' )
+    def _onchange_sale_order_id(self) :
+        """تحديث الحقول تلقائيًا عند اختيار Sale Order"""
+        for rec in self :
+            if rec.sale_order_id :
+                # ضبط البرتنر تلقائيًا
+                rec.partner_id = rec.sale_order_id.partner_id.id
+                # ضبط عنوان الشحن
+                rec.partner_shipping_id = rec.sale_order_id.partner_shipping_id.id
+                # ضبط شروط الدفع
+                rec.invoice_payment_term_id = (
+                        rec.sale_order_id.payment_term_id
+                        or rec.partner_id.property_payment_term_id
+                        or self.env['account.move'].default_get ( ['invoice_payment_term_id'] ).get (
+                    'invoice_payment_term_id' )
+                )
+                # ضبط المرجع / المصدر
+                rec.invoice_origin = rec.sale_order_id.name
+
     def _compute_analytic_distribution(self) :
         for rec in self :
             analytic_name = ''
@@ -72,7 +91,7 @@ class AccountPayment ( models.Model ) :
     multi_sale = fields.Boolean ( string='Multi Sale' , default=False )
     from_sale = fields.Boolean ( string='From Sale' , default=False )
     amount = fields.Monetary ( currency_field='currency_id' , store=True )
-    display_name=fields.Char( readonly=False,store=True)
+    display_name = fields.Char ( readonly=False , store=True )
 
     # تحديث amount بناءً على sale_order_ids بدون loop
     @api.onchange ( 'sale_order_ids' )
