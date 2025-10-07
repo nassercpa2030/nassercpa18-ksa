@@ -148,6 +148,24 @@ class SaleOrder ( models.Model ) :
         store=True
     )
 
+    def _compute_invoice_ids(self) :
+        for order in self :
+            # لو الفاتورة مربوطة بالـ invoice_origin = order.name
+            normal_invoices = self.env['account.move'].search ( [
+                ('invoice_origin' , '=' , order.name) ,
+                ('move_type' , '=' , 'out_invoice')
+            ] )
+
+            # لو الفاتورة invoice_origin فاضي لكن sale_order_test = order.name
+            extra_invoices = self.env['account.move'].search ( [
+                ('invoice_origin' , '=' , False) ,
+                ('sale_order_test' , '=' , order.name) ,
+                ('move_type' , '=' , 'out_invoice')
+            ] )
+
+            # دمج الفواتير
+            order.invoice_ids = normal_invoices | extra_invoices
+
     @api.depends ( 'project_ids' )
     def _compute_project_count(self) :
         for order in self :
@@ -398,7 +416,7 @@ class SaleOrder ( models.Model ) :
     amount_due = fields.Float ( string='Amount Due' , compute="_compute_amount_due" )
     project_name = fields.Char ( string='Project Name' )
     project_code = fields.Char ( string='Project Code' )
-    invoice_ids=fields.One2many(string="Invoices",comodel_name="account.move",inverse_name="sale_order_id",readonly=False,store=True)
+    invoice_ids=fields.One2many(string="Invoices",comodel_name="account.move",compute="_compute_invoice_ids",readonly=False,store=True)
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
