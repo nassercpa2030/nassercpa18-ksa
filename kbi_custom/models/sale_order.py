@@ -148,7 +148,7 @@ class SaleOrder ( models.Model ) :
         store=True
     )
 
-    @api.depends ( 'name' )  # يعتمد على اسم الـ Sale Order
+    @api.depends ( 'name' )
     def _compute_invoice_ids(self) :
         for order in self :
             extra_invoices = self.env['account.move'].search ( [
@@ -156,7 +156,6 @@ class SaleOrder ( models.Model ) :
                 ('sale_order_test' , '=' , order.name) ,
                 ('move_type' , '=' , 'out_invoice')
             ] )
-            # تسجيل العدد وليس السجلات نفسها
             order.invoice_count_odoo16 = len ( extra_invoices )
 
     @api.depends ( 'project_ids' )
