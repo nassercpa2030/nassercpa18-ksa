@@ -351,6 +351,7 @@ class SaleOrder ( models.Model ) :
     amount_due = fields.Float ( string='Amount Due' , compute="_compute_amount_due" )
     project_name = fields.Char ( string='Project Name' )
     project_code = fields.Char ( string='Project Code' )
+    invoice_ids=fields.One2many(string="Invoices",comodel="account.move",reverse_name="sale_order_id",readonly=False,store=True)
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
