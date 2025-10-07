@@ -24,7 +24,7 @@ class ResPartner ( models.Model ) :
     name_english = fields.Char ( String="English name" , readonly=False , store=True )
     partner_vat_placeholder = fields.Char ( string="Vat Number" , readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
-    #l10n_sa_additional_identification_number=fields.Char(string="CR number" ,readonly=False,store=True)
+    l10n_sa_additional_identification_number=fields.Char(string="CR number" ,readonly=False,store=True)
     property_account_payable_id = fields.Many2one(commodel_name="account.account", domain=[('code', '=', '21011001')],store=True,readonly=False,string='Account Payable', default=lambda self: self.env['account.account'].search([('code', '=', '21011001')], limit=1).id)
     fax_number=fields.Char(string='FAX',readonly=False,required=False)
     @api.constrains ( 'number_700' )
