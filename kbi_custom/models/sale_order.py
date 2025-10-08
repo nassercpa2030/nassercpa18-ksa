@@ -151,7 +151,7 @@ class SaleOrder ( models.Model ) :
     def action_compute_invoices(self) :
         for order in self :
             extra_invoices = self.env['account.move'].search_count( [
-                ('sale_order_test' , '=' , order.name) ,
+                ('sale_order_test' , 'ilike' , order.name) ,
                 ('move_type' , '=' , 'out_invoice')
             ] )
             order.invoice_count_odoo16 = extra_invoices
