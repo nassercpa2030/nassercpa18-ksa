@@ -148,11 +148,9 @@ class SaleOrder ( models.Model ) :
         store=True
     )
 
-    @api.depends ( 'name' )
     def action_compute_invoices(self) :
         for order in self :
             extra_invoices = self.env['account.move'].search ( [
-                ('invoice_origin' , '=' , False) ,
                 ('sale_order_test' , '=' , order.name) ,
                 ('move_type' , '=' , 'out_invoice')
             ] )
