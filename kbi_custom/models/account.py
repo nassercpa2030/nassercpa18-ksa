@@ -135,14 +135,14 @@ class AccountPayment(models.Model):
     # =====================================
     # التحقق من أن amount لا يتجاوز amount_due
     # =====================================
-    @api.onchange('amount')
-    def _onchange_amount_sale_order_id(self):
-        for rec in self:
-            if rec.sale_order_id and not rec.multi_sale and not rec.from_sale:
-                if rec.amount > rec.sale_order_id.amount_due:
-                    raise ValidationError(
-                        "Paid amount cannot be greater than order due amount"
-                    )
+   # @api.onchange('amount')
+  #  def _onchange_amount_sale_order_id(self):
+       # for rec in self:
+          #  if rec.sale_order_id and not rec.multi_sale and not rec.from_sale:
+             #   if rec.amount > rec.sale_order_id.amount_due:
+               #     raise ValidationError(
+               #         "Paid amount cannot be greater than order due amount"
+                #    )
 
 # =====================================
 # Account Payment Sale
