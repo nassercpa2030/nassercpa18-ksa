@@ -20,6 +20,17 @@ class AccountMove(models.Model):
     invoice_count_odoo16 = fields.Integer(
         string="Same Invoices Count", compute="_compute_invoices", store=True
     )
+    @api.model
+    def default_get(self, fields_list):
+        res = super(AccountPayment, self).default_get(fields_list)
+        # البحث عن طريقة الدفع "Manual Payment" الموجودة مسبقًا
+        method = self.env['account.payment.method'].search([('name', '=', 'Manual Payment')], limit=1)
+        if method:
+            # إذا وجدنا طريقة الدفع، نربطها بسطر الدفع الافتراضي
+            line = self.env['account.payment.method.line'].search([('payment_method_id', '=', method.id)], limit=1)
+            if line:
+                res.update({'payment_method_line_id': line.id})
+        return res
 
     # =====================================
     # حساب عدد الفواتير المرتبطة بـ sale_order_test
@@ -110,6 +121,7 @@ class AccountPayment(models.Model):
     display_name = fields.Char(readonly=False, store=True)
     payment_method_line_id=fields.Many2one(comodel_name='account.payment.method.line',string="Payment Method Line",required=False,readonly=False,store=True)
     payment_method_real_id=fields.Many2one( comodel_name='account.payment.method', related='payment_method_line_id.payment_method_id',string="Payment Method",required=False,readonly=False,store=True)
+    
     @api.onchange ( 'sale_order_id' )
     def _change_memo(self) :
         for rec in self :
