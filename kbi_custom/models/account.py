@@ -108,6 +108,15 @@ class AccountPayment(models.Model):
     from_sale = fields.Boolean(string='From Sale', default=False)
     amount = fields.Monetary(currency_field='currency_id', store=True)
     display_name = fields.Char(readonly=False, store=True)
+    
+    @api.onchange ( 'sale_order_id' )
+    def _change_memo(self) :
+        for rec in self :
+            if rec.sale_order_id :
+                partner_name = rec.sale_order_id.partner_id.name or ''
+                project_name = rec.sale_order_id.project_name or ''
+                rec.memo = f" تحصيل من العميل : { partner_name} - {project_name}"
+
 
     # =====================================
     # تحديث amount بناءً على sale_order_ids
