@@ -70,6 +70,7 @@ class SaleOrder ( models.Model ) :
     # paid_total = fields.Float(compute='_compute_payment_count')
     # unpaid_total = fields.Float(compute='_compute_payment_count')
     # paid_percent = fields.Float(compute='_compute_payment_count')
+    amount_due = fields.Float(compute="_compute_payment_count",string="Amount Due",readonly=False)
     project_budget = fields.Float ( string='Project Budget' , copy=False )
     project_name = fields.Char ( string='Project Name' )
     project_code = fields.Char ( string='Project Code' )
@@ -317,6 +318,7 @@ class SaleOrder ( models.Model ) :
             rec.payment_count = len ( rec.payment_ids )
             rec.paid_percent = (rec.paid_total / (rec.amount_total or 1)) * 100
             rec.unpaid_total = rec.amount_total - rec.paid_total
+            rec.amount_due = rec.amount_total - rec.paid_total
 
     def _compute_amount_due(self) :
         for rec in self :
