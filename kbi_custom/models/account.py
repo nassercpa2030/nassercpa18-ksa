@@ -109,13 +109,13 @@ class AccountPayment(models.Model):
     from_sale = fields.Boolean(string='From Sale', default=False)
     amount = fields.Monetary(currency_field='currency_id', store=True)
     display_name = fields.Char(readonly=False, store=True)
-    payment_method_line_id = fields.Many2one(
-        comodel_name='account.payment.method.line',
-        string="Payment Method",
-        required=False,
-        readonly=False,
-        store=True
-    )
+  #  payment_method_line_id = fields.Many2one(
+     #   comodel_name='account.payment.method.line',
+       # string="Payment Method",
+      #  required=False,
+       # readonly=False,
+       # store=True
+   # )
 
     # =====================================
     # تعديل memo عند اختيار sale_order_id
@@ -132,25 +132,26 @@ class AccountPayment(models.Model):
     # default_get لتعيين طريقة الدفع الافتراضية
     # =====================================
     @api.model
-    def default_get(self, fields_list):
-        res = super(AccountPayment, self).default_get(fields_list)
+    
+    #def default_get(self, fields_list):
+      #  res = super(AccountPayment, self).default_get(fields_list)
 
         # البحث عن طريقة الدفع باسم "Manual Payment"
-        method = self.env['account.payment.method'].search([('name', 'ilike', 'Manual Payment')], limit=1)
-        if not method:
-            method = self.env['account.payment.method'].create({'name': 'Manual Payment'})
+      #  method = self.env['account.payment.method'].search([('name', 'ilike', 'Manual Payment')], limit=1)
+       # if not method:
+         #   method = self.env['account.payment.method'].create({'name': 'Manual Payment'})
 
         # البحث عن سطر الدفع المرتبط
-        line = self.env['account.payment.method.line'].search([('payment_method_id', '=', method.id)], limit=1)
-        if not line:
-            line = self.env['account.payment.method.line'].create({
-                'payment_method_id': method.id,
-                'name': 'Manual Payment',
-                'sequence': 10,
-            })
+       #3 line = self.env['account.payment.method.line'].search([('payment_method_id', '=', method.id)], limit=1)
+       # if not line:
+        #    line = self.env['account.payment.method.line'].create({
+        #        'payment_method_id': method.id,
+        #        'name': 'Manual Payment',
+      #          'sequence': 10,
+      #      })
 
-        res.update({'payment_method_line_id': line.id})
-        return res
+      #  res.update({'payment_method_line_id': line.id})
+      # return res
 
     # =====================================
     # تحديث amount بناءً على sale_order_ids
