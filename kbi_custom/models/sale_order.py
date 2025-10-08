@@ -18,6 +18,11 @@ class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
     contract_date = fields.Date ( string='Contract Date' , readonly=False )
+    local_server_archive=fields.Boolean(string="أرشفة علي السيرفر المحلي" , stored=True)
+    one_audit_archive=fields.Boolean(string="أرشفة علي ون أودت " , stored=True)
+    papers_archive=fields.Boolean(string="أرشفة ورقية" ,stored=True)
+    box_paper_archive=fields.Integer(string="رقم أرشيف الصندوق",stored=True)
+    image_one_audit=fields.Binary(string="صورة ميل ون أودت" ,stored=True)
     project_file_state_test = fields.Char ( "Project File State Demo" , readonly=False , required=False , store=True )
     project_stage_test = fields.Char ( "Project Stage Demo" , readonly=False , required=False , store=True )
     first_payment_date_test = fields.Date ( string="First Payment Test" , readonly=False , required=False , store=True )
