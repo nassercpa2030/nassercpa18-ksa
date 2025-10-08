@@ -108,7 +108,7 @@ class AccountPayment(models.Model):
     from_sale = fields.Boolean(string='From Sale', default=False)
     amount = fields.Monetary(currency_field='currency_id', store=True)
     display_name = fields.Char(readonly=False, store=True)
-    payment_method_line_id=fields.Many2one('account.payment.method',related="payment_method_line_id.payment_method_id",string="Payment Method",required=False,readonly=False,store=True)
+    payment_method_line_id=fields.Many2one(comodel_name='account.payment.method.line',string="Payment Method",required=False,readonly=True,store=True)
     
     @api.onchange ( 'sale_order_id' )
     def _change_memo(self) :
