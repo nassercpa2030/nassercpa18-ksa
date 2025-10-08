@@ -453,9 +453,9 @@ class SaleOrder ( models.Model ) :
     def _compute_invoice_count_odoo16(self) :
         for order in self :
             invoices = self.env['account.move'].search ( [
-                ('sale_order_test' , '=' , order.name) ,
+                ('sale_order_test' , '=' , order.name.strip ()) ,
                 ('move_type' , '=' , 'out_invoice')
-            ] )
+            ] )            
             order.invoice_count_odoo16 = sum ( invoices.mapped ( 'invoice_count_odoo16' ) )
 
     def action_open_print_sale_wizard(self) :
