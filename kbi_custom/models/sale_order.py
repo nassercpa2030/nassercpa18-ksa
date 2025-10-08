@@ -399,7 +399,7 @@ class SaleOrder ( models.Model ) :
     project_name = fields.Char ( string='Project Name' )
     project_code = fields.Char ( string='Project Code' )
     #invoice_ids=fields.Many2many('account.move',compute="_compute_invoice_ids",readonly=True,store=True,string="Invoices")
-    invoice_count_odoo16 = fields.Integer(string="", related="invoice_ids.invoice_count_odoo16",store=True)
+    invoice_count_odoo16 = fields.Integer(string="", compute="_compute_invoice_count_odoo16",store=True)
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
@@ -448,6 +448,15 @@ class SaleOrder ( models.Model ) :
                 'default_sale_order_id' : self.id ,
             }
         }
+
+    @api.depends ( 'name' )
+    def _compute_invoice_count_odoo16(self) :
+        for order in self :
+            invoices = self.env['account.move'].search ( [
+                ('sale_order_test' , '=' , order.name) ,
+                ('move_type' , '=' , 'out_invoice')
+            ] )
+            order.invoice_count_odoo16 = sum ( invoices.mapped ( 'invoice_count_odoo16' ) )
 
     def action_open_print_sale_wizard(self) :
         return {
