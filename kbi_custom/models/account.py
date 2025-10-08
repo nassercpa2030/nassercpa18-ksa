@@ -24,7 +24,7 @@ class AccountMove(models.Model):
     def default_get(self, fields_list):
         res = super(AccountPayment, self).default_get(fields_list)
         # البحث عن طريقة الدفع "Manual Payment" الموجودة مسبقًا
-        method = self.env['account.payment.method'].search([('name', '=', 'Manual Payment')], limit=1)
+        method = self.env['account.payment.method'].search([('name', 'ilike', 'Manual Payment')], limit=1)
         if method:
             # إذا وجدنا طريقة الدفع، نربطها بسطر الدفع الافتراضي
             line = self.env['account.payment.method.line'].search([('payment_method_id', '=', method.id)], limit=1)
