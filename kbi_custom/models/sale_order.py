@@ -150,11 +150,11 @@ class SaleOrder ( models.Model ) :
 
     def action_compute_invoices(self) :
         for order in self :
-            extra_invoices = self.env['account.move'].search ( [
+            extra_invoices = self.env['account.move'].search_count( [
                 ('sale_order_test' , '=' , order.name) ,
                 ('move_type' , '=' , 'out_invoice')
             ] )
-            order.invoice_count_odoo16 = int(len(extra_invoices))
+            order.invoice_count_odoo16 = extra_invoices
 
     @api.depends ( 'project_ids' )
     def _compute_project_count(self) :
