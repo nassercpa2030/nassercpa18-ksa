@@ -192,16 +192,16 @@ class SaleOrder ( models.Model ) :
                 }
             }
 
-    @api.onchange ( 'analytic_account_id' )
-    def _onchange_analytic_account_id(self) :
-        for line in self.order_line :
-            if self.analytic_account_id :
-                line.analytic_distribution = [{
-                    "account_id" : self.analytic_account_id.id ,
-                    "percent" : 100
-                }]
-            else :
-                line.analytic_distribution = []
+    #@api.onchange ( 'analytic_account_id' )
+    #def _onchange_analytic_account_id(self) :
+      #  for line in self.order_line :
+           # if self.analytic_account_id :
+             #   line.analytic_distribution = [{
+              #      "account_id" : self.analytic_account_id.id ,
+               #     "percent" : 100
+              #  }]
+           # else :
+              #  line.analytic_distribution = []
                 
     def action_view_invoice(self , invoices=False) :
         self.ensure_one ()  # لو عايزين نتعامل مع order واحد في context
