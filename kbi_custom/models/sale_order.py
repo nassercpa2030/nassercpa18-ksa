@@ -433,7 +433,7 @@ class SaleOrder ( models.Model ) :
     can_edit_approve = fields.Boolean ( string='Can Edit Approve Route' , compute='compute_can_edit_approve' , )
     print_history_ids = fields.One2many ( comodel_name='sale.order.print.history' , inverse_name='sale_id' ,
                                           string='Print History' )
-    sign_qrcode = fields.Binary ( string='Sign QR Code' , compute='compute_sign_qrcode' , store=False 
+    sign_qrcode = fields.Binary ( string='Sign QR Code' , compute='compute_sign_qrcode' , store=False )
     #sign_qrcode = fields.Binary ( string='Sign QR Code'  , store=False )
     uuid = fields.Char ( string='UUID' )
     validity_date = fields.Date ( string='Validity Date' ,
