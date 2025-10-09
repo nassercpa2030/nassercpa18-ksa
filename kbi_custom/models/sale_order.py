@@ -18,11 +18,11 @@ class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
     contract_date = fields.Date ( string='Contract Date' , readonly=False )
-    local_server_archive=fields.Boolean(string="أرشفة علي السيرفر المحلي" , stored=True)
-    one_audit_archive=fields.Boolean(string="أرشفة علي ون أودت " , stored=True)
-    papers_archive=fields.Boolean(string="أرشفة ورقية" ,stored=True)
-    box_paper_archive=fields.Integer(string="رقم أرشيف الصندوق",stored=True)
-    image_one_audit=fields.Binary(string="صورة ميل ون أودت" ,stored=True)
+    local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
+    one_audit_archive = fields.Boolean ( string="أرشفة علي ون أودت " , stored=True )
+    papers_archive = fields.Boolean ( string="أرشفة ورقية" , stored=True )
+    box_paper_archive = fields.Integer ( string="رقم أرشيف الصندوق" , stored=True )
+    image_one_audit = fields.Binary ( string="صورة ميل ون أودت" , stored=True )
     project_file_state_test = fields.Char ( "Project File State Demo" , readonly=False , required=False , store=True )
     project_stage_test = fields.Char ( "Project Stage Demo" , readonly=False , required=False , store=True )
     first_payment_date_test = fields.Date ( string="First Payment Test" , readonly=False , required=False , store=True )
@@ -75,7 +75,7 @@ class SaleOrder ( models.Model ) :
     # paid_total = fields.Float(compute='_compute_payment_count')
     # unpaid_total = fields.Float(compute='_compute_payment_count')
     # paid_percent = fields.Float(compute='_compute_payment_count')
-    amount_due = fields.Float(compute="_compute_payment_count",string="Amount Due",readonly=False)
+    amount_due = fields.Float ( compute="_compute_payment_count" , string="Amount Due" , readonly=False )
     project_budget = fields.Float ( string='Project Budget' , copy=False )
     project_name = fields.Char ( string='Project Name' )
     project_code = fields.Char ( string='Project Code' )
@@ -89,9 +89,10 @@ class SaleOrder ( models.Model ) :
     reject_reason = fields.Text ( string='Reject Reason' )
     broker_id = fields.Many2one ( comodel_name='res.partner' , string='Salesperson' ,
                                   domain="[('is_broker', '=', True)]" )
-    number_700_sale =fields.Char(related='partner_id.number_700',string="700 Number",readonly=False,required=True,store=True)
-   # cr_number_sale =fields.Char(related='partner_id.cr_number_sale',string="Customer CR Number",readonly=False,store=True)
-    cr_number_sale =fields.Char(string="Customer CR Number",readonly=False,store=True)
+    number_700_sale = fields.Char ( related='partner_id.number_700' , string="700 Number" , readonly=False ,
+                                    required=True , store=True )
+    # cr_number_sale =fields.Char(related='partner_id.cr_number_sale',string="Customer CR Number",readonly=False,store=True)
+    cr_number_sale = fields.Char ( string="Customer CR Number" , readonly=False , store=True )
     broker_amount = fields.Float ( string='Broker Amount' , tracking=True )
     broker_invoiced_amount = fields.Float ( string='Broker Paid Amount' , compute="_compute_broker_invoiced_amount" )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
@@ -101,7 +102,7 @@ class SaleOrder ( models.Model ) :
     first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
     first_payment_amount = fields.Monetary ( string='First Payment Date' , related='first_payment_id.amount' )
     project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
-                                         related='project_ids.stage_id' , store=True,groups='base.group_user' )
+                                         related='project_ids.stage_id' , store=True , groups='base.group_user' )
     # close_type = fields.Char(comodel_name='project.project.close_type',string='Close_type', related='close_type', store=True)
     from_crm = fields.Boolean ( string='From CRM' )
     can_edit_analytic = fields.Boolean ( string='Can Edit Analytic Account' , compute='compute_can_edit_analytic' , )
@@ -144,7 +145,7 @@ class SaleOrder ( models.Model ) :
     partner_id = fields.Many2one ( string="Customer" , comodel_name="res.partner" , strore=True , required=False ,
                                    readonly=False )
     customer_english_name = fields.Char ( string="Customer_English_Name" , related="partner_id.name_english" ,
-                                          store=True ,readonly=False)
+                                          store=True , readonly=False )
 
     project_ids = fields.Many2many ( 'project.project' , 'sale_order_project_rel' , 'sale_order_id' , 'project_id' ,
                                      string='Projects' )
@@ -244,7 +245,8 @@ class SaleOrder ( models.Model ) :
             if order.number_700_sale :
                 partner = self.env['res.partner'].search ( [('number_700' , '=' , order.number_700_sale)] , limit=1 )
             if not partner and order.cr_number_sale :
-                partner = self.env['res.partner'].search ( [('l10n_sa_additional_identification_number' , '=' , order.cr_number_sale)] , limit=1 )
+                partner = self.env['res.partner'].search (
+                    [('l10n_sa_additional_identification_number' , '=' , order.cr_number_sale)] , limit=1 )
 
             if partner :
                 order.partner_id = partner.id
@@ -266,7 +268,7 @@ class SaleOrder ( models.Model ) :
     def compute_sign_qrcode(self) :
         for rec in self :
             qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
-            base_url = self.env['ir.config_parameter'].sudo().get_param ( 'web.base.url' )
+            base_url = self.env['ir.config_parameter'].sudo ().get_param ( 'web.base.url' )
             qr_code.add_data ( f'{base_url}//order/verify/{rec.uuid}' )
             qr_code.make ( fit=True )
             qr_img = qr_code.make_image ()
@@ -403,9 +405,9 @@ class SaleOrder ( models.Model ) :
     amount_due = fields.Float ( string='Amount Due' , compute="_compute_amount_due" )
     project_name = fields.Char ( string='Project Name' )
     project_code = fields.Char ( string='Project Code' )
-    #invoice_ids=fields.Many2many('account.move',compute="_compute_invoice_ids",readonly=True,store=True,string="Invoices")
-    invoice_count_odoo16 = fields.Integer(string="", compute="_compute_invoice_count_odoo16",store=True)
-    #invoice_count=fields.Integer(string="",store=True,readonly=False)
+    # invoice_ids=fields.Many2many('account.move',compute="_compute_invoice_ids",readonly=True,store=True,string="Invoices")
+    invoice_count_odoo16 = fields.Integer ( string="" , compute="_compute_invoice_count_odoo16" , store=True )
+    # invoice_count=fields.Integer(string="",store=True,readonly=False)
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
@@ -424,7 +426,7 @@ class SaleOrder ( models.Model ) :
     first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
     first_payment_amount = fields.Monetary ( string='First Payment Amount' , related='first_payment_id.amount' )
     project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
-                                         related='project_ids.stage_id' , store=True ,groups='base.group_user')
+                                         related='project_ids.stage_id' , store=True , groups='base.group_user' )
     # close_type = fields.Char(comodel_name='project.project.close_type',string='Close_type', related='close_type', store=True)
     from_crm = fields.Boolean ( string='From CRM' )
     can_edit_analytic = fields.Boolean ( string='Can Edit Analytic Account' , compute='compute_can_edit_analytic' , )
@@ -432,7 +434,7 @@ class SaleOrder ( models.Model ) :
     print_history_ids = fields.One2many ( comodel_name='sale.order.print.history' , inverse_name='sale_id' ,
                                           string='Print History' )
     sign_qrcode = fields.Binary ( string='Sign QR Code' , compute='compute_sign_qrcode' , store=False )
-    #sign_qrcode = fields.Binary ( string='Sign QR Code'  , store=False )
+    # sign_qrcode = fields.Binary ( string='Sign QR Code'  , store=False )
     uuid = fields.Char ( string='UUID' )
     validity_date = fields.Date ( string='Validity Date' ,
                                   default=fields.Date.today () + datetime.timedelta ( days=30 ) )
@@ -463,7 +465,7 @@ class SaleOrder ( models.Model ) :
                 ('sale_order_test' , '=' , order.name.strip ()) ,
                 ('move_type' , '=' , 'out_invoice')
             ] )
-            order.invoice_count_odoo16 = len(invoices)
+            order.invoice_count_odoo16 = len ( invoices )
 
     def action_open_print_sale_wizard(self) :
         return {
@@ -637,7 +639,17 @@ class SaleOrderLine ( models.Model ) :
     finance_service_ok = fields.Boolean ( string='Finance Service' , related='product_id.finance_service_ok' )
     downpayment_ok = fields.Boolean ( string='Downpayment Service' , related='product_id.downpayment_ok' )
     public_name = fields.Char ( string='Public Name' , related='product_id.public_name' )
+    analyric_distribution=fields.Json(string='Analytic Distribution',compute='_compute_analytic_distribution',store=True)
 
+    @api.depends ( 'order_id.analytic_account_id' )
+    def _compute_analytic_distribution(self) :
+        for line in self :
+            if line.order_id.analytic_account_id :
+                # JSON format: [{"account_id": <id>, "percent": 100}]
+                line.analytic_distribution = [{"account_id" : line.order_id.analytic_account_id.id , "percent" : 100}]
+            else :
+                line.analytic_distribution = []
+                
     @api.onchange ( 'budget_percentage' )
     def _onchange_budget_percentage(self) :
         for line in self :
