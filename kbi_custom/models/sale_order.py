@@ -465,7 +465,7 @@ class SaleOrder ( models.Model ) :
                 ('sale_order_test' , '=' , order.name.strip ()) ,
                 ('move_type' , '=' , 'out_invoice')
             ] )            
-            order.invoice_count_odoo16 = sum ( invoices.mapped ( 'invoice_count_odoo16' ) )
+            order.invoice_count_odoo16 = len(invoices)
 
     def action_open_print_sale_wizard(self) :
         return {
