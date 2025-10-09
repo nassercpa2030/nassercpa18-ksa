@@ -265,18 +265,18 @@ class SaleOrder ( models.Model ) :
         res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
         return res
 
-    def compute_sign_qrcode(self) :
-        for rec in self :
-            qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
-            base_url = self.env['ir.config_parameter'].get_param ( 'web.base.url' )
-            qr_code.add_data ( f'{base_url}//order/verify/{rec.uuid}' )
-            qr_code.make ( fit=True )
-            qr_img = qr_code.make_image ()
-            im = qr_img._img.convert ( "RGB" )
-            buffered = BytesIO ()
-            im.save ( buffered , format="png" )
-            qr_image = base64.b64encode ( buffered.getvalue () ).decode ( 'ascii' )
-            rec.sign_qrcode = qr_image
+    #def compute_sign_qrcode(self) :
+        #for rec in self :
+            #qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
+            #base_url = self.env['ir.config_parameter'].get_param ( 'web.base.url' )
+            #qr_code.add_data ( f'{base_url}//order/verify/{rec.uuid}' )
+            #qr_code.make ( fit=True )
+            #qr_img = qr_code.make_image ()
+            #im = qr_img._img.convert ( "RGB" )
+            #buffered = BytesIO ()
+            #im.save ( buffered , format="png" )
+            #qr_image = base64.b64encode ( buffered.getvalue () ).decode ( 'ascii' )
+            #rec.sign_qrcode = qr_image
 
     @api.depends ( 'user_id' )
     def compute_can_edit_analytic(self) :
@@ -433,7 +433,8 @@ class SaleOrder ( models.Model ) :
     can_edit_approve = fields.Boolean ( string='Can Edit Approve Route' , compute='compute_can_edit_approve' , )
     print_history_ids = fields.One2many ( comodel_name='sale.order.print.history' , inverse_name='sale_id' ,
                                           string='Print History' )
-    sign_qrcode = fields.Binary ( string='Sign QR Code' , compute='compute_sign_qrcode' , store=False )
+    #sign_qrcode = fields.Binary ( string='Sign QR Code' , compute='compute_sign_qrcode' , store=False 
+    sign_qrcode = fields.Binary ( string='Sign QR Code'  , store=False )
     uuid = fields.Char ( string='UUID' )
     validity_date = fields.Date ( string='Validity Date' ,
                                   default=fields.Date.today () + datetime.timedelta ( days=30 ) )
