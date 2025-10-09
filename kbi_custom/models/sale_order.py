@@ -192,16 +192,16 @@ class SaleOrder ( models.Model ) :
                 }
             }
 
-    #@api.onchange ( 'analytic_account_id' )
-    #def _onchange_analytic_account_id(self) :
-      #  for line in self.order_line :
-           # if self.analytic_account_id :
-             #   line.analytic_distribution = [{
-              #      "account_id" : self.analytic_account_id.id ,
-               #     "percent" : 100
-              #  }]
-           # else :
-              #  line.analytic_distribution = []
+    @api.onchange ( 'analytic_account_id' )
+    def _onchange_analytic_account_id(self) :
+        for line in self.order_line :
+            if self.analytic_account_id :
+                line.analytic_distribution = [{
+                    "account_id" : self.analytic_account_id.id ,
+                    "percent" : 100
+                }]
+             else :
+                line.analytic_distribution = []
                 
     def action_view_invoice(self , invoices=False) :
         self.ensure_one ()  # لو عايزين نتعامل مع order واحد في context
@@ -348,22 +348,22 @@ class SaleOrder ( models.Model ) :
         if self.partner_id :
             self.agreement_id = self.partner_id.agreement_id.id
 
-    @api.depends ( 'project_type_id' , 'order_line' )
-    @api.onchange ( 'project_type_id' , 'order_line' )
-    def _onchange_project_type_approve(self) :
-        for rec in self :
-            rec.approval_route_id = rec.project_type_id.approval_route_ids[
-                0].id if rec.project_type_id.approval_route_ids else False
-            account = False
-            if rec.order_line :
-                account = rec.order_line[0].product_id.product_analytic_ids.filtered (
-                    lambda x : x.analytic_plan_id.id == rec.project_type_id.id )
-                if account :
-                    rec.analytic_account_id = account.analytic_account_id.id
-                else :
-                    rec.analytic_account_id = False
-            else :
-                rec.analytic_account_id = False
+   # @api.depends ( 'project_type_id' , 'order_line' )
+   # @api.onchange ( 'project_type_id' , 'order_line' )
+   # def _onchange_project_type_approve(self) :
+        #for rec in self :
+           # rec.approval_route_id = rec.project_type_id.approval_route_ids[
+               # 0].id if rec.project_type_id.approval_route_ids else False
+            #account = False
+            #if rec.order_line :
+                #account = rec.order_line[0].product_id.product_analytic_ids.filtered (
+                    #lambda x : x.analytic_plan_id.id == rec.project_type_id.id )
+                #if account :
+                    #rec.analytic_account_id = account.analytic_account_id.id
+                #else :
+                    #rec.analytic_account_id = False
+            #else :
+                #rec.analytic_account_id = False
 
     @api.depends ( 'project_type_id' , 'order_line' )
     @api.onchange ( 'project_type_id' , 'order_line' )
