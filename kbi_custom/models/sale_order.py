@@ -192,6 +192,17 @@ class SaleOrder ( models.Model ) :
                 }
             }
 
+    @api.onchange ( 'analytic_account_id' )
+    def _onchange_analytic_account_id(self) :
+        for line in self.order_line :
+            if self.analytic_account_id :
+                line.analytic_distribution = [{
+                    "account_id" : self.analytic_account_id.id ,
+                    "percent" : 100
+                }]
+            else :
+                line.analytic_distribution = []
+                
     def action_view_invoice(self , invoices=False) :
         self.ensure_one ()  # لو عايزين نتعامل مع order واحد في context
 
@@ -639,16 +650,16 @@ class SaleOrderLine ( models.Model ) :
     finance_service_ok = fields.Boolean ( string='Finance Service' , related='product_id.finance_service_ok' )
     downpayment_ok = fields.Boolean ( string='Downpayment Service' , related='product_id.downpayment_ok' )
     public_name = fields.Char ( string='Public Name' , related='product_id.public_name' )
-    analyric_distribution=fields.Json(string='Analytic Distribution',compute='_compute_analytic_distribution',store=True)
+   # analytic_distribution=fields.Json(string='Analytic Distribution',compute='_compute_analytic_distribution',store=True)
 
-    @api.depends ( 'order_id.analytic_account_id' )
-    def _compute_analytic_distribution(self) :
-        for line in self :
-            if line.order_id.analytic_account_id :
+   # @api.depends ( 'order_id.analytic_account_id' )
+   # def _compute_analytic_distribution(self) :
+    #    for line in self :
+      #      if line.order_id.analytic_account_id :
                 # JSON format: [{"account_id": <id>, "percent": 100}]
-                line.analytic_distribution = [{"account_id" : line.order_id.analytic_account_id.id , "percent" : 100}]
-            else :
-                line.analytic_distribution = []
+         #       line.analytic_distribution = [{"account_id" : line.order_id.analytic_account_id.id , "percent" : 100}]
+         #   else :
+           #     line.analytic_distribution = []
 
     @api.onchange ( 'budget_percentage' )
     def _onchange_budget_percentage(self) :
