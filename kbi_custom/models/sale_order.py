@@ -142,6 +142,7 @@ class SaleOrder ( models.Model ) :
     mulit_year_price1 = fields.Float ( string="Price1" , readonly=False )
     mulit_year_price2 = fields.Float ( string="Price2" , readonly=False )
     mulit_year_price3 = fields.Float ( string="Price3" , readonly=False )
+    ass_visible = fields.Boolean(string="Visible", compute='_compute_ass_visible')
     partner_id = fields.Many2one ( string="Customer" , comodel_name="res.partner" , strore=True , required=False ,
                                    readonly=False )
     customer_english_name = fields.Char ( string="Customer_English_Name" , related="partner_id.name_english" ,
@@ -154,6 +155,11 @@ class SaleOrder ( models.Model ) :
         compute="_compute_project_count" ,
         store=True
     )
+    
+    @api.depends('review_manager_id')
+    def _compute_ass_visible(self):
+        for rec in self:
+            rec.ass_visible = bool(rec.review_manager_id)
 
     @api.depends ( 'project_ids' )
     def _compute_project_count(self) :
