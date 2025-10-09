@@ -8,6 +8,7 @@ class AccountMove ( models.Model ) :
     _inherit = 'account.move'
 
     broker_sale_id = fields.Many2one ( 'sale.order' , string='Broker Sale' )
+    sale_order_test = fields.Char(string='Sale Order Test',readonly=False,required=False)
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
     analytic_acc_desc = fields.Char (
         string=" Journal Analytic Description" ,
