@@ -24,41 +24,21 @@ class AccountMove ( models.Model ) :
             return autopost_bills_wizard
         return True
 
-    def _compute_analytic_distribution(self) :
+     def _compute_analytic_distribution(self) :
         for rec in self :
             analytic_name = ''
-            analytic_id = False
-
-            # التأكد أن الفاتورة مرتبطة بسيل أوردر
-            if rec.invoice_origin :
-                sale_order = self.env['sale.order'].sudo ().search ( [('name' , '=' , rec.invoice_origin)] , limit=1 )
-                if sale_order and sale_order.analytic_account_id :
-                    analytic_name = sale_order.analytic_account_id.name
-                    analytic_id = sale_order.analytic_account_id.id
-
-            # حفظ الاسم في الحقل
-            rec.analytic_acc_desc = analytic_name
-
-            # تحديث كل سطر بالفاتورة
             for line in rec.line_ids :
-                if hasattr ( line , 'analytic_distribution' ) and analytic_id :
-                    line.analytic_distribution = {analytic_id : 100}
-
-    #def _compute_analytic_distribution(self) :
-    #    for rec in self :
-    #        analytic_name = ''
-    #        for line in rec.line_ids :
-    #            if hasattr ( line , 'analytic_distribution' ) and line.analytic_distribution :
-    #                analytic_ids = list ( line.analytic_distribution.keys () )
-    #                try :
-    #                    analytic_id = int ( analytic_ids[0] )
-    #                    analytic = self.env['account.analytic.account'].browse ( analytic_id )
-    #                    if analytic.exists () :
-    #                        analytic_name = analytic.name
-    #                        break
-    #                except (ValueError , TypeError) :
-    #                    continue
-    #        rec.analytic_acc_desc = analytic_name
+                if hasattr ( line , 'analytic_distribution' ) and line.analytic_distribution :
+                    analytic_ids = list ( line.analytic_distribution.keys () )
+                    try :
+                        analytic_id = int ( analytic_ids[0] )
+                        analytic = self.env['account.analytic.account'].browse ( analytic_id )
+                        if analytic.exists () :
+                            analytic_name = analytic.name
+                            break
+                    except (ValueError , TypeError) :
+                        continue
+            rec.analytic_acc_desc = analytic_name
 
 
 class AccountMoveLine ( models.Model ) :
