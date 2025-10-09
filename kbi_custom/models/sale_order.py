@@ -641,19 +641,15 @@ class SaleOrderLine ( models.Model ) :
     public_name = fields.Char ( string='Public Name' , related='product_id.public_name' )
     analyric_distribution=fields.Json(string='Analytic Distribution',compute='_compute_analytic_distribution',store=True)
 
-    @api.depends ( 'order_id.analytic_distribution_ids' )
+    @api.depends ( 'order_id.analytic_account_id' )
     def _compute_analytic_distribution(self) :
         for line in self :
-            dist_list = []
-            if line.order_id.analytic_distribution_ids :
-                for dist in line.order_id.analytic_distribution_ids :
-                    # كل dist يحتوي على account_id و percent
-                    dist_list.append ( {
-                        "account_id" : dist.account_id.id ,
-                        "percent" : dist.percent
-                    } )
-            line.analytic_distribution = dist_list  # JSON كـ list of dicts
-                
+            if line.order_id.analytic_account_id :
+                # JSON format: [{"account_id": <id>, "percent": 100}]
+                line.analytic_distribution = [{"account_id" : line.order_id.analytic_account_id.id , "percent" : 100}]
+            else :
+                line.analytic_distribution = []
+
     @api.onchange ( 'budget_percentage' )
     def _onchange_budget_percentage(self) :
         for line in self :
