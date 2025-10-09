@@ -196,12 +196,11 @@ class SaleOrder ( models.Model ) :
     def _onchange_analytic_account_id(self) :
         for line in self.order_line :
             if self.analytic_account_id :
-                line.analytic_distribution = [{
-                    "account_id" : self.analytic_account_id.id ,
-                    "percent" : 100
-                }]
+                line.analytic_distribution = {
+                    self.analytic_account_id.id : 100
+                }
             else :
-                line.analytic_distribution = []
+                line.analytic_distribution = {}
 
     def action_view_invoice(self , invoices=False) :
         self.ensure_one ()  # لو عايزين نتعامل مع order واحد في context
