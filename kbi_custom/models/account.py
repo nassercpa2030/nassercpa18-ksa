@@ -9,6 +9,7 @@ class AccountMove ( models.Model ) :
 
     broker_sale_id = fields.Many2one ( 'sale.order' , string='Broker Sale' )
     sale_order_test = fields.Char(string='Sale Order Test',readonly=False,required=False)
+    invoice_count_odoo16 = fields.Integer(string="",store=True)
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
     analytic_acc_desc = fields.Char (
         string=" Journal Analytic Description" ,
