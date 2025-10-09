@@ -192,50 +192,48 @@ class SaleOrder ( models.Model ) :
             }
 
     def action_view_invoice(self , invoices=False) :
-        if not invoices :
-            # 1- الفواتير المرتبطة عادي بالـ invoice_ids
-            invoices = self.mapped ( 'invoice_ids' )
+        self.ensure_one ()  # لو عايزين نتعامل مع order واحد في context
 
-            # 2- الفواتير اللي فيها قيمة في sale_order_test = self.name
-            extra_invoices = self.env['account.move'].search ( [
-                ('sale_order_test' , 'ilike' , self.name.strip ()) ,
-                ('move_type' , '=' , 'out_invoice')
-            ] )
+        # 1️⃣ جلب الفواتير المرتبطة بالـ invoice_ids
+        invoices = invoices or self.mapped ( 'invoice_ids' )
 
-            # 3- دمج الاثنين مع إزالة التكرار
-            invoices = invoices | extra_invoices
+        # 2️⃣ جلب الفواتير اللي فيها sale_order_test مطابق للاسم
+        extra_invoices = self.env['account.move'].search ( [
+            ('sale_order_test' , 'ilike' , self.name.strip ()) ,
+            ('move_type' , '=' , 'out_invoice')
+        ] )
 
-        # جلب الـ action الافتراضي للفواتير الصادرة
+        # 3️⃣ دمج الاثنين وإزالة التكرار
+        invoices |= extra_invoices
+
+        # 4️⃣ جلب action الافتراضي للفواتير الصادرة
         action = self.env['ir.actions.actions']._for_xml_id ( 'account.action_move_out_invoice_type' )
 
-        if len ( invoices ) > 1 :
-            action['domain'] = [('id' , 'in' , invoices.ids)]
-        elif len ( invoices ) == 1 :
-            form_view = [(self.env.ref ( 'account.view_move_form' ).id , 'form')]
-            if 'views' in action :
-                action['views'] = form_view + [(state , view) for state , view in action['views'] if view != 'form']
+        if invoices :
+            if len ( invoices ) == 1 :
+                # فتح الفورم مباشرة للفاتورة الواحدة
+                action['views'] = [(self.env.ref ( 'account.view_move_form' ).id , 'form')]
+                action['res_id'] = invoices.id
             else :
-                action['views'] = form_view
-            action['res_id'] = invoices.id
+                # عرض قائمة الفواتير
+                action['domain'] = [('id' , 'in' , invoices.ids)]
         else :
-            action = {'type' : 'ir.actions.act_window_close'}
+            # لو مفيش فواتير، يغلق الـ action
+            return {'type' : 'ir.actions.act_window_close'}
 
-        # تحضير context للفواتير الجديدة
+        # 5️⃣ تحضير context للفواتير الجديدة
         context = {
             'default_move_type' : 'out_invoice' ,
+            'default_partner_id' : self.partner_id.id ,
+            'default_partner_shipping_id' : self.partner_shipping_id.id ,
+            'default_invoice_payment_term_id' : self.payment_term_id.id
+                                                or self.partner_id.property_payment_term_id.id
+                                                or self.env['account.move'].default_get (
+                ['invoice_payment_term_id'] ).get ( 'invoice_payment_term_id' ) ,
+            'default_invoice_origin' : self.name ,
         }
-        if len ( self ) == 1 :
-            context.update ( {
-                'default_partner_id' : self.partner_id.id ,
-                'default_partner_shipping_id' : self.partner_shipping_id.id ,
-                'default_invoice_payment_term_id' : self.payment_term_id.id
-                                                    or self.partner_id.property_payment_term_id.id
-                                                    or self.env['account.move'].default_get (
-                    ['invoice_payment_term_id'] ).get ( 'invoice_payment_term_id' ) ,
-                'default_invoice_origin' : self.name ,
-            } )
-
         action['context'] = context
+
         return action
 
     @api.onchange ( 'number_700_sale' , 'cr_number_sale' )
@@ -464,7 +462,7 @@ class SaleOrder ( models.Model ) :
             invoices = self.env['account.move'].search ( [
                 ('sale_order_test' , '=' , order.name.strip ()) ,
                 ('move_type' , '=' , 'out_invoice')
-            ] )            
+            ] )
             order.invoice_count_odoo16 = len(invoices)
 
     def action_open_print_sale_wizard(self) :
