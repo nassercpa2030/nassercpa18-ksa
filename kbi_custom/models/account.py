@@ -24,7 +24,7 @@ class AccountMove ( models.Model ) :
             return autopost_bills_wizard
         return True
 
-     def _compute_analytic_distribution(self) :
+    def _compute_analytic_distribution(self) :
         for rec in self :
             analytic_name = ''
             for line in rec.line_ids :
