@@ -199,7 +199,7 @@ class SaleOrder ( models.Model ) :
 
         # 2️⃣ جلب الفواتير اللي فيها sale_order_test مطابق للاسم
         extra_invoices = self.env['account.move'].search ( [
-            ('sale_order_test' , 'ilike' , self.name.strip ()) ,
+            ('invoice_origin' , 'ilike' , self.name.strip ()) ,
             ('move_type' , '=' , 'out_invoice')
         ] )
 
