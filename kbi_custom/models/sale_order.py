@@ -656,7 +656,7 @@ class SaleOrderLine ( models.Model ) :
     def _compute_analytic_distribution(self) :
         for line in self :
             if line.order_id.analytic_account_id :
-                 JSON format: [{"account_id": <id>, "percent": 100}]
+                #JSON format: [{"account_id": <id>, "percent": 100}]
                 line.analytic_distribution = [{"account_id" : line.order_id.analytic_account_id.id , "percent" : 100}]
             else :
                 line.analytic_distribution = []
