@@ -45,13 +45,13 @@ class CloseEntryWizard(models.TransientModel):
     use_account_id1 = fields.Boolean(string='Use Alternative Account')
     journal_id = fields.Many2one('account.journal', string="Journal", required=False,ondelete='set null')
     journal_id1 = fields.Many2one('account.journal', string="Deferred Journal", required=True,
-                                  default=lambda self: self.env['account.journal'].browse(32))
+                                  default=lambda self: self.env['account.journal'].browse(161))
     journal_id2 = fields.Many2one('account.journal', string="Deferred close Journal", required=True,
-                                  default=lambda self: self.env['account.journal'].browse(33))
+                                  default=lambda self: self.env['account.journal'].browse(162))
     account_id1 = fields.Many2one('account.account', string="Deferred Aggregate Account", required=True,
-                                  default=lambda self: self.env['account.account'].browse(1206))
+                                  default=lambda self: self.env['account.account'].browse(1192))
     account_id = fields.Many2one('account.account', string="Aggregate Account", required=True,
-                                 default=lambda self: self.env['account.account'].browse(158))
+                                 default=lambda self: self.env['account.account'].browse(1341))
 
     @api.model
     def default_get(self, fields_list):
