@@ -43,9 +43,9 @@ class CloseEntryWizard(models.TransientModel):
     invoice_lines = fields.One2many('invoice.line.wizard', 'wizard_id', string='Invoice Lines')
     sale_order_id = fields.Many2one('sale.order', string='Sales Order', ondelete='set null')
     use_account_id1 = fields.Boolean(string='Use Alternative Account')
-    journal_id = fields.Many2one('account.journal', string="Journal", required=False,ondelete='set null')
-    journal_id1 = fields.Many2one('account.journal', string="Deferred Journal", required=True,
-                                  default=lambda self: self.env['account.journal'].browse(161))
+    journal_id = fields.Many2one('account.journal', string="Journal", required=False,ondelete='set null', default=lambda self: self.env['account.journal'].browse(161))
+    journal_id1 = fields.Many2one('account.journal', string="Deferred Journal", required=True
+                                 )
     journal_id2 = fields.Many2one('account.journal', string="Deferred close Journal", required=True,
                                   default=lambda self: self.env['account.journal'].browse(162))
     account_id1 = fields.Many2one('account.account', string="Deferred Aggregate Account", required=True,
