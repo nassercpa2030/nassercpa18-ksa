@@ -54,8 +54,8 @@
               <group>
                   <!--field name="journal_id" invisible="1"/-->
                   <!--field name="journal_id2" invisible="1"/-->
-                 <field name="journal_id" modifiers="{'invisible': [('use_account_id1', '=', True)],'required': [('use_account_id1', '=', False)]}"/>
-                  <field name="journal_id2" modifiers="{'invisible': [('use_account_id1', '=', False)],'required': [('use_account_id1', '=', True)]}"/>
+                 <field name="journal_id"  invisible="use_account_id1 = True"  required="use_account_id1 = False"/>
+                 <field name="journal_id2" invisible="use_account_id1 = False" required="use_account_id1 = True"/>
                   <field name="account_id" required="1"/>
               </group>
               <field name="invoice_lines" widget="one2many_list" mode="list,form">
