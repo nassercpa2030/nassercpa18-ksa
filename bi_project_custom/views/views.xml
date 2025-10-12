@@ -52,8 +52,8 @@
       <field name="arch" type="xml">
           <form string="Close Entry">
               <group>
-                  <field name="journal_id" required="use_account_id1 = False" />
-                  <field name="journal_id2" required="use_account_id1 = True" />
+                  <field name="journal_id"  />
+                  <field name="journal_id2"  />
                  <!--field name="journal_id"  invisible="use_account_id1 = True"  required="use_account_id1 = False"/-->
                  <!--field name="journal_id2" invisible="use_account_id1 = False" required="use_account_id1 = True"/-->
                   <field name="account_id" required="1"/>
