@@ -351,14 +351,19 @@ class SaleOrder ( models.Model ) :
             
     @api.depends ( 'first_payment_id' )
     def _compute_first_payment_fields(self) :
-        for rec in self :
-            if rec.first_payment_id._name == 'account.payment' :
-                rec.first_payment_date = rec.first_payment_id.date
-                rec.first_payment_amount = rec.first_payment_id.amount
-            elif rec.first_payment_id._name == 'account.move.line' :
-                rec.first_payment_date = rec.first_payment_id.date
-                rec.first_payment_amount = rec.first_payment_id.credit
-            else :
+       for rec in self:
+            payment = rec.first_payment_id
+            if payment:
+                if payment._name == 'account.payment':
+                    rec.first_payment_date = payment.date
+                    rec.first_payment_amount = payment.amount
+                elif payment._name == 'account.move.line':
+                    rec.first_payment_date = payment.date
+                    rec.first_payment_amount = payment.credit
+                else:
+                    rec.first_payment_date = False
+                    rec.first_payment_amount = 0.0
+            else:
                 rec.first_payment_date = False
                 rec.first_payment_amount = 0.0
 
