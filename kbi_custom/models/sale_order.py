@@ -99,7 +99,7 @@ class SaleOrder ( models.Model ) :
                                               compute="_compute_broker_invoiced_amount" )
     first_payment_id = fields.Many2one( 'account.payment',string="First Payment", compute="_compute_first_payment_id")
     first_payment_code = fields.Char(string="First Payment Code", compute="_compute_payment_count")
-    first_payment_code_date = fields.Date ( string='First Journal Date' , related='_compute_payment_count' )
+    first_payment_code_date = fields.Date ( string='First Journal Date' , compute='_compute_payment_count' )
     first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
     first_payment_amount = fields.Monetary ( string='First Payment Date' , related='first_payment_id.amount' )
     #first_payment_date = fields.Date ( string='First Payment Date' , compute='_compute_first_payment_fields' )
