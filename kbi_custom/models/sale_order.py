@@ -97,8 +97,9 @@ class SaleOrder ( models.Model ) :
     broker_invoiced_amount = fields.Float ( string='Broker Paid Amount' , compute="_compute_broker_invoiced_amount" )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
                                               compute="_compute_broker_invoiced_amount" )
-    first_payment_id = fields.Many2one ( comodel_name='account.payment' , string='First Payment' ,
-                                         compute='_compute_first_payment_id' )
+    #first_payment_id = fields.Many2one ( string='First Payment' ,compute='_compute_first_payment_id' )
+    first_payment_id=fields.Reference( [('account.payment', 'Payment'), ('account.move', 'Journal Entry')],
+    string='First Payment')
     # first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
     # first_payment_amount = fields.Monetary ( string='First Payment Date' , related='first_payment_id.amount' )
     first_payment_date = fields.Date ( string='First Payment Date' , compute='_compute_first_payment_fields' )
