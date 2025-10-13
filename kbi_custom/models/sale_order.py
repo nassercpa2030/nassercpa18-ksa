@@ -333,7 +333,7 @@ class SaleOrder ( models.Model ) :
 
             # أول قيد يومية مرتبط بالـ sale order
             move_lines = rec.order_line.mapped ( 'move_ids' ).filtered (
-                lambda l : l.credit > 0 and l.state == 'posted' )
+                lambda l : l.sale_order_id == rec and l.state == 'posted' )
             first_move_line = move_lines.sorted ( key='date' )
             first_move_line = first_move_line[0] if first_move_line else False
 
