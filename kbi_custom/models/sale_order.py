@@ -320,16 +320,49 @@ class SaleOrder ( models.Model ) :
 
             rec.payment_ids = [(6 , 0 , payments)]
     def action_unlock(self):
-        for rec in self :
-           if rec.state in ("done"):
-               rec.state ="sale"
+        for rec in self
+           if rec.state = "done"
+              rec.state ="sale"
 
-    def _compute_first_payment_id(self) :
-        for rec in self :
-            rec.first_payment_id = self.env['account.payment'].search ( [('id' , 'in' , rec.payment_ids.ids)] ,
 
-                                                                        order="date asc" , limit=1 )
-    @api.depends ( 'first_payment_id' )
+@api.depends ( 'payment_ids' )
+def _compute_first_payment_id(self) :
+    for rec in self :
+        # 1️⃣ أول دفعة من account.payment
+        first_payment = self.env['account.payment'].search (
+            [('id' , 'in' , rec.payment_ids.ids)] ,
+            order="date asc" ,
+            limit=1
+        )
+
+        # 2️⃣ أول قيد يومية فيه sale_order_id = نفس الطلب
+        first_move_line = self.env['account.move.line'].search (
+            [
+                ('sale_order_id' , '=' , rec.id) ,
+                ('credit' , '>' , 0) ,
+                ('move_id.state' , '=' , 'posted') ,
+            ] ,
+            order="date asc" ,
+            limit=1
+        )
+
+        # 3️⃣ نحدد الأقدم من الاثنين
+        first_record = None
+        if first_payment and first_move_line :
+            if first_payment.date <= first_move_line.date :
+                first_record = first_payment
+            else :
+                first_record = first_move_line
+        elif first_payment :
+            first_record = first_payment
+        elif first_move_line :
+            first_record = first_move_line
+
+        # 4️⃣ نخزن النتيجة
+        rec.first_payment_id = first_record.id if first_record else False
+
+
+@api.depends ( 'first_payment_id' )
     def _compute_first_payment_fields(self) :
         for rec in self :
             if rec.first_payment_id._name == 'account.payment' :
