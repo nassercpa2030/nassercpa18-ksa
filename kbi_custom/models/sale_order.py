@@ -121,10 +121,8 @@ class SaleOrder ( models.Model ) :
     ] , string="Project Files State" , store=True )
     # identifying new variable not signed by _customer
     state = fields.Selection (
-        [('customer_notsigned' , 'NOT_Customer_Signed') , ('done' , 'Locked') , ('archive2024' , 'Archive2024') ,
-         ('to approve' , 'To Approve') ,
-         ('draft' , 'Quotation') , ('archived' , 'Archived') ,
-         ('cancel' , 'Cancelled') , ('archive2025' , 'Archive2025') , ('sale' , 'Sales Order')] , store=True ,
+        [ ('draft' , 'Quotation') , ('to approve' , 'To Approve'), ('done' , 'Locked') ,('sale' , 'Sales Order') ('archived' , 'Archived') ,('customer_notsigned' , 'NOT_Customer_Signed'), 
+         ('cancel' , 'Cancelled') , ('archive2025' , 'Archive2025')  , ('archive2024' , 'Archive2024') ] , store=True ,
         readonly=False )
     project_id = fields.Many2one ( 'project.project' , string="المشروع" )
     auto_code = fields.Char ( string="Auto Code" , readonly=False , store=True )
