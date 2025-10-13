@@ -97,9 +97,8 @@ class SaleOrder ( models.Model ) :
     broker_invoiced_amount = fields.Float ( string='Broker Paid Amount' , compute="_compute_broker_invoiced_amount" )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
                                               compute="_compute_broker_invoiced_amount" )
-    #first_payment_id = fields.Many2one ( string='First Payment' ,compute='_compute_first_payment_id' )
-    first_payment_id=fields.Reference( [('account.payment', 'Payment'), ('account.move', 'Journal Entry')],
-    string='First Payment')
+    first_payment_id = fields.Many2one('account.payment', string="First Payment", compute="_compute_first_payment_id")
+    first_payment_code = fields.Char(string="First Payment Code", compute="_compute_first_payment_fields")
     # first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
     # first_payment_amount = fields.Monetary ( string='First Payment Date' , related='first_payment_id.amount' )
     first_payment_date = fields.Date ( string='First Payment Date' , compute='_compute_first_payment_fields' )
@@ -326,6 +325,8 @@ class SaleOrder ( models.Model ) :
             if rec.state in ("done") :
                 rec.state = "sale"
 
+
+    api.depends ( 'payment_ids' , 'order_line.move_ids' )
     def _compute_first_payment_id(self) :
         for rec in self :
             # أول دفعة منشورة
@@ -347,26 +348,37 @@ class SaleOrder ( models.Model ) :
             elif first_move_line :
                 first_record = first_move_line
 
-            rec.first_payment_id = first_record.id if first_record else False
-            
+            # نحتفظ بالسجل كامل وليس فقط الـ id
+            rec.first_payment_id = first_record if isinstance ( first_record ,
+                                                                self.env['account.payment'].__class__ ) else False
+
     @api.depends ( 'first_payment_id' )
     def _compute_first_payment_fields(self) :
-       for rec in self:
+        for rec in self :
             payment = rec.first_payment_id
-            if payment:
-                if payment._name == 'account.payment':
-                    rec.first_payment_date = payment.date
-                    rec.first_payment_amount = payment.amount
-                elif payment._name == 'account.move.line':
-                    rec.first_payment_date = payment.date
-                    rec.first_payment_amount = payment.credit
-                else:
+            if payment :
+                # أول دفعة يمكن تكون payment أو move_line
+                if hasattr ( payment , '_name' ) :
+                    if payment._name == 'account.payment' :
+                        rec.first_payment_code = payment.name
+                        rec.first_payment_date = payment.date
+                        rec.first_payment_amount = payment.amount
+                    elif payment._name == 'account.move.line' :
+                        rec.first_payment_code = payment.name
+                        rec.first_payment_date = payment.date
+                        rec.first_payment_amount = payment.credit
+                    else :
+                        rec.first_payment_code = False
+                        rec.first_payment_date = False
+                        rec.first_payment_amount = 0.0
+                else :
+                    rec.first_payment_code = False
                     rec.first_payment_date = False
                     rec.first_payment_amount = 0.0
-            else:
+            else :
+                rec.first_payment_code = False
                 rec.first_payment_date = False
                 rec.first_payment_amount = 0.0
-
     @api.depends ( 'payment_ids' )
     def _compute_payment_count(self) :
         for rec in self :
@@ -495,11 +507,11 @@ class SaleOrder ( models.Model ) :
     broker_invoiced_amount = fields.Float ( string='Broker Paid Amount' , compute="_compute_broker_invoiced_amount" )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
                                               compute="_compute_broker_invoiced_amount" )
-    #first_payment_id = fields.Many2one ( string='First Payment' , compute='_compute_first_payment_id' )
+    # first_payment_id = fields.Many2one ( string='First Payment' , compute='_compute_first_payment_id' )
     # first_payment_id = fields.Many2one ( comodel_name='account.payment' , string='First Payment' ,
     # compute='_compute_first_payment_id' )
-    #first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
-    #first_payment_amount = fields.Monetary ( string='First Payment Amount' , related='first_payment_id.amount' )
+    # first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
+    # first_payment_amount = fields.Monetary ( string='First Payment Amount' , related='first_payment_id.amount' )
     project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
                                          related='project_ids.stage_id' , store=True , groups='base.group_user' )
     # close_type = fields.Char(comodel_name='project.project.close_type',string='Close_type', related='close_type', store=True)
