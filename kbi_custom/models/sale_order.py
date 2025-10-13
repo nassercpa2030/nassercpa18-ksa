@@ -321,8 +321,8 @@ class SaleOrder ( models.Model ) :
             rec.payment_ids = [(6 , 0 , payments)]
     def action_unlock(self):
         for rec in self :
-           if rec.state in ("done")
-              rec.state ="sale"
+           if rec.state in ("done"):
+               rec.state ="sale"
 
     def _compute_first_payment_id(self) :
         for rec in self :
