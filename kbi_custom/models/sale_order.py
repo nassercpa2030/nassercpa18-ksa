@@ -99,11 +99,8 @@ class SaleOrder ( models.Model ) :
                                               compute="_compute_broker_invoiced_amount" )
     first_payment_id = fields.Many2one ( comodel_name='account.payment' , string='First Payment' ,
                                          compute='_compute_first_payment_id' )
-    # first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
-    # first_payment_amount = fields.Monetary ( string='First Payment Date' , related='first_payment_id.amount' )
-    first_payment_date = fields.Date ( string='First Payment Date' , compute='_compute_first_payment_fields' )
-    first_payment_amount = fields.Monetary ( string='First Payment Amount' , compute='_compute_first_payment_fields' )
-
+    first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
+    first_payment_amount = fields.Monetary ( string='First Payment Date' , related='first_payment_id.amount' )
     project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
                                          related='project_ids.stage_id' , store=True , groups='base.group_user' )
     # close_type = fields.Char(comodel_name='project.project.close_type',string='Close_type', related='close_type', store=True)
@@ -124,9 +121,10 @@ class SaleOrder ( models.Model ) :
     ] , string="Project Files State" , store=True )
     # identifying new variable not signed by _customer
     state = fields.Selection (
-        [('draft' , 'Quotation') , ('to approve' , 'To Approve') , ('done' , 'Locked') , ('sale' , 'Sales Order') ,
-         ('archived' , 'Archived') , ('customer_notsigned' , 'NOT_Customer_Signed') ,
-         ('cancel' , 'Cancelled') , ('archive2025' , 'Archive2025') , ('archive2024' , 'Archive2024')] , store=True ,
+        [('customer_notsigned' , 'NOT_Customer_Signed') , ('done' , 'Locked') , ('archive2024' , 'Archive2024') ,
+         ('to approve' , 'To Approve') ,
+         ('draft' , 'Quotation') , ('archived' , 'Archived') ,
+         ('cancel' , 'Cancelled') , ('archive2025' , 'Archive2025') , ('sale' , 'Sales Order')] , store=True ,
         readonly=False )
     project_id = fields.Many2one ( 'project.project' , string="المشروع" )
     auto_code = fields.Char ( string="Auto Code" , readonly=False , store=True )
@@ -319,37 +317,38 @@ class SaleOrder ( models.Model ) :
                     payments.append ( payment.id )
 
             rec.payment_ids = [(6 , 0 , payments)]
-    def action_unlock(self):
-        for rec in self :
-           if rec.state in ("done"):
-               rec.state ="sale"
 
     def _compute_first_payment_id(self) :
         for rec in self :
-            rec.first_payment_id = self.env['account.payment'].search ( [('id' , 'in' , rec.payment_ids.ids)] ,
-                                                                        order="date asc" , limit=1 )
+            # أول دفعة
+            first_payment = rec.payment_ids.filtered ( lambda p : p.state == 'posted' ).sorted ( key='date' )[:1]
+            first_payment = first_payment[0] if first_payment else False
 
+            # أول قيد يومية مرتبط بالـ sale order
+            first_move_line = self.env['account.move.line'].search (
+                [('sale_order_id' , '=' , rec.id) , ('credit' , '>' , 0) , ('move_id.state' , '=' , 'posted')] ,
+                order='date asc' ,
+                limit=1
+            )
+
+            # نحدد الأقدم
+            first_record = False
+            if first_payment and first_move_line :
+                if first_payment.date <= first_move_line.date :
+                    first_record = first_payment
+                else :
+                    first_record = first_move_line
+            elif first_payment :
+                first_record = first_payment
+            elif first_move_line :
+                first_record = first_move_line
+
+            rec.first_payment_id = first_record.id if first_record else False
             
-
-    @api.depends ( 'first_payment_id' )
-    def _compute_first_payment_fields(self) :
-        for rec in self :
-            if rec.first_payment_id._name == 'account.payment' :
-                rec.first_payment_date = rec.first_payment_id.date
-                rec.first_payment_amount = rec.first_payment_id.amount
-            elif rec.first_payment_id._name == 'account.move.line' :
-                rec.first_payment_date = rec.first_payment_id.date
-                rec.first_payment_amount = rec.first_payment_id.credit
-            else :
-                rec.first_payment_date = False
-                rec.first_payment_amount = 0.0
-
     @api.depends ( 'payment_ids' )
     def _compute_payment_count(self) :
         for rec in self :
             paid_total = 0
-
-            # 1️⃣ نجمع المدفوعات من account.payment
             for payment in self.env['account.payment'].search ( [('partner_id' , '=' , rec.partner_id.id)] ) :
                 if payment.multi_sale :
                     payment_sale = payment.sale_order_ids.filtered ( lambda d : d.sale_order_id.id == rec.id )
@@ -358,23 +357,11 @@ class SaleOrder ( models.Model ) :
                 if payment.sale_order_id.id == rec.id :
                     paid_total += payment.amount
 
-            # 2️⃣ نجمع المدفوعات من قيود اليومية account.move.line
-            move_lines = self.env['account.move.line'].search ( [
-                ('sale_order_id' , '=' , rec.id) ,
-                ('credit' , '>' , 0)
-            ] )
-            for line in move_lines :
-                paid_total += line.credit or 0.0
-
             rec.paid_total = paid_total
             rec.payment_count = len ( rec.payment_ids )
             rec.paid_percent = (rec.paid_total / (rec.amount_total or 1)) * 100
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
-            # 3️⃣ change state of order
-            if paid_total > 0 :
-                if rec.state in ("draft" , "to approve") :
-                    rec.state = "done"
 
     def _compute_amount_due(self) :
         for rec in self :
@@ -414,8 +401,8 @@ class SaleOrder ( models.Model ) :
                     lambda x : x.analytic_plan_id.id == rec.project_type_id.id )
                 if account :
                     rec.analytic_account_id = account.analytic_account_id.id
-                # else :
-                # rec.analytic_account_id = False
+                else :
+                    rec.analytic_account_id = False
             else :
                 rec.analytic_account_id = False
 
@@ -472,9 +459,8 @@ class SaleOrder ( models.Model ) :
     broker_invoiced_amount = fields.Float ( string='Broker Paid Amount' , compute="_compute_broker_invoiced_amount" )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
                                               compute="_compute_broker_invoiced_amount" )
-    first_payment_id = fields.Many2one ( string='First Payment' , compute='_compute_first_payment_id' )
-    # first_payment_id = fields.Many2one ( comodel_name='account.payment' , string='First Payment' ,
-    # compute='_compute_first_payment_id' )
+    first_payment_id = fields.Many2one ( comodel_name='account.payment' , string='First Payment' ,
+                                         compute='_compute_first_payment_id' )
     first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
     first_payment_amount = fields.Monetary ( string='First Payment Amount' , related='first_payment_id.amount' )
     project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
