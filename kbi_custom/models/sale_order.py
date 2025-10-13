@@ -142,7 +142,7 @@ class SaleOrder ( models.Model ) :
     mulit_year_price1 = fields.Float ( string="Price1" , readonly=False )
     mulit_year_price2 = fields.Float ( string="Price2" , readonly=False )
     mulit_year_price3 = fields.Float ( string="Price3" , readonly=False )
-    ass_visible = fields.Boolean(string="Visible", compute='_compute_ass_visible')
+    ass_visible = fields.Boolean ( string="Visible" , compute='_compute_ass_visible' )
     partner_id = fields.Many2one ( string="Customer" , comodel_name="res.partner" , strore=True , required=False ,
                                    readonly=False )
     customer_english_name = fields.Char ( string="Customer_English_Name" , related="partner_id.name_english" ,
@@ -155,11 +155,11 @@ class SaleOrder ( models.Model ) :
         compute="_compute_project_count" ,
         store=True
     )
-    
-    @api.depends('review_manager_id')
-    def _compute_ass_visible(self):
-        for rec in self:
-            rec.ass_visible = bool(rec.review_manager_id)
+
+    @api.depends ( 'review_manager_id' )
+    def _compute_ass_visible(self) :
+        for rec in self :
+            rec.ass_visible = bool ( rec.review_manager_id )
 
     @api.depends ( 'project_ids' )
     def _compute_project_count(self) :
@@ -327,6 +327,8 @@ class SaleOrder ( models.Model ) :
     def _compute_payment_count(self) :
         for rec in self :
             paid_total = 0
+
+            # 1️⃣ نجمع المدفوعات من account.payment
             for payment in self.env['account.payment'].search ( [('partner_id' , '=' , rec.partner_id.id)] ) :
                 if payment.multi_sale :
                     payment_sale = payment.sale_order_ids.filtered ( lambda d : d.sale_order_id.id == rec.id )
@@ -335,6 +337,15 @@ class SaleOrder ( models.Model ) :
                 if payment.sale_order_id.id == rec.id :
                     paid_total += payment.amount
 
+            # 2️⃣ نجمع المدفوعات من قيود اليومية account.move.line
+            move_lines = self.env['account.move.line'].search ( [
+                ('sale_order_id' , '=' , rec.id) ,
+                ('credit' , '>' , 0)
+            ] )
+            for line in move_lines :
+                paid_total += line.credit or 0.0
+
+            # 3️⃣ نحسب باقي القيم
             rec.paid_total = paid_total
             rec.payment_count = len ( rec.payment_ids )
             rec.paid_percent = (rec.paid_total / (rec.amount_total or 1)) * 100
