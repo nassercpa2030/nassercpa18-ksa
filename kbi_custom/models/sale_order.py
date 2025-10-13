@@ -325,21 +325,23 @@ class SaleOrder ( models.Model ) :
             if rec.state in ("done") :
                 rec.state = "sale"
 
-    @api.depends ( 'payment_ids.date' , 'payment_ids.state' , 'invoice_line_ids.move_id.line_ids.credit' ,
-                   'invoice_line_ids.move_id.state' )
+    @api.depends (
+        'payment_ids.date' , 'payment_ids.state' ,  # الدفعات المرتبطة
+        'order_line.move_ids.date' , 'order_line.move_ids.state' , 'order_line.move_ids.credit'  # القيود المرتبطة
+    )
     def _compute_first_payment_id(self) :
         for rec in self :
             # أول دفعة منشورة
             first_payment = rec.payment_ids.filtered ( lambda p : p.state == 'posted' ).sorted ( key='date' )
             first_payment = first_payment[0] if first_payment else False
 
-            # أول قيد منشور مرتبط بالـ sale order
-            move_lines = rec.invoice_line_ids.mapped ( 'move_id.line_ids' ).filtered (
-                lambda l : l.credit > 0 and l.move_id.state == 'posted' )
+            # أول قيد يومية مرتبط بالـ sale order
+            move_lines = rec.order_line.mapped ( 'move_ids' ).filtered (
+                lambda l : l.credit > 0 and l.state == 'posted' )
             first_move_line = move_lines.sorted ( key='date' )
             first_move_line = first_move_line[0] if first_move_line else False
 
-            # نحدد الأقدم
+            # تحديد الأقدم من الاثنين
             first_record = False
             if first_payment and first_move_line :
                 first_record = first_payment if first_payment.date <= first_move_line.date else first_move_line
@@ -349,7 +351,7 @@ class SaleOrder ( models.Model ) :
                 first_record = first_move_line
 
             rec.first_payment_id = first_record.id if first_record else False
-
+            
     @api.depends ( 'first_payment_id' )
     def _compute_first_payment_fields(self) :
         for rec in self :
