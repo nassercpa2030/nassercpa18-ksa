@@ -492,7 +492,7 @@ class SaleOrder ( models.Model ) :
     #first_payment_id = fields.Many2one ( string='First Payment' , compute='_compute_first_payment_id' )
     # first_payment_id = fields.Many2one ( comodel_name='account.payment' , string='First Payment' ,
     # compute='_compute_first_payment_id' )
-    ُ#first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
+    #first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
     #first_payment_amount = fields.Monetary ( string='First Payment Amount' , related='first_payment_id.amount' )
     project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
                                          related='project_ids.stage_id' , store=True , groups='base.group_user' )
