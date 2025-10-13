@@ -325,6 +325,7 @@ class SaleOrder ( models.Model ) :
         for rec in self :
             if rec.state in ("done") :
                 rec.state = "sale"
+                rec.action_create_project()
 
     @api.depends ( 'payment_ids' , 'order_line.move_ids' )
     def _compute_first_payment_id(self) :
