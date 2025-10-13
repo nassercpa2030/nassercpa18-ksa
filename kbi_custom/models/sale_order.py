@@ -97,7 +97,7 @@ class SaleOrder ( models.Model ) :
     broker_invoiced_amount = fields.Float ( string='Broker Paid Amount' , compute="_compute_broker_invoiced_amount" )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
                                               compute="_compute_broker_invoiced_amount" )
-    first_payment_id = fields.Many2one('account.payment', string="First Payment", compute="_compute_first_payment_id")
+    first_payment_id = fields.Many2one( string="First Payment", compute="_compute_first_payment_id")
     first_payment_code = fields.Char(string="First Payment Code", compute="_compute_first_payment_fields")
     # first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
     # first_payment_amount = fields.Monetary ( string='First Payment Date' , related='first_payment_id.amount' )
@@ -325,8 +325,7 @@ class SaleOrder ( models.Model ) :
             if rec.state in ("done") :
                 rec.state = "sale"
 
-
-    api.depends ( 'payment_ids' , 'order_line.move_ids' )
+    @api.depends ( 'payment_ids' , 'order_line.move_ids' )
     def _compute_first_payment_id(self) :
         for rec in self :
             # أول دفعة منشورة
@@ -348,37 +347,28 @@ class SaleOrder ( models.Model ) :
             elif first_move_line :
                 first_record = first_move_line
 
-            # نحتفظ بالسجل كامل وليس فقط الـ id
-            rec.first_payment_id = first_record if isinstance ( first_record ,
-                                                                self.env['account.payment'].__class__ ) else False
+            # نحتفظ بالسجل سواء كان دفعة أو قيد يومية
+            rec.first_payment_id = first_record
 
     @api.depends ( 'first_payment_id' )
     def _compute_first_payment_fields(self) :
         for rec in self :
-            payment = rec.first_payment_id
-            if payment :
-                # أول دفعة يمكن تكون payment أو move_line
-                if hasattr ( payment , '_name' ) :
-                    if payment._name == 'account.payment' :
-                        rec.first_payment_code = payment.name
-                        rec.first_payment_date = payment.date
-                        rec.first_payment_amount = payment.amount
-                    elif payment._name == 'account.move.line' :
-                        rec.first_payment_code = payment.name
-                        rec.first_payment_date = payment.date
-                        rec.first_payment_amount = payment.credit
-                    else :
-                        rec.first_payment_code = False
-                        rec.first_payment_date = False
-                        rec.first_payment_amount = 0.0
+            first_record = rec.first_payment_id
+
+            if first_record :
+                rec.first_payment_code = getattr ( first_record , 'name' , False )
+                rec.first_payment_date = getattr ( first_record , 'date' , False )
+                if getattr ( first_record , '_name' , False ) == 'account.payment' :
+                    rec.first_payment_amount = getattr ( first_record , 'amount' , 0.0 )
+                elif getattr ( first_record , '_name' , False ) == 'account.move.line' :
+                    rec.first_payment_amount = getattr ( first_record , 'credit' , 0.0 )
                 else :
-                    rec.first_payment_code = False
-                    rec.first_payment_date = False
                     rec.first_payment_amount = 0.0
             else :
                 rec.first_payment_code = False
                 rec.first_payment_date = False
                 rec.first_payment_amount = 0.0
+
     @api.depends ( 'payment_ids' )
     def _compute_payment_count(self) :
         for rec in self :
