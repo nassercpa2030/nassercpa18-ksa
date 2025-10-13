@@ -325,7 +325,15 @@ class SaleOrder ( models.Model ) :
         for rec in self :
             if rec.state in ("done") :
                 rec.state = "sale"
-                rec.action_create_project()
+                #rec.action_create_project()
+                existing_project = self.env['project.project'].search([('sale_order_id','=',rec.id)], limit=1)
+                if not existing_project:
+                    # إنشاء المشروع الجديد
+                    self.env['project.project'].create({
+                        'name': rec.name,  # اسم المشروع نفس اسم أمر البيع
+                        'sale_order_id': rec.id,
+                        'user_id': rec.user_id.id,  # مدير المشروع نفس مدير البيع
+                    })
 
     @api.depends ( 'payment_ids' , 'order_line.move_ids' )
     def _compute_first_payment_id(self) :
