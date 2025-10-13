@@ -392,8 +392,8 @@ class SaleOrder ( models.Model ) :
                     lambda x : x.analytic_plan_id.id == rec.project_type_id.id )
                 if account :
                     rec.analytic_account_id = account.analytic_account_id.id
-                else :
-                    rec.analytic_account_id = False
+                #else :
+                    #rec.analytic_account_id = False
             else :
                 rec.analytic_account_id = False
 
