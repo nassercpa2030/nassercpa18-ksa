@@ -345,12 +345,16 @@ class SaleOrder ( models.Model ) :
             for line in move_lines :
                 paid_total += line.credit or 0.0
 
-            # 3️⃣ نحسب باقي القيم
+          
             rec.paid_total = paid_total
             rec.payment_count = len ( rec.payment_ids )
             rec.paid_percent = (rec.paid_total / (rec.amount_total or 1)) * 100
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
+              # 3️⃣ change state of order
+            if paid_total  > 0:
+               if rec.state in ("draft","to approve"):
+                  rec.state ="done"
 
     def _compute_amount_due(self) :
         for rec in self :
