@@ -325,10 +325,6 @@ class SaleOrder ( models.Model ) :
             if rec.state in ("done") :
                 rec.state = "sale"
 
-    @api.depends (
-        'payment_ids.date' , 'payment_ids.state' ,  # الدفعات المرتبطة
-        'order_line.move_ids.date' , 'order_line.move_ids.state' , 'order_line.move_ids.credit'  # القيود المرتبطة
-    )
     def _compute_first_payment_id(self) :
         for rec in self :
             # أول دفعة منشورة
