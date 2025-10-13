@@ -336,34 +336,44 @@ class SaleOrder ( models.Model ) :
         for rec in self :
             paid_total = 0
 
-            # 1️⃣ نجمع المدفوعات من account.payment
-            for payment in self.env['account.payment'].search ( [('partner_id' , '=' , rec.partner_id.id)] ) :
+            # جمع المدفوعات من account.payment
+            payments = self.env['account.payment'].search ( [('partner_id' , '=' , rec.partner_id.id)] )
+            for payment in payments :
                 if payment.multi_sale :
-                    payment_sale = payment.sale_order_ids.filtered ( lambda d : d.sale_order_id.id == rec.id )
-                    if payment_sale :
-                        paid_total += payment_sale.amount
-                if payment.sale_order_id.id == rec.id :
+                    sale_payment = payment.sale_order_ids.filtered ( lambda d : d.sale_order_id.id == rec.id )
+                    paid_total += sum ( sale_payment.mapped ( 'amount' ) )
+                elif payment.sale_order_id.id == rec.id :
                     paid_total += payment.amount
 
-            # 2️⃣ نجمع المدفوعات من قيود اليومية account.move.line
+            # جمع المدفوعات من قيود اليومية
             move_lines = self.env['account.move.line'].search ( [
                 ('sale_order_id' , '=' , rec.id) ,
                 ('credit' , '>' , 0)
             ] )
-            for line in move_lines :
-                paid_total += line.credit or 0.0
-                first_payment_code_date = line.date if move_lines else False
-                first_payment_code=line.move_id if move_lines else False
+            paid_total += sum ( move_lines.mapped ( 'credit' ) )
 
+            # أول دفعة
+            if move_lines :
+                first_line = move_lines.sorted ( 'date' )[0]
+                rec.first_payment_code = first_line.move_id
+                rec.first_payment_code_date = first_line.date
+            else :
+                rec.first_payment_code = False
+                rec.first_payment_code_date = False
+
+            # تحديث الحقول الأخرى
             rec.paid_total = paid_total
             rec.payment_count = len ( rec.payment_ids )
             rec.paid_percent = (rec.paid_total / (rec.amount_total or 1)) * 100
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
-            # 3️⃣ change state of order
-            if paid_total > 0 :
-                if rec.state in ("draft" , "to approve") :
-                    rec.state = "done"
+
+    # 2️⃣ Onchange method لتغيير state بناءً على paid_total
+    @api.onchange ( 'paid_total' )
+    def _onchange_paid_total_state(self) :
+        for rec in self :
+            if rec.paid_total > 0 and rec.state in ('draft' , 'to approve') :
+                rec.state = 'done'
 
     def _compute_amount_due(self) :
         for rec in self :
