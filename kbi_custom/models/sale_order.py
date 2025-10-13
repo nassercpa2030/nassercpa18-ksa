@@ -352,8 +352,8 @@ class SaleOrder ( models.Model ) :
             ] )
             for line in move_lines :
                 paid_total += line.credit or 0.0
-                first_payment_code_date = line.date or None
-                first_payment_code=line.move_id
+                first_payment_code_date = line.date if move_lines else False
+                first_payment_code=line.move_id if move_lines else False
 
             rec.paid_total = paid_total
             rec.payment_count = len ( rec.payment_ids )
