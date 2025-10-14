@@ -479,7 +479,7 @@ def action_open_order_lines(self):
     return {
         'name': 'Sale Order Lines',
         'type': 'ir.actions.act_window',
-        'view_mode': 'tree,form',
+        'view_mode': 'list,form',
         'res_model': 'sale.order.line',
         'domain': [
             ('order_id', '=', self.id),
