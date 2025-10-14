@@ -71,7 +71,7 @@ class SaleOrder ( models.Model ) :
     auditor = fields.Many2one ( string="Auditor" , comodel_name="hr.employee" ,
                                 domain=[('job_id' , '!=' , 'مدير مراجعة')] )
 
-    payment_count2 = fields.Integer(compute='_compute_payment_count')
+    payment_count2 = fields.Integer ( compute='_compute_payment_count' )
     # paid_total = fields.Float(compute='_compute_payment_count')
     # unpaid_total = fields.Float(compute='_compute_payment_count')
     # paid_percent = fields.Float(compute='_compute_payment_count')
@@ -97,13 +97,14 @@ class SaleOrder ( models.Model ) :
     broker_invoiced_amount = fields.Float ( string='Broker Paid Amount' , compute="_compute_broker_invoiced_amount" )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
                                               compute="_compute_broker_invoiced_amount" )
-    first_payment_id = fields.Many2one( 'account.payment',string="First Payment", compute="_compute_first_payment_id")
-    first_payment_code = fields.Char(string="First Payment Code", compute="_compute_payment_count")
+    first_payment_id = fields.Many2one ( 'account.payment' , string="First Payment" ,
+                                         compute="_compute_first_payment_id" )
+    first_payment_code = fields.Char ( string="First Payment Code" , compute="_compute_payment_count" )
     first_payment_code_date = fields.Date ( string='First Journal Date' , compute='_compute_payment_count' )
     first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
     first_payment_amount = fields.Monetary ( string='First Payment Date' , related='first_payment_id.amount' )
-    #first_payment_date = fields.Date ( string='First Payment Date' , compute='_compute_first_payment_fields' )
-    #first_payment_amount = fields.Monetary ( string='First Payment Amount' , compute='_compute_first_payment_fields' )
+    # first_payment_date = fields.Date ( string='First Payment Date' , compute='_compute_first_payment_fields' )
+    # first_payment_amount = fields.Monetary ( string='First Payment Amount' , compute='_compute_first_payment_fields' )
 
     project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
                                          related='project_ids.stage_id' , store=True , groups='base.group_user' )
@@ -320,57 +321,12 @@ class SaleOrder ( models.Model ) :
                     payments.append ( payment.id )
 
             rec.payment_ids = [(6 , 0 , payments)]
-    @api.onchange ( 'paid_total' )
-    def action_unlock(self) :
-        # فلترة الأوردرات المراد تحويلها
-      if paid_total > 0 :  
-        records_to_update = records.filtered (
-            lambda r : r.state in ["draft" ,"to approve","sent" , "archived" , "archived2024" , "archive2025"] )
-
-        for order in records_to_update :
-            # تغيير الحالة مباشرة
-            order.write ( {'state' : 'sale'} )
-
-            # إنشاء مشروع مرتبط إذا لم يكن موجود
-            if not order.project_ids :  # One2many
-                project = env['project.project'].create ( {
-                    'name' : f"Project - {order.name}" ,  # اسم المشروع
-                    'partner_id' : order.partner_id.id ,
-                    'sale_order_id' : order.id ,  # هنا فقط الـ id بدون .name
-                    'user_id' : order.user_id.id ,
-                    'contract_name' : order.project_name ,
-                    'company_id' : order.company_id.id ,
-                    'code' : order.auto_code ,
-                    'sale_person2' : order.broker_id ,
-                    'paid_percent' : order.paid_percent
-                } )
-
-                # ربط المشروع بالسيل أوردر
-                order.write ( {
-                    'project_ids' : [(4 , project.id)] ,  # One2many
-                    'project_id' : project.id  # Many2one
-
-                } )
-
-                # تحديث sale_order_id مرة أخرى إذا أردت (اختياري)
-                project.write ( {'sale_order_id' : order.id} )
-
-        # عرض إشعار النجاح
-        action = {
-            'type' : 'ir.actions.client' ,
-            'tag' : 'display_notification' ,
-            'params' : {
-                'title' : 'التحويل لعقود' ,
-                'message' : f'تم تحويل {len ( records_to_update )} أوردر إلى عقود وإنشاء المشاريع بنجاح ✅' ,
-                'type' : 'success' ,
-                'sticky' : False ,
-            }
-        }
 
     @api.depends ( 'payment_ids' , 'order_line.move_ids' )
     def _compute_first_payment_id(self) :
         for rec in self :
-           rec.first_payment_id = self.env['account.payment'].search ( [('id' , 'in' , rec.payment_ids.ids)] ,order="date asc" , limit=1 )
+            rec.first_payment_id = self.env['account.payment'].search ( [('id' , 'in' , rec.payment_ids.ids)] ,
+                                                                        order="date asc" , limit=1 )
 
     @api.depends ( 'payment_ids' )
     def _compute_payment_count(self) :
@@ -392,7 +348,6 @@ class SaleOrder ( models.Model ) :
                 ('credit' , '>' , 0)
             ] )
             paid_total += sum ( move_lines.mapped ( 'credit' ) )
-           
 
             # أول دفعة
             if move_lines :
@@ -406,17 +361,65 @@ class SaleOrder ( models.Model ) :
             # تحديث الحقول الأخرى
             rec.paid_total = paid_total
             rec.payment_count = len ( rec.payment_ids )
-            rec.payment_count2=len(move_lines)
+            rec.payment_count2 = len ( move_lines )
             rec.paid_percent = (rec.paid_total / (rec.amount_total or 1)) * 100
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
 
-    # 2️⃣ Onchange method لتغيير state بناءً على paid_total
+
     @api.onchange ( 'paid_total' )
-    def _onchange_paid_total_state(self) :
-        for rec in self :
-            if rec.paid_total > 0 and rec.state in ('draft' , 'to approve') :
-                rec.state = 'done'
+    def action_unlock(self) :
+        # فلترة الأوردرات المراد تحويلها
+        if paid_total > 0 :
+            records_to_update = records.filtered (
+                lambda r : r.state in ["draft" , "to approve" , "sent" , "archived" , "archived2024" , "archive2025"] )
+
+            for order in records_to_update :
+                # تغيير الحالة مباشرة
+                order.write ( {'state' : 'sale'} )
+
+                # إنشاء مشروع مرتبط إذا لم يكن موجود
+                if not order.project_ids :  # One2many
+                    project = env['project.project'].create ( {
+                        'name' : f"Project - {order.name}" ,  # اسم المشروع
+                        'partner_id' : order.partner_id.id ,
+                        'sale_order_id' : order.id ,  # هنا فقط الـ id بدون .name
+                        'user_id' : order.user_id.id ,
+                        'contract_name' : order.project_name ,
+                        'company_id' : order.company_id.id ,
+                        'code' : order.auto_code ,
+                        'sale_person2' : order.broker_id ,
+                        'paid_percent' : order.paid_percent
+                    } )
+
+                    # ربط المشروع بالسيل أوردر
+                    order.write ( {
+                        'project_ids' : [(4 , project.id)] ,  # One2many
+                        'project_id' : project.id  # Many2one
+
+                    } )
+
+                    # تحديث sale_order_id مرة أخرى إذا أردت (اختياري)
+                    project.write ( {'sale_order_id' : order.id} )
+
+            # عرض إشعار النجاح
+            action = {
+                'type' : 'ir.actions.client' ,
+                'tag' : 'display_notification' ,
+                'params' : {
+                    'title' : 'التحويل لعقود' ,
+                    'message' : f'تم تحويل {len ( records_to_update )} أوردر إلى عقود وإنشاء المشاريع بنجاح ✅' ,
+                    'type' : 'success' ,
+                    'sticky' : False ,
+                }
+            }
+
+    # 2️⃣ Onchange method لتغيير state بناءً على paid_total
+    #@api.onchange ( 'paid_total' )
+    #def _onchange_paid_total_state(self) :
+       # for rec in self :
+            #if rec.paid_total > 0 and rec.state in ('draft' , 'to approve') :
+                #rec.state = 'done'
 
     def _compute_amount_due(self) :
         for rec in self :
@@ -462,7 +465,7 @@ class SaleOrder ( models.Model ) :
                 rec.analytic_account_id = False
 
     def action_open_payment(self) :
-        return { 
+        return {
             'name' : 'Create Payment' ,
             'type' : 'ir.actions.act_window' ,
             'view_mode' : 'list,form' ,
@@ -476,20 +479,20 @@ class SaleOrder ( models.Model ) :
                 'create' : self.state == 'sale' ,
             }
         }
-    
-    def action_open_order_lines(self):
-       self.ensure_one()
-       return {
-          'name': 'Paid Move Lines',
-          'type': 'ir.actions.act_window',
-          'view_mode': 'list,form',
-          'res_model': 'account.move.line',
-          'domain': [
-             ('sale_order_id', '=', self.id),
-             ('credit', '>', 0)
-             ],
-          'context': {'create': False},
-       }
+
+    def action_open_order_lines(self) :
+        self.ensure_one ()
+        return {
+            'name' : 'Paid Move Lines' ,
+            'type' : 'ir.actions.act_window' ,
+            'view_mode' : 'list,form' ,
+            'res_model' : 'account.move.line' ,
+            'domain' : [
+                ('sale_order_id' , '=' , self.id) ,
+                ('credit' , '>' , 0)
+            ] ,
+            'context' : {'create' : False} ,
+        }
 
 
 class SaleOrder ( models.Model ) :
