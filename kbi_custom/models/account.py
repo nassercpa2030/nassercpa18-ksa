@@ -8,8 +8,8 @@ class AccountMove ( models.Model ) :
     _inherit = 'account.move'
 
     broker_sale_id = fields.Many2one ( 'sale.order' , string='Broker Sale' )
-    sale_order_test = fields.Char(string='Sale Order Test',readonly=False,required=False)
-    invoice_count_odoo16 = fields.Integer(string="",store=True)
+    sale_order_test = fields.Char ( string='Sale Order Test' , readonly=False , required=False )
+    invoice_count_odoo16 = fields.Integer ( string="" , store=True )
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
     analytic_acc_desc = fields.Char (
         string=" Journal Analytic Description" ,
@@ -73,6 +73,15 @@ class AccountPayment ( models.Model ) :
     from_sale = fields.Boolean ( string='From Sale' , default=False )
     amount = fields.Monetary ( currency_field='currency_id' , store=True )
 
+    @api.onchange ( 'sale_order_id' )
+    def _change_memo(self) :
+        for rec in self :
+            if rec.sale_order_id :
+                partner_name = rec.sale_order_id.partner_id.name or ''
+                project_name = rec.sale_order_id.project_name or ''
+                rec.memo = f" تحصيل من العميل : {partner_name} - {project_name}"
+                
+
     # تحديث amount بناءً على sale_order_ids بدون loop
     @api.onchange ( 'sale_order_ids' )
     def _onchange_sale_order_ids(self) :
@@ -86,14 +95,16 @@ class AccountPayment ( models.Model ) :
                     rec.amount = 0
 
     # التحقق من أن amount لا يتجاوز amount_due عند تعديل amount
-   # @api.onchange ( 'amount' )
-    #def _onchange_amount_sale_order_id(self) :
-     #   for rec in self :
-        #    if rec.sale_order_id and not rec.multi_sale and not rec.from_sale :
-         #       if rec.amount > rec.sale_order_id.amount_due :
-                    #raise ValidationError (
-                     #   "Paid amount cannot be greater than order due amount"
-                    #)
+
+
+# @api.onchange ( 'amount' )
+# def _onchange_amount_sale_order_id(self) :
+#   for rec in self :
+#    if rec.sale_order_id and not rec.multi_sale and not rec.from_sale :
+#       if rec.amount > rec.sale_order_id.amount_due :
+# raise ValidationError (
+#   "Paid amount cannot be greater than order due amount"
+# )
 
 
 class AccountPaymentSale ( models.Model ) :
