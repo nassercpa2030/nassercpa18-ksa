@@ -478,12 +478,12 @@ class SaleOrder ( models.Model ) :
     def action_open_order_lines(self):
        self.ensure_one()
        return {
-          'name': 'Sale Order Lines',
+          'name': 'Paid Move Lines',
           'type': 'ir.actions.act_window',
           'view_mode': 'list,form',
-          'res_model': 'sale.order.line',
+          'res_model': 'account.move.line',
           'domain': [
-             ('order_id', '=', self.id),
+             ('sale_order_id', '=', self.id),
              ('credit', '>', 0)
              ],
           'context': {'create': False},
