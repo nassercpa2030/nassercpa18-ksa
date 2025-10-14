@@ -391,7 +391,7 @@ class SaleOrder ( models.Model ) :
                 ('credit' , '>' , 0)
             ] )
             paid_total += sum ( move_lines.mapped ( 'credit' ) )
-            payment_count2=len(move_lines)
+           
 
             # أول دفعة
             if move_lines :
@@ -405,6 +405,7 @@ class SaleOrder ( models.Model ) :
             # تحديث الحقول الأخرى
             rec.paid_total = paid_total
             rec.payment_count = len ( rec.payment_ids )
+            rec.payment_count2=len(move_lines)
             rec.paid_percent = (rec.paid_total / (rec.amount_total or 1)) * 100
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
