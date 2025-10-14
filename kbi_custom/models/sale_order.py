@@ -320,9 +320,10 @@ class SaleOrder ( models.Model ) :
                     payments.append ( payment.id )
 
             rec.payment_ids = [(6 , 0 , payments)]
-
+    @api.onchange ( 'paid_total' )
     def action_unlock(self) :
         # فلترة الأوردرات المراد تحويلها
+      if paid_total > 0 :  
         records_to_update = records.filtered (
             lambda r : r.state in ["draft" ,"to approve","sent" , "archived" , "archived2024" , "archive2025"] )
 
