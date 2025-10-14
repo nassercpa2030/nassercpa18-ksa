@@ -322,18 +322,49 @@ class SaleOrder ( models.Model ) :
             rec.payment_ids = [(6 , 0 , payments)]
 
     def action_unlock(self) :
-        for rec in self :
-            if rec.state in ("done") :
-                rec.state = "sale"
-                #rec.action_create_project()
-                existing_project = self.env['project.project'].search([('sale_order_id','=',rec.id)], limit=1)
-                if not existing_project:
-                    # إنشاء المشروع الجديد
-                    self.env['project.project'].create({
-                        'name': rec.name,  # اسم المشروع نفس اسم أمر البيع
-                        'sale_order_id': rec.id,
-                        'user_id': rec.user_id.id,  # مدير المشروع نفس مدير البيع
-                    })
+        # فلترة الأوردرات المراد تحويلها
+        records_to_update = records.filtered (
+            lambda r : r.state in ["draft" , "sent" , "archived" , "archived2024" , "archive2025"] )
+
+        for order in records_to_update :
+            # تغيير الحالة مباشرة
+            order.write ( {'state' : 'sale'} )
+
+            # إنشاء مشروع مرتبط إذا لم يكن موجود
+            if not order.project_ids :  # One2many
+                project = env['project.project'].create ( {
+                    'name' : f"Project - {order.name}" ,  # اسم المشروع
+                    'partner_id' : order.partner_id.id ,
+                    'sale_order_id' : order.id ,  # هنا فقط الـ id بدون .name
+                    'user_id' : order.user_id.id ,
+                    'contract_name' : order.project_name ,
+                    'company_id' : order.company_id.id ,
+                    'code' : order.auto_code ,
+                    'sale_person2' : order.broker_id ,
+                    'paid_percent' : order.paid_percent
+                } )
+
+                # ربط المشروع بالسيل أوردر
+                order.write ( {
+                    'project_ids' : [(4 , project.id)] ,  # One2many
+                    'project_id' : project.id  # Many2one
+
+                } )
+
+                # تحديث sale_order_id مرة أخرى إذا أردت (اختياري)
+                project.write ( {'sale_order_id' : order.id} )
+
+        # عرض إشعار النجاح
+        action = {
+            'type' : 'ir.actions.client' ,
+            'tag' : 'display_notification' ,
+            'params' : {
+                'title' : 'التحويل لعقود' ,
+                'message' : f'تم تحويل {len ( records_to_update )} أوردر إلى عقود وإنشاء المشاريع بنجاح ✅' ,
+                'type' : 'success' ,
+                'sticky' : False ,
+            }
+        }
 
     @api.depends ( 'payment_ids' , 'order_line.move_ids' )
     def _compute_first_payment_id(self) :
