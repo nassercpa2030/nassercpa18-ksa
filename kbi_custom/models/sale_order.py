@@ -71,7 +71,7 @@ class SaleOrder ( models.Model ) :
     auditor = fields.Many2one ( string="Auditor" , comodel_name="hr.employee" ,
                                 domain=[('job_id' , '!=' , 'مدير مراجعة')] )
 
-    # payment_count = fields.Integer(compute='_compute_payment_count')
+    payment_count2 = fields.Integer(compute='_compute_payment_count')
     # paid_total = fields.Float(compute='_compute_payment_count')
     # unpaid_total = fields.Float(compute='_compute_payment_count')
     # paid_percent = fields.Float(compute='_compute_payment_count')
@@ -391,6 +391,7 @@ class SaleOrder ( models.Model ) :
                 ('credit' , '>' , 0)
             ] )
             paid_total += sum ( move_lines.mapped ( 'credit' ) )
+            payment_count2=len(move_lines)
 
             # أول دفعة
             if move_lines :
@@ -479,7 +480,7 @@ class SaleOrder ( models.Model ) :
        return {
           'name': 'Sale Order Lines',
           'type': 'ir.actions.act_window',
-          'view_mode': 'tree,form',
+          'view_mode': 'list,form',
           'res_model': 'sale.order.line',
           'domain': [
              ('order_id', '=', self.id),
