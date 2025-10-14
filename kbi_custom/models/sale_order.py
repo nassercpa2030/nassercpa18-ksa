@@ -324,7 +324,7 @@ class SaleOrder ( models.Model ) :
     def action_unlock(self) :
         # فلترة الأوردرات المراد تحويلها
         records_to_update = records.filtered (
-            lambda r : r.state in ["draft" , "sent" , "archived" , "archived2024" , "archive2025"] )
+            lambda r : r.state in ["draft" ,"to approve","sent" , "archived" , "archived2024" , "archive2025"] )
 
         for order in records_to_update :
             # تغيير الحالة مباشرة
