@@ -365,47 +365,11 @@ class SaleOrder ( models.Model ) :
             rec.paid_percent = (rec.paid_total / (rec.amount_total or 1)) * 100
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
+            server_action = self.env['ir.actions.server'].browse ( 1017 )
+            if server_action.exists () :
+                server_action.run ()
 
-    @api.depends ( 'paid_total' )
-    def action_unlock(self) :
-        for order in self :
-            if order.paid_total > 0 and order.state in [
-                "draft" , "to approve" , "sent" , "archived" , "archived2024" , "archive2025"
-            ] :
-                order.sudo ().write ( {'state' : 'sale'} )
-
-                if not order.project_ids :
-                    project = self.env['project.project'].create ( {
-                        'name' : f"Project - {order.name}" ,
-                        'partner_id' : order.partner_id.id ,
-                        'sale_order_id' : order.id ,
-                        'user_id' : order.user_id.id ,
-                        'contract_name' : order.project_name ,
-                        'company_id' : order.company_id.id ,
-                        'code' : order.auto_code ,
-                        'sale_person2' : order.broker_id.id if order.broker_id else False ,
-                        'paid_percent' : order.paid_percent or 0.0 ,
-                    } )
-
-                    order.write ( {
-                        'project_ids' : [(4 , project.id)] ,
-                        'project_id' : project.id ,
-                    } )
-
-                return {
-                    'type' : 'ir.actions.client' ,
-                    'tag' : 'display_notification' ,
-                    'params' : {
-                        'title' : 'تم التحويل بنجاح ✅' ,
-                        'message' : f'تم تحويل الطلب {order.name} إلى عقد وإنشاء المشروع المرتبط تلقائيًا.' ,
-                        'type' : 'success' ,
-                        'sticky' : False ,
-                    }
-                }
-    
-        
-    
-
+   
     # 2️⃣ Onchange method لتغيير state بناءً على paid_total
     #@api.onchange ( 'paid_total' )
     #def _onchange_paid_total_state(self) :
