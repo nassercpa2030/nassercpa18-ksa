@@ -365,9 +365,6 @@ class SaleOrder ( models.Model ) :
             rec.paid_percent = (rec.paid_total / (rec.amount_total or 1)) * 100
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
-            server_action = self.env['ir.actions.server'].browse ( 1017 )
-            if server_action.exists () :
-                server_action.run ()
 
    
     # 2️⃣ Onchange method لتغيير state بناءً على paid_total
