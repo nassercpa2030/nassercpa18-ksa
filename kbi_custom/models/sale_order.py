@@ -473,6 +473,20 @@ class SaleOrder ( models.Model ) :
                 'create' : self.state == 'sale' ,
             }
         }
+    
+def action_open_order_lines(self):
+    self.ensure_one()
+    return {
+        'name': 'Sale Order Lines',
+        'type': 'ir.actions.act_window',
+        'view_mode': 'tree,form',
+        'res_model': 'sale.order.line',
+        'domain': [
+            ('order_id', '=', self.id),
+            ('credit', '>', 0)
+        ],
+        'context': {'create': False},
+    }
 
 
 class SaleOrder ( models.Model ) :
