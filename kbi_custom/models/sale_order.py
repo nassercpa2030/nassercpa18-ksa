@@ -459,7 +459,7 @@ class SaleOrder ( models.Model ) :
                 rec.analytic_account_id = False
 
     def action_open_payment(self) :
-        return {
+        return { 
             'name' : 'Create Payment' ,
             'type' : 'ir.actions.act_window' ,
             'view_mode' : 'list,form' ,
@@ -474,19 +474,19 @@ class SaleOrder ( models.Model ) :
             }
         }
     
-def action_open_order_lines(self):
-    self.ensure_one()
-    return {
-        'name': 'Sale Order Lines',
-        'type': 'ir.actions.act_window',
-        'view_mode': 'list,form',
-        'res_model': 'sale.order.line',
-        'domain': [
-            ('order_id', '=', self.id),
-            ('credit', '>', 0)
-        ],
-        'context': {'create': False},
-    }
+    def action_open_order_lines(self):
+       self.ensure_one()
+       return {
+          'name': 'Sale Order Lines',
+          'type': 'ir.actions.act_window',
+          'view_mode': 'tree,form',
+          'res_model': 'sale.order.line',
+          'domain': [
+             ('order_id', '=', self.id),
+             ('credit', '>', 0)
+             ],
+          'context': {'create': False},
+       }
 
 
 class SaleOrder ( models.Model ) :
