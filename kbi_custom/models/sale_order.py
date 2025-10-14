@@ -366,53 +366,45 @@ class SaleOrder ( models.Model ) :
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
 
-
-    @api.onchange ( 'paid_total' )
+    @api.depends ( 'paid_total' )
     def action_unlock(self) :
-        # فلترة الأوردرات المراد تحويلها
-        if paid_total > 0 :
-            records_to_update = records.filtered (
-                lambda r : r.state in ["draft" , "to approve" , "sent" , "archived" , "archived2024" , "archive2025"] )
+        for order in self :
+            if order.paid_total > 0 and order.state in [
+                "draft" , "to approve" , "sent" , "archived" , "archived2024" , "archive2025"
+            ] :
+                order.sudo ().write ( {'state' : 'sale'} )
 
-            for order in records_to_update :
-                # تغيير الحالة مباشرة
-                order.write ( {'state' : 'sale'} )
-
-                # إنشاء مشروع مرتبط إذا لم يكن موجود
-                if not order.project_ids :  # One2many
-                    project = env['project.project'].create ( {
-                        'name' : f"Project - {order.name}" ,  # اسم المشروع
+                if not order.project_ids :
+                    project = self.env['project.project'].create ( {
+                        'name' : f"Project - {order.name}" ,
                         'partner_id' : order.partner_id.id ,
-                        'sale_order_id' : order.id ,  # هنا فقط الـ id بدون .name
+                        'sale_order_id' : order.id ,
                         'user_id' : order.user_id.id ,
                         'contract_name' : order.project_name ,
                         'company_id' : order.company_id.id ,
                         'code' : order.auto_code ,
-                        'sale_person2' : order.broker_id ,
-                        'paid_percent' : order.paid_percent
+                        'sale_person2' : order.broker_id.id if order.broker_id else False ,
+                        'paid_percent' : order.paid_percent or 0.0 ,
                     } )
 
-                    # ربط المشروع بالسيل أوردر
                     order.write ( {
-                        'project_ids' : [(4 , project.id)] ,  # One2many
-                        'project_id' : project.id  # Many2one
-
+                        'project_ids' : [(4 , project.id)] ,
+                        'project_id' : project.id ,
                     } )
 
-                    # تحديث sale_order_id مرة أخرى إذا أردت (اختياري)
-                    project.write ( {'sale_order_id' : order.id} )
-
-            # عرض إشعار النجاح
-            action = {
-                'type' : 'ir.actions.client' ,
-                'tag' : 'display_notification' ,
-                'params' : {
-                    'title' : 'التحويل لعقود' ,
-                    'message' : f'تم تحويل {len ( records_to_update )} أوردر إلى عقود وإنشاء المشاريع بنجاح ✅' ,
-                    'type' : 'success' ,
-                    'sticky' : False ,
+                return {
+                    'type' : 'ir.actions.client' ,
+                    'tag' : 'display_notification' ,
+                    'params' : {
+                        'title' : 'تم التحويل بنجاح ✅' ,
+                        'message' : f'تم تحويل الطلب {order.name} إلى عقد وإنشاء المشروع المرتبط تلقائيًا.' ,
+                        'type' : 'success' ,
+                        'sticky' : False ,
+                    }
                 }
-            }
+    
+        
+    
 
     # 2️⃣ Onchange method لتغيير state بناءً على paid_total
     #@api.onchange ( 'paid_total' )
