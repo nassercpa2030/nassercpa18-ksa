@@ -616,10 +616,8 @@ class SaleOrder ( models.Model ) :
                 'product_id' : product.id ,
                 'quantity' : 1 ,
                 'price_unit' : self.broker_uninvoiced_amount ,
-                'analytic_distribution' : [(0 , 0 , {
-                    'analytic_account_id' : self.analytic_account_id.id ,
-                    'percent' : 100
-                })] ,
+                'analytic_distribution' :{
+                self.analytic_account_id.id: 100 },
             })]
         }
 
