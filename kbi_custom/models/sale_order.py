@@ -592,9 +592,9 @@ class SaleOrder ( models.Model ) :
             rec.broker_uninvoiced_amount = rec.broker_amount - rec.broker_invoiced_amount
 
     def action_open_broker_bill(self) :
-        self.ensure_one ()  # نتأكد أننا نتعامل مع سجل واحد فقط
+        self.ensure_one ()
 
-        # جلب المنتج ودفتر اليومية من إعدادات الشركة
+        # جلب المنتج ودفتر اليومية
         settings = self.env['res.config.settings'].search ( [('company_id' , '=' , self.company_id.id)] , limit=1 )
         product = settings.broker_comm_product_id
         journal = settings.broker_comm_journal_id
@@ -604,33 +604,43 @@ class SaleOrder ( models.Model ) :
         if not journal :
             raise ValidationError ( 'No broker commission journal found' )
 
-        # إعداد بيانات الفاتورة
-        move_vals = {
-            'partner_id' : self.broker_id.id ,
-            'move_type' : 'in_invoice' ,  # فاتورة مشتريات
-            'broker_sale_id' : self.id ,
-            'invoice_origin' : self.name ,  # سيتم حفظها
-            'journal_id' : journal.id ,
-            'is_broker_move' : True ,
-            'invoice_line_ids' : [(0 , 0 , {
-                'product_id' : product.id ,
-                'quantity' : 1 ,
-                'price_unit' : self.broker_uninvoiced_amount ,
-                'analytic_distribution' :{
-                self.analytic_account_id.id: 100 },
-            })]
-        }
+        # التحقق إذا كانت هناك فاتورة وسيط موجودة بالفعل
+        existing_invoice = self.env['account.move'].search ( [
+            ('broker_sale_id' , '=' , self.id) ,
+            ('is_broker_move' , '=' , True)
+        ] , limit=1 )
 
-        # إنشاء الفاتورة مباشرة
-        invoice = self.env['account.move'].create ( move_vals )
+        if existing_invoice :
+            # فتح الفاتورة الموجودة
+            invoice = existing_invoice
+        else :
+            # إنشاء فاتورة جديدة
+            move_vals = {
+                'partner_id' : self.broker_id.id ,
+                'move_type' : 'in_invoice' ,
+                'broker_sale_id' : self.id ,
+                'invoice_origin' : self.name ,
+                'journal_id' : journal.id ,
+                'is_broker_move' : True ,
+                'invoice_line_ids' : [(0 , 0 , {
+                    'product_id' : product.id ,
+                    'quantity' : 1 ,
+                    'price_subtotal' : self.broker_amount ,
+                    'price_unit' : self.broker_uninvoiced_amount ,
+                    'analytic_distribution' : {
+                        self.analytic_account_id.id : 100
+                    } ,
+                })]
+            }
+            invoice = self.env['account.move'].create ( move_vals )
 
-        # فتح الفاتورة مباشرة
+        # فتح الفاتورة (سواء موجودة أو جديدة)
         return {
             'type' : 'ir.actions.act_window' ,
             'name' : 'Broker Bill' ,
             'view_mode' : 'form' ,
             'res_model' : 'account.move' ,
-            'res_id' : invoice.id ,  # فتح الفاتورة الجديدة مباشرة
+            'res_id' : invoice.id ,
             'target' : 'current' ,
         }
 
