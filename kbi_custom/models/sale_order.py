@@ -612,12 +612,19 @@ class SaleOrder ( models.Model ) :
                 'default_partner_id' : self.broker_id.id ,
                 'default_move_type' : 'in_invoice' ,
                 'default_broker_sale_id' : self.id ,
+                'default_invoice_origin': self.name,
                 'default_journal_id' : journal.id ,
                 'default_is_broker_move' : True ,
                 'default_invoice_line_ids' : [(0 , 0 , {
                     'product_id' : product.id ,
                     'quantity' : 1 ,
-                    'price_unit' : self.broker_uninvoiced_amount , })]
+                    'price_unit' : self.broker_uninvoiced_amount ,
+                    'analytic_distribution_ids': [(0, 0, {
+                    'analytic_account_id': self.analytic_account_id.id, 
+                    'percent': 100
+                })],
+                })]
+                    
             }
         }
 
