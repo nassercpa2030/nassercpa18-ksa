@@ -80,7 +80,7 @@ class SaleOrder ( models.Model ) :
     amount_due = fields.Float ( compute="_compute_payment_count" , string="Amount Due" , readonly=False )
     project_budget = fields.Float ( string='Project Budget' , copy=False )
     project_name = fields.Char ( string='Project Name' )
-    project_code = fields.Char ( string='Project Code' )
+    project_code = fields.Char ( string='Project Code' ,related="auto_code")
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
