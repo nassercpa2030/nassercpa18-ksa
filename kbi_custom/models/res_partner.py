@@ -29,7 +29,7 @@ class ResPartner ( models.Model ) :
     fax_number=fields.Char(string='FAX',readonly=False,required=False)
     @api.constrains ( 'number_700' )
     def _check700_number(self) :
-        pattern = r'^7\d*$'
+        pattern = r'^7\d{9}*$'
         for rec in self :
             if rec.number_700 and not re.match ( pattern , rec.number_700 ) :
                 raise ValidationError ( "You must enter numbers only and start with 7" )
