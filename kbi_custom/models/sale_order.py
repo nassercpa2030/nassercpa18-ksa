@@ -19,6 +19,8 @@ class SaleOrder ( models.Model ) :
 
     contract_date = fields.Date ( string='Contract Date' , readonly=False )
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
+    next_number = fields.Integer ( string="next sequence number" , store=True )
+    product_code = fields.Char ( string="Porduct Code" , related="x_studio_contract_service.barcode" , store=True )
     one_audit_archive = fields.Boolean ( string="أرشفة علي ون أودت " , stored=True )
     papers_archive = fields.Boolean ( string="أرشفة ورقية" , stored=True )
     box_paper_archive = fields.Integer ( string="رقم أرشيف الصندوق" , stored=True )
@@ -285,6 +287,18 @@ class SaleOrder ( models.Model ) :
         res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
         return res
 
+    @api.onchange ( 'x_studio_contract_service' )
+    def change_autocode(self) :
+        for record in self :
+            team_ids = [5 , 6 , 8 , 9 , 10 , 11 , 15]  # الفرق المسموح بها
+            # 5=>101  6=>102  8=>103  9=>104  10=>200  11=>110 15=>115
+            if record.team_id.id in team_ids :
+                sequence_code = f'sale.order.auto.sequence.serial.{record.team_id.id}'
+                next_number = self.env['ir.sequence'].next_by_code ( sequence_code )
+
+                record.next_number = next_number
+                record.auto_code = f"{record.team_id or ''}{record.name or ''}{record.product_code or ''}{next_number}"
+
     def compute_sign_qrcode(self) :
         for rec in self :
             qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
@@ -366,13 +380,12 @@ class SaleOrder ( models.Model ) :
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
 
-   
     # 2️⃣ Onchange method لتغيير state بناءً على paid_total
-    #@api.onchange ( 'paid_total' )
-    #def _onchange_paid_total_state(self) :
-       # for rec in self :
-            #if rec.paid_total > 0 and rec.state in ('draft' , 'to approve') :
-                #rec.state = 'done'
+    # @api.onchange ( 'paid_total' )
+    # def _onchange_paid_total_state(self) :
+    # for rec in self :
+    # if rec.paid_total > 0 and rec.state in ('draft' , 'to approve') :
+    # rec.state = 'done'
 
     def _compute_amount_due(self) :
         for rec in self :
