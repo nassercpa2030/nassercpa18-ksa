@@ -598,6 +598,7 @@ class SaleOrder ( models.Model ) :
         settings = self.env['res.config.settings'].search ( [('company_id' , '=' , self.company_id.id)] , limit=1 )
         product = settings.broker_comm_product_id
         journal = settings.broker_comm_journal_id
+        
 
         if not product :
             raise ValidationError ( 'No broker commission product found' )
@@ -609,6 +610,7 @@ class SaleOrder ( models.Model ) :
             ('broker_sale_id' , '=' , self.id) ,
             ('is_broker_move' , '=' , True)
         ] , limit=1 )
+         payment_ref = f"{self.partner_id.name or ''} - {self.name or ''} - مكافأة تسويق"
 
         if existing_invoice :
             # فتح الفاتورة الموجودة
@@ -621,6 +623,7 @@ class SaleOrder ( models.Model ) :
                 'broker_sale_id' : self.id ,
                 'invoice_origin' : self.name ,
                 'journal_id' : journal.id ,
+                'payment_refrence':payment_ref ,
                 'is_broker_move' : True ,
                 'invoice_line_ids' : [(0 , 0 , {
                     'product_id' : product.id ,
