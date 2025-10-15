@@ -626,7 +626,7 @@ class SaleOrder ( models.Model ) :
                     'product_id' : product.id ,
                     'quantity' : 1 ,
                     'price_subtotal' : self.broker_amount ,
-                    'price_unit' : self.broker_uninvoiced_amount ,
+                    'price_unit' : self.broker_amount ,
                     'analytic_distribution' : {
                         self.analytic_account_id.id : 100
                     } ,
