@@ -610,7 +610,7 @@ class SaleOrder ( models.Model ) :
             ('broker_sale_id' , '=' , self.id) ,
             ('is_broker_move' , '=' , True)
         ] , limit=1 )
-         payment_ref = f"{self.partner_id.name or ''} - {self.name or ''} - مكافأة تسويق"
+        payment_ref = f"{self.partner_id.name or ''} - {self.name or ''} - مكافأة تسويق"
 
         if existing_invoice :
             # فتح الفاتورة الموجودة
