@@ -135,6 +135,7 @@ class SaleOrder ( models.Model ) :
     project_id = fields.Many2one ( 'project.project' , string="المشروع" )
     auto_code = fields.Char ( string="Auto Code" , readonly=False , store=True )
     x_studio_auto_code = fields.Char ( string="Auto Code_printing" , related='auto_code' , readonly=False , store=True )
+    last_service = fields.Many2one(string="Last Contract Service")
     assigned_to = fields.Many2one ( 'res.users' , string="Assigned To" )
     ass_to = fields.Float ( string="Ass_to" )
     ass_from = fields.Float ( string="Ass_from" )
@@ -287,17 +288,35 @@ class SaleOrder ( models.Model ) :
         res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
         return res
 
-    @api.onchange ( 'x_studio_contract_service' )
-    def change_autocode(self) :
-        for record in self :
-            team_ids = [5 , 6 , 8 , 9 , 10 , 11 , 15]  # الفرق المسموح بها
-            # 5=>101  6=>102  8=>103  9=>104  10=>200  11=>110 15=>115
-            if record.team_id.id in team_ids :
-                sequence_code = f'sale.order.auto.sequence.serial.{record.team_id.id}'
-                next_number = self.env['ir.sequence'].next_by_code ( sequence_code )
+    @api.model
+    def create(self , vals) :
+        record = super ().create ( vals )
+        record._generate_autocode ( force=True )
+        return record
 
-                record.next_number = next_number
-                record.auto_code = f"{record.team_id or ''}{record.name or ''}{record.product_code or ''}{next_number}"
+    def write(self , vals) :
+        res = super ().write ( vals )
+        # إذا حصل تغيير في x_studio_contract_service
+        for rec in self :
+            if 'x_studio_contract_service' in vals :
+                rec._generate_autocode ( force=True )
+        return res
+
+    def _generate_autocode(self , force=False) :
+        """ توليد auto_code حسب team_id و x_studio_contract_service """
+        team_ids = [5 , 6 , 8 , 9 , 10 , 11 , 15]
+        for record in self :
+            team_id = record.team_id.id
+            if team_id in team_ids :
+                # يولد الكود إذا force=True أو auto_code فارغ
+                if force or not record.auto_code :
+                    sequence_code = f'sale.order.auto.sequence.serial.{team_id}'
+                    next_number = record.env['ir.sequence'].next_by_code ( sequence_code )
+                    record.write ( {
+                        'next_number' : next_number ,
+                        'auto_code' : f"{record.team_id.name or ''}-{record.name or ''}-{record.product_code or ''}-{next_number}" ,
+                        'last_service' : record.x_studio_contract_service.id
+                    } )
 
     def compute_sign_qrcode(self) :
         for rec in self :
