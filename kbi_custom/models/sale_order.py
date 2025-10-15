@@ -135,7 +135,7 @@ class SaleOrder ( models.Model ) :
     project_id = fields.Many2one ( 'project.project' , string="المشروع" )
     auto_code = fields.Char ( string="Auto Code" , readonly=False , store=True )
     x_studio_auto_code = fields.Char ( string="Auto Code_printing" , related='auto_code' , readonly=False , store=True )
-    last_service = fields.Many2one(string="Last Contract Service",comodel_name='service.contract')
+    last_service = fields.Many2one ( string="Last Contract Service" , comodel_name='service.contract' )
     assigned_to = fields.Many2one ( 'res.users' , string="Assigned To" )
     ass_to = fields.Float ( string="Ass_to" )
     ass_from = fields.Float ( string="Ass_from" )
@@ -592,40 +592,48 @@ class SaleOrder ( models.Model ) :
             rec.broker_uninvoiced_amount = rec.broker_amount - rec.broker_invoiced_amount
 
     def action_open_broker_bill(self) :
+        self.ensure_one ()  # نتأكد أننا نتعامل مع سجل واحد فقط
 
-        product = self.env['res.config.settings'].search ( [('company_id' , '=' , self.company_id.id)] ,
-                                                           limit=1 ).broker_comm_product_id
-        journal = self.env['res.config.settings'].search ( [('company_id' , '=' , self.company_id.id)] ,
-                                                           limit=1 ).broker_comm_journal_id
+        # جلب المنتج ودفتر اليومية من إعدادات الشركة
+        settings = self.env['res.config.settings'].search ( [('company_id' , '=' , self.company_id.id)] , limit=1 )
+        product = settings.broker_comm_product_id
+        journal = settings.broker_comm_journal_id
+
         if not product :
             raise ValidationError ( 'No broker commission product found' )
         if not journal :
             raise ValidationError ( 'No broker commission journal found' )
+
+        # إعداد بيانات الفاتورة
+        move_vals = {
+            'partner_id' : self.broker_id.id ,
+            'move_type' : 'in_invoice' ,  # فاتورة مشتريات
+            'broker_sale_id' : self.id ,
+            'invoice_origin' : self.name ,  # سيتم حفظها
+            'journal_id' : journal.id ,
+            'is_broker_move' : True ,
+            'invoice_line_ids' : [(0 , 0 , {
+                'product_id' : product.id ,
+                'quantity' : 1 ,
+                'price_unit' : self.broker_uninvoiced_amount ,
+                'analytic_distribution' : [(0 , 0 , {
+                    'analytic_account_id' : self.analytic_account_id.id ,
+                    'percent' : 100
+                })] ,
+            })]
+        }
+
+        # إنشاء الفاتورة مباشرة
+        invoice = self.env['account.move'].create ( move_vals )
+
+        # فتح الفاتورة مباشرة
         return {
             'type' : 'ir.actions.act_window' ,
             'name' : 'Broker Bill' ,
-            'view_mode' : 'list,form' ,
+            'view_mode' : 'form' ,
             'res_model' : 'account.move' ,
+            'res_id' : invoice.id ,  # فتح الفاتورة الجديدة مباشرة
             'target' : 'current' ,
-            'domain' : [('broker_sale_id' , '=' , self.id) , ('is_broker_move' , '=' , True)] ,
-            'context' : {
-                'default_partner_id' : self.broker_id.id ,
-                'default_move_type' : 'in_invoice' ,
-                'default_broker_sale_id' : self.id ,
-                'invoice_origin': self.name,
-                'default_journal_id' : journal.id ,
-                'default_is_broker_move' : True ,
-                'default_invoice_line_ids' : [(0 , 0 , {
-                    'product_id' : product.id ,
-                    'quantity' : 1 ,
-                    'price_unit' : self.broker_uninvoiced_amount ,
-                    'analytic_distribution': [(0, 0, {
-                    'analytic_account_id': self.analytic_account_id.id, 
-                    'percent': 100
-                })],
-                })]
-                    
-            }
         }
 
     def action_update_and_open_projects(self) :
