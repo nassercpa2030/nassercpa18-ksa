@@ -623,7 +623,7 @@ class SaleOrder ( models.Model ) :
                 'broker_sale_id' : self.id ,
                 'invoice_origin' : self.name ,
                 'journal_id' : journal.id ,
-                'payment_reference':payment_ref ,
+                'ref':payment_ref ,
                 'is_broker_move' : True ,
                 'invoice_line_ids' : [(0 , 0 , {
                     'product_id' : product.id ,
