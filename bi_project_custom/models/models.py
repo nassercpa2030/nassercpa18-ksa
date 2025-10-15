@@ -186,7 +186,7 @@ class SaleOrder(models.Model):
             'name': 'Journal Entries',
             'view_mode': 'list,form',
             'res_model': 'account.move',
-            'domain': [('sale_order_id', '=', self.id), ('move_type', '=', 'entry'), ('journal_id', 'in', [17,37,165])],
+            'domain': [('sale_order_id', '=', self.id), ('move_type', '=', 'entry'), ('journal_id', 'in', [162,161,165])],
             'context': {'default_sale_order_id': self.id},
         }
 
