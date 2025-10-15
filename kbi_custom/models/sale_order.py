@@ -288,36 +288,6 @@ class SaleOrder ( models.Model ) :
         res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
         return res
 
-    @api.model
-    def create(self , vals) :
-        record = super ().create ( vals )
-        record._generate_autocode ( force=True )
-        return record
-
-    def write(self , vals) :
-        res = super ().write ( vals )
-        # إذا حصل تغيير في x_studio_contract_service
-        for rec in self :
-            if 'x_studio_contract_service' in vals :
-                rec._generate_autocode ( force=True )
-        return res
-
-    def _generate_autocode(self , force=False) :
-        """ توليد auto_code حسب team_id و x_studio_contract_service """
-        team_ids = [5 , 6 , 8 , 9 , 10 , 11 , 15]
-        for record in self :
-            team_id = record.team_id.id
-            if team_id in team_ids :
-                # يولد الكود إذا force=True أو auto_code فارغ
-                if force or not record.auto_code :
-                    sequence_code = f'sale.order.auto.sequence.serial.{team_id}'
-                    next_number = record.env['ir.sequence'].next_by_code ( sequence_code )
-                    record.write ( {
-                        'next_number' : next_number ,
-                        'auto_code' : f"{record.team_id.name or ''}-{record.name or ''}-{record.product_code or ''}-{next_number}" ,
-                        'last_service' : record.x_studio_contract_service.id
-                    } )
-
     def compute_sign_qrcode(self) :
         for rec in self :
             qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
