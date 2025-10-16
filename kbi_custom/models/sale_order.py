@@ -94,7 +94,7 @@ class SaleOrder ( models.Model ) :
                                   domain="[('is_broker', '=', True)]" )
     number_700_sale = fields.Char ( related='partner_id.number_700' , string="700 Number" , readonly=False ,
                                     required=True , store=True )
-    contact_manager_team=fields.Many2one(comodel_name="crm.team" ,related="team_id", string="contact_manager_team",store=True,readonly=False)
+    contact_manager_team=fields.Many2one(comodel_name="crm.team" ,related="user_id", string="contact_manager_team",store=True,readonly=False)
     # cr_number_sale =fields.Char(related='partner_id.cr_number_sale',string="Customer CR Number",readonly=False,store=True)
     cr_number_sale = fields.Char ( string="Customer CR Number" , readonly=False , store=True )
     broker_amount = fields.Float ( string='Broker Amount' , tracking=True )
