@@ -20,7 +20,7 @@ class ResPartner ( models.Model ) :
     city_id = fields.Many2one ( comodel_name='res.country.state.city' , string='City' )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
     nationality = fields.Char ( "Nationality" )
-    manager_team = fields.Many2one ( comodel_name="res.users" , string='Manager' , store=True,readonly=False )
+    manager_team = fields.Many2one ( comodel_name="res.users" , string='Manager',compute="_compute_manager_team" , store=True,readonly=False )
     is_broker = fields.Boolean ( string='Broker' )
     name_english = fields.Char ( String="English name" , readonly=False , store=True )
     partner_vat_placeholder = fields.Char ( string="Vat Number" , readonly=False )
@@ -41,15 +41,15 @@ class ResPartner ( models.Model ) :
             if rec.number_700 and not re.match ( pattern , rec.number_700 ) :
                 raise ValidationError ( "You must enter numbers only and start with 7" )
 
-    @api.depends ( 'sale_order_ids.team_id' )
+ 
     def _compute_manager_team(self) :
         for partner in self :
             if partner.sale_order_count > 0 :
                 # هيرجع الفريق من أول order (تقدر تعدلها لو عايز آخر order مثلاً)
-                partner.manager_team = partner.sale_order_ids[0].team_id.id
-            else :
-                partner.manager_team = False
-
+                 partner.manager_team =partner.sale_order_ids[0].contact_manager_team
+            else: 
+                 partner.manager_team=False
+                
     def action_merge_specific_duplicates(self) :
         """
         دمج كل الشركاء المكررة بناءً على الاسم فقط.
