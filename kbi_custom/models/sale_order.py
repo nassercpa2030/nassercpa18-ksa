@@ -19,6 +19,7 @@ class SaleOrder ( models.Model ) :
 
     contract_date = fields.Date ( string='Contract Date' , readonly=False )
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
+ 
     next_number = fields.Integer ( string="next sequence number" , store=True )
     product_code = fields.Char ( string="Porduct Code" , related="x_studio_contract_service.barcode" , store=True )
     one_audit_archive = fields.Boolean ( string="أرشفة علي ون أودت " , stored=True )
@@ -93,6 +94,7 @@ class SaleOrder ( models.Model ) :
                                   domain="[('is_broker', '=', True)]" )
     number_700_sale = fields.Char ( related='partner_id.number_700' , string="700 Number" , readonly=False ,
                                     required=True , store=True )
+    contact_manager_team=fields.Many2one(comodel_name="res.partner" ,compute="_compute_contact_manager_team", string="contact_manager_team",store=True,readonly=False)
     # cr_number_sale =fields.Char(related='partner_id.cr_number_sale',string="Customer CR Number",readonly=False,store=True)
     cr_number_sale = fields.Char ( string="Customer CR Number" , readonly=False , store=True )
     broker_amount = fields.Float ( string='Broker Amount' , tracking=True )
@@ -167,6 +169,16 @@ class SaleOrder ( models.Model ) :
     def _compute_ass_visible(self) :
         for rec in self :
             rec.ass_visible = bool ( rec.review_manager_id )
+            
+    @api.depends('sale_order_ids.team_id')
+    def _compute_contact_manager_team(self):
+        for rec in self:
+            # إذا عنده أوامر بيع، نأخذ الفريق من آخر أمر بيع
+            if rec.sale_order_ids:
+                last_order = rec.sale_order_ids[-1]  # آخر أمر بيع
+                rec.contact_manager_team = last_order.team_id
+            else:
+                rec.contact_manager_team = False
 
     @api.depends ( 'project_ids' )
     def _compute_project_count(self) :
