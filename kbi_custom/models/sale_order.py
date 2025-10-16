@@ -170,7 +170,7 @@ class SaleOrder ( models.Model ) :
         for rec in self :
             rec.ass_visible = bool ( rec.review_manager_id )
             
-    @api.depends('sale_order_ids.team_id')
+    
     def _compute_contact_manager_team(self):
         for rec in self:
             # إذا عنده أوامر بيع، نأخذ الفريق من آخر أمر بيع
