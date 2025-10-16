@@ -42,15 +42,15 @@ class ResPartner ( models.Model ) :
                 raise ValidationError ( "You must enter numbers only and start with 7" )
 
  
-    @api.depends('sale_order_ids.project_id.user_id', 'sale_order_ids.date_order')
+    @api.depends('sale_order_ids.user_id', 'sale_order_ids.date_order', 'sale_order_ids.state')
     def _compute_manager_team(self):
         for partner in self:
-            # فلترة أوامر البيع اللي لها مشروع مرتبط
-            orders_with_project = partner.sale_order_ids.filtered(lambda o: o.project_id)
-            if orders_with_project:
-                # نجيب آخر أمر بيع حسب التاريخ
-                last_order = orders_with_project.sorted(key=lambda o: o.date_order, reverse=True)[0]
-                partner.manager_team = last_order.project_id.user_id
+            # فلترة أوامر البيع المكتملة فقط
+            sale_orders = partner.sale_order_ids.filtered(lambda o: o.state in ['sale','done'])
+            if sale_orders:
+                # ترتيب حسب التاريخ الأخير
+                last_order = sale_orders.sorted(key=lambda o: o.date_order or fields.Datetime.now(), reverse=True)[0]
+                partner.manager_team = last_order.user_id
             else:
                 partner.manager_team = False
 
