@@ -20,8 +20,7 @@ class ResPartner ( models.Model ) :
     city_id = fields.Many2one ( comodel_name='res.country.state.city' , string='City' )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
     nationality = fields.Char ( "Nationality" )
-    manager_team = fields.Many2one ( comodel_name="crm.team" , string='Manager Team' , compute="_compute_manager_team" ,
-                                     readonly=False , store=True )
+    manager_team = fields.Many2one ( comodel_name="res.users" , string='Manager' , store=True,readonly=False )
     is_broker = fields.Boolean ( string='Broker' )
     name_english = fields.Char ( String="English name" , readonly=False , store=True )
     partner_vat_placeholder = fields.Char ( string="Vat Number" , readonly=False )
