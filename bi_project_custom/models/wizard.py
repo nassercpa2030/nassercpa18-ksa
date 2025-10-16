@@ -156,7 +156,7 @@ class CloseEntryWizard(models.TransientModel):
                         'debit': line.total_price,
                         'credit': 0.0,
                         'name': f'Reversal of {line.name}',
-                        'account_id': wizard.account_id1.id if wizard.use_account_id1 else line.account_id.id,
+                        'account_id': wizard.account_id1.id if wizard.use_account_id1 else wizard.account_id.id,
                         'product_id': line.product_id.id,
                         'quantity': line.quantity,
                         'analytic_distribution': analytic_distribution,
