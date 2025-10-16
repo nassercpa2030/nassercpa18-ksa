@@ -42,14 +42,22 @@ class ResPartner ( models.Model ) :
                 raise ValidationError ( "You must enter numbers only and start with 7" )
 
  
-    def _compute_manager_team(self) :
-        for partner in self :
-            if partner.sale_order_count > 0 :
-                # هيرجع الفريق من أول order (تقدر تعدلها لو عايز آخر order مثلاً)
-                 partner.manager_team =partner.sale_order_ids[0].contact_manager_team
-            else: 
-                 partner.manager_team=False
-                
+    @api.depends('sale_order_ids.project_id.user_id')
+    def _compute_manager_team(self):
+        for partner in self:
+            # تأكد أن هناك أوامر بيع مرتبطة
+            if partner.sale_order_ids:
+                # خذ أول أمر بيع (يمكن تغييره لآخر order)
+                first_order = partner.sale_order_ids[0]
+                # تأكد أن هناك مشروع مرتبط بالأمر
+                if first_order.project_id:
+                    partner.manager_team = first_order.project_id.user_id
+                else:
+                    partner.manager_team = False
+            else:
+                partner.manager_team = False
+
+    
     def action_merge_specific_duplicates(self) :
         """
         دمج كل الشركاء المكررة بناءً على الاسم فقط.
