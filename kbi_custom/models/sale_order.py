@@ -19,7 +19,7 @@ class SaleOrder ( models.Model ) :
 
     contract_date = fields.Date ( string='Contract Date' , readonly=False )
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
- 
+
     next_number = fields.Integer ( string="next sequence number" , store=True )
     product_code = fields.Char ( string="Porduct Code" , related="x_studio_contract_service.barcode" , store=True )
     one_audit_archive = fields.Boolean ( string="أرشفة علي ون أودت " , stored=True )
@@ -81,7 +81,7 @@ class SaleOrder ( models.Model ) :
     amount_due = fields.Float ( compute="_compute_payment_count" , string="Amount Due" , readonly=False )
     project_budget = fields.Float ( string='Project Budget' , copy=False )
     project_name = fields.Char ( string='Project Name' )
-    project_code = fields.Char ( string='Project Code' ,related="auto_code")
+    project_code = fields.Char ( string='Project Code' , related="auto_code" )
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
@@ -94,8 +94,10 @@ class SaleOrder ( models.Model ) :
                                   domain="[('is_broker', '=', True)]" )
     number_700_sale = fields.Char ( related='partner_id.number_700' , string="700 Number" , readonly=False ,
                                     required=True , store=True )
-    manager_id_sale= fields.Integer(related="partner_id.manager_id", string="Manager Id",store=True,readonly=False)
-    contact_manager_team=fields.Many2one(comodel_name="res.users" ,related="user_id", string="contact_manager_team",store=True,readonly=False)
+    manager_id_sale = fields.Integer ( related="partner_id.manager_id" , string="Manager Id" , store=True ,
+                                       readonly=False )
+    contact_manager_team = fields.Many2one ( comodel_name="res.users" , related="user_id" ,
+                                             string="contact_manager_team" , store=True , readonly=False )
     # cr_number_sale =fields.Char(related='partner_id.cr_number_sale',string="Customer CR Number",readonly=False,store=True)
     cr_number_sale = fields.Char ( string="Customer CR Number" , readonly=False , store=True )
     broker_amount = fields.Float ( string='Broker Amount' , tracking=True )
@@ -170,15 +172,14 @@ class SaleOrder ( models.Model ) :
     def _compute_ass_visible(self) :
         for rec in self :
             rec.ass_visible = bool ( rec.review_manager_id )
-            
-    
-    def _compute_contact_manager_team(self):
-        for rec in self:
+
+    def _compute_contact_manager_team(self) :
+        for rec in self :
             # إذا عنده أوامر بيع، نأخذ الفريق من آخر أمر بيع
-            if rec.sale_order_ids:
+            if rec.sale_order_ids :
                 last_order = rec.sale_order_ids[-1]  # آخر أمر بيع
                 rec.contact_manager_team = last_order.team_id
-            else:
+            else :
                 rec.contact_manager_team = False
 
     @api.depends ( 'project_ids' )
@@ -388,6 +389,40 @@ class SaleOrder ( models.Model ) :
     # for rec in self :
     # if rec.paid_total > 0 and rec.state in ('draft' , 'to approve') :
     # rec.state = 'done'
+    
+    @api.depends('paid_total')
+    def _auto_convert_to_contract(self):
+        for order in self:
+            # لو مفيش مدفوعات، تجاهل
+            if order.paid_total <= 0:
+                continue
+
+            # لو الحالة مش واحدة من الحالات المستهدفة
+            if order.state not in ["to approve","sent","archived","archived2024","archive2025","draft"]:
+                continue
+
+            # تحويل الحالة إلى عقد
+            order.state = 'sale'
+
+            # إنشاء مشروع لو مش موجود
+            if not order.project_ids:
+                project = self.env['project.project'].create({
+                    'name': f"Project - {order.name}",
+                    'partner_id': order.partner_id.id,
+                    'sale_order_id': order.id,
+                    'user_id': order.user_id.id,
+                    'contract_name': order.project_name,
+                    'company_id': order.company_id.id,
+                    'code': order.auto_code,
+                    'sale_person2': order.broker_id.id if order.broker_id else False,
+                    'paid_percent': order.paid_percent,
+                })
+                order.write({
+                    'project_ids': [(4, project.id)],
+                    'project_id': project.id,
+                })
+
+                project.write({'sale_order_id': order.id})
 
     def _compute_amount_due(self) :
         for rec in self :
@@ -611,7 +646,6 @@ class SaleOrder ( models.Model ) :
         settings = self.env['res.config.settings'].search ( [('company_id' , '=' , self.company_id.id)] , limit=1 )
         product = settings.broker_comm_product_id
         journal = settings.broker_comm_journal_id
-        
 
         if not product :
             raise ValidationError ( 'No broker commission product found' )
@@ -623,7 +657,7 @@ class SaleOrder ( models.Model ) :
             ('broker_sale_id' , '=' , self.id) ,
             ('is_broker_move' , '=' , True)
         ] , limit=1 )
-        payment_ref =  f"{self.name or ''} - مكافأة تسويق عن - {self.partner_id.name or ''}"
+        payment_ref = f"{self.name or ''} - مكافأة تسويق عن - {self.partner_id.name or ''}"
 
         if existing_invoice :
             # فتح الفاتورة الموجودة
@@ -636,7 +670,7 @@ class SaleOrder ( models.Model ) :
                 'broker_sale_id' : self.id ,
                 'invoice_origin' : self.name ,
                 'journal_id' : journal.id ,
-                'ref':payment_ref ,
+                'ref' : payment_ref ,
                 'is_broker_move' : True ,
                 'invoice_line_ids' : [(0 , 0 , {
                     'product_id' : product.id ,
