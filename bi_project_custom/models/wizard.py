@@ -40,7 +40,7 @@ class CloseEntryWizard(models.TransientModel):
     _name = 'close.entry.wizard'
     _description = 'Close Entry Wizard'
 
-    invoice_lines = fields.One2many('invoice.line.wizard', 'wizard_id', string='Invoice Lines')
+    invoice_lines = fields.One2many('invoice.line.wizard', 'wizard_id', string='Invoice Lines',readonly=False,store=True)
     sale_order_id = fields.Many2one('sale.order', string='Sales Order', ondelete='set null')
     use_account_id1 = fields.Boolean(string='Use Alternative Account')
     journal_id = fields.Many2one('account.journal', string="Journal", required=False,ondelete='set null', default=lambda self: self.env['account.journal'].browse(161))
