@@ -167,6 +167,11 @@ class SaleOrder ( models.Model ) :
         compute="_compute_project_count" ,
         store=True
     )
+    auto_conversion_flag = fields.Boolean (
+        string="Auto Contract Trigger" ,
+        compute="_auto_convert_to_contract" ,
+        store=False
+    )
 
     @api.depends ( 'review_manager_id' )
     def _compute_ass_visible(self) :
@@ -389,40 +394,40 @@ class SaleOrder ( models.Model ) :
     # for rec in self :
     # if rec.paid_total > 0 and rec.state in ('draft' , 'to approve') :
     # rec.state = 'done'
-    
-    @api.depends('paid_total')
-    def _auto_convert_to_contract(self):
-        for order in self:
+
+    @api.depends ( 'paid_total' )
+    def _auto_convert_to_contract(self) :
+        for order in self :
             # لو مفيش مدفوعات، تجاهل
-            if order.paid_total <= 0:
+            if order.paid_total <= 0 :
                 continue
 
             # لو الحالة مش واحدة من الحالات المستهدفة
-            if order.state not in ["to approve","sent","archived","archived2024","archive2025","draft"]:
+            if order.state not in ["to approve" , "sent" , "archived" , "archived2024" , "archive2025" , "draft"] :
                 continue
 
             # تحويل الحالة إلى عقد
             order.state = 'sale'
 
             # إنشاء مشروع لو مش موجود
-            if not order.project_ids:
-                project = self.env['project.project'].create({
-                    'name': f"Project - {order.name}",
-                    'partner_id': order.partner_id.id,
-                    'sale_order_id': order.id,
-                    'user_id': order.user_id.id,
-                    'contract_name': order.project_name,
-                    'company_id': order.company_id.id,
-                    'code': order.auto_code,
-                    'sale_person2': order.broker_id.id if order.broker_id else False,
-                    'paid_percent': order.paid_percent,
-                })
-                order.write({
-                    'project_ids': [(4, project.id)],
-                    'project_id': project.id,
-                })
+            if not order.project_ids :
+                project = self.env['project.project'].create ( {
+                    'name' : f"Project - {order.name}" ,
+                    'partner_id' : order.partner_id.id ,
+                    'sale_order_id' : order.id ,
+                    'user_id' : order.user_id.id ,
+                    'contract_name' : order.project_name ,
+                    'company_id' : order.company_id.id ,
+                    'code' : order.auto_code ,
+                    'sale_person2' : order.broker_id.id if order.broker_id else False ,
+                    'paid_percent' : order.paid_percent ,
+                } )
+                order.write ( {
+                    'project_ids' : [(4 , project.id)] ,
+                    'project_id' : project.id ,
+                } )
 
-                project.write({'sale_order_id': order.id})
+                project.write ( {'sale_order_id' : order.id} )
 
     def _compute_amount_due(self) :
         for rec in self :
