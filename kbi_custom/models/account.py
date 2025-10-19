@@ -78,7 +78,7 @@ class AccountPayment ( models.Model ) :
         help="عند تفعيل هذا الاختيار، سيتم تنفيذ Server Action لتحويل الأوردرات المرتبطة إلى مشاريع."
     )
 
-       @api.onchange ( 'sale_order_id' )
+    @api.onchange ( 'sale_order_id' )
     def _change_memo(self) :
         for rec in self :
             if rec.sale_order_id :
