@@ -605,7 +605,7 @@ class SaleOrder ( models.Model ) :
         else :
             self.broker_amount = 0
 
-    @api.depends ('paid_total')
+    @api.onchange ('paid_total')
     def _onchange_convert_order(self) :
         for record in self:
            record.convert_orders = record.paid_total > 0
