@@ -389,7 +389,14 @@ class SaleOrder ( models.Model ) :
             rec.amount_due = rec.amount_total - rec.paid_total
 
             # تحديث convert_orders بناءً على paid_total
+            previous_convert = rec.convert_orders
             rec.convert_orders = rec.paid_total > 0
+
+            # تنفيذ السيرفر أكشن لو convert_orders أصبح True لأول مرة
+            if rec.convert_orders and not previous_convert :
+                action = self.env['ir.actions.server'].browse ( 1017 )
+                if action.exists () :
+                    action.run ()  # تنفيذ السيرفر أكشن
 
     # 2️⃣ Onchange method لتغيير state بناءً على paid_total
     # @api.onchange ( 'paid_total' )
@@ -606,6 +613,8 @@ class SaleOrder ( models.Model ) :
                     self.broker_amount = (self.amount_untaxed * broker_ids[0].value) / 100
         else :
             self.broker_amount = 0
+
+
 
     def _compute_broker_invoiced_amount(self) :
         for rec in self :
