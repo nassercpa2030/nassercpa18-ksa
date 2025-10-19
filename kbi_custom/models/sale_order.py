@@ -22,6 +22,7 @@ class SaleOrder ( models.Model ) :
     convert_orders = fields.Boolean (
         string="تحويل الأوردرات لعقود" ,
         default=False ,
+        store=True,
         help="عند تفعيل هذا الاختيار، سيتم تنفيذ Server Action لتحويل الأوردرات المرتبطة إلى مشاريع."
     )
     next_number = fields.Integer ( string="next sequence number" , store=True )
@@ -604,9 +605,11 @@ class SaleOrder ( models.Model ) :
         else :
             self.broker_amount = 0
 
-    @api.onchange ('paid_total')
+    @api.depends ('paid_total')
     def _onchange_convert_order(self) :
-       self.convert_orders = self.paid_total > 0
+        for record in self:
+           record.convert_orders = record.paid_total > 0
+       
             
     def _compute_broker_invoiced_amount(self) :
         for rec in self :
