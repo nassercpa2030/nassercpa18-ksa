@@ -395,7 +395,6 @@ class SaleOrder ( models.Model ) :
             # تنفيذ الدالة بدل السيرفر أكشن لو convert_orders أصبح True لأول مرة
             if rec.convert_orders and not previous_convert:
                 rec.action_convert_orders()  # استدعاء الدالة مباشرة
-                
 
     def action_convert_orders(self) :
         """
@@ -404,18 +403,21 @@ class SaleOrder ( models.Model ) :
         # فلترة الأوردرات المراد تحويلها
         records_to_update = self.filtered (
             lambda r : r.state in ["to approve" , "draft" , "sent" , "archived" , "archived2024" , "archive2025"]
+                       and r.paid_total > 0
         )
-
-        if not records_to_update :
-            raise ValidationError ( _ ( "❌ لا توجد أوردرات صالحة للتحويل في الحالات المحددة." ) )
 
         converted_count = 0
         skipped_orders = []
 
-        for order in records_to_update :
+        for order in self :
+            # تجاهل الأوردرات بدون دفعات
             if order.paid_total <= 0 :
                 skipped_orders.append ( order.name )
-                continue  # تجاهل هذا الأوردر واستمر مع البقية
+                continue
+
+            # تجاهل الأوردرات التي تم تحويلها مسبقًا (state = 'sale')
+            if order.state == 'sale' :
+                continue
 
             # تغيير الحالة مباشرة
             order.write ( {'state' : 'sale'} )
@@ -461,6 +463,7 @@ class SaleOrder ( models.Model ) :
                 'sticky' : False ,
             }
         }
+
     # 2️⃣ Onchange method لتغيير state بناءً على paid_total
     # @api.onchange ( 'paid_total' )
     # def _onchange_paid_total_state(self) :
