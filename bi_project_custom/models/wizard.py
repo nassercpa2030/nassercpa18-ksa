@@ -43,9 +43,9 @@ class CloseEntryWizard(models.TransientModel):
     invoice_lines = fields.One2many('invoice.line.wizard', 'wizard_id', string='Invoice Lines',readonly=False,store=True)
     sale_order_id = fields.Many2one('sale.order', string='Sales Order', ondelete='set null')
     use_account_id1 = fields.Boolean(string='Use Alternative Account')
-    journal_id = fields.Many2one('account.journal', string="Journal", required=False,ondelete='set null', default=lambda self: self.env['account.journal'].browse(161))
+    journal_id = fields.Many2one('account.journal', string="Journal", required=False,ondelete='set null', default=lambda self: self.env['account.journal'].browse(165))
     journal_id1 = fields.Many2one('account.journal', string="Deferred Journal", required=True
-                                 ,default=lambda self: self.env['account.journal'].browse(165))
+                                 ,default=lambda self: self.env['account.journal'].browse(161))
     journal_id2 = fields.Many2one('account.journal', string="Deferred close Journal", required=True,
                                   default=lambda self: self.env['account.journal'].browse(162))
     account_id1 = fields.Many2one('account.account', string="Deferred Aggregate Account", required=True,
@@ -157,6 +157,7 @@ class CloseEntryWizard(models.TransientModel):
                         'credit': 0.0,
                         'name': f'Reversal of {line.name}',
                         'account_id': wizard.account_id1.id if wizard.use_account_id1 else wizard.account_id.id,
+                        'journal_id': wizard.journal_id1.id if wizard.use_account_id1 else wizard.journal_id.id,
                         'product_id': line.product_id.id,
                         'quantity': line.quantity,
                         'analytic_distribution': analytic_distribution,
@@ -168,7 +169,7 @@ class CloseEntryWizard(models.TransientModel):
                         'account_id': wizard.account_id.id,
                         'product_id': line.product_id.id,
                         'quantity': line.quantity,
-                        'analytic_distribution': analytic_distribution,
+                        #'analytic_distribution': analytic_distribution,
                     }),
                 ]
 
