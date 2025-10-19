@@ -19,7 +19,11 @@ class SaleOrder ( models.Model ) :
 
     contract_date = fields.Date ( string='Contract Date' , readonly=False )
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
-
+    convert_orders = fields.Boolean (
+        string="تحويل الأوردرات لعقود" ,
+        default=False ,
+        help="عند تفعيل هذا الاختيار، سيتم تنفيذ Server Action لتحويل الأوردرات المرتبطة إلى مشاريع."
+    )
     next_number = fields.Integer ( string="next sequence number" , store=True )
     product_code = fields.Char ( string="Porduct Code" , related="x_studio_contract_service.barcode" , store=True )
     one_audit_archive = fields.Boolean ( string="أرشفة علي ون أودت " , stored=True )
@@ -600,6 +604,10 @@ class SaleOrder ( models.Model ) :
         else :
             self.broker_amount = 0
 
+    @api.onchange ('paid_total')
+    def _onchange_convert_order(self) :
+       self.convert_orders = self.paid_total > 0
+            
     def _compute_broker_invoiced_amount(self) :
         for rec in self :
             moves = self.env['account.move'].search ( [('broker_sale_id' , '=' , rec.id)] )
