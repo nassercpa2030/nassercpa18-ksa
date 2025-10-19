@@ -167,7 +167,7 @@ class SaleOrder ( models.Model ) :
         compute="_compute_project_count" ,
         store=True
     )
-    
+  
     @api.depends ( 'review_manager_id' )
     def _compute_ass_visible(self) :
         for rec in self :
@@ -390,32 +390,28 @@ class SaleOrder ( models.Model ) :
     # if rec.paid_total > 0 and rec.state in ('draft' , 'to approve') :
     # rec.state = 'done'
 
-    @api.model
-    def create(self , vals) :
-        rec = super ().create ( vals )
-        rec._auto_convert_to_contract ()
-        return rec
-
     def write(self , vals) :
-        res = super ().write ( vals )
+        res = super ( SaleOrder , self ).write ( vals )
+
+        # إذا تغير الحقل paid_total، نفذ تحويل المشاريع
         if 'paid_total' in vals :
-            self._auto_convert_to_contract ()
+            self.convert_to_project_if_paid ()
+
         return res
 
-    def _auto_convert_to_contract(self) :
-        for order in self :
-            # لو مفيش مدفوعات، تجاهل
-            if order.paid_total <= 0 :
-                continue
+    @api.model
+    def convert_to_project_if_paid(self) :
+        records_to_update = self.filtered (
+            lambda r : r.state in ["to approve" , "draft" , "sent" , "archived" , "archived2024" , "archive2025"]
+                       and r.paid_total > 0
+        )
 
-            # لو الحالة مش واحدة من الحالات المستهدفة
-            if order.state not in ["to approve" , "sent" , "archived" , "archived2024" , "archive2025" , "draft"] :
-                continue
+        if not records_to_update :
+            return False
 
-            # تحويل الحالة إلى عقد
-            order.state = 'sale'
+        for order in records_to_update :
+            order.write ( {'state' : 'sale'} )
 
-            # إنشاء مشروع لو مش موجود
             if not order.project_ids :
                 project = self.env['project.project'].create ( {
                     'name' : f"Project - {order.name}" ,
@@ -425,14 +421,16 @@ class SaleOrder ( models.Model ) :
                     'contract_name' : order.project_name ,
                     'company_id' : order.company_id.id ,
                     'code' : order.auto_code ,
-                    'sale_person2' : order.broker_id.id if order.broker_id else False ,
+                    'sale_person2' : order.broker_id ,
                     'paid_percent' : order.paid_percent ,
                 } )
                 order.write ( {
                     'project_ids' : [(4 , project.id)] ,
-                    'project_id' : project.id ,
+                    'project_id' : project.id
                 } )
                 project.write ( {'sale_order_id' : order.id} )
+
+        return len ( records_to_update )
 
     def _compute_amount_due(self) :
         for rec in self :
