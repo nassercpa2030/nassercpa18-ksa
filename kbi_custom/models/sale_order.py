@@ -22,7 +22,7 @@ class SaleOrder ( models.Model ) :
     convert_orders = fields.Boolean (
         string="تحويل الأوردرات لعقود" ,
         default=False ,
-        store=True,
+        store=True ,
         help="عند تفعيل هذا الاختيار، سيتم تنفيذ Server Action لتحويل الأوردرات المرتبطة إلى مشاريع."
     )
     next_number = fields.Integer ( string="next sequence number" , store=True )
@@ -172,7 +172,7 @@ class SaleOrder ( models.Model ) :
         compute="_compute_project_count" ,
         store=True
     )
-  
+
     @api.depends ( 'review_manager_id' )
     def _compute_ass_visible(self) :
         for rec in self :
@@ -388,6 +388,9 @@ class SaleOrder ( models.Model ) :
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
 
+            # تحديث convert_orders بناءً على paid_total
+            rec.convert_orders = rec.paid_total > 0
+
     # 2️⃣ Onchange method لتغيير state بناءً على paid_total
     # @api.onchange ( 'paid_total' )
     # def _onchange_paid_total_state(self) :
@@ -395,7 +398,6 @@ class SaleOrder ( models.Model ) :
     # if rec.paid_total > 0 and rec.state in ('draft' , 'to approve') :
     # rec.state = 'done'
 
-   
     def _compute_amount_due(self) :
         for rec in self :
             if rec.unpaid_total != 0 :
@@ -605,12 +607,6 @@ class SaleOrder ( models.Model ) :
         else :
             self.broker_amount = 0
 
-    @api.onchange ('paid_total')
-    def _onchange_convert_order(self) :
-        for record in self:
-           record.convert_orders = record.paid_total > 0
-       
-            
     def _compute_broker_invoiced_amount(self) :
         for rec in self :
             moves = self.env['account.move'].search ( [('broker_sale_id' , '=' , rec.id)] )
