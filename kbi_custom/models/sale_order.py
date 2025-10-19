@@ -350,40 +350,40 @@ class SaleOrder ( models.Model ) :
             rec.first_payment_id = self.env['account.payment'].search ( [('id' , 'in' , rec.payment_ids.ids)] ,
                                                                         order="date asc" , limit=1 )
 
-    @api.depends ( 'payment_ids' )
-    def _compute_payment_count(self) :
-        for rec in self :
+    @api.depends('payment_ids')
+    def _compute_payment_count(self):
+        for rec in self:
             paid_total = 0
 
             # جمع المدفوعات من account.payment
-            payments = self.env['account.payment'].search ( [('partner_id' , '=' , rec.partner_id.id)] )
-            for payment in payments :
-                if payment.multi_sale :
-                    sale_payment = payment.sale_order_ids.filtered ( lambda d : d.sale_order_id.id == rec.id )
-                    paid_total += sum ( sale_payment.mapped ( 'amount' ) )
-                elif payment.sale_order_id.id == rec.id :
+            payments = self.env['account.payment'].search([('partner_id', '=', rec.partner_id.id)])
+            for payment in payments:
+                if payment.multi_sale:
+                    sale_payment = payment.sale_order_ids.filtered(lambda d: d.sale_order_id.id == rec.id)
+                    paid_total += sum(sale_payment.mapped('amount'))
+                elif payment.sale_order_id.id == rec.id:
                     paid_total += payment.amount
 
             # جمع المدفوعات من قيود اليومية
-            move_lines = self.env['account.move.line'].search ( [
-                ('sale_order_id' , '=' , rec.id) ,
-                ('credit' , '>' , 0)
-            ] )
-            paid_total += sum ( move_lines.mapped ( 'credit' ) )
+            move_lines = self.env['account.move.line'].search([
+                ('sale_order_id', '=', rec.id),
+                ('credit', '>', 0)
+            ])
+            paid_total += sum(move_lines.mapped('credit'))
 
             # أول دفعة
-            if move_lines :
-                first_line = move_lines.sorted ( 'date' )[0]
+            if move_lines:
+                first_line = move_lines.sorted('date')[0]
                 rec.first_payment_code = first_line.move_id
                 rec.first_payment_code_date = first_line.date
-            else :
+            else:
                 rec.first_payment_code = False
                 rec.first_payment_code_date = False
 
             # تحديث الحقول الأخرى
             rec.paid_total = paid_total
-            rec.payment_count = len ( rec.payment_ids )
-            rec.payment_count2 = len ( move_lines )
+            rec.payment_count = len(rec.payment_ids)
+            rec.payment_count2 = len(move_lines)
             rec.paid_percent = (rec.paid_total / (rec.amount_total or 1)) * 100
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
@@ -392,12 +392,75 @@ class SaleOrder ( models.Model ) :
             previous_convert = rec.convert_orders
             rec.convert_orders = rec.paid_total > 0
 
-            # تنفيذ السيرفر أكشن لو convert_orders أصبح True لأول مرة
-            if rec.convert_orders and not previous_convert :
-                action = self.env['ir.actions.server'].browse ( 1017 )
-                if action.exists () :
-                    action.run ()  # تنفيذ السيرفر أكشن
+            # تنفيذ الدالة بدل السيرفر أكشن لو convert_orders أصبح True لأول مرة
+            if rec.convert_orders and not previous_convert:
+                rec.action_convert_orders()  # استدعاء الدالة مباشرة
+                
 
+    def action_convert_orders(self) :
+        """
+        دالة لتحويل الأوردرات إلى عقود وإنشاء المشاريع المرتبطة
+        """
+        # فلترة الأوردرات المراد تحويلها
+        records_to_update = self.filtered (
+            lambda r : r.state in ["to approve" , "draft" , "sent" , "archived" , "archived2024" , "archive2025"]
+        )
+
+        if not records_to_update :
+            raise ValidationError ( _ ( "❌ لا توجد أوردرات صالحة للتحويل في الحالات المحددة." ) )
+
+        converted_count = 0
+        skipped_orders = []
+
+        for order in records_to_update :
+            if order.paid_total <= 0 :
+                skipped_orders.append ( order.name )
+                continue  # تجاهل هذا الأوردر واستمر مع البقية
+
+            # تغيير الحالة مباشرة
+            order.write ( {'state' : 'sale'} )
+
+            # إنشاء مشروع مرتبط إذا لم يكن موجود
+            if not order.project_ids :
+                project = self.env['project.project'].create ( {
+                    'name' : f"Project - {order.name}" ,
+                    'partner_id' : order.partner_id.id ,
+                    'sale_order_id' : order.id ,
+                    'user_id' : order.user_id.id ,
+                    'contract_name' : order.project_name ,
+                    'company_id' : order.company_id.id ,
+                    'code' : order.auto_code ,
+                    'sale_person2' : order.broker_id.id if order.broker_id else False ,
+                    'paid_percent' : order.paid_percent ,
+                } )
+
+                # ربط المشروع بالسيل أوردر
+                order.write ( {
+                    'project_ids' : [(4 , project.id)] ,
+                    'project_id' : project.id
+                } )
+
+                project.write ( {'sale_order_id' : order.id} )
+
+            converted_count += 1
+
+        # تحضير الرسالة
+        message = f'تم تحويل {converted_count} أوردر إلى عقود وإنشاء المشاريع بنجاح ✅'
+        if skipped_orders :
+            message += "\n⚠️ لم يتم تحويل الأوردرات التالية لأنها لا تحتوي على أي دفعات:\n" + ", ".join (
+                skipped_orders )
+
+        # عرض الإشعار
+        return {
+            'type' : 'ir.actions.client' ,
+            'tag' : 'display_notification' ,
+            'params' : {
+                'title' : _ ( 'التحويل لعقود' ) ,
+                'message' : message ,
+                'type' : 'success' if converted_count > 0 else 'warning' ,
+                'sticky' : False ,
+            }
+        }
     # 2️⃣ Onchange method لتغيير state بناءً على paid_total
     # @api.onchange ( 'paid_total' )
     # def _onchange_paid_total_state(self) :
