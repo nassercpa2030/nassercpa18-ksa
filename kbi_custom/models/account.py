@@ -78,23 +78,7 @@ class AccountPayment ( models.Model ) :
         help="عند تفعيل هذا الاختيار، سيتم تنفيذ Server Action لتحويل الأوردرات المرتبطة إلى مشاريع."
     )
 
-    @api.onchange ( 'convert_orders' )
-    def _onchange_convert_orders(self) :
-        if self.convert_orders :
-            # تنفيذ Server Action (id=1017) على الأوردرات المرتبطة بالدفع
-            # أولاً استخرج أسماء الأوردرات من الفاتورة/الدفع
-            sale_orders = self.mapped ( 'invoice_ids.invoice_origin' )  # أسماء الأوردرات المرتبطة
-            records = self.env['sale.order'].search ( [('name' , 'in' , sale_orders)] )
-
-            if records :
-                # استدعاء السيرفر أكشن مباشرة
-                server_action = self.env.ref ( 'base.ir_actions_server_1017' )  # إذا عندك xml id
-                if not server_action :
-                    server_action = self.env['ir.actions.server'].browse ( 1017 )  # id مباشر
-
-                server_action.run ( records.ids )
-
-    @api.onchange ( 'sale_order_id' )
+       @api.onchange ( 'sale_order_id' )
     def _change_memo(self) :
         for rec in self :
             if rec.sale_order_id :
