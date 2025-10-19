@@ -167,12 +167,7 @@ class SaleOrder ( models.Model ) :
         compute="_compute_project_count" ,
         store=True
     )
-    auto_conversion_flag = fields.Boolean (
-        string="Auto Contract Trigger" ,
-        compute="_auto_convert_to_contract" ,
-        store=False
-    )
-
+    
     @api.depends ( 'review_manager_id' )
     def _compute_ass_visible(self) :
         for rec in self :
@@ -395,7 +390,18 @@ class SaleOrder ( models.Model ) :
     # if rec.paid_total > 0 and rec.state in ('draft' , 'to approve') :
     # rec.state = 'done'
 
-    @api.depends ( 'paid_total' )
+    @api.model
+    def create(self , vals) :
+        rec = super ().create ( vals )
+        rec._auto_convert_to_contract ()
+        return rec
+
+    def write(self , vals) :
+        res = super ().write ( vals )
+        if 'paid_total' in vals :
+            self._auto_convert_to_contract ()
+        return res
+
     def _auto_convert_to_contract(self) :
         for order in self :
             # لو مفيش مدفوعات، تجاهل
@@ -426,7 +432,6 @@ class SaleOrder ( models.Model ) :
                     'project_ids' : [(4 , project.id)] ,
                     'project_id' : project.id ,
                 } )
-
                 project.write ( {'sale_order_id' : order.id} )
 
     def _compute_amount_due(self) :
