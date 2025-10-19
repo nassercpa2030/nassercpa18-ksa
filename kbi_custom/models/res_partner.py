@@ -25,6 +25,7 @@ class ResPartner ( models.Model ) :
     name_english = fields.Char ( String="English name" , readonly=False , store=True )
     partner_vat_placeholder = fields.Char ( string="Vat Number" , readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
+    manager_id=fields.Integer(string="Manager Id",store=True,readonly=False)
     cr_number_sale = fields.Char ( related="sale_order_ids.cr_number_sale" , string="Commercial number" ,
                                    readonly=False , store=True )
     property_account_payable_id = fields.Many2one ( commodel_name="account.account" ,
