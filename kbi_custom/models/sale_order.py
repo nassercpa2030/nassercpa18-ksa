@@ -390,48 +390,7 @@ class SaleOrder ( models.Model ) :
     # if rec.paid_total > 0 and rec.state in ('draft' , 'to approve') :
     # rec.state = 'done'
 
-    def write(self , vals) :
-        res = super ( SaleOrder , self ).write ( vals )
-
-        # إذا تغير الحقل paid_total، نفذ تحويل المشاريع
-        if 'paid_total' in vals :
-            self.convert_to_project_if_paid ()
-
-        return res
-
-    @api.model
-    def convert_to_project_if_paid(self) :
-        records_to_update = self.filtered (
-            lambda r : r.state in ["to approve" , "draft" , "sent" , "archived" , "archived2024" , "archive2025"]
-                       and r.paid_total > 0
-        )
-
-        if not records_to_update :
-            return False
-
-        for order in records_to_update :
-            order.write ( {'state' : 'sale'} )
-
-            if not order.project_ids :
-                project = self.env['project.project'].create ( {
-                    'name' : f"Project - {order.name}" ,
-                    'partner_id' : order.partner_id.id ,
-                    'sale_order_id' : order.id ,
-                    'user_id' : order.user_id.id ,
-                    'contract_name' : order.project_name ,
-                    'company_id' : order.company_id.id ,
-                    'code' : order.auto_code ,
-                    'sale_person2' : order.broker_id ,
-                    'paid_percent' : order.paid_percent ,
-                } )
-                order.write ( {
-                    'project_ids' : [(4 , project.id)] ,
-                    'project_id' : project.id
-                } )
-                project.write ( {'sale_order_id' : order.id} )
-
-        return len ( records_to_update )
-
+   
     def _compute_amount_due(self) :
         for rec in self :
             if rec.unpaid_total != 0 :
