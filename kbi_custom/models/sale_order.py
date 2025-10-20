@@ -565,7 +565,7 @@ class SaleOrder ( models.Model ) :
     amount_due = fields.Float ( string='Amount Due' , compute="_compute_amount_due" )
     project_name = fields.Char ( string='Project Name' )
     project_code = fields.Char ( string='Project Code' )
-    # invoice_ids=fields.Many2many('account.move',compute="_compute_invoice_ids",readonly=True,store=True,string="Invoices")
+    invoice_ids=fields.Many2many('account.move',compute="action_view_invoice",readonly=True,store=True,string="Invoices")
     invoice_count_odoo16 = fields.Integer ( string="" , compute="_compute_invoice_count_odoo16" , store=True )
     # invoice_count=fields.Integer(string="",store=True,readonly=False)
     contract_signature = fields.Boolean ( "Contract Signature" )
