@@ -65,7 +65,7 @@ class CloseEntryWizard(models.TransientModel):
         'account.account', string="Aggregate Account", required=True,
         default=lambda self: self.env['account.account'].browse(1341)
     )
-    journal_entry_date = fields.Date (commodel_name='account.move',string='Journal Entry Date',store=True,readonly=False,required=True,default=lambda self: fields.Date.today() )
+    journal_entry_date = fields.Date (commodel_name='account.move',string='Journal Entry Date',store=True,readonly=False,required=True )
 
     @api.model
     def default_get(self, fields_list):
@@ -144,7 +144,9 @@ class CloseEntryWizard(models.TransientModel):
 
             move_vals = {
                 'move_type': 'entry',
-                'date': fields.Date.today(),
+                #'date': fields.Date.today(),
+                'date': wizard.journal_entry_date,
+                'invoice_origin':sale_order.name,
                 'journal_id': wizard.journal_id1.id,
                 'line_ids': move_lines,
                 'ref': f'Deferred Reversal for {wizard.sale_order_id.name}',
@@ -214,8 +216,10 @@ class CloseEntryWizard(models.TransientModel):
             # إنشاء القيد ونشره
             move_vals = {
                 'move_type': 'entry',
-                'date': fields.Date.today(),
+                #'date': fields.Date.today(),
+                'date': wizard.journal_entry_date,
                 'journal_id': journal_to_use,
+                'invoice_origin':sale_order.name,
                 'line_ids': move_lines,
                 'ref': f'Reversal for {sale_order.name}',
             }
