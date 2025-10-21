@@ -65,7 +65,7 @@ class CloseEntryWizard(models.TransientModel):
         'account.account', string="Aggregate Account", required=True,
         default=lambda self: self.env['account.account'].browse(1341)
     )
-    journal_entry_date = fields.Date (commodel_name='account.move',string='Journal Entry Date',store=True,readonly=False,required=True )
+    journal_entry_date = fields.Date (commodel_name='account.move',string='Journal Entry Date',store=True,readonly=False,required=True,default=lambda self: fields.Date.today() )
 
     @api.model
     def default_get(self, fields_list):
