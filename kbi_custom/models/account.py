@@ -9,7 +9,7 @@ class AccountMove ( models.Model ) :
 
     broker_sale_id = fields.Many2one ( 'sale.order' , string='Broker Sale' )
     sale_order_test = fields.Char ( string='Sale Order Test' , readonly=False , required=False )
-
+    sale_order_id = fields.Many2one ( 'sale.order' , string='Sale Order' , compute='_compute_sale_order_id' ,readonly=False )
     invoice_count_odoo16 = fields.Integer ( string="" , store=True )
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
     analytic_acc_desc = fields.Char (
@@ -26,6 +26,14 @@ class AccountMove ( models.Model ) :
         if autopost_bills_wizard := self._show_autopost_bills_wizard () :
             return autopost_bills_wizard
         return True
+
+    @api.depends ( 'invoice_origin' )
+    def _compute_sale_order_id(self) :
+        for move in self :
+            order = False
+            if move.invoice_origin :
+                order = self.env['sale.order'].search ( [('name' , '=' , move.invoice_origin)] , limit=1 )
+            move.sale_order_id = order
 
     def _compute_analytic_distribution(self) :
         for rec in self :
@@ -51,7 +59,7 @@ class AccountMoveLine ( models.Model ) :
     x_studio_analytic_account_test = fields.Char ( string="analytic_Test" ,
                                                    related='sale_order_id.analytic_account_id.display_name' ,
                                                    store=True )
-    sale_order_id = fields.Many2one ( 'sale.order' , string='Sale Order', compute='_compute_sale_order_id' , related="sale" ,
+    sale_order_id = fields.Many2one ( 'sale.order' , string='Sale Order', related="sale" ,
                                       domain="[('partner_id','=',partner_id)]" )
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
     analytic_acc_desc_line = fields.Char (
@@ -60,13 +68,6 @@ class AccountMoveLine ( models.Model ) :
         readonly=False
     )
 
-    @api.depends ( 'invoice_origin' )
-    def _compute_sale_order_id(self) :
-        for move in self :
-            order = False
-            if move.invoice_origin :
-                order = self.env['sale.order'].search ( [('name' , '=' , move.invoice_origin)] , limit=1 )
-            move.sale_order_id = order
 
 
 class AccountPayment ( models.Model ) :
