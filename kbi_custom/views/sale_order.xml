@@ -35,9 +35,9 @@
                 <!-- Header -->
                 <xpath expr="//header" position="inside">
                     <field name="is_current_approver"/>
-                    <button name="action_open_reject_sale_wizard" type="object" string="Reject Order"
+                    <!--button name="action_open_reject_sale_wizard" type="object" string="Reject Order"
                         class="btn btn-danger"
-                        modifiers="{'invisible':['|', ('is_current_approver', '!=', True)]}"/>
+                        modifiers="{'invisible':['|', ('is_current_approver', '!=', True)]}"/-->
                     <button name="action_open_print_sale_wizard" type="object" class="oe_highlight" string="Print Offer/Contract"
                         modifiers="{'invisible':[('state','in',['cancel','rejected'])]}"/>
                 </xpath>
