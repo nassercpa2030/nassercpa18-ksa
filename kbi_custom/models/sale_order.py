@@ -385,6 +385,7 @@ class SaleOrder ( models.Model ) :
             rec.payment_count = len(rec.payment_ids)
             rec.payment_count2 = len(move_lines)
             rec.paid_percent = (rec.paid_total / (rec.amount_total or 1)) * 100
+            rec.paid_percentage_refrence=rec.paid_percent
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
 
