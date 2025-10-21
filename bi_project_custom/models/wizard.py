@@ -107,7 +107,7 @@ class CloseEntryWizard(models.TransientModel):
         for wizard in self:
             if not wizard.account_id1:
                 raise ValidationError("Deferred Aggregate Account is missing on the wizard.")
-
+            sale_order = wizard.sale_order_id
             move_lines = []
             for line in wizard.invoice_lines:
                 if not line.account_id:
