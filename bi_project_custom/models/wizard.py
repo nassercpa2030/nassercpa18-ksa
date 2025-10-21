@@ -205,6 +205,8 @@ class CloseEntryWizard(models.TransientModel):
                         'account_id': wizard.account_id.id,
                         'product_id': line.product_id.id,
                         'quantity': line.product_uom_qty,
+                        'analytic_distribution': analytic_distribution,
+                        'partner_id' :partner,
                     }),
                 ]
 
