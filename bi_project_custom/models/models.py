@@ -177,7 +177,7 @@ class SaleOrder(models.Model):
     def _compute_journal_entry_count(self):
         for order in self:
             order.journal_entry_count = self.env['account.move'].search_count(
-                [('sale_order_id', '=', order.id), ('move_type', '=', 'entry'), ('journal_id', 'in', [162,161,160])])
+                [('sale_order_id', '=', order.id), ('move_type', '=', 'entry'), ('journal_id', 'in', [162,161,160,165])])
 
     def action_view_journal_entries(self):
         self.ensure_one()
@@ -186,7 +186,7 @@ class SaleOrder(models.Model):
             'name': 'Journal Entries',
             'view_mode': 'list,form',
             'res_model': 'account.move',
-            'domain': [('sale_order_id', '=', self.id), ('move_type', '=', 'entry'), ('journal_id', 'in', [162,161,160])],
+            'domain': [('sale_order_id', '=', self.id), ('move_type', '=', 'entry'), ('journal_id', 'in', [162,161,160,165])],
             'context': {'default_sale_order_id': self.id},
         }
 
