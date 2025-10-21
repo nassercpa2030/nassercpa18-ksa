@@ -163,7 +163,8 @@ class CloseEntryWizard(models.TransientModel):
             move_lines = []
 
             # تحديد الحساب والـ journal بناء على use_account_id1
-            debit_account = wizard.account_id1.id if wizard.use_account_id1 else wizard.account_id.id
+            for line in wizard.invoice_lines:
+                debit_account = line.account_id1.id if wizard.use_account_id1 else line.account_id.id
             journal_to_use = wizard.journal_id1.id if wizard.use_account_id1 else wizard.journal_id.id
 
             sale_order = wizard.sale_order_id
@@ -181,7 +182,8 @@ class CloseEntryWizard(models.TransientModel):
                 analytic_distribution = {}
                 if sale_order.analytic_account_id:
                     analytic_distribution = {sale_order.analytic_account_id.id: 100.0}
-
+                    partner= sale_order.partner_id.id
+               
                 # إضافة خطوط القيد
                 move_lines += [
                     (0, 0, {
@@ -193,6 +195,8 @@ class CloseEntryWizard(models.TransientModel):
                         'product_id': line.product_id.id,
                         'quantity': line.product_uom_qty,
                         'analytic_distribution': analytic_distribution,
+                        'partner_id' :partner,
+                       
                     }),
                     (0, 0, {
                         'debit': 0.0,
