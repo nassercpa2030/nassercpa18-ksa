@@ -59,8 +59,7 @@ class AccountMoveLine ( models.Model ) :
     x_studio_analytic_account_test = fields.Char ( string="analytic_Test" ,
                                                    related='sale_order_id.analytic_account_id.display_name' ,
                                                    store=True )
-    sale_order_id = fields.Many2one ( 'sale.order' , string='Sale Order', related="sale" ,
-                                      domain="[('partner_id','=',partner_id)]" )
+    sale_order_id = fields.Many2one ('sale.order' , string='Sale Order' , domain="[('partner_id','=',partner_id)]" )
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
     analytic_acc_desc_line = fields.Char (
         string="Analytic Description" ,
