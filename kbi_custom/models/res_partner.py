@@ -48,12 +48,8 @@ class ResPartner ( models.Model ) :
     @api.depends ( 'manager_id' )
     def _compute_manager_name(self) :
         for rec in self :
-            if rec.manager_id :
-                user = self.env['res.users'].search ( [('id' , '=' , rec.manager_id)] , limit=1 )
-                rec.manager_name = user.id if user else False
-            else :
-                rec.manager_name = False
-
+            rec.manager_name = rec.manager_id if rec.manager_id else False
+               
     def action_merge_specific_duplicates(self) :
         """
         دمج كل الشركاء المكررة بناءً على الاسم فقط.
