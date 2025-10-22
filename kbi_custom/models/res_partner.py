@@ -20,12 +20,15 @@ class ResPartner ( models.Model ) :
     city_id = fields.Many2one ( comodel_name='res.country.state.city' , string='City' )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
     nationality = fields.Char ( "Nationality" )
-    manager_team = fields.Many2one ( comodel_name="res.users" , string='Manager',related="x_studio_related_field_7pm_1j7mp6p7k" , store=True,readonly=False )
+    manager_team = fields.Many2one ( comodel_name="res.users" , string='Manager' ,
+                                     related="x_studio_related_field_7pm_1j7mp6p7k" , store=True , readonly=False )
     is_broker = fields.Boolean ( string='Broker' )
     name_english = fields.Char ( String="English name" , readonly=False , store=True )
     partner_vat_placeholder = fields.Char ( string="Vat Number" , readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
-    manager_id=fields.Integer(string="Manager Id",store=True,readonly=False)
+    manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' , compute="action_search_manager" ,
+                                     store=True , readonly=False )
+    manager_id = fields.Integer ( string="Manager Id" , store=True , readonly=False )
     cr_number_sale = fields.Char ( related="sale_order_ids.cr_number_sale" , string="Commercial number" ,
                                    readonly=False , store=True )
     property_account_payable_id = fields.Many2one ( commodel_name="account.account" ,
@@ -41,7 +44,16 @@ class ResPartner ( models.Model ) :
         for rec in self :
             if rec.number_700 and not re.match ( pattern , rec.number_700 ) :
                 raise ValidationError ( "You must enter numbers only and start with 7" )
-           
+
+    @api.depends ( 'manager_id' )
+    def _compute_manager_name(self) :
+        for rec in self :
+            if rec.manager_id :
+                user = self.env['res.users'].search ( [('id' , '=' , rec.manager_id)] , limit=1 )
+                rec.manager_name = user.id if user else False
+            else :
+                rec.manager_name = False
+
     def action_merge_specific_duplicates(self) :
         """
         دمج كل الشركاء المكررة بناءً على الاسم فقط.
