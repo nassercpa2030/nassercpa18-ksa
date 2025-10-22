@@ -177,7 +177,8 @@ class SaleOrder(models.Model):
     def _compute_journal_entry_count(self):
         for order in self:
             order.journal_entry_count = self.env['account.move'].search_count(
-                ['|',('sale_order_id', '=', self.id),('invoice_origin', '=', self.name), ('move_type', '=', 'entry'), ('journal_id', 'in', [162,161,160,165])])
+                [('invoice_origin', '=', self.name), ('move_type', '=', 'entry'), ('journal_id', 'in', [162,161,160,165])])
+             #['|',('sale_order_id', '=', self.id),('invoice_origin', '=', self.name), ('move_type', '=', 'entry'), ('journal_id', 'in', [162,161,160,165])])
 
     def action_view_journal_entries(self):
         self.ensure_one()
@@ -186,7 +187,8 @@ class SaleOrder(models.Model):
             'name': 'Journal Entries',
             'view_mode': 'list,form',
             'res_model': 'account.move',
-            'domain': ['|',('sale_order_id', '=', self.id),('invoice_origin', '=', self.name), ('journal_id', 'in', [162,161,160,165])],
+            'domain': [('invoice_origin', '=', self.name), ('journal_id', 'in', [162,161,160,165])],
+           # 'domain': ['|',('sale_order_id', '=', self.id),('invoice_origin', '=', self.name), ('journal_id', 'in', [162,161,160,165])],
             'context': {'default_sale_order_id': self.id},
         }
 
