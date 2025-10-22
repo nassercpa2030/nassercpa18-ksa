@@ -18,6 +18,7 @@ class ResCity ( models.Model ) :
 class ResPartner ( models.Model ) :
     _inherit = 'res.partner'
     city_id = fields.Many2one ( comodel_name='res.country.state.city' , string='City' )
+    user_id= fields.Many2one( compute='_compute_user_id',string='Sales Person',store=True)
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
     nationality = fields.Char ( "Nationality" )
     manager_team = fields.Many2one ( comodel_name="res.users" , string='Manager',related="x_studio_related_field_7pm_1j7mp6p7k" , store=True,readonly=False )
@@ -41,7 +42,11 @@ class ResPartner ( models.Model ) :
         for rec in self :
             if rec.number_700 and not re.match ( pattern , rec.number_700 ) :
                 raise ValidationError ( "You must enter numbers only and start with 7" )
-   
+    @api.depends('manager_id')
+    def _compute_user_id(self):
+       for rec in self:
+        rec.user_id = self.env['res.users'].browse(rec.manager_id) if rec.manager_id else False
+           
     def action_merge_specific_duplicates(self) :
         """
         دمج كل الشركاء المكررة بناءً على الاسم فقط.
