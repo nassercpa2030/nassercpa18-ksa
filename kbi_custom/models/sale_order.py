@@ -62,7 +62,7 @@ class SaleOrder ( models.Model ) :
     review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Assigned To' , readonly=False ,
                                           domain=[('job_id' , '=' , 'مدير مراجعة')] )
     # review_manager_id=fields.Many2one(comodel_name='res.users',string='Manager',readonly=False )
-    partner_manager = fields.Many2one('res.users', related='partner_id.user_id',store=True)
+    #partner_manager = fields.Many2one(comodel_name="res.partner",related='partner_id.user_id',store=True)
     user_id = fields.Many2one ( 'res.users', string='Manager' , readonly=False )
     sequence = fields.Integer ( string='Sequence' , )
     report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
