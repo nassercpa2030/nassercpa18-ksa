@@ -211,19 +211,19 @@ class SaleOrder ( models.Model ) :
             else :
                 raise ValidationError ( _ ( "لا يوجد مشروع مرتبط بهذا الطلب لتحديث مرحلته." ) )
 
-    def action_confirm(self) :
-        for order in self :
-            order.state = 'to approve'
-            return {
-                'type' : 'ir.actions.client' ,
-                'tag' : 'display_notification' ,
-                'params' : {
-                    'title' : _ ( 'تم التنفيذ' ) ,
-                    'message' : _ ( 'العقد تم عمله بإنتظار السداد' ) ,
-                    'type' : 'success' ,  # ممكن success, warning, danger, info
-                    'sticky' : False ,  # لو True الرسالة تفضل لحد ما المستخدم يقفلها
-                }
-            }
+    #def action_confirm(self) :
+       # for order in self :
+           # order.state = 'to approve'
+           # return {
+              #  'type' : 'ir.actions.client' ,
+              #  'tag' : 'display_notification' ,
+              #  'params' : {
+               #     'title' : _ ( 'تم التنفيذ' ) ,
+               #     'message' : _ ( 'العقد تم عمله بإنتظار السداد' ) ,
+              #      'type' : 'success' ,  # ممكن success, warning, danger, info
+             #       'sticky' : False ,  # لو True الرسالة تفضل لحد ما المستخدم يقفلها
+            #    }
+           # }
 
     @api.onchange ( 'analytic_account_id' )
     def _onchange_analytic_account_id(self) :
