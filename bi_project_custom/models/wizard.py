@@ -199,6 +199,7 @@ class CloseEntryWizard(models.TransientModel):
                         'quantity': line.product_uom_qty,
                         'analytic_distribution': analytic_distribution,
                         'partner_id' :partner,
+                        'sale_order_id':sale_order.id,
                        
                     }),
                     (0, 0, {
@@ -210,6 +211,7 @@ class CloseEntryWizard(models.TransientModel):
                         'quantity': line.product_uom_qty,
                         'analytic_distribution': analytic_distribution,
                         'partner_id' :partner,
+                        'sale_order_id':sale_order.id,
                     }),
                 ]
 
