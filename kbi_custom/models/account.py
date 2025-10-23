@@ -9,7 +9,7 @@ class AccountMove ( models.Model ) :
 
     broker_sale_id = fields.Many2one ( 'sale.order' , string='Broker Sale' )
     sale_order_test = fields.Char ( string='Sale Order Test' , readonly=False , required=False )
-    sale_order_id = fields.Many2one ( 'sale.order' , string='Sale Order' , compute='_compute_sale_order_id' ,readonly=False )
+    sale_order_id_finance = fields.Many2one ( 'sale.order' , string='Sale Order' , compute='_compute_sale_order_id' ,readonly=False )
     invoice_count_odoo16 = fields.Integer ( string="" , store=True )
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
     analytic_acc_desc = fields.Char (
@@ -33,7 +33,7 @@ class AccountMove ( models.Model ) :
             order = False
             if move.invoice_origin :
                 order = self.env['sale.order'].search ( [('name' , '=' , move.invoice_origin)] , limit=1 )
-            move.sale_order_id = order
+            move.sale_order_id_finance  = order
 
     def _compute_analytic_distribution(self) :
         for rec in self :
