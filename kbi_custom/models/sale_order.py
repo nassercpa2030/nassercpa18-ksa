@@ -368,9 +368,10 @@ class SaleOrder ( models.Model ) :
             # جمع المدفوعات من قيود اليومية
             move_lines = self.env['account.move.line'].search([
                 ('sale_order_id', '=', rec.id),
-                ('credit', '>', 0)
+                ('credit', '>', 0),('account_id','=',62)
             ])
             paid_total += sum(move_lines.mapped('credit'))
+            
 
             # أول دفعة
             if move_lines:
