@@ -186,7 +186,7 @@ class SaleOrder ( models.Model ) :
             }
         }
        
-    def _action_print_mutalba_report(self):
+    def action_print_mutalba_report(self):
         report = self.env['ir.actions.report'].browse(1079)
         return report.report_action(self)
 
