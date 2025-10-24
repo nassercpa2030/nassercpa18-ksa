@@ -129,6 +129,16 @@ class SaleOrder ( models.Model ) :
                                             string='Journal Data Lines' )
     first_dofaa=fields.Boolean(store=True,default=False,string="1")
     second_dofaa=fields.Boolean(store=True,default=False,string="2")
+    first_line_name = fields.Char(
+        string="First Line Description",
+        compute="_compute_second_line_name",
+        store=True
+    )
+    second_line_name = fields.Char(
+        string="Second Line Description",
+        compute="_compute_second_line_name",
+        store=True
+    )
     is_journal_state_not_posted = fields.Boolean ( compute='_compute_is_journal_state_not_posted' ,
                                                    string='Journal State' , default=True )
     team_id = fields.Many2one ( 'crm.team' , string='Sales Team' , readonly=False )
@@ -164,7 +174,20 @@ class SaleOrder ( models.Model ) :
                 if lines.qty_invoiced > 0.0 :
                     total_2 += lines.price_subtotal
             rec.is_journal_state_not_posted = total_1 != total_2
+            
+    @api.depends('order_line')
+    def _compute_second_line_name(self):
+        for order in self:
+            if len(order.order_line) >= 1:
+                order.first_line_name = order.order_line[0].name
+            else:
+                order.first_line_name = False
 
+            if len(order.order_line) >= 2:
+                order.second_line_name = order.order_line[1].name
+            else:
+                order.second_line_name = False
+                
     def _compute_journal_entry_data(self) :
         for date in self :
             date.journal_entry_data = self.env['account.move'].search (
