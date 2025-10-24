@@ -129,6 +129,7 @@ class SaleOrder ( models.Model ) :
                                             string='Journal Data Lines' )
     first_dofaa=fields.Boolean(store=True,default=False,string="1")
     second_dofaa=fields.Boolean(store=True,default=False,string="2")
+    # first and second dofaa name
     first_line_name = fields.Char(
         string="First Line Description",
         compute="_compute_second_line_name",
@@ -139,6 +140,40 @@ class SaleOrder ( models.Model ) :
         compute="_compute_second_line_name",
         store=True
     )
+    # first and second dofaa untaxed
+    first_line_untaxed = fields.Float(
+        string="First Line Untaxed",
+        compute="_compute_second_line_name",
+        store=True
+    )
+   second_line_untaxed = fields.Float(
+        string="Second Line Untaxed",
+        compute="_compute_second_line_name",
+        store=True
+    )
+   # first and second dofaa taxed
+   first_line_taxed = fields.Float(
+        string="Second Line Untaxed",
+        compute="_compute_second_line_name",
+        store=True
+    )
+   second_line_taxed = fields.Float(
+        string="Second Line Untaxed",
+        compute="_compute_second_line_name",
+        store=True
+    )
+   # first and second dofaa taxes
+   second_line_taxes = fields.Float(
+        string="Second Line Taxe",
+        compute="_compute_second_line_name",
+        store=True
+    )
+   second_line_taxes = fields.Float(
+        string="Second Line Taxe",
+        compute="_compute_second_line_name",
+        store=True
+    )
+    
     is_journal_state_not_posted = fields.Boolean ( compute='_compute_is_journal_state_not_posted' ,
                                                    string='Journal State' , default=True )
     team_id = fields.Many2one ( 'crm.team' , string='Sales Team' , readonly=False )
@@ -180,11 +215,18 @@ class SaleOrder ( models.Model ) :
         for order in self:
             if len(order.order_line) >= 1:
                 order.first_line_name = order.order_line[0].name
+                order.first_line_taxed = order.order_line[0].price_total
+                order.first_line_untaxed = order.order_line[0].price_subtotal
+                order.first_line_taxes = order.order_line[0].price_tax
             else:
                 order.first_line_name = False
 
             if len(order.order_line) >= 2:
                 order.second_line_name = order.order_line[1].name
+                order.second_line_name = order.order_line[1].name
+                order.second_line_taxed = order.order_line[1].price_total
+                order.second_line_untaxed = order.order_line[1].price_subtotal
+                order.second_line_taxes = order.order_line[1].price_tax
             else:
                 order.second_line_name = False
                 
