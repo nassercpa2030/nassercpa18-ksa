@@ -25,19 +25,23 @@
                 <!-- Buttons -->
                 <xpath expr="//div[@name='button_box']" position="inside">
                      <!--button class="oe_stat_button" name="action_open_payment" string="طباعة مطالبة" type="object" icon="fa-print"/-->
-                      <div style="background-color:#f0f0f0;" groups="base.group_system">
-                      <button name="action_print_mutalba_report" type="object" class="btn btn-outline-danger" groups="base.group_system" style="padding: .75rem 1.25rem; font-size: 16px;" icon="fa-print" string="طباعة مطالبة"/> 
-                        <b invisible="second_dofaa" string="1" style="color:red;" groups="base.group_system">1:</b>
-                        <field name="first_dofaa" widget="boolean_toggle" invisible="second_dofaa" groups="base.group_system"/>
-                         <b invisible="first_dofaa" style="color:red;" groups="base.group_system">2:</b>
-                        <field name="second_dofaa" widget="boolean_toggle" invisible="first_dofaa" groups="base.group_system"/>
-                        </div>   
+                      
                     <button class="oe_stat_button" name="action_open_payment" type="object" icon="fa-money">
                         <field name="payment_count" widget="statinfo" string="Payments"/>
                     </button>
                     <button class="oe_stat_button" name="action_open_broker_bill" type="object" icon="fa-pencil-square-o">
                         <field name="broker_invoiced_amount" widget="statinfo" string="Broker Bills"/>
                     </button>
+                </xpath>
+                <xpath expr="//header" position="inside">
+                     <div style="background-color:#f0f0f0;" groups="base.group_system">
+                      <button name="action_print_mutalba_report" type="object" class="btn btn-outline-danger" groups="base.group_system" style="padding: .75rem 1.25rem; font-size: 16px;" icon="fa-print" string="طباعة مطالبة"/> 
+                        <b invisible="second_dofaa" string="1" style="color:red;" groups="base.group_system">1:</b>
+                        <field name="first_dofaa" widget="boolean_toggle" invisible="second_dofaa" groups="base.group_system"/>
+                         <b invisible="first_dofaa" style="color:red;" groups="base.group_system">2:</b>
+                        <field name="second_dofaa" widget="boolean_toggle" invisible="first_dofaa" groups="base.group_system"/>
+                        </div>  
+                
                 </xpath>
 
                 <!-- Header -->
