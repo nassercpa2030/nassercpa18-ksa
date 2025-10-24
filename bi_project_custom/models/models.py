@@ -210,6 +210,10 @@ class SaleOrder ( models.Model ) :
                     total_2 += lines.price_subtotal
             rec.is_journal_state_not_posted = total_1 != total_2
             
+    def action_print_mutalba_report(self):
+        report = self.env['ir.actions.report'].browse(1079)
+        return report.report_action(self)    
+        
     @api.depends('order_line')
     def _compute_second_line_name(self):
         for order in self:
@@ -252,10 +256,6 @@ class SaleOrder ( models.Model ) :
                 'sticky' : False ,  # لو True الرسالة تظل حتى يغلقها المستخدم
             }
         }
-       
-    def action_print_mutalba_report(self):
-        report = self.env['ir.actions.report'].browse(1079)
-        return report.report_action(self)
 
     def _auto_code(self) :
         sequence_map = {
