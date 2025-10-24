@@ -126,12 +126,6 @@
                      <button name="_action_print_mutalba_report" type="object" class="alert alert-danger" icon="fa fa-print" string="طباعة مطالبة"
                         groups="base.group_user"/>
                     </div-->
-            <button name="_action_print_mutalba_report"
-                      type="object"
-                      string="طباعة مطالبة"
-                      icon="fa-print"
-                      class="oe_lowlight"
-                      style="color: white; font-weight: bold;"/>
             
               <button name="action_set_not_custom_signed"
                       type="object"
