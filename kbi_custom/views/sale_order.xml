@@ -44,10 +44,10 @@
                         modifiers="{'invisible':[('state','in',['cancel','rejected'])]}"/>
                     <!--button name="action_open_print_sale_wizard" type="object" class="oe_mediumlight" icon="fa fa-print" string="طباعة مطالبة"
                         groups="base.group_user"/-->
-                    <!--div style="background-color:#a94442"-->
+                    <div style="background-color:#a94442">
                      <button name="_action_print_mutalba_report" type="object" class="alert alert-danger" icon="fa fa-print" string="طباعة مطالبة"
                         groups="base.group_user"/>
-                    <!--/div-->
+                    <!/div>
                 </xpath>
 
                 <!-- Validity Date Required -->
@@ -75,7 +75,7 @@
                     <field name="analytic_account_id"/>
                     <field name="agreement_id" invisible="1"/>
                     <field name="broker_id" modifiers="{'invisible':[('state','not in',['sale','done'])]}"/>
-                    <field name="broker_amount" string="string="Sale_person Amount""/>
+                    <field name="broker_amount" string="string="Sale_person Amount"/>
                     <field name="auditor" />
                     <field name="broker_invoiced_amount" string="Sale_person Paid Amount"  force_save="1" modifiers="{'invisible':[('state','not in',['sale','done'])]}"/>
                     <field name="broker_uninvoiced_amount" string="Sale_person UnPaid Amount" force_save="1" modifiers="{'invisible':[('state','not in',['sale','done'])]}"/>
