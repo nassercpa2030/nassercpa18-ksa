@@ -145,34 +145,34 @@ class SaleOrder ( models.Model ) :
         string="First Line Untaxed",
         compute="_compute_second_line_name",
         store=True
-    )
-   second_line_untaxed = fields.Float(
+     )
+    second_line_untaxed = fields.Float(
         string="Second Line Untaxed",
         compute="_compute_second_line_name",
         store=True
-    )
-   # first and second dofaa taxed
-   first_line_taxed = fields.Float(
+     )
+    # first and second dofaa taxed
+    first_line_taxed = fields.Float(
         string="Second Line Untaxed",
         compute="_compute_second_line_name",
         store=True
-    )
-   second_line_taxed = fields.Float(
+     )
+    second_line_taxed = fields.Float(
         string="Second Line Untaxed",
         compute="_compute_second_line_name",
         store=True
-    )
-   # first and second dofaa taxes
-   second_line_taxes = fields.Float(
+     )
+    # first and second dofaa taxes
+    second_line_taxes = fields.Float(
         string="Second Line Taxe",
         compute="_compute_second_line_name",
         store=True
-    )
-   second_line_taxes = fields.Float(
+     )
+    second_line_taxes = fields.Float(
         string="Second Line Taxe",
         compute="_compute_second_line_name",
         store=True
-    )
+     )
     
     is_journal_state_not_posted = fields.Boolean ( compute='_compute_is_journal_state_not_posted' ,
                                                    string='Journal State' , default=True )
