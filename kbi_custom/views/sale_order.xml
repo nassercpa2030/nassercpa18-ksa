@@ -75,7 +75,7 @@
                     <field name="analytic_account_id"/>
                     <field name="agreement_id" invisible="1"/>
                     <field name="broker_id" modifiers="{'invisible':[('state','not in',['sale','done'])]}"/>
-                    <field name="broker_amount" string="string="Sale_person Amount"/>
+                    <field name="broker_amount" string="Sale_person Amount"/>
                     <field name="auditor" />
                     <field name="broker_invoiced_amount" string="Sale_person Paid Amount"  force_save="1" modifiers="{'invisible':[('state','not in',['sale','done'])]}"/>
                     <field name="broker_uninvoiced_amount" string="Sale_person UnPaid Amount" force_save="1" modifiers="{'invisible':[('state','not in',['sale','done'])]}"/>
