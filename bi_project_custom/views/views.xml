@@ -122,6 +122,10 @@
                       class="btn btn-warning"
                       groups="base.group_system"
                       style="background-color: orange; color: white; font-weight: bold;"/>
+                 <div style="background-color:#a94442">
+                     <button name="_action_print_mutalba_report" type="object" class="alert alert-danger" icon="fa fa-print" string="طباعة مطالبة"
+                        groups="base.group_user"/>
+                    </div>
               <button name="action_set_not_custom_signed"
                       type="object"
                       string="Customer Not_Signed"
