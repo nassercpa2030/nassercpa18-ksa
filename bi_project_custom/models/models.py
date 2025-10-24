@@ -185,6 +185,10 @@ class SaleOrder ( models.Model ) :
                 'sticky' : False ,  # لو True الرسالة تظل حتى يغلقها المستخدم
             }
         }
+    @api.multi   
+    def _action_print_mutalba_report(self):
+        report = self.env['ir.actions.report'].browse(1079)
+        return report.report_action(self)
 
     def _auto_code(self) :
         sequence_map = {
