@@ -24,6 +24,8 @@
 
                 <!-- Buttons -->
                 <xpath expr="//div[@name='button_box']" position="inside">
+                     <button class="oe_stat_button" name="action_open_payment" string="طباعة مطالبة" type="object" icon="fa-print"/>
+                     
                     <button class="oe_stat_button" name="action_open_payment" type="object" icon="fa-money">
                         <field name="payment_count" widget="statinfo" string="Payments"/>
                     </button>
