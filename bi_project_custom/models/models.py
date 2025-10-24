@@ -127,8 +127,8 @@ class SaleOrder ( models.Model ) :
                                               string='Is Project in Close Stage' )
     journal_entry_data = fields.Many2many ( comodel_name='account.move' , compute='_compute_journal_entry_data' ,
                                             string='Journal Data Lines' )
-    first_dofaa=fields.Boolean(store=True,default=False)
-    second_dofaa=fields.Boolean(store=True,default=False)
+    first_dofaa=fields.Boolean(store=True,default=False,string="1")
+    second_dofaa=fields.Boolean(store=True,default=False,string="2")
     is_journal_state_not_posted = fields.Boolean ( compute='_compute_is_journal_state_not_posted' ,
                                                    string='Journal State' , default=True )
     team_id = fields.Many2one ( 'crm.team' , string='Sales Team' , readonly=False )
