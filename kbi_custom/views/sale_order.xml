@@ -44,8 +44,10 @@
                         modifiers="{'invisible':[('state','in',['cancel','rejected'])]}"/>
                     <!--button name="action_open_print_sale_wizard" type="object" class="oe_mediumlight" icon="fa fa-print" string="طباعة مطالبة"
                         groups="base.group_user"/-->
-                     <button name="action_open_print_sale_wizard" type="object" class="alert alert-danger" icon="fa fa-print" string="طباعة مطالبة"
+                    <div style="background-color:#a94442">
+                     <button name="_action_print_mutalba_report" type="object" class="alert alert-danger" icon="fa fa-print" string="طباعة مطالبة"
                         groups="base.group_user"/>
+                    </div>
                 </xpath>
 
                 <!-- Validity Date Required -->
