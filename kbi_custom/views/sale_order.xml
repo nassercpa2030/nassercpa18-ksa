@@ -28,7 +28,7 @@
                      
                     <button class="oe_stat_button" name="action_open_payment" type="object" icon="fa-money">
                         <field name="payment_count" widget="statinfo" string="Payments"/>
-                    </button>b
+                    </button>
                     <button class="oe_stat_button" name="action_open_broker_bill" type="object" icon="fa-pencil-square-o">
                         <field name="broker_invoiced_amount" widget="statinfo" string="Broker Bills"/>
                     </button>
@@ -44,10 +44,10 @@
                         modifiers="{'invisible':[('state','in',['cancel','rejected'])]}"/>
                     <!--button name="action_open_print_sale_wizard" type="object" class="oe_mediumlight" icon="fa fa-print" string="طباعة مطالبة"
                         groups="base.group_user"/-->
-                    <div style="background-color:#a94442">
+                    <!--div style="background-color:#a94442"-->
                      <button name="_action_print_mutalba_report" type="object" class="alert alert-danger" icon="fa fa-print" string="طباعة مطالبة"
                         groups="base.group_user"/>
-                    </div>
+                    <!--/div-->
                 </xpath>
 
                 <!-- Validity Date Required -->
