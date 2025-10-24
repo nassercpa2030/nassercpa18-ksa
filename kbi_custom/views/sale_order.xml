@@ -47,7 +47,7 @@
                     <div style="background-color:#a94442">
                      <button name="_action_print_mutalba_report" type="object" class="alert alert-danger" icon="fa fa-print" string="طباعة مطالبة"
                         groups="base.group_user"/>
-                    <!/div>
+                    </div>
                 </xpath>
 
                 <!-- Validity Date Required -->
