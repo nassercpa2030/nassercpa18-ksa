@@ -128,7 +128,7 @@ class SaleOrder ( models.Model ) :
     journal_entry_data = fields.Many2many ( comodel_name='account.move' , compute='_compute_journal_entry_data' ,
                                             string='Journal Data Lines' )
     first_dofaa=fields.Boolean(store=True,default=False,string="1")
-    second_dofaa=fields.Boolean(store=True,default=False,string="2")
+    second_dofaa=fields.Boolean(store=True,default=True,string="2")
     # first and second dofaa name
     first_line_name = fields.Char(
         string="First Line Description",
