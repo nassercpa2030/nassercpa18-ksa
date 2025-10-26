@@ -168,7 +168,7 @@ class CloseEntryWizard(models.TransientModel):
             # تحديد الحساب والـ journal بناء على use_account_id1
             for line in wizard.invoice_lines:
                 debit_account = wizard.account_id1.id if wizard.use_account_id1 else line.account_id.id
-            journal_to_use = wizard.journal_id1.id if wizard.use_account_id1 else wizard.journal_id.id
+            journal_to_use = wizard.journal_id2.id if wizard.use_account_id1 else wizard.journal_id1.id
 
             sale_order = wizard.sale_order_id
             if not sale_order.order_line:
