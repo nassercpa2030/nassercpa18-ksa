@@ -553,7 +553,9 @@ class SaleOrder ( models.Model ) :
 
     # contract_date = fields.Date(string='Contract Date')
     audit_date = fields.Date ( string='Audit Date' )
-    account_year = fields.Integer ( string='Year' , required=True , default=lambda self : fields.Date.today ().year )
+    #account_year = fields.Integer ( string='Year' , required=True , default=lambda self : fields.Date.today ().year )
+    account_year = fields.Integer ( string='Year' , required=True , compute='compute_audit_year' )
+   
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreement' )
     payment_ids = fields.Many2many ( 'account.payment' , string='Payments' , compute='_compute_payment_ids' )
     payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
