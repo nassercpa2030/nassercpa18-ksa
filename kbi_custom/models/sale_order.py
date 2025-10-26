@@ -70,7 +70,7 @@ class SaleOrder ( models.Model ) :
     x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="Contract_service" )
     report_template_id = fields.Many2one ( comodel_name='ir.actions.report' , string='Report Template' ,
                                            related="report_id.report_template_id" )
-    account_year = fields.Integer ( string='Year' , required=True , default=lambda self : fields.Date.today ().year )
+    #account_year = fields.Integer ( string='Year' , required=True , default=lambda self : fields.Date.today ().year )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreement' )
     payment_ids = fields.Many2many ( 'account.payment' , string='Payments' , compute='_compute_payment_ids' )
     payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
@@ -606,7 +606,15 @@ class SaleOrder ( models.Model ) :
         ('done' , 'طبيعي') ,
         ('not_done' , '(مستثني)غير مكتمل') ,
     ] , string="Project Files State" , store=True )
-
+    
+    @api.depends('audit_date')
+    def compute_audit_year(self):
+        for rec in self :
+            if rec.audit_date:
+               rec.account_year=rec.audit_date.year
+            else:
+               rec.account_year = fields.Date.today ().year 
+            
     def action_open_close_entry_wizard_deffered(self) :
         self.ensure_one ()
         return {
