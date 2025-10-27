@@ -57,7 +57,7 @@
                     <field name="project_stage_id"/>
                     <field name="project_type_id" string="Department"/>
                     <field name="project_budget" modifiers="{'readonly':[('state','!=','draft')]}"/>
-                    <field name= auto_contract_name" string="Auto Name" widget="boolean_toggle"/>
+                    <field name= "auto_contract_name" string="Auto Name" widget="boolean_toggle"/>
                     <field name="project_name" string="Contract Name"/>
                     <field name="x_studio_contract_service" style="font-size:14px; font-weight:bold;"/>
                     <field name="project_code" string="Code"/>
