@@ -194,8 +194,8 @@ class SaleOrder ( models.Model ) :
                     rec.project_name ="لم يتم تحديد السنة لهذا العقد "
                elif rec.account_year : 
                     rec.project_name ="لم يتم تحديد الخدمة لهذا العقد "
-             else :
-                rec.project_name ="لم يتم تحديد الخدمة والسنة لهذا العقد "
+               else :
+                    rec.project_name ="لم يتم تحديد الخدمة والسنة لهذا العقد "
                  
      # @api.depends("x_studio_contract_service")           
       #def get_audit_date (self):
