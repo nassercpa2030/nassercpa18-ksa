@@ -17,7 +17,7 @@ class ProductTemplate(models.Model):
     report_template_ids = fields.One2many(comodel_name='product.report.template', inverse_name="product_tmpl_id", string='Report Templates')
     report_template_id = fields.Many2one('ir.actions.report', string='Report Template', required=True)
     product_analytic_ids = fields.One2many(comodel_name='product.analytic.account', inverse_name='product_tmpl_id', string='Products')
-    public_name = fields.Char(string='Public Name')
+    public_name = fields.Char(comodel_name='product.product', inverse_name='public_name', readonly=False , store=True)
     super_report_user_ids = fields.Many2many(comodel_name='res.users', string='Super Report Users')
 class ProductProduct(models.Model):
     _inherit = 'product.product'
