@@ -26,7 +26,7 @@ class SaleOrder ( models.Model ) :
         help="عند تفعيل هذا الاختيار، سيتم تنفيذ Server Action لتحويل الأوردرات المرتبطة إلى مشاريع."
     )
     next_number = fields.Integer ( string="next sequence number" , store=True )
-    product_code = fields.Char ( string="Porduct Code" , related="x_studio_contract_service.barcode" , store=True )
+    product_code = fields.Char ( string="Product Code" , related="x_studio_contract_service.barcode" , store=True )
     one_audit_archive = fields.Boolean ( string="أرشفة علي ون أودت " , stored=True )
     papers_archive = fields.Boolean ( string="أرشفة ورقية" , stored=True )
     box_paper_archive = fields.Integer ( string="رقم أرشيف الصندوق" , stored=True )
@@ -86,7 +86,8 @@ class SaleOrder ( models.Model ) :
     # paid_percent = fields.Float(compute='_compute_payment_count')
     amount_due = fields.Float ( compute="_compute_payment_count" , string="Amount Due" , readonly=False )
     project_budget = fields.Float ( string='Project Budget' , copy=False )
-    project_name = fields.Char ( string='Project Name' )
+    project_name = fields.Char ( string='Project Name',compute="get_project_name" ,readonly=False)
+    product_public_name = fields.Char(string="Product Public Name",compute="get_pr_nam_fr_service",readonly=True)
     project_code = fields.Char ( string='Project Code' , related="auto_code" )
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
@@ -173,7 +174,22 @@ class SaleOrder ( models.Model ) :
         compute="_compute_project_count" ,
         store=True
     )
-
+    
+    @api.depends("x_studio_contract_service")
+    def get_pr_nam_fr_service(self):
+        if self.x_studio_contract_service :
+           self.product_public_name = self.x_studio_contract_service.public_name
+        else  :
+           self.product_public_name=False
+            
+    @api.depends("product_public_name","account_year")
+    def get_project_name(self):
+        if self.product_public_name and year  :
+            self.project_name=f"{self.product_public_name} {self.account_year}"
+        else :
+            self.project_name ="لم يتم تحديد الخدمة والسنة لهذه الخدمة"
+            
+            
     @api.depends ( 'review_manager_id' )
     def _compute_ass_visible(self) :
         for rec in self :
@@ -568,16 +584,16 @@ class SaleOrder ( models.Model ) :
     # paid_percent = fields.Float(compute='_compute_payment_count')
     project_budget = fields.Float ( string='Project Budget' , copy=False )
     amount_due = fields.Float ( string='Amount Due' , compute="_compute_amount_due" )
-    project_name = fields.Char ( string='Project Name' )
-    project_code = fields.Char ( string='Project Code' )
+    #project_name = fields.Char ( string='Project Name' )
+    #project_code = fields.Char ( string='Project Code' )
     invoice_ids=fields.Many2many('account.move',compute="action_view_invoice",readonly=True,store=True,string="Invoices")
     invoice_count_odoo16 = fields.Integer ( string="" , compute="_compute_invoice_count_odoo16" , store=True )
     # invoice_count=fields.Integer(string="",store=True,readonly=False)
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
-    analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
-                                            domain="[('plan_id', '=', project_type_id)]" ,
-                                            compute='_compute_analytic_account_id' , readonly=False , store=True )
+    #analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
+    #                                        domain="[('plan_id', '=', project_type_id)]" ,
+    #                                        compute='_compute_analytic_account_id' , readonly=False , store=True )
     approve_uid = fields.Many2one ( 'res.users' , string='Approve User' , )
     approve_date = fields.Datetime ( string='Approve Date' )
     reject_reason = fields.Text ( string='Reject Reason' )
