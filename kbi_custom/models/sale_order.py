@@ -184,7 +184,7 @@ class SaleOrder ( models.Model ) :
             
     @api.depends("product_public_name","account_year")
     def get_project_name(self):
-        if self.product_public_name and year  :
+        if self.product_public_name and self.account_year  :
             self.project_name=f"{self.product_public_name} {self.account_year}"
         else :
             self.project_name ="لم يتم تحديد الخدمة والسنة لهذه الخدمة"
