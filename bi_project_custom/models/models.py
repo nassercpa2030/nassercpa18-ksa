@@ -19,7 +19,7 @@ class ProjectProject ( models.Model ) :
     stage_name = fields.Char ( string='Stage Name' , related='stage_id.name' , store=False )
     sale_order_id = fields.Many2one ( commodel_name='sale.order' , string="Sales Order" , store=True ,
                                       ondelete='set null' )
-    manager_id = fields.Intger(String="Manager_id",related="user_id.id",store=True,readonly=False,ondelete='set null')
+    manager_id = fields.Integer(String="Manager_id",related="user_id.id",store=True,readonly=False,ondelete='set null')
     # adding field close_type
     close_type = fields.Text ( string="Close Type" , default="قيد إغلاق مؤجل" , readonly=True )
     # إضافة حقل paid_percent محسوب بناءً على paid_percent في sale_order
