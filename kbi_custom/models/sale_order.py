@@ -187,9 +187,13 @@ class SaleOrder ( models.Model ) :
     def get_project_name(self):
          for rec in self:
              if rec.product_public_name and rec.account_year  :
-                rec.project_name=f"{rec.product_public_name} {rec.account_year}"
+                  rec.project_name=f"{rec.product_public_name} {rec.account_year}"
+             elif rec.product_public_name :
+                  rec.project_name ="لم يتم تحديد السنة لهذا العقد "
+             elif rec.account_year : 
+                  rec.project_name ="لم يتم تحديد الخدمة لهذا العقد "
              else :
-                rec.project_name ="لم يتم تحديد الخدمة والسنة لهذه الخدمة"
+                rec.project_name ="لم يتم تحديد الخدمة والسنة لهذا العقد "
             
             
     @api.depends ( 'review_manager_id' )
