@@ -187,7 +187,7 @@ class SaleOrder ( models.Model ) :
     @api.depends("product_public_name","account_year")
     def get_project_name(self):
          for rec in self:
-            if auto_contract_name and  project_name == "" : 
+            if rec.auto_contract_name and  rec.project_name == "" : 
                if  rec.product_public_name and rec.account_year  :
                    rec.project_name=f"{rec.product_public_name} {rec.account_year}"
                elif rec.product_public_name :
