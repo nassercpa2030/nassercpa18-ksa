@@ -55,7 +55,7 @@ class SaleOrder ( models.Model ) :
     partner_shipping_id = fields.Many2one ( string='Delivery Address' , required=False , readonly=False )
     archived_sale = fields.Boolean ( 'Archived' , readonly=False , required=False , default=False )
     amount_tax = fields.Float ( "Taxes" , readonly=False , required=False )
-    audit_date = fields.Date ( string='Audit Date' , readonly=False )
+    audit_date = fields.Date ( string='Audit Date' , readonly=False, required=True,store=True )
     close_entry_date = fields.Date ( string="Close Entry Date" , readonly=True )
     close_entry_year = fields.Integer ( string="Close Entry Year" , readonly=False )
     date = fields.Datetime ( string='Date' )
@@ -194,6 +194,11 @@ class SaleOrder ( models.Model ) :
                   rec.project_name ="لم يتم تحديد الخدمة لهذا العقد "
              else :
                 rec.project_name ="لم يتم تحديد الخدمة والسنة لهذا العقد "
+     # @api.depends("x_studio_contract_service")           
+      #def get_audit_date (self):
+       #   for rec in self :
+           #   if rec.x_studio_contract_service :
+            #      if x_studio_contract_service.id in []
             
             
     @api.depends ( 'review_manager_id' )
