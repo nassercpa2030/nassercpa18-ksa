@@ -177,17 +177,19 @@ class SaleOrder ( models.Model ) :
     
     @api.depends("x_studio_contract_service")
     def get_pr_nam_fr_service(self):
-        if self.x_studio_contract_service :
-           self.product_public_name = self.x_studio_contract_service.public_name
-        else  :
-           self.product_public_name=False
+        for rec in self:
+           if rec.x_studio_contract_service :
+              rec.product_public_name = rec.x_studio_contract_service.public_name
+           else  :
+              rec.product_public_name=False
             
     @api.depends("product_public_name","account_year")
     def get_project_name(self):
-        if self.product_public_name and self.account_year  :
-            self.project_name=f"{self.product_public_name} {self.account_year}"
-        else :
-            self.project_name ="لم يتم تحديد الخدمة والسنة لهذه الخدمة"
+         for rec in self:
+             if rec.product_public_name and rec.account_year  :
+                rec.project_name=f"{rec.product_public_name} {rec.account_year}"
+             else :
+                rec.project_name ="لم يتم تحديد الخدمة والسنة لهذه الخدمة"
             
             
     @api.depends ( 'review_manager_id' )
