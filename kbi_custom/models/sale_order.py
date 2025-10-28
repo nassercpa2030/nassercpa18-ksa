@@ -323,7 +323,7 @@ class SaleOrder ( models.Model ) :
 
     @api.onchange ( 'number_700_sale' , 'cr_number_sale' )
     def _onchange_customer_by_number(self) :
-    """تحديث العميل تلقائيًا بناءً على الرقم المدخل"""
+        """تحديث العميل تلقائيًا بناءً على الرقم المدخل"""
         for order in self :
            partner = False
            if order.number_700_sale :
