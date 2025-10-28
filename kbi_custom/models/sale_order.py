@@ -643,8 +643,9 @@ class SaleOrder ( models.Model ) :
         for rec in self :
             if rec.audit_date:
                rec.account_year=rec.audit_date.year
-            else:
-               rec.account_year = fields.Date.today ().year 
+            #else:
+               #rec.account_year = fields.Date.today ().year 
+                
             
     def action_open_close_entry_wizard_deffered(self) :
         self.ensure_one ()
