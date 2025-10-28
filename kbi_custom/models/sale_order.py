@@ -86,7 +86,7 @@ class SaleOrder ( models.Model ) :
     # paid_percent = fields.Float(compute='_compute_payment_count')
     amount_due = fields.Float ( compute="_compute_payment_count" , string="Amount Due" , readonly=False )
     project_budget = fields.Float ( string='Project Budget' , copy=False )
-    project_name = fields.Char ( string='Auto Project Name',compute="get_project_name" ,readonly=False)
+    project_name = fields.Char ( string='Auto Project Name',compute="get_project_name" ,readonly=False,store=True)
     auto_contract_name=fields.Boolean( string="Auto Name",readonly=False,default=True)
     product_public_name = fields.Char(string="Product Public Name",compute="get_pr_nam_fr_service",readonly=True)
     project_code = fields.Char ( string='Project Code' , related="auto_code" )
