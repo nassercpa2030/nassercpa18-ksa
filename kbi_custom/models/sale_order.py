@@ -315,7 +315,8 @@ class SaleOrder ( models.Model ) :
         for order in self :
             # جميع الفواتير المرتبطة مباشرة بالـ Sale Order
             invoices = self.env['account.move'].search ( [
-                ('sale_order_id_finance' , '=' , order.id) ,
+                #('sale_order_id_finance' , '=' , order.id) ,
+                ('sale_order_id_finance' , '=' , self.id)
                 ('move_type' , '=' , 'out_invoice')
             ] )
             order.invoice_ids = invoices
