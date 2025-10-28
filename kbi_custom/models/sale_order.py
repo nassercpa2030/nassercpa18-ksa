@@ -81,7 +81,7 @@ class SaleOrder ( models.Model ) :
                                 domain=[('job_id' , '!=' , 'مدير مراجعة')] )
     #invoice_ids = fields.Many2many ( 'account.move' , compute="compute_invoice_ids" , readonly=True , store=True ,
      #                                string="Invoices" )
-    invoice_ids = fields.One2many ( 'account.move' ,'sale_order_finance', compute="compute_invoice_ids" , readonly=True , store=True ,
+    invoice_ids = fields.One2many ( 'account.move' ,'sale_order_id_finance', compute="compute_invoice_ids" , readonly=True , store=True ,
                                      string="Invoices" )
     payment_count2 = fields.Integer ( compute='_compute_payment_count' )
     # paid_total = fields.Float(compute='_compute_payment_count')
