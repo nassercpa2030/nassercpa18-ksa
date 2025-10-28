@@ -55,22 +55,22 @@ class SaleOrder ( models.Model ) :
     partner_shipping_id = fields.Many2one ( string='Delivery Address' , required=False , readonly=False )
     archived_sale = fields.Boolean ( 'Archived' , readonly=False , required=False , default=False )
     amount_tax = fields.Float ( "Taxes" , readonly=False , required=False )
-    audit_date = fields.Date ( string='Audit Date' , readonly=False, required=True,store=True )
+    audit_date = fields.Date ( string='Audit Date' , readonly=False , required=True , store=True )
     close_entry_date = fields.Date ( string="Close Entry Date" , readonly=True )
     close_entry_year = fields.Integer ( string="Close Entry Year" , readonly=False )
     date = fields.Datetime ( string='Date' )
     review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Assigned To' , readonly=False ,
                                           domain=[('job_id' , '=' , 'مدير مراجعة')] )
     # review_manager_id=fields.Many2one(comodel_name='res.users',string='Manager',readonly=False )
-    #partner_manager = fields.Many2one(comodel_name="res.partner",related='partner_id.user_id',store=True)
-    user_id = fields.Many2one ( 'res.users', string='Manager' , readonly=False )
+    # partner_manager = fields.Many2one(comodel_name="res.partner",related='partner_id.user_id',store=True)
+    user_id = fields.Many2one ( 'res.users' , string='Manager' , readonly=False )
     sequence = fields.Integer ( string='Sequence' , )
     report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
                                   domain="[('id', 'in', exist_report_ids)]" )
     x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="Contract_service" )
     report_template_id = fields.Many2one ( comodel_name='ir.actions.report' , string='Report Template' ,
                                            related="report_id.report_template_id" )
-    #account_year = fields.Integer ( string='Year' , required=True , default=lambda self : fields.Date.today ().year )
+    # account_year = fields.Integer ( string='Year' , required=True , default=lambda self : fields.Date.today ().year )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreement' )
     payment_ids = fields.Many2many ( 'account.payment' , string='Payments' , compute='_compute_payment_ids' )
     payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
@@ -79,16 +79,17 @@ class SaleOrder ( models.Model ) :
     paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" )
     auditor = fields.Many2one ( string="Auditor" , comodel_name="hr.employee" ,
                                 domain=[('job_id' , '!=' , 'مدير مراجعة')] )
-
+    invoice_ids = fields.Many2many ( 'account.move' , compute="_compute_invoice_ids" , readonly=True , store=True ,
+                                     string="Invoices" )
     payment_count2 = fields.Integer ( compute='_compute_payment_count' )
     # paid_total = fields.Float(compute='_compute_payment_count')
     # unpaid_total = fields.Float(compute='_compute_payment_count')
     # paid_percent = fields.Float(compute='_compute_payment_count')
     amount_due = fields.Float ( compute="_compute_payment_count" , string="Amount Due" , readonly=False )
     project_budget = fields.Float ( string='Project Budget' , copy=False )
-    project_name = fields.Char ( string='Auto Project Name',compute="get_project_name" ,readonly=False,store=True)
-    auto_contract_name=fields.Boolean( string="Auto Name",readonly=False,default=True)
-    product_public_name = fields.Char(string="Product Public Name",compute="get_pr_nam_fr_service",readonly=True)
+    project_name = fields.Char ( string='Auto Project Name' , compute="get_project_name" , readonly=False , store=True )
+    auto_contract_name = fields.Boolean ( string="Auto Name" , readonly=False , default=True )
+    product_public_name = fields.Char ( string="Product Public Name" , compute="get_pr_nam_fr_service" , readonly=True )
     project_code = fields.Char ( string='Project Code' , related="auto_code" )
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
@@ -175,34 +176,33 @@ class SaleOrder ( models.Model ) :
         compute="_compute_project_count" ,
         store=True
     )
-    
-    @api.depends("x_studio_contract_service")
-    def get_pr_nam_fr_service(self):
-        for rec in self:
-           if rec.x_studio_contract_service :
-              rec.product_public_name = rec.x_studio_contract_service.public_name
-           else  :
-              rec.product_public_name=False
-            
-    @api.depends("product_public_name","account_year","auto_contract_name")
-    def get_project_name(self):
-      for rec in self:
-          #if not rec.project_name and rec.auto_contract_name:
-              #if rec.product_public_name and rec.account_year:
-                 #rec.project_name = f"{rec.product_public_name} {rec.account_year}"
-           if not rec.project_name and rec.auto_contract_name:
-                if not rec.product_public_name or not rec.account_year:
+
+    @api.depends ( "x_studio_contract_service" )
+    def get_pr_nam_fr_service(self) :
+        for rec in self :
+            if rec.x_studio_contract_service :
+                rec.product_public_name = rec.x_studio_contract_service.public_name
+            else :
+                rec.product_public_name = False
+
+    @api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
+    def get_project_name(self) :
+        for rec in self :
+            # if not rec.project_name and rec.auto_contract_name:
+            # if rec.product_public_name and rec.account_year:
+            # rec.project_name = f"{rec.product_public_name} {rec.account_year}"
+            if not rec.project_name and rec.auto_contract_name :
+                if not rec.product_public_name or not rec.account_year :
                     rec.project_name = ""
-                else:
+                else :
                     rec.project_name = f"{rec.product_public_name} {rec.account_year}"
-       
-     # @api.depends("x_studio_contract_service")           
-      #def get_audit_date (self):
-       #   for rec in self :
-           #   if rec.x_studio_contract_service :
-            #      if x_studio_contract_service.id in []
-            
-            
+
+    # @api.depends("x_studio_contract_service")
+    # def get_audit_date (self):
+    #   for rec in self :
+    #   if rec.x_studio_contract_service :
+    #      if x_studio_contract_service.id in []
+
     @api.depends ( 'review_manager_id' )
     def _compute_ass_visible(self) :
         for rec in self :
@@ -240,19 +240,19 @@ class SaleOrder ( models.Model ) :
             else :
                 raise ValidationError ( _ ( "لا يوجد مشروع مرتبط بهذا الطلب لتحديث مرحلته." ) )
 
-    #def action_confirm(self) :
-       # for order in self :
-           # order.state = 'to approve'
-           # return {
-              #  'type' : 'ir.actions.client' ,
-              #  'tag' : 'display_notification' ,
-              #  'params' : {
-               #     'title' : _ ( 'تم التنفيذ' ) ,
-               #     'message' : _ ( 'العقد تم عمله بإنتظار السداد' ) ,
-              #      'type' : 'success' ,  # ممكن success, warning, danger, info
-             #       'sticky' : False ,  # لو True الرسالة تفضل لحد ما المستخدم يقفلها
-            #    }
-           # }
+    # def action_confirm(self) :
+    # for order in self :
+    # order.state = 'to approve'
+    # return {
+    #  'type' : 'ir.actions.client' ,
+    #  'tag' : 'display_notification' ,
+    #  'params' : {
+    #     'title' : _ ( 'تم التنفيذ' ) ,
+    #     'message' : _ ( 'العقد تم عمله بإنتظار السداد' ) ,
+    #      'type' : 'success' ,  # ممكن success, warning, danger, info
+    #       'sticky' : False ,  # لو True الرسالة تفضل لحد ما المستخدم يقفلها
+    #    }
+    # }
 
     @api.onchange ( 'analytic_account_id' )
     def _onchange_analytic_account_id(self) :
@@ -272,8 +272,8 @@ class SaleOrder ( models.Model ) :
 
         # 2️⃣ جلب الفواتير اللي فيها sale_order_test مطابق للاسم
         extra_invoices = self.env['account.move'].search ( [
-            #('invoice_origin' , 'ilike' , self.name.strip ()) ,
-            ('sale_order_id_finance', '=', self.id),
+            # ('invoice_origin' , 'ilike' , self.name.strip ()) ,
+            ('sale_order_id_finance' , '=' , self.id) ,
             ('move_type' , '=' , 'out_invoice')
         ] )
 
@@ -310,51 +310,66 @@ class SaleOrder ( models.Model ) :
 
         return action
 
+    @api.depends ( 'order_line.invoice_lines.move_id.state' )  # يعتمد على الفواتير المرتبطة بالخطوط
+    def _compute_invoice_ids(self) :
+        for order in self :
+            # جميع الفواتير المرتبطة مباشرة بالـ Sale Order
+            invoices = self.env['account.move'].search ( [
+                ('sale_order_id_finance' , '=' , order.id) ,
+                ('move_type' , '=' , 'out_invoice')
+            ] )
+            order.invoice_ids = invoices
+
+
     @api.onchange ( 'number_700_sale' , 'cr_number_sale' )
     def _onchange_customer_by_number(self) :
-        """تحديث العميل تلقائيًا بناءً على الرقم المدخل"""
+    """تحديث العميل تلقائيًا بناءً على الرقم المدخل"""
         for order in self :
-            partner = False
-            if order.number_700_sale :
-                partner = self.env['res.partner'].search ( [('number_700' , '=' , order.number_700_sale)] , limit=1 )
-            if not partner and order.cr_number_sale :
-                partner = self.env['res.partner'].search (
-                    [('l10n_sa_additional_identification_number' , '=' , order.cr_number_sale)] , limit=1 )
+           partner = False
+           if order.number_700_sale :
+               partner = self.env['res.partner'].search ( [('number_700' , '=' , order.number_700_sale)] , limit=1 )
+           if not partner and order.cr_number_sale :
+               partner = self.env['res.partner'].search (
+                   [('l10n_sa_additional_identification_number' , '=' , order.cr_number_sale)] , limit=1 )
+         
+         if partner :
+            order.partner_id = partner.id
 
-            if partner :
-                order.partner_id = partner.id
 
     @api.depends ( 'project_ids' )
     def _compute_project_files_state(self) :
-        for order in self :
-            if order.project_ids :
-                order.project_files_state = order.project_ids[0].files_state or None
-            else :
-                order.project_files_state = None
+      for order in self :
+        if order.project_ids :
+            order.project_files_state = order.project_ids[0].files_state or None
+        else :
+            order.project_files_state = None
+
 
     @api.model
     def create(self , vals_list) :
-        res = super ().create ( vals_list )
-        res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
-        return res
+      res = super ().create ( vals_list )
+      res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
+      return res
+
 
     def compute_sign_qrcode(self) :
-        for rec in self :
-            qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
-            base_url = self.env['ir.config_parameter'].sudo ().get_param ( 'web.base.url' )
-            qr_code.add_data ( f'{base_url}//order/verify/{rec.uuid}' )
-            qr_code.make ( fit=True )
-            qr_img = qr_code.make_image ()
-            im = qr_img._img.convert ( "RGB" )
-            buffered = BytesIO ()
-            im.save ( buffered , format="png" )
-            qr_image = base64.b64encode ( buffered.getvalue () ).decode ( 'ascii' )
-            rec.sign_qrcode = qr_image
+      for rec in self :
+        qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
+        base_url = self.env['ir.config_parameter'].sudo ().get_param ( 'web.base.url' )
+        qr_code.add_data ( f'{base_url}//order/verify/{rec.uuid}' )
+        qr_code.make ( fit=True )
+        qr_img = qr_code.make_image ()
+        im = qr_img._img.convert ( "RGB" )
+        buffered = BytesIO ()
+        im.save ( buffered , format="png" )
+        qr_image = base64.b64encode ( buffered.getvalue () ).decode ( 'ascii' )
+        rec.sign_qrcode = qr_image
+
 
     @api.depends ( 'user_id' )
     def compute_can_edit_analytic(self) :
-        for rec in self :
-            rec.can_edit_analytic = self.env.user.has_group ( 'kbi_custom.can_edit_analytic_account_in_sale' )
+      for rec in self :
+        rec.can_edit_analytic = self.env.user.has_group ( 'kbi_custom.can_edit_analytic_account_in_sale' )
 
     @api.depends ( 'user_id' )
     def compute_can_edit_approve(self) :
@@ -600,7 +615,6 @@ class SaleOrder ( models.Model ) :
     amount_due = fields.Float ( string='Amount Due' , compute="_compute_amount_due" )
     #project_name = fields.Char ( string='Project Name' )
     #project_code = fields.Char ( string='Project Code' )
-    invoice_ids=fields.Many2many('account.move',compute="action_view_invoice",readonly=True,store=True,string="Invoices")
     invoice_count_odoo16 = fields.Integer ( string="" , compute="_compute_invoice_count_odoo16" , store=True )
     # invoice_count=fields.Integer(string="",store=True,readonly=False)
     contract_signature = fields.Boolean ( "Contract Signature" )
