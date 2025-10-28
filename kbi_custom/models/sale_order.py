@@ -187,9 +187,14 @@ class SaleOrder ( models.Model ) :
     @api.depends("product_public_name","account_year","auto_contract_name")
     def get_project_name(self):
       for rec in self:
-          if not rec.project_name and rec.auto_contract_name:
-              if rec.product_public_name and rec.account_year:
-                 rec.project_name = f"{rec.product_public_name} {rec.account_year}"
+          #if not rec.project_name and rec.auto_contract_name:
+              #if rec.product_public_name and rec.account_year:
+                 #rec.project_name = f"{rec.product_public_name} {rec.account_year}"
+           if not rec.project_name and rec.auto_contract_name:
+                if not rec.product_public_name or not rec.account_year:
+                    rec.project_name = ""
+                else:
+                    rec.project_name = f"{rec.product_public_name} {rec.account_year}"
        
      # @api.depends("x_studio_contract_service")           
       #def get_audit_date (self):
