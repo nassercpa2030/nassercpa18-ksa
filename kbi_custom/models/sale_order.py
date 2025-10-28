@@ -79,7 +79,9 @@ class SaleOrder ( models.Model ) :
     paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" )
     auditor = fields.Many2one ( string="Auditor" , comodel_name="hr.employee" ,
                                 domain=[('job_id' , '!=' , 'مدير مراجعة')] )
-    invoice_ids = fields.Many2many ( 'account.move' , compute="_compute_invoice_ids" , readonly=True , store=True ,
+    #invoice_ids = fields.Many2many ( 'account.move' , compute="compute_invoice_ids" , readonly=True , store=True ,
+     #                                string="Invoices" )
+    invoice_ids = fields.One2many ( 'account.move' , compute="compute_invoice_ids" , readonly=True , store=True ,
                                      string="Invoices" )
     payment_count2 = fields.Integer ( compute='_compute_payment_count' )
     # paid_total = fields.Float(compute='_compute_payment_count')
@@ -310,16 +312,20 @@ class SaleOrder ( models.Model ) :
 
         return action
 
-    @api.depends ( 'order_line.invoice_lines.move_id.state' )  # يعتمد على الفواتير المرتبطة بالخطوط
-    def _compute_invoice_ids(self) :
+    #@api.depends ( 'order_line.invoice_lines.move_id.state' )  # يعتمد على الفواتير المرتبطة بالخطوط
+    def compute_invoice_ids(self) :
         for order in self :
+            order.invoice_ids = self.env['account.move'].search([
+                ('invoice_origin' , 'ilike' , self.name.strip ()) ,
+                ('move_type', '=', 'out_invoice')  # إذا أردت فقط فواتير المبيعات
+            ])
             # جميع الفواتير المرتبطة مباشرة بالـ Sale Order
-            invoices = self.env['account.move'].search ( [
+           # invoices = self.env['account.move'].search ( [
                 #('sale_order_id_finance' , '=' , order.id) ,
-                ('sale_order_id_finance' , '=' , self.id)
-                ('move_type' , '=' , 'out_invoice')
-            ] )
-            order.invoice_ids = invoices
+            #    ('sale_order_id_finance' , '=' , self.id)
+             #   ('move_type' , '=' , 'out_invoice')
+            #] )
+            #order.invoice_ids = invoices
 
 
     @api.onchange ( 'number_700_sale' , 'cr_number_sale' )
