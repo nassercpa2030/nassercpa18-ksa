@@ -325,15 +325,16 @@ class SaleOrder ( models.Model ) :
     def _onchange_customer_by_number(self) :
         """تحديث العميل تلقائيًا بناءً على الرقم المدخل"""
         for order in self :
-           partner = False
-           if order.number_700_sale :
-               partner = self.env['res.partner'].search ( [('number_700' , '=' , order.number_700_sale)] , limit=1 )
-           if not partner and order.cr_number_sale :
-               partner = self.env['res.partner'].search (
-                   [('l10n_sa_additional_identification_number' , '=' , order.cr_number_sale)] , limit=1 )
-         
-         if partner :
-            order.partner_id = partner.id
+          partner = False
+          if order.number_700_sale:
+            partner = self.env['res.partner'].search([('number_700', '=', order.number_700_sale)], limit=1)
+          if not partner and order.cr_number_sale:
+            partner = self.env['res.partner'].search(
+                [('l10n_sa_additional_identification_number', '=', order.cr_number_sale)], limit=1
+             )
+
+          if partner:
+             order.partner_id = partner.id
 
 
     @api.depends ( 'project_ids' )
