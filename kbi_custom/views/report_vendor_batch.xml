@@ -19,18 +19,28 @@
                 <div class="page">
                     <!-- عنوان التقرير -->
                     <h2 style="text-align: center; direction: rtl;">طلب صرف مكافأة مسوق بالقطعة </h2>
-                    <p style="text-align: center; direction: rtl;">
+                    <!-- p style="text-align: center; direction: rtl;">
                         تاريخ الطباعة: 
                         <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/>
+                    </p-->
+                       < p style="text-align: center; direction: rtl;">
+                       ***********************************************
                     </p>
 
                     <!-- معلومات المسوق ومدير المجموعة -->
                     <div style="margin-bottom: 15px; direction: rtl;">
+                            <p style="padding: 8px; text-align:right; font-size:10px;">
+                        التاريخ: 
+                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d ')"/>
+                    </p>
                         <p style="padding: 8px; text-align:right;">
                             المسوق: <span t-field="docs[0].partner_id.name"/>
                         </p>
                         <p style="padding: 8px; text-align:right;">
                             مدير المجموعة: <span t-field="docs[0].sale_order_id_finance.user_id.name"/>
+                        </p>
+                           <p style="padding: 8px; text-align:right;">
+                         مجموعة: <span t-field="docs[0].sale_order_id_finance.team_id.name"/>
                         </p>
                     </div>
                     <hr/>
@@ -44,6 +54,7 @@
                                 <th style="padding: 8px; text-align: center;">أمر البيع</th>
                                 <th style="padding: 8px; text-align: center;">إسم المشروع</th>
                                 <th style="padding: 8px; text-align: center;">قيمة العقد</th>
+                                
                                 <th style="padding: 8px; text-align: center;">قيمة فاتورة المسوق</th>
                             </tr>
                         </thead>
@@ -95,5 +106,6 @@
         </t>
     </template>
 </odoo>
+
 
 
