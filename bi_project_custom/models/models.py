@@ -199,7 +199,7 @@ class SaleOrder ( models.Model ) :
             order.project_files_state = order.project_ids[:1].files_state if order.project_ids else False
             
     @api.onchange ( 'amount_untaxed','broker_amount' )       
-    @api.depnds( 'amount_untaxed','broker_amount' )     
+    @api.depends( 'amount_untaxed','broker_amount' )     
     def compute_broker_percentage(self):
         if amount_untaxed and broker_amount :
             broker_percentage_= amount_untaxed / broker_amount
