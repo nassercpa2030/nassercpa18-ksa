@@ -42,7 +42,7 @@
                     <hr/>
 
                     <!-- الجدول الذي سيحتوي على البيانات -->
-                    <table class="table table-bordered" style="width: 100%; direction: rtl;">
+                    <table class="table table-bordered" style="width: 100%; direction: rtl; font-size: 10px;">
                         <thead style="background-color: #f0f0f0;">
                             <tr>
                                 <th style="padding: 8px; text-align: center;">رقم الفاتورة</th>
@@ -90,10 +90,16 @@
                         </tbody>
                     </table>
                     <hr/>
-      <div style="display: flex; justify-content: space-between; margin-bottom: 15px; direction: rtl;">
-    <span style="text-decoration: underline;" >إعداد</span>
-    <span style="text-align: center; text-decoration: underline;" >مراجعة</span>
-    <span style="text-align: left; text-decoration: underline;">إعتماد</span>
+<div style="display: flex; justify-content: space-between; margin-bottom: 15px; direction: rtl;">
+    <div style="text-align: right; width: 33%;">
+        <span style="text-decoration: underline;">إعداد</span>
+    </div>
+    <div style="text-align: center; width: 33%;">
+        <span style="text-decoration: underline;">مراجعة</span>
+    </div>
+    <div style="text-align: left; width: 33%;">
+        <span style="text-decoration: underline;">إعتماد</span>
+    </div>
 </div>
 
                     
@@ -103,6 +109,7 @@
     </template>
 
 </odoo>
+
 
 
 
