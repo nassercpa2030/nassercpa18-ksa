@@ -89,7 +89,7 @@
                          <tr style="font-weight:bold; border-top: 2px solid black;">
                              <td colspan="5" style="text-align:right; padding:8px;">إجمالي المبالغ:</td>
                              <td style="padding:8px; text-align:left;">
-                            <span t-esc="formatLang(total_sum, monetary=True, currency_obj=(docs and docs[0].currency_id or None))"/>
+                            <span t-esc="formatLang(total_sum or 0.0, monetary=True, currency_obj=(docs and docs[0].currency_id or None))"/>
                            </td>
                           </tr>
 
@@ -115,6 +115,7 @@
     </template>
 
 </odoo>
+
 
 
 
