@@ -83,7 +83,7 @@
 
                             <!-- صف المجموع النهائي -->
                             <tr style="font-weight:bold; border-top: 2px solid black;">
-                                <td colspan="5" style="text-align:right; padding:8px;">إجمالي المبالغ:</td>
+                                <td colspan="6" style="text-align:right; padding:8px;">إجمالي المبالغ:</td>
                                 <td style="padding:8px; text-align:left;">
                                     <span t-esc="'{:,.2f}'.format(total_sum or 0.0)"  />
                                 </td>
@@ -109,6 +109,7 @@
         </t>
     </template>
 </odoo>
+
 
 
 
