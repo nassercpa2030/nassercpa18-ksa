@@ -63,7 +63,7 @@
                                         <span t-field="bill.amount_total" t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/>
                                     </td>
                                     <!-- تحديث المجموع -->
-                                    <t t-set="total_sum" t-value="total_sum + (bill.amount_total or 0.0)"  t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/>
+                                    <t t-set="total_sum" t-value="total_sum + (bill.amount_total or 0.0)"  />
                                 </tr>
                             </t>
 
@@ -71,7 +71,7 @@
                             <tr style="font-weight:bold; border-top: 2px solid black;">
                                 <td colspan="5" style="text-align:right; padding:8px;">إجمالي المبالغ:</td>
                                 <td style="padding:8px; text-align:left;">
-                                    <span t-esc="'{:,.2f}'.format(total_sum or 0.0)"  t-options='{"widget": "monetary", "display_currency": docs[0].currency_id}'/>
+                                    <span t-esc="'{:,.2f}'.format(total_sum or 0.0)"  />
                                 </td>
                             </tr>
                         </tbody>
@@ -95,4 +95,5 @@
         </t>
     </template>
 </odoo>
+
 
