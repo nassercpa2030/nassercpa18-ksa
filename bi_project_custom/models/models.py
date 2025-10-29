@@ -202,7 +202,7 @@ class SaleOrder ( models.Model ) :
     @api.onchange ( 'amount_untaxed','broker_amount' )       
     @api.depends( 'amount_untaxed','broker_amount' )     
     def compute_broker_percentage(self):
-        if amount_untaxed and broker_amount :
+        if self.amount_untaxed and self.broker_amount :
            self.broker_percentage_= self.amount_untaxed / self.broker_amount
         else:
             self.broker_percentage_= False
