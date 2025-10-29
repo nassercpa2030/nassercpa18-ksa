@@ -21,7 +21,8 @@
         سيستقبل هذا القالب قائمة السجلات المحددة في المتغير `docs`.
     -->
     <template id="report_vendor_batch_template">
-        <t t-set="company" t-value="docs[0].company_id"/>
+        <!--t t-set="company" t-value="docs[0].company_id"/-->
+        <t t-set="bill" t-value="docs[0]"/>
         <t t-call="web.html_container">
             <t t-call="web.external_layout_standard">
                 <div class="page">
@@ -91,6 +92,7 @@
     </template>
 
 </odoo>
+
 
 
 
