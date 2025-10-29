@@ -202,10 +202,12 @@ class SaleOrder ( models.Model ) :
     @api.onchange ( 'amount_untaxed','broker_amount' )       
     @api.depends( 'amount_untaxed','broker_amount' )     
     def compute_broker_percentage(self):
-        if self.amount_untaxed and self.broker_amount :
-           self.broker_percentage_= self.amount_untaxed / self.broker_amount
-        else:
-            self.broker_percentage_= False
+        for record in self:
+            if record.amount_untaxed and record.broker_amount:
+                record.broker_percentage_ = (record.broker_amount / record.amount_untaxed) * 100
+            else:
+                record.broker_percentage_ = False
+
             
         
     @api.onchange ( 'journal_entry_data' )
