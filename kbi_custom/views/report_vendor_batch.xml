@@ -84,7 +84,7 @@
                                     </td>
                                 </tr>                               
                                        <!-- تحديث المجموع -->
-                              <t t-set="total_sum" t-value="total_sum + bill.amount_total"/>
+                              <t t-set="total_sum" t-value="total_sum + (bill.amount_total or 0.0)"/>
                             </t>
                             <!-- صف المجموع النهائي -->
                           <tr style="font-weight: bold; background-color: #f0f0f0; border-top: 2px solid #000;">
@@ -117,6 +117,7 @@
     </template>
 
 </odoo>
+
 
 
 
