@@ -90,12 +90,24 @@
                         </tbody>
                     </table>
                     <hr/>
-                     <div style="margin-bottom: 15px; direction: rtl;">
-                    <p style="padding: 8px; text-align:right;">إعداد </p>
-                     <p style="padding: 8px; text-align:center;">مراجعة </p>
-                      <p style="padding: 8px; text-align:left;">إعتماد </p>
-                
-                </div>
+             <div style="display: flex; justify-content: space-between; margin-bottom: 30px; direction: rtl;">
+    <div style="text-align: center; width: 33%;">
+        <span style="text-decoration: underline;">إعداد</span>
+        <br/>
+        <span>......................</span>
+    </div>
+    <div style="text-align: center; width: 33%;">
+        <span style="text-decoration: underline;">مراجعة</span>
+        <br/>
+        <span>......................</span>
+    </div>
+    <div style="text-align: center; width: 33%;">
+        <span style="text-decoration: underline;">إعتماد</span>
+        <br/>
+        <span>......................</span>
+    </div>
+</div>
+
                     
                 </div>
             </t>
@@ -103,6 +115,7 @@
     </template>
 
 </odoo>
+
 
 
 
