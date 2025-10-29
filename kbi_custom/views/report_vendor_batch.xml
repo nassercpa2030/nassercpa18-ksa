@@ -54,7 +54,7 @@
                                 <th style="padding: 8px; text-align: center;">أمر البيع</th>
                                 <th style="padding: 8px; text-align: center;">إسم المشروع</th>
                                 <th style="padding: 8px; text-align: center;">قيمة العقد</th>
-                                
+                                <th style="padding: 8px; text-align: center;">نسبة العمولة</th>
                                 <th style="padding: 8px; text-align: center;">قيمة فاتورة المسوق</th>
                             </tr>
                         </thead>
@@ -66,10 +66,13 @@
                             <t t-foreach="docs" t-as="bill">
                                 <tr>
                                     <td style="padding: 8px;"><span t-field="bill.name"/></td>
-                                    <td style="padding: 8px;"><span t-field="bill.sale_order_id_finance.partner_id.name"/></td>
-                                    <td style="padding: 8px;"><span t-field="bill.sale_order_id_finance.name"/></td>
-                                    <td style="padding: 8px; text-align: center;"><span t-field="bill.sale_order_id_finance.project_name"/></td>
-                                    <td style="padding: 8px; text-align: center;"><span t-field="bill.sale_order_id_finance.amount_untaxed"/></td>
+                                    <td style="padding: 8px;"><span t-field="bill.sale_order_id_finance.partner_id.name" /></td>
+                                    <td style="padding: 8px;"><span t-field="bill.sale_order_id_finance.name" t-if="bill.sale_order_id_finance"/></td>
+                                    <td style="padding: 8px; text-align: center;"><span t-field="bill.sale_order_id_finance.project_name" t-if="bill.sale_order_id_finance"/></td>
+                                    <td style="padding: 8px; text-align: center;"><span t-field="bill.sale_order_id_finance.amount_untaxed" t-if="bill.sale_order_id_finance"/></td>
+                                    <td style="padding: 8px; text-align: center;"><span t-field="bill.sale_order_id_finance.broker_percentage_" t-if="bill.sale_order_id_finance"/>
+                                    <b>%</b>
+                                    </td>
                                     <td style="padding: 8px; text-align: left;">
                                         <span t-field="bill.amount_total" t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/>
                                     </td>
@@ -106,6 +109,7 @@
         </t>
     </template>
 </odoo>
+
 
 
 
