@@ -5,7 +5,7 @@
         هذا التعريف كافٍ لجعل التقرير يظهر في قائمة "الإجراءات".
     -->
     <record id="action_vendor_bill_batch_report" model="ir.actions.report">
-        <field name="name">طباعة تقرير الفواتير المحددة</field>
+        <field name="name">طلب صرف عمولة مسوق بالقطعة</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">kbi_custom.report_vendor_batch_template</field>
@@ -63,7 +63,7 @@
                                         <span t-field="bill.partner_id.name"/>
                                     </td-->
                                      <td style="padding: 8px;">
-                                        <span t-field="bill..sale_order_id_finance.name"/>
+                                        <span t-field="bill.sale_order_id_finance.name"/>
                                     </td>
                                     <td style="padding: 8px; text-align: center;">
                                         <span t-field="bill.sale_order_id_finance.project_name"/>
@@ -84,6 +84,7 @@
     </template>
 
 </odoo>
+
 
 
 
