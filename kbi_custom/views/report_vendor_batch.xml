@@ -83,17 +83,19 @@
                                         <span t-field="bill.amount_total" t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/>
                                     </td>
                                 </tr>
-                                <hr/>
+                                
                                  <!-- الجزء اللي عايزه فوق الجدول -->
-                <div style="margin-bottom: 15px; direction: rtl;">
+        
+                            </t>
+                        </tbody>
+                    </table>
+                    <hr/>
+                     <div style="margin-bottom: 15px; direction: rtl;">
                     <p style="padding: 8px; text-align:right;">إعداد </p>
                      <p style="padding: 8px; text-align:center;">مراجعة </p>
                       <p style="padding: 8px; text-align:left;">إعتماد </p>
                 
                 </div>
-                            </t>
-                        </tbody>
-                    </table>
                     
                 </div>
             </t>
@@ -101,6 +103,7 @@
     </template>
 
 </odoo>
+
 
 
 
