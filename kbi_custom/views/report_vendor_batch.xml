@@ -68,9 +68,9 @@
                                     <td style="padding: 8px;"><span t-field="bill.name"/></td>
                                     <td style="padding: 8px;"><span t-field="bill.sale_order_id_finance.partner_id.name" /></td>
                                     <td style="padding: 8px;"><span t-field="bill.sale_order_id_finance.name" t-if="bill.sale_order_id_finance"/></td>
-                                    <td style="padding: 8px; text-align: center;"><span t-field="bill.sale_order_id_finance.project_name" t-if="bill.sale_order_id_finance"/></td>
-                                    <td style="padding: 8px; text-align: center;"><span t-field="bill.sale_order_id_finance.amount_untaxed" t-if="bill.sale_order_id_finance"/></td>
-                                    <td style="padding: 8px; text-align: center;"><span t-field="bill.sale_order_id_finance.broker_percentage_" t-if="bill.sale_order_id_finance"/>
+                                    <td style="padding: 7px; text-align: center;"><span t-field="bill.sale_order_id_finance.project_name" t-if="bill.sale_order_id_finance"/></td>
+                                    <td style="padding: 10px; text-align: center;"><span t-field="bill.sale_order_id_finance.amount_untaxed" t-if="bill.sale_order_id_finance"/></td>
+                                    <td style="padding: 7px; text-align: center;"><span t-field="bill.sale_order_id_finance.broker_percentage_" t-if="bill.sale_order_id_finance"/>
                                     <b>%</b>
                                     </td>
                                     <td style="padding: 8px; text-align: left;">
@@ -109,6 +109,7 @@
         </t>
     </template>
 </odoo>
+
 
 
 
