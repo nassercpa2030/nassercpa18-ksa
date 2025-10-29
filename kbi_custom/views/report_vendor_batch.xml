@@ -91,13 +91,13 @@
                     </table>
                     <hr/>
 <div style="display: flex; justify-content: space-between; margin-bottom: 15px; direction: rtl;">
-    <div style="text-align: right; width: 33%;">
+    <div style="display: inline-block; width: 33%; text-align: right;">
         <span style="text-decoration: underline;">إعداد</span>
     </div>
-    <div style="text-align: center; width: 33%;">
+    <div style="display: inline-block; width: 33%; text-align: center;">
         <span style="text-decoration: underline;">مراجعة</span>
     </div>
-    <div style="text-align: left; width: 33%;">
+    <div style="display: inline-block; width: 33%; text-align: left;">
         <span style="text-decoration: underline;">إعتماد</span>
     </div>
 </div>
@@ -109,6 +109,7 @@
     </template>
 
 </odoo>
+
 
 
 
