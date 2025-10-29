@@ -128,6 +128,7 @@ class SaleOrder ( models.Model ) :
                                               string='Is Project in Close Stage' )
     journal_entry_data = fields.Many2many ( comodel_name='account.move' , compute='_compute_journal_entry_data' ,
                                             string='Journal Data Lines' )
+    broker_percentage_ =fields.Float(string="Broker Percentage",readonly=False,store=True,compute="compute_broker_percentage")
     first_dofaa=fields.Boolean(store=True,default=False,string="1")
     second_dofaa=fields.Boolean(store=True,default=True,string="2")
     # first and second dofaa name
@@ -196,7 +197,16 @@ class SaleOrder ( models.Model ) :
     def _compute_project_files_state(self) :
         for order in self :
             order.project_files_state = order.project_ids[:1].files_state if order.project_ids else False
-
+            
+    @api.onchange ( 'amount_untaxed','broker_amount' )       
+    @api.depnds( 'amount_untaxed','broker_amount' )     
+    def compute_broker_percentage(self):
+        if amount_untaxed and broker_amount :
+            broker_percentage_= amount_untaxed / broker_amount
+        else:
+            broker_percentage_= False
+            
+        
     @api.onchange ( 'journal_entry_data' )
     @api.depends ( 'journal_entry_data' )
     def _compute_is_journal_state_not_posted(self) :
