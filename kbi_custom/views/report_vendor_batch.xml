@@ -59,6 +59,7 @@
                                 t-foreach يقوم بالمرور على كل فاتورة تم إرسالها إلى التقرير.
                                 المتغير `docs` يحتوي تلقائيًا على السجلات المحددة.
                             -->
+                            <t t-set="total_sum" t-value="0.0"/> 
                             <t t-foreach="docs" t-as="bill">
                                 <tr>
                                     <td style="padding: 8px;">
@@ -115,6 +116,7 @@
     </template>
 
 </odoo>
+
 
 
 
