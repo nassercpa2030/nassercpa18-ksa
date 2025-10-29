@@ -1,3 +1,4 @@
+
 from odoo import models , fields , api , _
 from odoo.exceptions import ValidationError
 
@@ -128,7 +129,7 @@ class SaleOrder ( models.Model ) :
                                               string='Is Project in Close Stage' )
     journal_entry_data = fields.Many2many ( comodel_name='account.move' , compute='_compute_journal_entry_data' ,
                                             string='Journal Data Lines' )
-    broker_percentage_ =fields.Float(string="Broker Percentage",readonly=False,store=True,compute="compute_broker_percentage")
+    broker_percentage_ =fields.Float(string="Broker Percentage",readonly=False,compute="compute_broker_percentage")
     first_dofaa=fields.Boolean(store=True,default=False,string="1")
     second_dofaa=fields.Boolean(store=True,default=True,string="2")
     # first and second dofaa name
