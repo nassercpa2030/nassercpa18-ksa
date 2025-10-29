@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 
+        تعريف التقرير مباشرة وربطه بنموذج فواتير الموردين.
+        هذا التعريف كافٍ لجعل التقرير يظهر في قائمة "الإجراءات".
+    -->
+    <record id="action_vendor_bill_batch_report" model="ir.actions.report">
+        <field name="name">طباعة تقرير الفواتير المحددة</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">kbi_custom.report_vendor_batch_template</field>
+        <field name="print_report_name">تقرير_فواتير_الموردين.pdf</field>
+        
+        <!-- السطران التاليان هما مفتاح الحل البسيط -->
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- 
+        قالب QWeb لتصميم شكل التقرير.
+        سيستقبل هذا القالب قائمة السجلات المحددة في المتغير `docs`.
+    -->
+    <template id="report_vendor_batch_template">
+        <t t-set="company" t-value="docs[0].company_id"/>
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout_standard">
+                <div class="page">
+                    <!-- عنوان التقرير -->
+                    <h2 style="text-align: center; direction: rtl;">طلب صرف مكافأة مسوق بالقطعة </h2>
+                    <p style="text-align: center; direction: rtl;">
+                        تاريخ الطباعة: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/>
+                    </p>
+                     <p style="padding: 8px; text-align:right;">المسوق</p>
+                    <hr/>
+
+                    <!-- الجدول الذي سيحتوي على البيانات -->
+                    <table class="table table-bordered" style="width: 100%; direction: rtl;">
+                        <thead style="background-color: #f0f0f0;">
+                            <tr>
+                                <th style="padding: 8px; text-align: center;">رقم الفاتورة</th>
+                                  <th style="padding: 8px; text-align: center;">أسم العميل</th>
+                                <th style="padding: 8px; text-align: center;">أمر البيع</th>
+                                 <th style="padding: 8px; text-align: center;">إسم المشروع<th>
+                                 <th style="padding: 8px; text-align: center;">قيمة العقد</th>
+                                <th style="padding: 8px; text-align: center;">قيمة فاتورة المسوق</th>
+                               
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 
+                                t-foreach يقوم بالمرور على كل فاتورة تم إرسالها إلى التقرير.
+                                المتغير `docs` يحتوي تلقائيًا على السجلات المحددة.
+                            -->
+                            <t t-foreach="docs" t-as="bill">
+                                <tr>
+                                    <td style="padding: 8px;">
+                                        <span t-field="bill.name"/>
+                                    </td>
+                                    <td style="padding: 8px;">
+                                        <span t-field="bill.sale_order_id_finance.user_id.name"/>
+                                    </td>
+                                    <!--td style="padding: 8px;">
+                                        <span t-field="bill.partner_id.name"/>
+                                    </td-->
+                                     <td style="padding: 8px;">
+                                        <span t-field="bill..sale_order_id_finance.name"/>
+                                    </td>
+                                    <td style="padding: 8px; text-align: center;">
+                                        <span t-field="bill.sale_order_id_finance.project_name"/>
+                                    </td>
+                                    <td style="padding: 8px; text-align: center;">
+                                        <span t-field="bill.sale_order_id_finance.amount_untaxed"/>
+                                    </td>
+                                    <td style="padding: 8px; text-align: left;">
+                                        <span t-field="bill.amount_total" t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>
+
+
+
