@@ -92,7 +92,8 @@
                             الإجمالي الكلي للفواتير :
                        </td>
                       <td style="text-align: left; padding: 10px;">
-                     <span t-esc="formatLang(total_sum, monetary=True, currency_obj=bill.currency_id)"/>
+                    <span t-esc="formatLang(total_sum, monetary=True, currency_obj=(docs and docs[0].currency_id or None))"/>
+
                      </td>
                      </tr>
                         </tbody>
@@ -117,6 +118,7 @@
     </template>
 
 </odoo>
+
 
 
 
