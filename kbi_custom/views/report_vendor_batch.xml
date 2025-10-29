@@ -30,7 +30,14 @@
                     <p style="text-align: center; direction: rtl;">
                         تاريخ الطباعة: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/>
                     </p>
-                     <p style="padding: 8px; text-align:right;">المسوق</p>
+                    <div>
+                     <p style="padding: 8px; text-align:right;">المسوق:</p>
+                         <span t-field="bill.partner_id.name"/>
+                    </div>
+                    <div>
+                         <p style="padding: 8px; text-align:right;">مدير المجموعة :</p>
+                         <span t-field="bill.sale_order_id_finance.user_id.name"/>
+                    </div>
                     <hr/>
 
                     <!-- الجدول الذي سيحتوي على البيانات -->
@@ -57,7 +64,7 @@
                                         <span t-field="bill.name"/>
                                     </td>
                                     <td style="padding: 8px;">
-                                        <span t-field="bill.sale_order_id_finance.user_id.name"/>
+                                        <span t-field="bill.sale_order_id_finance.partner_id.name"/>
                                     </td>
                                     <!--td style="padding: 8px;">
                                         <span t-field="bill.partner_id.name"/>
@@ -84,6 +91,7 @@
     </template>
 
 </odoo>
+
 
 
 
