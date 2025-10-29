@@ -36,5 +36,6 @@
         'views/payment.xml',
         'views/res_config_settings.xml',
         'views/order_verify.xml',
+        'views/report_vendor_batch.xml',
     ],
    }
