@@ -82,11 +82,19 @@
                                     <td style="padding: 8px; text-align: left;">
                                         <span t-field="bill.amount_total" t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/>
                                     </td>
-                                </tr>
-                                
-                                 <!-- الجزء اللي عايزه فوق الجدول -->
-        
+                                </tr>                               
+                                       <!-- تحديث المجموع -->
+                              <t t-set="total_sum" t-value="total_sum + bill.amount_total"/>
                             </t>
+                            <!-- صف المجموع النهائي -->
+                          <tr style="font-weight: bold; background-color: #f0f0f0; border-top: 2px solid #000;">
+                         <td colspan="5" style="text-align: right; padding: 10px;">
+                            الإجمالي الكلي للفواتير :
+                       </td>
+                      <td style="text-align: left; padding: 10px;">
+                     <span t-esc="formatLang(total_sum, monetary=True, currency_obj=bill.currency_id)"/>
+                     </td>
+                     </tr>
                         </tbody>
                     </table>
                     <hr/>
@@ -109,6 +117,7 @@
     </template>
 
 </odoo>
+
 
 
 
