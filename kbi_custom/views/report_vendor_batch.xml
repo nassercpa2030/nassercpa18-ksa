@@ -1,29 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- 
-        تعريف التقرير مباشرة وربطه بنموذج فواتير الموردين.
-        هذا التعريف كافٍ لجعل التقرير يظهر في قائمة "الإجراءات".
-    -->
+    <!-- تعريف التقرير وربطه بنموذج فواتير الموردين -->
     <record id="action_vendor_bill_batch_report" model="ir.actions.report">
         <field name="name">طلب صرف عمولة مسوق بالقطعة</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">kbi_custom.report_vendor_batch_template</field>
         <field name="print_report_name">'تقرير_فواتير_الموردين.pdf'</field>
-        
-        <!-- السطران التاليان هما مفتاح الحل البسيط -->
         <field name="binding_model_id" ref="account.model_account_move"/>
         <field name="binding_type">report</field>
     </record>
-    <record id="action_vendor_bill_batch_report" model="ir.actions.report">
-        <!-- السطران التاليان هما مفتاح الحل البسيط -->
-        <field name="binding_model_id" ref="account.model_account_move"/>
-        <field name="binding_type">report</field>
-    </record>
-    <!-- 
-        قالب QWeb لتصميم شكل التقرير.
-        سيستقبل هذا القالب قائمة السجلات المحددة في المتغير `docs`.
-    -->
+
+    <!-- قالب QWeb لتصميم شكل التقرير -->
     <template id="report_vendor_batch_template">
         <t t-set="company" t-value="docs[0].company_id"/>
         <t t-call="web.html_container">
@@ -32,13 +20,19 @@
                     <!-- عنوان التقرير -->
                     <h2 style="text-align: center; direction: rtl;">طلب صرف مكافأة مسوق بالقطعة </h2>
                     <p style="text-align: center; direction: rtl;">
-                        تاريخ الطباعة: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/>
+                        تاريخ الطباعة: 
+                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/>
                     </p>
-                 <!-- الجزء اللي عايزه فوق الجدول -->
-                <div style="margin-bottom: 15px; direction: rtl;">
-                    <p style="padding: 8px; text-align:right;">المسوق: <span t-field="docs[0].partner_id.name"/></p>
-                    <p style="padding: 8px; text-align:right;">مدير المجموعة: <span t-field="docs[0].sale_order_id_finance.user_id.name"/></p>
-                </div>
+
+                    <!-- معلومات المسوق ومدير المجموعة -->
+                    <div style="margin-bottom: 15px; direction: rtl;">
+                        <p style="padding: 8px; text-align:right;">
+                            المسوق: <span t-field="docs[0].partner_id.name"/>
+                        </p>
+                        <p style="padding: 8px; text-align:right;">
+                            مدير المجموعة: <span t-field="docs[0].sale_order_id_finance.user_id.name"/>
+                        </p>
+                    </div>
                     <hr/>
 
                     <!-- الجدول الذي سيحتوي على البيانات -->
@@ -46,91 +40,58 @@
                         <thead style="background-color: #f0f0f0;">
                             <tr>
                                 <th style="padding: 8px; text-align: center;">رقم الفاتورة</th>
-                                  <th style="padding: 8px; text-align: center;">أسم العميل</th>
+                                <th style="padding: 8px; text-align: center;">أسم العميل</th>
                                 <th style="padding: 8px; text-align: center;">أمر البيع</th>
-                                 <th style="padding: 8px; text-align: center;">إسم المشروع</th>
-                                 <th style="padding: 8px; text-align: center;">قيمة العقد</th>
+                                <th style="padding: 8px; text-align: center;">إسم المشروع</th>
+                                <th style="padding: 8px; text-align: center;">قيمة العقد</th>
                                 <th style="padding: 8px; text-align: center;">قيمة فاتورة المسوق</th>
-                               
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- 
-                                t-foreach يقوم بالمرور على كل فاتورة تم إرسالها إلى التقرير.
-                                المتغير `docs` يحتوي تلقائيًا على السجلات المحددة.
-                            -->
+                            <!-- تهيئة متغير المجموع -->
                             <t t-set="total_sum" t-value="0.0"/> 
+
+                            <!-- المرور على جميع الفواتير -->
                             <t t-foreach="docs" t-as="bill">
                                 <tr>
-                                    <td style="padding: 8px;">
-                                        <span t-field="bill.name"/>
-                                    </td>
-                                    <td style="padding: 8px;">
-                                        <span t-field="bill.sale_order_id_finance.partner_id.name"/>
-                                    </td>
-                                    <!--td style="padding: 8px;">
-                                        <span t-field="bill.partner_id.name"/>
-                                    </td-->
-                                     <td style="padding: 8px;">
-                                        <span t-field="bill.sale_order_id_finance.name"/>
-                                    </td>
-                                    <td style="padding: 8px; text-align: center;">
-                                        <span t-field="bill.sale_order_id_finance.project_name"/>
-                                    </td>
-                                    <td style="padding: 8px; text-align: center;">
-                                        <span t-field="bill.sale_order_id_finance.amount_untaxed"/>
-                                    </td>
+                                    <td style="padding: 8px;"><span t-field="bill.name"/></td>
+                                    <td style="padding: 8px;"><span t-field="bill.sale_order_id_finance.partner_id.name"/></td>
+                                    <td style="padding: 8px;"><span t-field="bill.sale_order_id_finance.name"/></td>
+                                    <td style="padding: 8px; text-align: center;"><span t-field="bill.sale_order_id_finance.project_name"/></td>
+                                    <td style="padding: 8px; text-align: center;"><span t-field="bill.sale_order_id_finance.amount_untaxed"/></td>
                                     <td style="padding: 8px; text-align: left;">
                                         <span t-field="bill.amount_total" t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/>
                                     </td>
-                                      <t t-set="total_sum" t-value="total_sum + (bill.amount_total or 0.0)"/>
-                                </tr>                               
+                                    <!-- تحديث المجموع -->
+                                    <t t-set="total_sum" t-value="total_sum + (bill.amount_total or 0.0)"/>
+                                </tr>
                             </t>
-                         <!-- صف المجموع النهائي -->
-                         <tr style="font-weight:bold; border-top: 2px solid black;">
-                             <td colspan="5" style="text-align:right; padding:8px;">إجمالي المبالغ:</td>
-                             <td style="padding:8px; text-align:left;">
-                            <span t-esc="formatLang(total_sum or 0.0, monetary=True, currency_obj=(docs and docs[0].currency_id or None))"/>
-                           </td>
-                          </tr>
 
+                            <!-- صف المجموع النهائي -->
+                            <tr style="font-weight:bold; border-top: 2px solid black;">
+                                <td colspan="5" style="text-align:right; padding:8px;">إجمالي المبالغ:</td>
+                                <td style="padding:8px; text-align:left;">
+                                    <span t-esc="'{:,.2f}'.format(total_sum or 0.0)"/>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <hr/>
-<div style="display: flex; justify-content: space-between; margin-bottom: 15px; direction: rtl;">
-    <div style="display: inline-block; width: 33%; text-align: right;">
-        <span style="text-decoration: underline;">إعداد</span>
-    </div>
-    <div style="display: inline-block; width: 33%; text-align: center;">
-        <span style="text-decoration: underline;">مراجعة</span>
-    </div>
-    <div style="display: inline-block; width: 33%; text-align: left;">
-        <span style="text-decoration: underline;">إعتماد</span>
-    </div>
-</div>
 
-                    
+                    <!-- توقيع الإعداد والمراجعة والإعتماد -->
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; direction: rtl;">
+                        <div style="display: inline-block; width: 33%; text-align: right;">
+                            <span style="text-decoration: underline;">إعداد</span>
+                        </div>
+                        <div style="display: inline-block; width: 33%; text-align: center;">
+                            <span style="text-decoration: underline;">مراجعة</span>
+                        </div>
+                        <div style="display: inline-block; width: 33%; text-align: left;">
+                            <span style="text-decoration: underline;">إعتماد</span>
+                        </div>
+                    </div>
                 </div>
             </t>
         </t>
     </template>
-
 </odoo>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
