@@ -1,7 +1,7 @@
 
 from odoo import models , fields , api , _
 from odoo.exceptions import ValidationError
-from decimal import Decimal, ROUND_DOWN
+
 
 
 class AccountMove ( models.Model ) :
@@ -167,12 +167,12 @@ class SaleOrder ( models.Model ) :
         store=True
      )
     # first and second dofaa taxes
-    first_line_taxes = fields.Float(
+    first_line_taxes = fields.Integer(
         string="First Line Taxe",
         compute="_compute_second_line_name",
         store=True
      )
-    second_line_taxes = fields.Float(
+    second_line_taxes = fields.Integer(
         string="Second Line Taxe",
         compute="_compute_second_line_name",
         store=True
@@ -234,10 +234,9 @@ class SaleOrder ( models.Model ) :
         for order in self:
             if len(order.order_line) >= 1:
                 order.first_line_name = order.order_line[0].product_id.name
-                value = order.order_line[0].price_tax
                 order.first_line_taxed = order.order_line[0].price_total
                 order.first_line_untaxed = order.order_line[0].price_subtotal
-                order.first_line_taxes = float(Decimal(str(value)).quantize(Decimal('0.01'), rounding=ROUND_DOWN))
+                order.first_line_taxes = order.order_line[0].price_tax
                 
             else:
                 order.first_line_name = False
@@ -247,8 +246,7 @@ class SaleOrder ( models.Model ) :
                 #order.second_line_name = order.order_line[1].name
                 order.second_line_taxed = order.order_line[1].price_total
                 order.second_line_untaxed = order.order_line[1].price_subtotal
-                value2 = order.order_line[0].price_tax
-                order.second_line_taxes =float(Decimal(str(value2)).quantize(Decimal('0.01'), rounding=ROUND_DOWN))
+                order.second_line_taxes =order.order_line[0].price_tax
             else:
                 order.second_line_name = False
                 
