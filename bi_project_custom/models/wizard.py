@@ -79,14 +79,14 @@ class CloseEntryWizard(models.TransientModel):
         invoices = sale_order.invoice_ids
         if not invoices:
                invoices = self.env['account.move'].search([
-               #('sale_order_id_finance', '=', sale_order.id)
                   '&','&',
                  ('journal_id', '=', 9),
                  ('state', '=', 'posted'),
-                 '|',
-                  ('id', 'in', sale_order.invoice_ids.ids),
-                  ('sale_order_id_finance', '=', sale_order.id),
-               ])
+                  '|',
+                 ('id', 'in', sale_order.invoice_ids.ids),
+                 ('sale_order_id_finance', '=', sale_order.id),
+                   ])
+
 
         for invoice in invoices:
             for line in invoice.invoice_line_ids:
