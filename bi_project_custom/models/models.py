@@ -168,7 +168,7 @@ class SaleOrder ( models.Model ) :
      )
     # first and second dofaa taxes
     first_line_taxes = fields.Float(
-        string="Second Line Taxe",
+        string="First Line Taxe",
         compute="_compute_second_line_name",
         store=True
      )
