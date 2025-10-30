@@ -235,7 +235,7 @@ class SaleOrder ( models.Model ) :
                 order.first_line_name = order.order_line[0].product_id.name
                 order.first_line_taxed = order.order_line[0].price_total
                 order.first_line_untaxed = order.order_line[0].price_subtotal
-                order.first_line_taxes = order.order_line[0].price_tax
+                order.first_line_taxes = round(order.order_line[0].price_tax, 2)
             else:
                 order.first_line_name = False
 
@@ -244,7 +244,7 @@ class SaleOrder ( models.Model ) :
                 #order.second_line_name = order.order_line[1].name
                 order.second_line_taxed = order.order_line[1].price_total
                 order.second_line_untaxed = order.order_line[1].price_subtotal
-                order.second_line_taxes = order.order_line[1].price_tax
+                order.second_line_taxes = round(order.order_line[0].price_tax, 2)
             else:
                 order.second_line_name = False
                 
