@@ -76,18 +76,18 @@ class CloseEntryWizard(models.TransientModel):
         invoice_lines = []
 
         # جلب كل الفواتير المرتبطة بالأوردر سواء كانت موجودة في sale_order.invoice_ids أم لا
-        invoices = sale_order.invoice_ids
-        if not invoices:
+       # invoices = sale_order.invoice_ids
+       # if not invoices:
                invoices = self.env['account.move'].search([
                   '&','&',
                  ('journal_id', '=', 9),
                  ('state', '=', 'posted'),
                   '|',
                  ('id', 'in', sale_order.invoice_ids.ids),
-                 ('sale_order_id_finance', '=', sale_order.id),
+                 #('sale_order_id_finance', '=', sale_order.id),
+                 ('invoice_origin' , 'ilike' , self.name.strip ()) ,
+                 ('move_type' , '=' , 'out_invoice')
                    ])
-
-
         for invoice in invoices:
             for line in invoice.invoice_line_ids:
                 if not line.account_id or not line.product_id:
