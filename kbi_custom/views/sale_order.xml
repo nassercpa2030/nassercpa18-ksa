@@ -86,9 +86,9 @@
                     <field name="multi_service"/>
                     <field name="multi_years"/>
                     <field name="review_manager_id" widget="many2one_avatar_user"/> 
-                     <field name="ass_from"/>
-                    <field name="ass_to"/>
-                    <field name="ass_to_percentage"/>
+                     <field name="ass_from" modifiers="{'invisible':[('review_manager_id','=',Flase)]}"/>
+                    <field name="ass_to" modifiers="{'invisible':[('review_manager_id','=',Flase)]}"/>
+                    <field name="ass_to_percentage" modifiers="{'invisible':[('review_manager_id','=',Flase)]}"/>
                     <field name="audit_date" modifiers="{'readonly':[('from_crm','=',True)]}"/>
                     <field name="account_year" modifiers="{'readonly':[('from_crm','=',True)]}"/>
                     <field name="from_crm" invisible="1"/>
