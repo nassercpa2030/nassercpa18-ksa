@@ -40,9 +40,10 @@ class CloseEntryWizard(models.TransientModel):
     _name = 'close.entry.wizard'
     _description = 'Close Entry Wizard'
 
-    invoice_lines = fields.One2many(
-        'invoice.line.wizard', 'wizard_id', string='Invoice Lines', readonly=False, store=True
-    )
+    #invoice_lines = fields.One2many(
+     #   'invoice.line.wizard', 'wizard_id', string='Invoice Lines', readonly=False, store=True
+    #)
+    invoice_lines = fields.Many2many('account.move', string="Invoices", readonly=True)
     sale_order_id = fields.Many2one('sale.order', string='Sales Order', ondelete='set null')
     use_account_id1 = fields.Boolean(string='Use Alternative Account')
     journal_id = fields.Many2one(
@@ -77,7 +78,9 @@ class CloseEntryWizard(models.TransientModel):
         # جلب كل الفواتير المرتبطة بالأوردر سواء كانت موجودة في sale_order.invoice_ids أم لا
         invoices = sale_order.invoice_ids
         if not invoices:
-            invoices = self.env['account.move'].search([('invoice_origin', '=', sale_order.name)])
+               invoices = self.env['account.move'].search([
+               ('sale_order_id_finance', '=', sale_order.id)
+               ])
 
         for invoice in invoices:
             for line in invoice.invoice_line_ids:
