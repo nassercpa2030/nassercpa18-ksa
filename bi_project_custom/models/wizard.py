@@ -85,7 +85,7 @@ class CloseEntryWizard(models.TransientModel):
                   '|',
                  ('id', 'in', sale_order.invoice_ids.ids),
                  #('sale_order_id_finance', '=', sale_order.id),
-                 ('invoice_origin' , 'ilike' , self.name.strip ()) ,
+                 ('invoice_origin' , 'ilike' , sale_order.name.strip ()) ,
                  ('move_type' , '=' , 'out_invoice')
                    ])
         for invoice in invoices:
