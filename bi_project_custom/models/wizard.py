@@ -82,7 +82,8 @@ class CloseEntryWizard(models.TransientModel):
                #('sale_order_id_finance', '=', sale_order.id)
                  '|',
                   ('id', 'in', sale_order.invoice_ids.ids),
-                  ('sale_order_id_finance', '=', sale_order.id)
+                  ('sale_order_id_finance', '=', sale_order.id),
+                  ('journal_id', '=', 9)
                ])
 
         for invoice in invoices:
