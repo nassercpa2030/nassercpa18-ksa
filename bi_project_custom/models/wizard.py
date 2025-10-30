@@ -78,7 +78,7 @@ class CloseEntryWizard(models.TransientModel):
         # جلب كل الفواتير المرتبطة بالأوردر سواء كانت موجودة في sale_order.invoice_ids أم لا
        # invoices = sale_order.invoice_ids
        # if not invoices:
-               invoices = self.env['account.move'].search([
+        invoices = self.env['account.move'].search([
                   '&','&',
                  ('journal_id', '=', 9),
                  ('state', '=', 'posted'),
