@@ -1,6 +1,7 @@
 
 from odoo import models , fields , api , _
 from odoo.exceptions import ValidationError
+from decimal import Decimal, ROUND_DOWN
 
 
 class AccountMove ( models.Model ) :
@@ -233,9 +234,11 @@ class SaleOrder ( models.Model ) :
         for order in self:
             if len(order.order_line) >= 1:
                 order.first_line_name = order.order_line[0].product_id.name
+                value = order.order_line[0].price_tax
                 order.first_line_taxed = order.order_line[0].price_total
                 order.first_line_untaxed = order.order_line[0].price_subtotal
-                order.first_line_taxes = float(f"{order.order_line[0].price_tax:.2f}")
+                order.first_line_taxes = float(Decimal(str(value)).quantize(Decimal('0.01'), rounding=ROUND_DOWN))
+                
             else:
                 order.first_line_name = False
 
@@ -244,7 +247,8 @@ class SaleOrder ( models.Model ) :
                 #order.second_line_name = order.order_line[1].name
                 order.second_line_taxed = order.order_line[1].price_total
                 order.second_line_untaxed = order.order_line[1].price_subtotal
-                order.second_line_taxes = float(f"{order.order_line[1].price_tax:.2f}")
+                value2 = order.order_line[0].price_tax
+                order.second_line_taxes =float(Decimal(str(value2)).quantize(Decimal('0.01'), rounding=ROUND_DOWN))
             else:
                 order.second_line_name = False
                 
