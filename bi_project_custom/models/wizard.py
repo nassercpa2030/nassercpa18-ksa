@@ -80,7 +80,7 @@ class CloseEntryWizard(models.TransientModel):
         if not invoices:
                invoices = self.env['account.move'].search([
                #('sale_order_id_finance', '=', sale_order.id)
-                  '&','&",
+                  '&','&',
                  ('journal_id', '=', 9),
                  ('state', '=', 'posted'),
                  '|',
