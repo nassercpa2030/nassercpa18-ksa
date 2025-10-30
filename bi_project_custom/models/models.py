@@ -232,7 +232,7 @@ class SaleOrder ( models.Model ) :
     def _compute_second_line_name(self):
         for order in self:
             if len(order.order_line) >= 1:
-                order.first_line_name = order.order_line[0].name
+                order.first_line_name = order.order_line[0].product_id.name
                 order.first_line_taxed = order.order_line[0].price_total
                 order.first_line_untaxed = order.order_line[0].price_subtotal
                 order.first_line_taxes = order.order_line[0].price_tax
@@ -240,8 +240,8 @@ class SaleOrder ( models.Model ) :
                 order.first_line_name = False
 
             if len(order.order_line) >= 2:
-                order.second_line_name = order.order_line[1].name
-                order.second_line_name = order.order_line[1].name
+                order.second_line_name = order.order_line[1].product_id.name
+                #order.second_line_name = order.order_line[1].name
                 order.second_line_taxed = order.order_line[1].price_total
                 order.second_line_untaxed = order.order_line[1].price_subtotal
                 order.second_line_taxes = order.order_line[1].price_tax
