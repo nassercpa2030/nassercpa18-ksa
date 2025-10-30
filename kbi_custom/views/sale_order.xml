@@ -80,12 +80,12 @@
 
                 <!-- Payment Term Fields -->
                 <xpath expr="//sheet//field[@name='payment_term_id']" position="after">
-                    <field name="user_id"/>
+                    <field name="user_id" widget="many2one_avatar_user"/>
                     <field name="team_id"/>
                     <field name="contract_date"/>
                     <field name="multi_service"/>
                     <field name="multi_years"/>
-                    <field name="review_manager_id"/> 
+                    <field name="review_manager_id" widget="many2one_avatar_user"/> 
                      <field name="ass_from"/>
                     <field name="ass_to"/>
                     <field name="ass_to_percentage"/>
