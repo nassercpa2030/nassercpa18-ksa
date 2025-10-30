@@ -153,9 +153,9 @@ class SaleOrder ( models.Model ) :
     x_studio_auto_code = fields.Char ( string="Auto Code_printing" , related='auto_code' , readonly=False , store=True )
     last_service = fields.Many2one ( string="Last Contract Service" , comodel_name='service.contract' )
     assigned_to = fields.Many2one ( 'res.users' , string="Assigned To" )
-    ass_to = fields.Float ( string="Ass_to" )
-    ass_from = fields.Float ( string="Ass_from" )
     ass_to_percentage = fields.Integer ( "Ass_to Percentage" )
+    ass_to = fields.Float (string="Ass_to",compute="_compute_ass_to",store=True )
+    ass_from = fields.Float ( string="Ass_from",compute="_compute_ass_to",store=True )
     multi_service = fields.Boolean ( string="Multi_Service" )
     multi_years = fields.Boolean ( string="Multi_Years" )
     multi_years_no = fields.Integer ( sring="Multi Years No" )
@@ -178,7 +178,12 @@ class SaleOrder ( models.Model ) :
         compute="_compute_project_count" ,
         store=True
     )
-
+    @api.depends('amount_total', 'ass_to_percentage')
+    def _compute_ass_to(self):
+        for rec in self:
+            rec.ass_to = rec.amount_total * rec.ass_to_percentage / 100
+            rec.ass_from = rec.amount_total - rec.ass_to
+            
     @api.depends ( "x_studio_contract_service" )
     def get_pr_nam_fr_service(self) :
         for rec in self :
