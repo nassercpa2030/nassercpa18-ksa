@@ -43,7 +43,7 @@ class CloseEntryWizard(models.TransientModel):
     #invoice_lines = fields.One2many(
      #   'invoice.line.wizard', 'wizard_id', string='Invoice Lines', readonly=False, store=True
     #)
-    invoice_lines = fields.Many2many('account.move', string="Invoices", readonly=True)
+    invoice_lines = fields.One2many( 'invoice.line.wizard', 'wizard_id', string="Invoices",store=True, readonly=True)
     sale_order_id = fields.Many2one('sale.order', string='Sales Order', ondelete='set null')
     use_account_id1 = fields.Boolean(string='Use Alternative Account')
     journal_id = fields.Many2one(
@@ -79,7 +79,10 @@ class CloseEntryWizard(models.TransientModel):
         invoices = sale_order.invoice_ids
         if not invoices:
                invoices = self.env['account.move'].search([
-               ('sale_order_id_finance', '=', sale_order.id)
+               #('sale_order_id_finance', '=', sale_order.id)
+                 '|',
+                  ('id', 'in', sale_order.invoice_ids.ids),
+                  ('sale_order_id_finance', '=', sale_order.id)
                ])
 
         for invoice in invoices:
