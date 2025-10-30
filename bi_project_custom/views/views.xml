@@ -10,7 +10,7 @@
                   <field name="account_id1" required="1"/>
                    <field name="journal_entry_date" />
               </group>
-              <field name="invoice_lines" widget="one2many_list" mode="list,form" domain=[('invoice_origin','=',name)]>
+              <field name="invoice_lines" widget="one2many_list" mode="list,form" domain="[('invoice_origin','=',name)]">
                 
                   <list create="1" edit="1" delete="1">
                       <field name="product_id"/>
