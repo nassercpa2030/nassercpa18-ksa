@@ -228,7 +228,26 @@ class SaleOrder ( models.Model ) :
     def action_print_mutalba_report(self):
         report = self.env['ir.actions.report'].browse(1079)
         return report.report_action(self)    
-        
+
+    @api.multi
+    def action_create_new(self):
+        self.ensure_one()
+        return {
+            'name': 'Create New Payment',
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.payment',  
+            'view_mode': 'form',             
+            'target': 'current',             
+            'context': {
+                'default_sale_order_id' :self.id ,
+                'default_partner_id' : self.partner_id.id ,
+                #'default_partner_id': self.partner_id.id if self.partner_id else False,
+                #'default_payment_type': self.payment_type,
+                'default_payment_type' : 'inbound' ,
+                #'default_amount': 0.0,
+                'create' : self.state == 'sale' ,
+            }
+            
     @api.depends('order_line')
     def _compute_second_line_name(self):
         for order in self:
