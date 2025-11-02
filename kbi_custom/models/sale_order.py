@@ -582,7 +582,7 @@ class SaleOrder ( models.Model ) :
             'view_mode' : 'list,form' ,
             'res_model' : 'account.payment' ,
             #'domain' : [('sale_order_id' , 'in' , self.ids)] ,
-            'domain': ['|',('sale_order_ids', 'in', [self.id] if self.id else []),('id', '=', 0)]
+            'domain': ['|',('sale_order_ids', 'in', [self.id] if self.id else []),('id', '=', 0)],
             'context' : {
                # 'default_sale_order_ids' :self.id ,
                 'default_sale_order_ids': [self.id] if self.id else [],
