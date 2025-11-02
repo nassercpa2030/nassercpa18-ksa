@@ -585,7 +585,7 @@ class SaleOrder ( models.Model ) :
             #'domain': ['|',('sale_order_ids', 'in', [self.id] if self.id else []),('id', '=', 0)],
             'context' : {
                # 'default_sale_order_ids' :self.id ,
-                'default_sale_order_ids': [self.id] if self.id else [],
+                #'default_sale_order_ids': [self.id] if self.id else [],
                 'default_partner_id' : self.partner_id.id ,
                 'default_payment_type' : 'inbound' ,
                 'default_from_sale' : True ,
