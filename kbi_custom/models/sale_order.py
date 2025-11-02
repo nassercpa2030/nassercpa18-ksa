@@ -581,7 +581,7 @@ class SaleOrder ( models.Model ) :
             'type' : 'ir.actions.act_window' ,
             'view_mode' : 'list,form' ,
             'res_model' : 'account.payment' ,
-            'domain' : ['|',('sale_order_id' , 'in' , self.ids),('sale_order_id', '!=', False)] ,
+            'domain' : ['|',('sale_order_id' , 'in' , self.ids),('id', '=', 0)] ,
             'context' : {
                 'default_sale_order_ids' : self.id ,
                 'default_partner_id' : self.partner_id.id ,
