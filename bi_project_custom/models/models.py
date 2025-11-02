@@ -229,8 +229,8 @@ class SaleOrder ( models.Model ) :
         report = self.env['ir.actions.report'].browse(1079)
         return report.report_action(self)    
 
-    @api.multi
-    def action_create_new(self):
+    #@api.multi
+    def action_create_new_payment2(self):
         self.ensure_one()
         return {
             'name': 'Create New Payment',
