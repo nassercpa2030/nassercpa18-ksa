@@ -582,12 +582,12 @@ class SaleOrder ( models.Model ) :
             'view_mode' : 'list,form' ,
             'res_model' : 'account.payment' ,
             'domain' : [('sale_order_id' , 'in' , self.ids)] ,
-            'target': 'current',
             #'domain' : ['|',('sale_order_id' , 'in' , self.ids),'&',('sale_order_id', '=', False),('amount','=','0')] ,
             #'domain': ['|',('sale_order_ids', 'in', [self.id] if self.id else []),('id', '=', 0)],
             'context' : {
                # 'default_sale_order_ids' :self.id ,
                 #'default_sale_order_ids': [self.id] if self.id else [],
+                'default_sale_order_id' :self.id ,
                 'default_partner_id' : self.partner_id.id ,
                 'default_payment_type' : 'inbound' ,
                 'default_from_sale' : True ,
