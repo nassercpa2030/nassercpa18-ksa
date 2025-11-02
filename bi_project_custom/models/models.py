@@ -246,6 +246,7 @@ class SaleOrder ( models.Model ) :
                 'default_payment_type' : 'inbound' ,
                 #'default_amount': 0.0,
                 'create' : self.state == 'sale' ,
+              }
             }
             
     @api.depends('order_line')
