@@ -111,6 +111,15 @@
           <xpath expr="//header" position="inside">
               <field name="is_project_close_stage" invisible="1"/>
               <field name="is_journal_state_not_posted" invisible="1"/>
+             <button name="action_create_new_payment2"
+                      string="Create Payment"
+                      type="object"
+                      icon="fa-money"
+                      style="background-color:#87CEFA; color:white;"
+                      class="oe_lowlight" 
+                      modifiers="{'invisible': [('paid_total','>',0)]}"
+               />
+            
               <button name="action_close_journal_entries"
                       string="Close Entry"
                       type="object"
