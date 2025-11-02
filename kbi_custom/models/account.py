@@ -95,7 +95,7 @@ class AccountPayment ( models.Model ) :
             if rec.sale_order_id :
                 partner_name = rec.sale_order_id.partner_id.name or ''
                 project_name = rec.sale_order_id.project_name or ''
-                rec.memo = f" تحصيل من العميل : {partner_name} - {project_name}"
+                rec.memo = f" تحصيل من العميل : {partner_name} - {project_name} ({audit_date})"
 
     # تحديث amount بناءً على sale_order_ids بدون loop
     @api.onchange ( 'sale_order_ids' )
