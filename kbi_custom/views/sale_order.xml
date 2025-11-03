@@ -41,6 +41,9 @@
                         modifiers="{'invisible':['|', ('is_current_approver', '!=', True)]}"/-->
                     <button name="action_open_print_sale_wizard" type="object" class="oe_highlight" string="Print Offer/Contract"
                         modifiers="{'invisible':[('state','in',['cancel','rejected'])]}"/>
+                    
+                      <button name="action_open_print_sale_wizard" type="object" class="oe_highlight" string="Create Payment"
+                        modifiers="{'invisible':[('state','in',['cancel','rejected'])]}"   groups="base.group_erp_manager" />
                     <!--button name="action_open_print_sale_wizard" type="object" class="oe_mediumlight" icon="fa fa-print" string="طباعة مطالبة"
                         groups="base.group_user"/-->
                 
