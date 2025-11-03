@@ -877,7 +877,7 @@ class SaleOrder ( models.Model ) :
                 return 1
                 
     def action_create_new_payment2(self):
-        self.ensure_one()
+        #self.ensure_one()
         return {
             'name': 'Create New Payment',
             'type': 'ir.actions.act_window',
