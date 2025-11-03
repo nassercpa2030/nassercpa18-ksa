@@ -875,7 +875,22 @@ class SaleOrder ( models.Model ) :
                 return sequence.sequence
             else :
                 return 1
-
+                
+    def action_create_new_payment2(self):
+        self.ensure_one()
+        return {
+            'name': 'Create New Payment',
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.payment',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_sale_order_id': self.id,
+                'default_partner_id': self.partner_id.id if self.partner_id else False,
+                'default_payment_type': 'inbound',
+                # 'default_amount': 0.0,  # اختياري حسب الحاجة
+               }
+             }
 
 class SaleOrderLine ( models.Model ) :
     _inherit = 'sale.order.line'
