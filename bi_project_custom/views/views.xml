@@ -116,12 +116,12 @@
               <button name="action_close_journal_entries"
                       string="Close Entry"
                       type="object"
-                      icon="fa-money"
+                      icon="fa-key"
                       class="oe_highlight"/>
               <button name="action_open_close_entry_wizard_deffered"
                       type="object"
                       string="Deffered-Rev"
-                      icon="fa-money"
+                      icon="fa-key"
                       class="btn btn-warning"
                       groups="base.group_system"
                       style="background-color: orange; color: white; font-weight: bold;"/>
