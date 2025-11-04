@@ -178,17 +178,7 @@
                           </list>
                       </field>
                   </page>
-                       <page string="Multi Years">
-                      <group>
-                          <group>
-                              <field name="allowed_users_ids" widget="many2many_tags"/>
-                          </group> 
-                            <group>
-                              <field name="allowed_users_ids" widget="many2many_tags"/>
-                          </group> 
-                      </group>
                   
-                  </page>
               </notebook>
           </xpath>
       </field>
