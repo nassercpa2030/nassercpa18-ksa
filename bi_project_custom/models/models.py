@@ -228,12 +228,12 @@ class SaleOrder ( models.Model ) :
     @api.depends ( 'price1','price2','price3' )
     def compute_taxed_price(self) :
         for rec in self :
-           rec.tax1=self.price1*0.15
-           rec.tax2=self.price2*0.15
-           rec.tax3=self.price3*0.15
-           rec.taxed_price1=self.price1*1.15
-           rec.taxed_price2=self.price2*1.15
-           rec.taxed_price3=self.price3*1.15 
+           rec.tax1=rec.price1*0.15
+           rec.tax2=rec.price2*0.15
+           rec.tax3=rec.price3*0.15
+           rec.taxed_price1=rec.price1*1.15
+           rec.taxed_price2=rec.price2*1.15
+           rec.taxed_price3=rec.price3*1.15 
             
     @api.onchange ( 'journal_entry_data' )
     @api.depends ( 'journal_entry_data' )
