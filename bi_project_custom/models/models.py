@@ -180,6 +180,14 @@ class SaleOrder ( models.Model ) :
     
     is_journal_state_not_posted = fields.Boolean ( compute='_compute_is_journal_state_not_posted' ,
                                                    string='Journal State' , default=True )
+    
+    price1=fields.Float(string="Untaxed Price1",readonly=False,deFault=False)
+    price2=fields.Float(string="Untaxed Price2",readonly=False,deFault=False)
+    price3=fields.Float(string="Untaxed Price3",readonly=False,deFault=False)
+    year1=fields.Char(string="Year1",readonly=False,deFault=False)
+    year2=fields.Char(string="Year2",readonly=False,deFault=False)
+    year3=fields.Char(string="Year3",readonly=False,deFault=False)
+    
     team_id = fields.Many2one ( 'crm.team' , string='Sales Team' , readonly=False )
     user_id = fields.Many2one ( 'res.users' , string="Manager" , compute='_compute_user_id' ,
                                 store=True , readonly=False , precompute=True , index=True ,
