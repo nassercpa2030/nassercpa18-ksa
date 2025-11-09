@@ -178,11 +178,11 @@ class SaleOrder ( models.Model ) :
         compute="_compute_project_count" ,
         store=True
     )
-    @api.depends('amount_total', 'ass_to_percentage')
+    @api.depends('amount_untaxed', 'ass_to_percentage')
     def _compute_ass_to(self):
         for rec in self:
-            rec.ass_to = rec.amount_total * rec.ass_to_percentage / 100
-            rec.ass_from = rec.amount_total - rec.ass_to
+            rec.ass_to = rec.amount_untaxed * rec.ass_to_percentage / 100
+            rec.ass_from = rec.amount_untaxed - rec.ass_to
             
     @api.depends ( "x_studio_contract_service" )
     def get_pr_nam_fr_service(self) :
