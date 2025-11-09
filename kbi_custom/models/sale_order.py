@@ -162,9 +162,6 @@ class SaleOrder ( models.Model ) :
     mulit_year1 = fields.Integer ( string="Year1" , readonly=False )
     mulit_year2 = fields.Integer ( string="Year2" , readonly=False )
     mulit_year3 = fields.Integer ( string="Year3" , readonly=False )
-    mulit_year_price1 = fields.Float ( string="Price1" , readonly=False )
-    mulit_year_price2 = fields.Float ( string="Price2" , readonly=False )
-    mulit_year_price3 = fields.Float ( string="Price3" , readonly=False )
     ass_visible = fields.Boolean ( string="Visible" , compute='_compute_ass_visible' )
     partner_id = fields.Many2one ( string="Customer" , comodel_name="res.partner" , strore=True , required=False ,
                                    readonly=False )
