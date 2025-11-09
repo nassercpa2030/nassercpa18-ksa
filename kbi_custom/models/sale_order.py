@@ -162,6 +162,9 @@ class SaleOrder ( models.Model ) :
     mulit_year1 = fields.Integer ( string="Year1" , readonly=False )
     mulit_year2 = fields.Integer ( string="Year2" , readonly=False )
     mulit_year3 = fields.Integer ( string="Year3" , readonly=False )
+    taxed_price1=fields.Float(string="Taxed Price1",readonly=False,compute="compute_taxed_price",store=True)
+    taxed_price2=fields.Float(string="Taxed Price2",readonly=False,compute="compute_taxed_price",store=True)
+    taxed_price3=fields.Float(string="Taxed Price3",readonly=False,compute="compute_taxed_price",store=True)
     ass_visible = fields.Boolean ( string="Visible" , compute='_compute_ass_visible' )
     partner_id = fields.Many2one ( string="Customer" , comodel_name="res.partner" , strore=True , required=False ,
                                    readonly=False )
@@ -211,6 +214,17 @@ class SaleOrder ( models.Model ) :
     def _compute_ass_visible(self) :
         for rec in self :
             rec.ass_visible = bool ( rec.review_manager_id )
+
+    @api.onchange ( 'price1','price2','price3' )
+    @api.depends ( 'price1','price2','price3' )
+    def compute_taxed_price(self) :
+        for rec in self :
+           rec.tax1=rec.price1*0.15
+           rec.tax2=rec.price2*0.15
+           rec.tax3=rec.price3*0.15
+           rec.taxed_price1=rec.price1*1.15
+           rec.taxed_price2=rec.price2*1.15
+           rec.taxed_price3=rec.price3*1.15 
 
     def _compute_contact_manager_team(self) :
         for rec in self :
