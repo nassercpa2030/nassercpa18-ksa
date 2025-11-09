@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- تعريف التقرير -->
-    <record id="action_vendor_bill_batch_report" model="ir.actions.report">
-        <field name="name">طلب صرف عمولة مسوق</field>
-        <field name="model">account.move</field>
+    <record id="action_motalba_report" model="ir.actions.report">
+        <field name="name">مطالبة بكامل المبلغ</field>
+       <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">custom_vendor_report.report_broker_payment_template</field>
-        <field name="report_file_name">طلب_صرف_عمولة.pdf</field>
-        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="report_file_name">مطالبة بكامل المبلغ.pdf</field>
+       <field name="binding_model_id" ref="sale.model_sale_order"/>
         <field name="binding_type">report</field>
     </record>
 
     <!-- قالب التقرير -->
-    <template id="report_broker_payment_template">
+    <template id="report__motalba_report_template">
         <t t-call="web.html_container">
             <!-- استخدام التخطيط القياسي لإضافة رأس الشركة وتذييلها وأرقام الصفحات -->
             <t t-call="web.external_layout_standard">
@@ -25,55 +25,55 @@
                     <hr/>
 
                     <!-- معلومات المورد (سنفترض أن كل الفواتير المحددة لنفس المورد) -->
-                    <div style="margin-bottom: 20px;">
-                        <strong>اسم المورد:</strong> 
-                        <span t-field="docs[0].partner_id.name"/><br/>
-                        
-                        <strong>هاتف المورد:</strong> 
-                        <span t-field="docs[0].partner_id.phone"/><br/>
-                        
-                        <strong>رقم حساب المورد:</strong> 
-                        <!-- هذا الحقل قد يكون custom field، يمكنك تعديله -->
-                        <span t-field="docs[0].partner_id.bank_ids[0].acc_number"/>
-                        
-                        <div style="text-align: left; margin-top: 10px;">
-                            <strong>التاريخ:</strong> 
-                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"/>
-                        </div>
+                        <div style=" direction: rtl;">
+                            <p style=" text-align:right; font-size:10px;">
+                        التاريخ: 
+                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d ')"/>
+                    </p>
+                        <p style=" text-align:right;">
+                            العميل: <span t-field="docs[0].partner_id.name"/>
+                        </p>
+                        <p style=" text-align:right;">
+                            رقم الأوردر: <span t-field="docs[0].name"/>
+                        </p>
+                           <p style=" text-align:right;">
+                        كود النظام : <span t-field="docs[0].auto_code"/>
+                        </p>
                     </div>
 
                     <hr/>
 
                     <!-- الجدول الرئيسي للبيانات -->
-                    <table class="table table-bordered" style="width: 100%; margin-bottom: 30px;">
-                        <thead style="background-color: #f2f2f2;">
+                     <table class="table table-bordered" style="width: 100%; direction: rtl; font-size: 10px;">
+                        <thead style="background-color: #f0f0f0;">
                             <tr>
-                                <th style="padding: 10px; text-align: center;">إسم العميل</th>
-                                <th style="padding: 10px; text-align: center;">إسم العقد</th>
-                                <th style="padding: 10px; text-align: center;">قيمة العقد قبل الضريبة</th>
-                                <th style="padding: 10px; text-align: center;">قيمة فاتورة المسوق</th>
+                                <th style="padding: 8px; text-align: center;"> الوصف</th>
+                                <th style="padding: 8px; text-align: center;"> القيمة قبل الضريبة </th>
+                                <th style="padding: 8px; text-align: center;">الضريبة </th>
+                                <th style="padding: 8px; text-align: center;">القيمة بعد  الضريبة </th>
+&gt;
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- المرور على كل فاتورة محددة -->
-                            <t t-foreach="docs" t-as="o">
+                            <!-- تهيئة متغير المجموع -->
+                            <t t-set="total_sum" t-value="0.0"/> 
+
+                            <!-- المرور على جميع الفواتير -->
+                            <t t-foreach="docs" t-as="bill">
                                 <tr>
-                                    <td style="padding: 8px;">
-                                        <span t-field="o.partner_id.name"/>
-                                    </td>
-                                    <td style="padding: 8px;">
-                                        <!-- ملاحظة: قد تحتاج لتغيير هذا الحقل حسب نظامك -->
-                                        <span t-field="o.ref"/>
-                                    </td>
+                                    <td style="padding: 8px;">  <span t-field="bill.project_name"/></td>
+                                    <td style="padding: 8px;"><span t-field="bill.amount_untaxed"/></td>
+                                 
+                                    <td style="padding: 7px; text-align: center;"><span t-field="bill.amount_tax"/>   <b>%</b></td>
+
+                                    <td style="padding: 10px; text-align: center;"><span t-field="bill.amount_total"/></td>
                                     <td style="padding: 8px; text-align: left;">
-                                        <span t-field="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        <span t-field="bill.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: bill.currency_id}"/>
                                     </td>
-                                    <td style="padding: 8px; text-align: left;">
-                                        <!-- ملاحظة: هذا حقل افتراضي، يجب إنشاؤه أو تغييره -->
-                                        <span t-field="o.x_broker_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                    </td>
+                                  
                                 </tr>
                             </t>
+
                         </tbody>
                     </table>
 
