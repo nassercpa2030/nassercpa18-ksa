@@ -660,6 +660,12 @@ class SaleOrder ( models.Model ) :
                                           string='Print History' )
     sign_qrcode = fields.Binary ( string='Sign QR Code' , compute='compute_sign_qrcode' , store=False )
     # sign_qrcode = fields.Binary ( string='Sign QR Code'  , store=False )
+    price1=fields.Float(string="Untaxed Price1",readonly=False,deFault=False)
+    price2=fields.Float(string="Untaxed Price2",readonly=False,deFault=False)
+    price3=fields.Float(string="Untaxed Price3",readonly=False,deFault=False)
+    year1=fields.Char(string="Year_1",readonly=False,deFault=False)
+    year2=fields.Char(string="Year_2",readonly=False,deFault=False)
+    year3=fields.Char(string="Year_3",readonly=False,deFault=False)
     uuid = fields.Char ( string='UUID' )
     validity_date = fields.Date ( string='Validity Date' ,
                                   default=fields.Date.today () + datetime.timedelta ( days=30 ) )
