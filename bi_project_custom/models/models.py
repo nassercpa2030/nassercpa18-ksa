@@ -184,9 +184,9 @@ class SaleOrder ( models.Model ) :
     price1=fields.Float(string="Untaxed Price1",readonly=False,deFault=False)
     price2=fields.Float(string="Untaxed Price2",readonly=False,deFault=False)
     price3=fields.Float(string="Untaxed Price3",readonly=False,deFault=False)
-    year1=fields.Char(string="Year1",readonly=False,deFault=False)
-    year2=fields.Char(string="Year2",readonly=False,deFault=False)
-    year3=fields.Char(string="Year3",readonly=False,deFault=False)
+    year1=fields.Char(string="Year_1",readonly=False,deFault=False)
+    year2=fields.Char(string="Year_2",readonly=False,deFault=False)
+    year3=fields.Char(string="Year_3",readonly=False,deFault=False)
   
     tax1=fields.Float(string="Tax1",readonly=False,compute="compute_taxed_price",store=True)
     tax2=fields.Float(string="Tax2",readonly=False,compute="compute_taxed_price",store=True)
