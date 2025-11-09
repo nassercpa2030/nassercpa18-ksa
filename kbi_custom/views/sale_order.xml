@@ -61,7 +61,7 @@
                     <field name="project_budget" modifiers="{'readonly':[('state','!=','draft')]}"/>
                     <field name= "auto_contract_name" string="Auto Name" widget="boolean_toggle"/>
                     <field name="project_name" string=" Auto Contract Name"/>
-                    <field name="x_studio_contract_service" style="font-size:14px; font-weight:bold;"/>
+                    <field name="x_studio_contract_service" style="font-size:14px; font-weight:bold;" domain="[('is_favorite','=',True),('nk_service','=',False)]"/>
                     <field name="project_code" string="Code"/>
                     <field name="multi_years_no"/>
                     <field name="close_entry_date"/>
