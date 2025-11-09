@@ -653,9 +653,7 @@ class SaleOrder ( models.Model ) :
                                          related='project_ids.stage_id' , store=True , groups='base.group_user' )
     # close_type = fields.Char(comodel_name='project.project.close_type',string='Close_type', related='close_type', store=True)
     from_crm = fields.Boolean ( string='From CRM' )
-    year1=fields.Char(string="Year1",readonly=False,deFault=False)
-    year2=fields.Char(string="Year2",readonly=False,deFault=False)
-    year3=fields.Char(string="Year3",readonly=False,deFault=False)
+   
     can_edit_analytic = fields.Boolean ( string='Can Edit Analytic Account' , compute='compute_can_edit_analytic' , )
     can_edit_approve = fields.Boolean ( string='Can Edit Approve Route' , compute='compute_can_edit_approve' , )
     print_history_ids = fields.One2many ( comodel_name='sale.order.print.history' , inverse_name='sale_id' ,
