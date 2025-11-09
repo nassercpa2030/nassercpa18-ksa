@@ -162,9 +162,9 @@ class SaleOrder ( models.Model ) :
     mulit_year1 = fields.Integer ( string="Year1" , readonly=False )
     mulit_year2 = fields.Integer ( string="Year2" , readonly=False )
     mulit_year3 = fields.Integer ( string="Year3" , readonly=False )
-    mulit_year_price1 = fields.Float ( string="Price1" , readonly=False )
-    mulit_year_price2 = fields.Float ( string="Price2" , readonly=False )
-    mulit_year_price3 = fields.Float ( string="Price3" , readonly=False )
+    taxed_price1=fields.Float(string="Taxed Price1",readonly=False,compute="compute_taxed_price",store=True)
+    taxed_price2=fields.Float(string="Taxed Price2",readonly=False,compute="compute_taxed_price",store=True)
+    taxed_price3=fields.Float(string="Taxed Price3",readonly=False,compute="compute_taxed_price",store=True)
     ass_visible = fields.Boolean ( string="Visible" , compute='_compute_ass_visible' )
     partner_id = fields.Many2one ( string="Customer" , comodel_name="res.partner" , strore=True , required=False ,
                                    readonly=False )
@@ -178,11 +178,11 @@ class SaleOrder ( models.Model ) :
         compute="_compute_project_count" ,
         store=True
     )
-    @api.depends('amount_total', 'ass_to_percentage')
+    @api.depends('amount_untaxed', 'ass_to_percentage')
     def _compute_ass_to(self):
         for rec in self:
-            rec.ass_to = rec.amount_total * rec.ass_to_percentage / 100
-            rec.ass_from = rec.amount_total - rec.ass_to
+            rec.ass_to = rec.amount_untaxed * rec.ass_to_percentage / 100
+            rec.ass_from = rec.amount_untaxed - rec.ass_to
             
     @api.depends ( "x_studio_contract_service" )
     def get_pr_nam_fr_service(self) :
@@ -214,6 +214,17 @@ class SaleOrder ( models.Model ) :
     def _compute_ass_visible(self) :
         for rec in self :
             rec.ass_visible = bool ( rec.review_manager_id )
+
+    @api.onchange ( 'price1','price2','price3' )
+    @api.depends ( 'price1','price2','price3' )
+    def compute_taxed_price(self) :
+        for rec in self :
+           rec.tax1=rec.price1*0.15
+           rec.tax2=rec.price2*0.15
+           rec.tax3=rec.price3*0.15
+           rec.taxed_price1=rec.price1*1.15
+           rec.taxed_price2=rec.price2*1.15
+           rec.taxed_price3=rec.price3*1.15 
 
     def _compute_contact_manager_team(self) :
         for rec in self :
@@ -656,12 +667,19 @@ class SaleOrder ( models.Model ) :
                                          related='project_ids.stage_id' , store=True , groups='base.group_user' )
     # close_type = fields.Char(comodel_name='project.project.close_type',string='Close_type', related='close_type', store=True)
     from_crm = fields.Boolean ( string='From CRM' )
+   
     can_edit_analytic = fields.Boolean ( string='Can Edit Analytic Account' , compute='compute_can_edit_analytic' , )
     can_edit_approve = fields.Boolean ( string='Can Edit Approve Route' , compute='compute_can_edit_approve' , )
     print_history_ids = fields.One2many ( comodel_name='sale.order.print.history' , inverse_name='sale_id' ,
                                           string='Print History' )
     sign_qrcode = fields.Binary ( string='Sign QR Code' , compute='compute_sign_qrcode' , store=False )
     # sign_qrcode = fields.Binary ( string='Sign QR Code'  , store=False )
+    price1=fields.Float(string="Untaxed Price1",readonly=False,deFault=False)
+    price2=fields.Float(string="Untaxed Price2",readonly=False,deFault=False)
+    price3=fields.Float(string="Untaxed Price3",readonly=False,deFault=False)
+    year1=fields.Char(string="Year_1",readonly=False,deFault=False)
+    year2=fields.Char(string="Year_2",readonly=False,deFault=False)
+    year3=fields.Char(string="Year_3",readonly=False,deFault=False)
     uuid = fields.Char ( string='UUID' )
     validity_date = fields.Date ( string='Validity Date' ,
                                   default=fields.Date.today () + datetime.timedelta ( days=30 ) )

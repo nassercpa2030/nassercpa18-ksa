@@ -181,18 +181,19 @@ class SaleOrder ( models.Model ) :
     is_journal_state_not_posted = fields.Boolean ( compute='_compute_is_journal_state_not_posted' ,
                                                    string='Journal State' , default=True )
     
-    price1=fields.Float(string="Untaxed Price1",readonly=False,deFault=False)
-    price2=fields.Float(string="Untaxed Price2",readonly=False,deFault=False)
-    price3=fields.Float(string="Untaxed Price3",readonly=False,deFault=False)
-    year1=fields.Char(string="Year1",readonly=False,deFault=False)
-    year2=fields.Char(string="Year2",readonly=False,deFault=False)
-    year3=fields.Char(string="Year3",readonly=False,deFault=False)
+    #price1=fields.Float(string="Untaxed Price1",readonly=False,deFault=False)
+    #price2=fields.Float(string="Untaxed Price2",readonly=False,deFault=False)
+    #price3=fields.Float(string="Untaxed Price3",readonly=False,deFault=False)
+    #year1=fields.Char(string="Year_1",readonly=False,deFault=False)
+    #year2=fields.Char(string="Year_2",readonly=False,deFault=False)
+    #year3=fields.Char(string="Year_3",readonly=False,deFault=False)
+  
     tax1=fields.Float(string="Tax1",readonly=False,compute="compute_taxed_price",store=True)
     tax2=fields.Float(string="Tax2",readonly=False,compute="compute_taxed_price",store=True)
     tax3=fields.Float(string="Tax3",readonly=False,compute="compute_taxed_price",store=True)
-    taxed_price1=fields.Float(string="Taxed Price1",readonly=False,compute="compute_taxed_price",store=True)
-    taxed_price2=fields.Float(string="Taxed Price2",readonly=False,compute="compute_taxed_price",store=True)
-    taxed_price3=fields.Float(string="Taxed Price3",readonly=False,compute="compute_taxed_price",store=True)
+    #taxed_price1=fields.Float(string="Taxed Price1",readonly=False,compute="compute_taxed_price",store=True)
+    #taxed_price2=fields.Float(string="Taxed Price2",readonly=False,compute="compute_taxed_price",store=True)
+    #taxed_price3=fields.Float(string="Taxed Price3",readonly=False,compute="compute_taxed_price",store=True)
     
     team_id = fields.Many2one ( 'crm.team' , string='Sales Team' , readonly=False )
     user_id = fields.Many2one ( 'res.users' , string="Manager" , compute='_compute_user_id' ,
@@ -224,16 +225,16 @@ class SaleOrder ( models.Model ) :
                 record.broker_percentage_ = False
 
             
-    @api.onchange ( 'price1','price2','price3' )
-    @api.depends ( 'price1','price2','price3' )
-    def compute_taxed_price(self) :
-        for rec in self :
-           rec.tax1=rec.price1*0.15
-           rec.tax2=rec.price2*0.15
-           rec.tax3=rec.price3*0.15
-           rec.taxed_price1=rec.price1*1.15
-           rec.taxed_price2=rec.price2*1.15
-           rec.taxed_price3=rec.price3*1.15 
+    #@api.onchange ( 'price1','price2','price3' )
+    #@api.depends ( 'price1','price2','price3' )
+    #def compute_taxed_price(self) :
+        #for rec in self :
+          # rec.tax1=rec.price1*0.15
+          # rec.tax2=rec.price2*0.15
+          # rec.tax3=rec.price3*0.15
+          # rec.taxed_price1=rec.price1*1.15
+          # rec.taxed_price2=rec.price2*1.15
+          # rec.taxed_price3=rec.price3*1.15 
             
     @api.onchange ( 'journal_entry_data' )
     @api.depends ( 'journal_entry_data' )
