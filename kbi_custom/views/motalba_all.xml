@@ -105,14 +105,14 @@
                           
                      
                          
-                        <tr>
+                        <tr >
                             
-                            <td style="height: 50px;"></td>
+                         
                           <td style="height: 220px;">
     <img t-att-src="'data:image/png;base64,%s' % (bill.sign_qrcode or '')" style="max-height:200px; max-width:180px;"/>
 </td>
 
-                            <td style="height: 50px;"></td>
+                            
                         </tr>      
               
                         <!--tr><h2 style="text-align: center;"><span t-field="bill.amount_total"/></h2></tr-->
