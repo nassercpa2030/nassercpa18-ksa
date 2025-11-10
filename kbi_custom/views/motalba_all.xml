@@ -80,8 +80,8 @@
                     <hr/>
 
                     <!-- كتعة التوقيعات -->
-                    <table style="width: 100%; text-align: center;">
-                          <thead style="background-color: #f0f0f0;">
+                    <table style="width: 100%; text-align: center; background-color: #f0f0f0;">
+                          
                         <tr>
                            <td style="width: 33%;"><strong>إجمالي المطلوب</strong></td>
                             <td style="width: 33%;"><strong></strong></td>
@@ -90,7 +90,7 @@
                                        <strong> <span t-field="bill.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: bill.currency_id}"/></strong>
                                     </td>
                         </tr>
-                          </thead>
+                         
                         <tr>
                             
                             <td style="height: 50px;"</td>
