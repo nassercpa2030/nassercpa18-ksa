@@ -62,12 +62,12 @@
                             <!-- المرور على جميع الفواتير -->
                             <t t-foreach="docs" t-as="bill">
                                 <tr>
-                                    <td style="padding: 8px;"> <h4> <span t-field="bill.project_name"/></h4></td>
-                                    <td style="padding: 8px;"><h4><span t-field="bill.amount_untaxed"/></h4></td>
+                                    <td style="padding: 8px;"> <h5> <span t-field="bill.project_name"/></h5></td>
+                                    <td style="padding: 8px;"><h5><span t-field="bill.amount_untaxed"/></h5></td>
                                  
-                                    <td style="padding: 7px; text-align: center;"><h4><span t-field="bill.amount_tax"/>   <b>SR</b></h4></td>
+                                    <td style="padding: 7px; text-align: center;"><h5><span t-field="bill.amount_tax"/>   <b>SR</b></h5></td>
 
-                                    <td style="padding: 10px; text-align: center;"><h4><span t-field="bill.amount_total"/></h4></td>
+                                    <td style="padding: 10px; text-align: center;"><h5><span t-field="bill.amount_total"/></h5></td>
                                    
                                   
                                 </tr>
