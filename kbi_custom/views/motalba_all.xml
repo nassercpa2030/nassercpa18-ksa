@@ -101,7 +101,7 @@
                         <!--tr><h2 style="text-align: center;"><span t-field="bill.amount_total"/></h2></tr-->
                     </table>
                     <hr/>
-                                <table style="width: 100%; text-align: center; >
+                                <table style="width: 100%; text-align: center;" >
                           
                      
                          
