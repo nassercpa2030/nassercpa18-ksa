@@ -108,8 +108,8 @@
                         <tr>
                             
                             <td style="height: 50px;"></td>
-                          <td style="height: 100px;">
-    <img t-att-src="'data:image/png;base64,%s' % (bill.sign_qrcode or '')" style="max-height:100px; max-width:100px;"/>
+                          <td style="height: 220px;">
+    <img t-att-src="'data:image/png;base64,%s' % (bill.sign_qrcode or '')" style="max-height:200px; max-width:180px;"/>
 </td>
 
                             <td style="height: 50px;"></td>
