@@ -108,7 +108,10 @@
                         <tr>
                             
                             <td style="height: 50px;"></td>
-                            <td style="height: 100px;"><span t-field="bill.sign_qrcode"/></td>
+                          <td style="height: 100px;">
+    <img t-att-src="'data:image/png;base64,%s' % (bill.sign_qrcode or '')" style="max-height:100px; max-width:100px;"/>
+</td>
+
                             <td style="height: 50px;"></td>
                         </tr>      
               
