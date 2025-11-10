@@ -27,7 +27,7 @@
 
                     <!-- معلومات المورد (سنفترض أن كل الفواتير المحددة لنفس المورد) -->
                         <div style=" direction: rtl;">
-                            <p style=" text-align:right; font-size:10px;">
+                            <p style=" text-align:right; ">
                         التاريخ: 
                         <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d ')"/>
                     </p>
@@ -48,11 +48,11 @@
                      <table class="table table-bordered" style="width: 100%; direction: rtl; font-size: 10px;">
                         <thead style="background-color: #f0f0f0;">
                             <tr>
-                                <th style="padding: 8px; text-align: center;"><h2> الوصف </h2></th>
-                                <th style="padding: 8px; text-align: center;"><h2> القيمة قبل الضريبة</h2> </th>
-                                <th style="padding: 8px; text-align: center;"><h2>الضريبة </h2></th>
-                                <th style="padding: 8px; text-align: center;"><h2>القيمة بعد  الضريبة</h2> </th>
-&gt;
+                                <th style="padding: 8px; text-align: center;"><h4> الوصف </h4></th>
+                                <th style="padding: 8px; text-align: center;"><h4> القيمة قبل الضريبة</h4> </th>
+                                <th style="padding: 8px; text-align: center;"><h4>الضريبة </h4></th>
+                                <th style="padding: 8px; text-align: center;"><h4>القيمة بعد  الضريبة</h4> </th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -62,20 +62,16 @@
                             <!-- المرور على جميع الفواتير -->
                             <t t-foreach="docs" t-as="bill">
                                 <tr>
-                                    <td style="padding: 8px;">  <span t-field="bill.project_name"/></td>
+                                    <td style="padding: 8px;"> <h4> <span t-field="bill.project_name"/></td>
                                     <td style="padding: 8px;"><span t-field="bill.amount_untaxed"/></td>
                                  
-                                    <td style="padding: 7px; text-align: center;"><span t-field="bill.amount_tax"/>   <b>%</b></td>
+                                    <td style="padding: 7px; text-align: center;"><span t-field="bill.amount_tax"/>   <b>SR</b></td>
 
                                     <td style="padding: 10px; text-align: center;"><span t-field="bill.amount_total"/></td>
                                    
                                   
                                 </tr>
-                                <tr>
-                                     <td style="padding: 8px; text-align: left;">
-                                        <span t-field="bill.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: bill.currency_id}"/>
-                                    </td>
-                                </tr>
+                             
                             </t>
 
                         </tbody>
@@ -85,18 +81,24 @@
 
                     <!-- كتعة التوقيعات -->
                     <table style="width: 100%; text-align: center;">
+                          <thead style="background-color: #f0f0f0;">
                         <tr>
-                            <td style="width: 33%;"><strong>إعداد</strong></td>
-                            <td style="width: 33%;"><strong>مراجعة</strong></td>
-                            <td style="width: 33%;"><strong>إعتماد</strong></td>
+                           <td style="width: 33%;"><strong>إجمالي المطلوب</strong></td>
+                            <td style="width: 33%;"><strong></strong></td>
+                            <!--td style="width: 33%;"><strong></strong></td-->
+                            <td style="padding: 8px; text-align: left;">
+                                       <strong> <span t-field="bill.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: bill.currency_id}"/></strong>
+                                    </td>
                         </tr>
+                          </thead>
                         <tr>
-                            <td style="height: 50px;">.........</td>
-                            <td style="height: 50px;">.........</td>
-                            <td style="height: 50px;">.........</td>
+                            
+                            <td style="height: 50px;"</td>
+                            <td style="height: 50px;">.</td>
+                            <td style="height: 50px;"></td>
                         </tr>      
-                    <hr/>
-                        <tr><h2 style="text-align: center;"><span t-field="bill.amount_total"/></h2></tr>
+              
+                        <!--tr><h2 style="text-align: center;"><span t-field="bill.amount_total"/></h2></tr-->
                     </table>
 
                 </div>
