@@ -100,6 +100,20 @@
               
                         <!--tr><h2 style="text-align: center;"><span t-field="bill.amount_total"/></h2></tr-->
                     </table>
+                    <hr/>
+                                <table style="width: 100%; text-align: center; >
+                          
+                     
+                         
+                        <tr>
+                            
+                            <td style="height: 50px;"></td>
+                            <td style="height: 100px;"><span t-field="bill.sign_qrcode"/></td>
+                            <td style="height: 50px;"></td>
+                        </tr>      
+              
+                        <!--tr><h2 style="text-align: center;"><span t-field="bill.amount_total"/></h2></tr-->
+                    </table>
 
                 </div>
             </t>
