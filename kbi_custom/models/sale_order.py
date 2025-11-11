@@ -775,13 +775,8 @@ class SaleOrder ( models.Model ) :
                     self.broker_amount = (self.amount_untaxed * broker_ids[0].value) / 100
         else :
             self.broker_amount = 0
-            
-     def _compute_broker_invoiced_amount(self) :
-        for rec in self :
-            moves = self.env['account.move'].search ( [('broker_sale_id' , '=' , rec.id),('state' , '=' , 'posted')] )
-            rec.broker_invoiced_amount = sum ( moves.mapped ( 'amount_untaxed' ) )
-            rec.broker_uninvoiced_amount = rec.broker_amount - rec.broker_invoiced_amount
-        
+
+
     def action_open_broker_bill(self) :
         self.ensure_one ()
 
@@ -837,6 +832,13 @@ class SaleOrder ( models.Model ) :
             'target' : 'current' ,
         }
 
+    def _compute_broker_invoiced_amount(self) :
+          for rec in self:
+            moves = self.env['account.move'].search ( [('broker_sale_id' , '=' , rec.id)] )
+            rec.broker_invoiced_amount = sum ( moves.mapped ( 'amount_untaxed' ) )
+            rec.broker_uninvoiced_amount = rec.broker_amount - rec.broker_invoiced_amount
+
+        
     def action_update_and_open_projects(self) :
         for record in self :
             # البحث عن المشاريع المرتبطة
