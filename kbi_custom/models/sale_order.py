@@ -112,7 +112,7 @@ class SaleOrder ( models.Model ) :
     # cr_number_sale =fields.Char(related='partner_id.cr_number_sale',string="Customer CR Number",readonly=False,store=True)
     cr_number_sale = fields.Char ( string="Customer CR Number" , readonly=False , store=True )
     broker_amount = fields.Float ( string='Broker Amount' , tracking=True )
-    broker_invoiced_amount = fields.Float ( string='فيمة فاتورة المسوق' , compute="_compute_broker_invoiced_amount",searchable=True )
+    broker_invoiced_amount = fields.Float ( string='قيمة إستحقاق فاتورة المسوق' , compute="_compute_broker_invoiced_amount",searchable=True )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
                                               compute="_compute_broker_invoiced_amount",searchable=True )
     broker_invoice_payment_state = fields.Selection([('not_paid', 'غيرمدفوع'),('partial', 'مدفوع جزئي'),('paid', 'مدفوع كلي'),('blocked', 'محظور'),('reversed', 'مرتجع'),('in_payment', 'للدفع'),
