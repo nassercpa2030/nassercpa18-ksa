@@ -115,7 +115,7 @@ class SaleOrder ( models.Model ) :
     broker_invoiced_amount = fields.Float ( string='فيمة فاتورة المسوق' , compute="_compute_broker_invoiced_amount",searchable=True )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
                                               compute="_compute_broker_invoiced_amount",searchable=True )
-    broker_invoice_payment_state = fields.Char(string='حالة دفع فاتورة المسوق',compute="_compute_broker_invoiced_amount",store=True,searchable=True,)
+    broker_invoice_payment_state = fields.Selection([('not_paid', 'غيرمدفوع'),('partial', 'مدفوع جزئي'),('paid', 'مدفوع كلي'),('blocked', 'محظور'),('reversed', 'مرتجع'),('in_payment', 'للدفع'),('invoicing_legacy', 'Invoicing App Legacy'],string='حالة دفع فاتورة المسوق',compute="_compute_broker_invoiced_amount",store=True,searchable=True,)
     first_payment_id = fields.Many2one ( 'account.payment' , string="First Payment" ,
                                          compute="_compute_first_payment_id" )
     first_payment_code = fields.Char ( string="First Payment Code" , compute="_compute_payment_count" )
@@ -775,25 +775,30 @@ class SaleOrder ( models.Model ) :
         else :
             self.broker_amount = 0
 
+   def _compute_broker_invoiced_amount(self) :
+    for rec in self :
+        moves = self.env['account.move'].search ( [('broker_sale_id' , '=' , rec.id) , ('state' , '=' , 'posted')] )
+        if moves :
+            payment_states = moves.mapped ( 'payment_state' )
+            # تحديد الحالة العامة بناءً على الفواتير
+            if all ( state == 'paid' for state in payment_states ) :
+                rec.broker_invoice_payment_state = 'paid'
+            elif any ( state == 'in_payment' for state in payment_states ) :
+                rec.broker_invoice_payment_state = 'in_payment'
+            elif any ( state == 'partial' for state in payment_states ) :
+                rec.broker_invoice_payment_state = 'partial'
+            elif all ( state == 'not_paid' for state in payment_states ) :
+                rec.broker_invoice_payment_state = 'not_paid'
+            else :
+                rec.broker_invoice_payment_state = 'partial'
 
-
-    def _compute_broker_invoiced_amount(self) :
-        for rec in self :
-            moves = self.env['account.move'].search ([('broker_sale_id' , '=' , rec.id),('state','not in', ['draft', 'cancel'])])
-            if moves:
-               #rec.broker_invoice_payment_state= moves.payment_state
-               rec.broker_invoice_payment_state = moves.mapped('payment_state')
-               states = moves.mapped('payment_state')
-
-               if all(state == 'paid' for state in states):
-                  broker_state = 'Paid'
-               elif all(state == 'partial' for state in states):
-                  broker_state = 'Partialy_paid' 
-               else:
-                  broker_state = 'Not_Paid' 
-               rec.broker_invoiced_amount = sum ( moves.mapped ( 'amount_untaxed' ) )
-               rec.broker_uninvoiced_amount = rec.broker_amount - rec.broker_invoiced_amount
-               rec.broker_invoice_payment_state = broker_state 
+            rec.broker_invoiced_amount = sum ( moves.mapped ( 'amount_untaxed' ) )
+            rec.broker_uninvoiced_amount = rec.broker_amount - rec.broker_invoiced_amount
+        else :
+           rec.broker_invoice_payment_state = 'not_paid'
+           rec.broker_invoiced_amount = 0.0
+           rec.broker_uninvoiced_amount = rec.broker_amount
+             
         
     def action_open_broker_bill(self) :
         self.ensure_one ()
