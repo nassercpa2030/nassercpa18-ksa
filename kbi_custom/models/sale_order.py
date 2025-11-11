@@ -835,7 +835,7 @@ class SaleOrder ( models.Model ) :
     def _compute_broker_invoiced_amount(self) :
           for rec in self:
             moves = self.env['account.move'].search ( [('broker_sale_id' , '=' , rec.id)] )
-              if moves :
+            if moves :
                  rec.broker_invoiced_amount = sum ( moves.mapped ( 'amount_untaxed' ) )
                  rec.broker_uninvoiced_amount = rec.broker_amount - rec.broker_invoiced_amount
                  payment_states = moves.mapped ( 'payment_state' )
