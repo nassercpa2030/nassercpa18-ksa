@@ -656,9 +656,9 @@ class SaleOrder ( models.Model ) :
     approve_date = fields.Datetime ( string='Approve Date' )
     reject_reason = fields.Text ( string='Reject Reason' )
     # broker_id = fields.Many2one(comodel_name='res.partner', string='Broker', domain="[('is_broker', '=', True)]")
-    broker_amount = fields.Float ( string='Broker Amount' , tracking=True )
-    broker_invoiced_amount = fields.Float ( string='Broker Paid Amount' , compute="_compute_broker_invoiced_amount" )
-    broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
+   # broker_amount = fields.Float ( string='Broker Amount' , tracking=True )
+   # broker_invoiced_amount = fields.Float ( string='Broker Paid Amount' , compute="_compute_broker_invoiced_amount" )
+   # broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
                                               compute="_compute_broker_invoiced_amount" )
     # first_payment_id = fields.Many2one ( string='First Payment' , compute='_compute_first_payment_id' )
     # first_payment_id = fields.Many2one ( comodel_name='account.payment' , string='First Payment' ,
