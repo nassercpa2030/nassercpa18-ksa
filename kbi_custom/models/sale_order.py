@@ -112,9 +112,10 @@ class SaleOrder ( models.Model ) :
     # cr_number_sale =fields.Char(related='partner_id.cr_number_sale',string="Customer CR Number",readonly=False,store=True)
     cr_number_sale = fields.Char ( string="Customer CR Number" , readonly=False , store=True )
     broker_amount = fields.Float ( string='Broker Amount' , tracking=True )
-    broker_invoiced_amount = fields.Float ( string='Broker Paid Amount' , compute="_compute_broker_invoiced_amount" )
+    broker_invoiced_amount = fields.Float ( string='فيمة فاتورة المسوق' , compute="_compute_broker_invoiced_amount",searchable=True )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
-                                              compute="_compute_broker_invoiced_amount" )
+                                              compute="_compute_broker_invoiced_amount",searchable=True )
+    broker_invoice_payment_state=fields.Char(string='حالة دفع فاتورة المسوق',searchable=True,compute="_compute_broker_invoiced_amount",store=True)
     first_payment_id = fields.Many2one ( 'account.payment' , string="First Payment" ,
                                          compute="_compute_first_payment_id" )
     first_payment_code = fields.Char ( string="First Payment Code" , compute="_compute_payment_count" )
@@ -778,7 +779,8 @@ class SaleOrder ( models.Model ) :
 
     def _compute_broker_invoiced_amount(self) :
         for rec in self :
-            moves = self.env['account.move'].search ( [('broker_sale_id' , '=' , rec.id)] )
+            moves = self.env['account.move'].search ([('broker_sale_id' , '=' , rec.id),('state','not in', ['draft', 'cancel'])])
+            rec.broker_invoice_payment_state= moves.payment_state
             rec.broker_invoiced_amount = sum ( moves.mapped ( 'amount_untaxed' ) )
             rec.broker_uninvoiced_amount = rec.broker_amount - rec.broker_invoiced_amount
 
