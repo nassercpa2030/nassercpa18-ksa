@@ -782,7 +782,7 @@ class SaleOrder ( models.Model ) :
             moves = self.env['account.move'].search ([('broker_sale_id' , '=' , rec.id),('state','not in', ['draft', 'cancel'])])
             if moves:
                #rec.broker_invoice_payment_state= moves.payment_state
-               rec.broker_invoice_payment_state = moves[0].payment_state
+               rec.broker_invoice_payment_state = moves.mapped('payment_state')
                rec.broker_invoiced_amount = sum ( moves.mapped ( 'amount_untaxed' ) )
                rec.broker_uninvoiced_amount = rec.broker_amount - rec.broker_invoiced_amount
             else:
