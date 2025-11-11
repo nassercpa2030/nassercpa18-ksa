@@ -835,9 +835,23 @@ class SaleOrder ( models.Model ) :
     def _compute_broker_invoiced_amount(self) :
           for rec in self:
             moves = self.env['account.move'].search ( [('broker_sale_id' , '=' , rec.id)] )
-            rec.broker_invoiced_amount = sum ( moves.mapped ( 'amount_untaxed' ) )
-            rec.broker_uninvoiced_amount = rec.broker_amount - rec.broker_invoiced_amount
-
+              if moves :
+                  rec.broker_invoiced_amount = sum ( moves.mapped ( 'amount_untaxed' ) )
+                  rec.broker_uninvoiced_amount = rec.broker_amount - rec.broker_invoiced_amount
+                  payment_states = moves.mapped ( 'payment_state' )
+                  if all ( state == 'paid' for state in payment_states ) :
+                         rec.broker_invoice_payment_state = 'paid'
+                  elif all ( state == 'not_paid' for state in payment_states ) :
+                         rec.broker_invoice_payment_state = 'not_paid'
+                  elif any ( state == 'in_payment' for state in payment_states ) :
+                         rec.broker_invoice_payment_state = 'in_payment'
+                  else :
+                         rec.broker_invoice_payment_state = 'partial'
+                 
+               else :
+                    rec.broker_invoice_payment_state = 'not_paid'
+                    rec.broker_invoiced_amount = 0.0
+                    rec.broker_uninvoiced_amount = rec.broker_amount or 0.0
         
     def action_update_and_open_projects(self) :
         for record in self :
