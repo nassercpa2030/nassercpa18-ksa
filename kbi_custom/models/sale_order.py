@@ -777,30 +777,30 @@ class SaleOrder ( models.Model ) :
             self.broker_amount = 0
 
 
+   @api.depends('broker_id') 
    def _compute_broker_invoiced_amount(self):
-    for rec in self:
-        moves = self.env['account.move'].search([
-            ('broker_sale_id', '=', rec.id),
-            ('state', '=', 'posted')
-        ])
-        if moves:
-            payment_states = moves.mapped('payment_state')
-            # تحديد الحالة العامة بناءً على الفواتير
-            if all(state == 'paid' for state in payment_states):
-                rec.broker_invoice_payment_state = 'paid'
-            elif all(state == 'not_paid' for state in payment_states):
-                rec.broker_invoice_payment_state = 'not_paid'
-            elif any(state == 'in_payment' for state in payment_states):
-                rec.broker_invoice_payment_state = 'in_payment'
-            else:
-                rec.broker_invoice_payment_state = 'partial'
+      for rec in self:
+          moves = self.env['account.move'].search([
+              ('broker_sale_id', '=', rec.id),
+              ('state', '=', 'posted')
+             ])
+           if moves:
+                 payment_states = moves.mapped('payment_state')
+                 if all(state == 'paid' for state in payment_states):
+                     rec.broker_invoice_payment_state = 'paid'
+                 elif all(state == 'not_paid' for state in payment_states):
+                     rec.broker_invoice_payment_state = 'not_paid'
+                 elif any(state == 'in_payment' for state in payment_states):
+                     rec.broker_invoice_payment_state = 'in_payment'
+                 else:
+                     rec.broker_invoice_payment_state = 'partial'
 
-            rec.broker_invoiced_amount = sum(moves.mapped('amount_untaxed')) or 0.0
-            rec.broker_uninvoiced_amount = (rec.broker_amount or 0.0) - rec.broker_invoiced_amount
-        else:
-            rec.broker_invoice_payment_state = 'not_paid'
-            rec.broker_invoiced_amount = 0.0
-            rec.broker_uninvoiced_amount = rec.broker_amount or 0.0
+                rec.broker_invoiced_amount = sum(moves.mapped('amount_untaxed')) or 0.0
+                rec.broker_uninvoiced_amount = (rec.broker_amount or 0.0) - rec.broker_invoiced_amount
+          else:
+               rec.broker_invoice_payment_state = 'not_paid'
+               rec.broker_invoiced_amount = 0.0
+               rec.broker_uninvoiced_amount = rec.broker_amount or 0.0
 
              
         
