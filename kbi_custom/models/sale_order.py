@@ -847,6 +847,10 @@ class SaleOrder ( models.Model ) :
                    rec.broker_invoice_payment_state = 'in_payment'
                  else :
                    rec.broker_invoice_payment_state = 'partial'
+            else:
+               rec.broker_invoiced_amount = 0
+               rec.broker_uninvoiced_amount = rec.broker_amount
+               rec.broker_invoice_payment_state = 'not_paid'
                      
         
     def action_update_and_open_projects(self) :
