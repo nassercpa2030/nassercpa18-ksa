@@ -783,12 +783,18 @@ class SaleOrder ( models.Model ) :
             if moves:
                #rec.broker_invoice_payment_state= moves.payment_state
                rec.broker_invoice_payment_state = moves.mapped('payment_state')
+               states = moves.mapped('payment_state')
+
+               if all(state == 'paid' for state in states):
+                  broker_state = 'Paid'
+               elif all(state == 'partial' for state in states):
+                  broker_state = 'Partialy_paid' 
+               else:
+                  broker_state = 'Not_Paid' 
                rec.broker_invoiced_amount = sum ( moves.mapped ( 'amount_untaxed' ) )
                rec.broker_uninvoiced_amount = rec.broker_amount - rec.broker_invoiced_amount
-            else:
-              rec.broker_invoice_payment_state = False 
-                
-
+               rec.broker_invoice_payment_state = broker_state 
+        
     def action_open_broker_bill(self) :
         self.ensure_one ()
 
