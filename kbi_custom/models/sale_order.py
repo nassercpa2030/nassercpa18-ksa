@@ -115,7 +115,7 @@ class SaleOrder ( models.Model ) :
     broker_invoiced_amount = fields.Float ( string='فيمة فاتورة المسوق' , compute="_compute_broker_invoiced_amount",searchable=True )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
                                               compute="_compute_broker_invoiced_amount",searchable=True )
-    broker_invoice_payment_state=fields.Char(string='حالة دفع فاتورة المسوق',searchable=True,compute="_compute_broker_invoiced_amount",store=True)
+    broker_invoice_payment_state = fields.Char(string='حالة دفع فاتورة المسوق',compute="_compute_broker_invoiced_amount",store=True,searchable=True,)
     first_payment_id = fields.Many2one ( 'account.payment' , string="First Payment" ,
                                          compute="_compute_first_payment_id" )
     first_payment_code = fields.Char ( string="First Payment Code" , compute="_compute_payment_count" )
