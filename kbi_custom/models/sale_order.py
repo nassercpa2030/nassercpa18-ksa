@@ -831,6 +831,7 @@ class SaleOrder ( models.Model ) :
             'view_mode' : 'list,form',
             'res_model' : 'account.move' ,
             'res_id' : invoice.id ,
+            'domain': [('broker_sale_id', '=', self.id), ('sale_order_id_finance' , '=' , self.id) ,('journal_id','=',163)],
             'target' : 'current' ,
         }
 
