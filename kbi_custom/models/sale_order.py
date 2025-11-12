@@ -785,8 +785,8 @@ class SaleOrder ( models.Model ) :
         product = settings.broker_comm_product_id
         journal = settings.broker_comm_journal_id
 
-        if not product :
-            raise ValidationError ( 'No broker commission product found' )
+        #if not product :
+          #  raise ValidationError ( 'No broker commission product found' )
         if not journal :
             raise ValidationError ( 'No broker commission journal found' )
 
@@ -826,7 +826,7 @@ class SaleOrder ( models.Model ) :
         return {
             'type' : 'ir.actions.act_window' ,
             'name' : 'Broker Bill' ,
-            'view_mode' : 'form' ,
+            'view_mode' : 'form' ,'list'
             'res_model' : 'account.move' ,
             'res_id' : invoice.id ,
             'target' : 'current' ,
