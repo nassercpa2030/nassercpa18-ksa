@@ -826,7 +826,7 @@ class SaleOrder ( models.Model ) :
         return {
             'type' : 'ir.actions.act_window' ,
             'name' : 'Broker Bill' ,
-            'view_mode' : 'form,list',
+            'view_mode' : 'list,form',
             'res_model' : 'account.move' ,
             'res_id' : invoice.id ,
             'target' : 'current' ,
