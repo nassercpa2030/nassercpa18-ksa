@@ -787,15 +787,16 @@ class SaleOrder ( models.Model ) :
 
         #if not product :
           #  raise ValidationError ( 'No broker commission product found' )
-        if not journal :
-            raise ValidationError ( 'No broker commission journal found' )
+        #if not journal :
+          #  raise ValidationError ( 'No broker commission journal found' )
 
         # التحقق إذا كانت هناك فاتورة وسيط موجودة بالفعل
         existing_invoice = self.env['account.move'].search ( [
-            ('broker_sale_id' , '=' , self.id) ,
-            ('is_broker_move' , '=' , True),
+            ('sale_order_id_finance' , '=' , self.id) ,
+            #('is_broker_move' , '=' , True),
             ('journal_id','=',163),
         ] , limit=1 )
+        
         payment_ref = f"{self.name or ''} - مكافأة تسويق عن - {self.partner_id.name or ''}"
 
         if existing_invoice :
