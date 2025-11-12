@@ -793,7 +793,8 @@ class SaleOrder ( models.Model ) :
         # التحقق إذا كانت هناك فاتورة وسيط موجودة بالفعل
         existing_invoice = self.env['account.move'].search ( [
             ('broker_sale_id' , '=' , self.id) ,
-            ('is_broker_move' , '=' , True)
+            ('is_broker_move' , '=' , True),
+            ('journal_id',163),
         ] , limit=1 )
         payment_ref = f"{self.name or ''} - مكافأة تسويق عن - {self.partner_id.name or ''}"
 
