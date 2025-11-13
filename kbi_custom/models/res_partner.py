@@ -36,7 +36,15 @@ class ResPartner ( models.Model ) :
                                                     string='Account Payable' ,
                                                     default=lambda self : self.env['account.account'].search (
                                                         [('code' , '=' , '21011001')] , limit=1 ).id )
+    attachment_ids= fields.Many2many('ir.attachment',string='Attachments',compute='_compute_attachments',store=False)
     fax_number = fields.Char ( string='FAX' , readonly=False , required=False )
+
+    def _compute_attachments(self):
+        for rec in self:
+            rec.attachment_ids = self.env['ir.attachment'].search([
+                ('res_model', '=', 'res.partner'),
+                ('res_id', '=', rec.id)
+            ])
 
     @api.constrains ( 'number_700' )
     def _check700_number(self) :
