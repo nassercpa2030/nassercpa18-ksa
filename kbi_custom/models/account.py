@@ -11,6 +11,7 @@ class AccountMove ( models.Model ) :
     sale_order_test = fields.Char ( string='Sale Order Test' , readonly=False , required=False )
     x_studio_auto_code=  fields.Char(string="order name")
     sale_order_id_finance = fields.Many2one ( 'sale.order' , string='أمر البيع' , compute='_compute_sale_order_id' ,readonly=False )
+    vendor_attachment= fields.Binary('string='Attachments',compute='compute_vendor_attachements',store=True)
     invoice_count_odoo16 = fields.Integer ( string="" , store=True )
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
     analytic_acc_desc = fields.Char (
@@ -27,6 +28,15 @@ class AccountMove ( models.Model ) :
         if autopost_bills_wizard := self._show_autopost_bills_wizard () :
             return autopost_bills_wizard
         return True
+        
+    @api.depends ( 'partner_id' )    
+    def compute_vendor_attachements(self):
+        for rec in self:
+            if rec.partner_id.attachment_ids:
+               rec.vendor_attachment = rec.partner_id.attachment_ids[0].datas
+            else:
+               rec.vendor_attachment = False
+             
 
     @api.depends ( 'invoice_origin' )
     def _compute_sale_order_id(self) :
