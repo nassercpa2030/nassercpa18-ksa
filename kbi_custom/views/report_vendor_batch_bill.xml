@@ -26,34 +26,35 @@
                    <p style="text-align: center;">
                  <span>***********************************************</span>
                  </p>
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; direction: rtl; width: 100%;">
+             
+<table style="width:100%; direction: rtl; border-collapse: collapse;">
+    <tr>
+        <!-- العمود الأول: النصوص -->
+        <td style="width:70%; vertical-align: top; text-align: right; padding: 5px;">
+            <p style="font-size:10px; margin: 3px 0;">
+                التاريخ:
+                <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"/>
+            </p>
+            <p style="margin: 3px 0;">
+                المسوق: <span t-field="docs[0].partner_id.name"/>
+            </p>
+            <p style="margin: 3px 0;">
+                مدير المجموعة: <span t-field="docs[0].sale_order_id_finance.user_id.name"/>
+            </p>
+            <p style="margin: 3px 0;">
+                مجموعة: <span t-field="docs[0].sale_order_id_finance.team_id.name"/>
+            </p>
+        </td>
 
-    <!-- القسم الأيمن: معلومات المسوق ومدير المجموعة -->
-    <div style="width: 65%; text-align: right;">
-        <p style="font-size:10px; margin: 3px 0;">
-            التاريخ:
-            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"/>
-        </p>
-        <p style="margin: 3px 0;">
-            المسوق: <span t-field="docs[0].partner_id.name"/>
-        </p>
-        <p style="margin: 3px 0;">
-            مدير المجموعة: <span t-field="docs[0].sale_order_id_finance.user_id.name"/>
-        </p>
-        <p style="margin: 3px 0;">
-            مجموعة: <span t-field="docs[0].sale_order_id_finance.team_id.name"/>
-        </p>
-    </div>
-
-    <!-- القسم الأيسر: الصورة -->
-    <div style="width: 30%; text-align: left;">
-        <t t-if="docs[0].vendor_attachment">
-            <img t-att-src="'data:image/png;base64,%s' % (docs[0].vendor_attachment.decode() if isinstance(docs[0].vendor_attachment, bytes) else docs[0].vendor_attachment)"
-                 style="width: 100%; max-width: 150px; max-height: 150px; border: 2px solid #000;"/>
-        </t>
-    </div>
-
-</div>
+        <!-- العمود الثاني: الصورة -->
+        <td style="width:30%; vertical-align: top; text-align: left; padding: 5px;">
+            <t t-if="docs[0].vendor_attachment">
+                <img t-att-src="'data:image/png;base64,%s' % (docs[0].vendor_attachment.decode() if isinstance(docs[0].vendor_attachment, bytes) else docs[0].vendor_attachment)"
+                     style="max-width:150px; max-height:150px; border:2px solid #000;"/>
+            </t>
+        </td>
+    </tr>
+</table>
 
                     <hr/>
 
