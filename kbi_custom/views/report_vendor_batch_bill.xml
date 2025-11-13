@@ -44,9 +44,10 @@
                         </p>
                     </div>
                         <div>
-        <img t-if="docs[0].vendor_attachment"
-             t-att-src="'data:image/png;base64,%s' % docs[0].vendor_attachment"
-             style="max-width:200px; max-height:200px; border:2px solid black;"/>
+    <img t-att-src="'data:image/png;base64,%s' % (docs[0].vendor_attachment.decode() if isinstance(docs[0].vendor_attachment, bytes) else docs[0].vendor_attachment)"
+         style="max-width:200px; max-height:200px; border:2px solid black;"/>
+</t>
+
     </div>
 </div>
                     <hr/>
