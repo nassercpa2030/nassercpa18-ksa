@@ -26,31 +26,35 @@
                    <p style="text-align: center;">
                  <span>***********************************************</span>
                  </p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; direction: rtl;">
-                    <!-- معلومات المسوق ومدير المجموعة -->
-                    <div style="margin-bottom: 15px; direction: rtl; flex: 1; padding: 10px; ">
-                            <p style="padding: 8px; text-align:right; font-size:10px;">
-                        التاريخ: 
-                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d ')"/>
-                    </p>
-                        <p style="padding: 8px; text-align:right;">
-                            المسوق: <span t-field="docs[0].partner_id.name"/>
-                        </p>
-                        <p style="padding: 8px; text-align:right;">
-                            مدير المجموعة: <span t-field="docs[0].sale_order_id_finance.user_id.name"/>
-                        </p>
-                           <p style="padding: 8px; text-align:right;">
-                         مجموعة: <span t-field="docs[0].sale_order_id_finance.team_id.name"/>
-                        </p>
-                    </div>
-                        <div style="flex: 0 0 auto; padding: 10px; text-align: left;">
-                            <t t-if="docs[0].vendor_attachment">
-    <img t-att-src="'data:image/png;base64,%s' % (docs[0].vendor_attachment.decode() if isinstance(docs[0].vendor_attachment, bytes) else docs[0].vendor_attachment)"
-         style="max-width:200px; max-height:200px; border:2px solid black;"/>
-</t>
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; direction: rtl; width: 100%;">
 
+    <!-- القسم الأيمن: معلومات المسوق ومدير المجموعة -->
+    <div style="width: 65%; text-align: right;">
+        <p style="font-size:10px; margin: 3px 0;">
+            التاريخ:
+            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"/>
+        </p>
+        <p style="margin: 3px 0;">
+            المسوق: <span t-field="docs[0].partner_id.name"/>
+        </p>
+        <p style="margin: 3px 0;">
+            مدير المجموعة: <span t-field="docs[0].sale_order_id_finance.user_id.name"/>
+        </p>
+        <p style="margin: 3px 0;">
+            مجموعة: <span t-field="docs[0].sale_order_id_finance.team_id.name"/>
+        </p>
     </div>
+
+    <!-- القسم الأيسر: الصورة -->
+    <div style="width: 30%; text-align: left;">
+        <t t-if="docs[0].vendor_attachment">
+            <img t-att-src="'data:image/png;base64,%s' % (docs[0].vendor_attachment.decode() if isinstance(docs[0].vendor_attachment, bytes) else docs[0].vendor_attachment)"
+                 style="width: 100%; max-width: 150px; max-height: 150px; border: 2px solid #000;"/>
+        </t>
+    </div>
+
 </div>
+
                     <hr/>
 
                     <!-- الجدول الذي سيحتوي على البيانات -->
