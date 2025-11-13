@@ -6,7 +6,8 @@
        <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">kbi_custom.report__motalba_report_template</field>
-        <field name="print_report_name">'مطالبة بكامل المبلغ.pdf'</field>
+        <!--field name="print_report_name">'مطالبة بكامل المبلغ.pdf'</field-->
+        <field name="print_report_name">'مطالبة بكامل المبلغ لـ'+object.partner_id.name+'.pdf'</field>
        <field name="binding_model_id" ref="sale.model_sale_order"/>
         <field name="binding_type">report</field>
     </record>
