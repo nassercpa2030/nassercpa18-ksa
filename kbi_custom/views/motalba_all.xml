@@ -24,11 +24,7 @@
                     <h2 style="text-align: center;">مطالبة عميل </h2>
                     <hr/>
                     <!-- معلومات المورد (سنفترض أن كل الفواتير المحددة لنفس المورد) -->
-                    <div style=" direction: ltr;"> 
-                       <img t-field="docs[0].vendor_attachment" t-field-options='{"widget": "image", "preview_image": false}' 
-                              style="max-width:200px; max-height:200px; border:2px solid black;"/>
-
-                    </div>
+                  
                         <div style=" direction: rtl;">
                             <p style=" text-align:right; ">
                         التاريخ: 
