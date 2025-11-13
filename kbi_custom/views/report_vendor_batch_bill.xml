@@ -26,11 +26,7 @@
                    <p style="text-align: center;">
                  <span>***********************************************</span>
                  </p>
-                     <div style=" direction: ltr;margin-bottom: 15px;"> 
-                       <img t-field="docs[0].vendor_attachment" t-field-options='{"widget": "image", "preview_image": false}' 
-                              style="max-width:200px; max-height:200px; border:2px solid black;"/>
-
-                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; direction: rtl;">
                     <!-- معلومات المسوق ومدير المجموعة -->
                     <div style="margin-bottom: 15px; direction: rtl;">
                             <p style="padding: 8px; text-align:right; font-size:10px;">
@@ -47,6 +43,12 @@
                          مجموعة: <span t-field="docs[0].sale_order_id_finance.team_id.name"/>
                         </p>
                     </div>
+                        <div>
+        <img t-if="docs[0].vendor_attachment"
+             t-att-src="'data:image/png;base64,%s' % docs[0].vendor_attachment"
+             style="max-width:200px; max-height:200px; border:2px solid black;"/>
+    </div>
+</div>
                     <hr/>
 
                     <!-- الجدول الذي سيحتوي على البيانات -->
