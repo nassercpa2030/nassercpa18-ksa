@@ -32,8 +32,8 @@ class AccountMove ( models.Model ) :
     @api.depends ( 'partner_id' )    
     def compute_vendor_attachements(self):
         for rec in self:
-            if rec.partner_id.attachment_ids:
-               rec.vendor_attachment = rec.partner_id.attachment_ids[0].datas
+            if rec.partner_id.image_1920:
+               rec.vendor_attachment = rec.partner_id.image_1920
             else:
                rec.vendor_attachment = False
              
