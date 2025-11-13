@@ -120,7 +120,7 @@
                     </div>
                 </div>
             </t>
-        </t>
+        <!--/t-->
     </template>
 </odoo>
 
