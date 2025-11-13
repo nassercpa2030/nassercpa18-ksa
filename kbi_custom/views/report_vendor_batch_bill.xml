@@ -50,7 +50,7 @@
         <td style="width:30%; vertical-align: top; text-align: left; padding: 5px;">
             <t t-if="docs[0].vendor_attachment">
                 <img t-att-src="'data:image/png;base64,%s' % (docs[0].vendor_attachment.decode() if isinstance(docs[0].vendor_attachment, bytes) else docs[0].vendor_attachment)"
-                     style="max-width:220px;height:auto; max-height:220px; border:2px solid #000;"/>
+                     style="max-width:400px;height:auto; width:400%;max-height:220px; border:2px solid #000; image-rendering: crisp-edges"/>
             </t>
         </td>
     </tr>
