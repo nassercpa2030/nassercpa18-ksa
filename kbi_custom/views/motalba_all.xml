@@ -26,7 +26,7 @@
                     <!-- معلومات المورد (سنفترض أن كل الفواتير المحددة لنفس المورد) -->
                     <div style=" direction: ltr;"> 
                        <img t-att-src="'/web/content/%s/%s' % (docs[0].attachment_ids[0].id, docs[0].attachment_ids[0].name)"
-             style="max-width:200px; max-height:200px; border:2px solid black;/>
+             style="max-width:200px; max-height:200px; border:2px solid black;"/>
                     </div>
                         <div style=" direction: rtl;">
                             <p style=" text-align:right; ">
