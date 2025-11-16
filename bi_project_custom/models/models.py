@@ -244,7 +244,10 @@ class SaleOrder ( models.Model ) :
                 ('res_model', '=', 'account.move'),
                 ('res_id', 'in', order.invoice_ids.ids)
             ])
-            order.invoice_attachements_ids  = attachments
+            #order.invoice_attachements_ids  = attachments
+            # إذا attachments هو recordset من ir.attachment
+            order.invoice_attachements_ids = [(6, 0, attachments.ids)]
+
             
     @api.model
     def create(self, vals):
