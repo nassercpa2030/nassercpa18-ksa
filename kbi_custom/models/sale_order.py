@@ -56,8 +56,8 @@ class SaleOrder ( models.Model ) :
     archived_sale = fields.Boolean ( 'Archived' , readonly=False , required=False , default=False )
     amount_tax = fields.Float ( "Taxes" , readonly=False , required=False )
     audit_date = fields.Date ( string='Audit Date' , readonly=False , required=True , store=True )
-    close_entry_date = fields.Date ( string="Close Entry Date" , readonly=True )
-    close_entry_year = fields.Integer ( string="Close Entry Year" , readonly=False )
+    close_entry_date = fields.Date (string="Close Entry Date" ,compute="calc_close_date",store=True, readonly=True ,searchable=True)
+    close_entry_year = fields.Integer ( string="Close Entry Year" ,compute="calc_close_date",store=True, readonly=False,searchable=True )
     date = fields.Datetime ( string='Date' )
     review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Assigned To' , readonly=False ,
                                           domain=[('job_id' , '=' , 'مدير مراجعة')] )
@@ -180,6 +180,18 @@ class SaleOrder ( models.Model ) :
         compute="_compute_project_count" ,
         store=True
     )
+    
+    def calc_close_date(self):
+        for rec in self:
+            move = self.env['account.move'].search([('sale_order_id_finance', '=', rec.id)], limit=1)
+            rec.close_entry_date = move.date if move else False
+            if rec.close_entry_date:
+                rec.close_entry_year=rec.close_entry_date.year
+            else :
+                rec.close_entry_year=False
+            
+            
+            
     @api.depends('amount_untaxed', 'ass_to_percentage')
     def _compute_ass_to(self):
         for rec in self:
