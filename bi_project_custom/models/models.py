@@ -177,7 +177,7 @@ class SaleOrder ( models.Model ) :
         compute="_compute_second_line_name",
         store=True
      )
-    invoice_attachements_ids = fields.Many2many(commodel_name='ir.attachment', string='Invoice Attachments', compute='_compute_invoice_attachments',store=True)
+    invoice_attachements_ids = fields.Many2many('ir.attachment', 'sale_order_invoice_attachment_rel', 'sale_order_id', 'attachment_id',string='Invoice Attachments', compute='_compute_invoice_attachments',store=True)
     
     is_journal_state_not_posted = fields.Boolean ( compute='_compute_is_journal_state_not_posted' ,
                                                    string='Journal State' , default=True )
@@ -247,7 +247,8 @@ class SaleOrder ( models.Model ) :
             #order.invoice_attachements_ids  = attachments
             # إذا attachments هو recordset من ir.attachment
             if attachments:
-               order.sudo().invoice_attachements_ids = [(6, 0, attachments.ids)]
+               order.invoice_attachements_ids = attachments
+               #order.sudo().invoice_attachements_ids = [(6, 0, attachments.ids)]
 
             
     @api.model
