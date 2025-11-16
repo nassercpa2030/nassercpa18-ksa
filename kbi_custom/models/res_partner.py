@@ -14,6 +14,10 @@ class ResCity ( models.Model ) :
     name = fields.Char ( string='Name' , required=True )
     code = fields.Char ( string='Code' )
 
+class ResCity ( models.Model ) :
+    _inherit = 'res.users'
+
+
 
 class ResPartner ( models.Model ) :
     _inherit = 'res.partner'
