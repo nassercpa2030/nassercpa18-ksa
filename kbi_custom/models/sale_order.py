@@ -56,8 +56,10 @@ class SaleOrder ( models.Model ) :
     archived_sale = fields.Boolean ( 'Archived' , readonly=False , required=False , default=False )
     amount_tax = fields.Float ( "Taxes" , readonly=False , required=False )
     audit_date = fields.Date ( string='Audit Date' , readonly=False , required=True , store=True )
-    close_entry_date = fields.Date (string="Close Entry Date" ,compute="calc_close_date",store=True, readonly=True ,searchable=True)
-    close_entry_year = fields.Integer ( string="Close Entry Year" ,compute="calc_close_date",store=True, readonly=False,searchable=True )
+    #close_entry_date = fields.Date (string="Close Entry Date" ,compute="calc_close_date",store=True, readonly=True ,searchable=True)
+    #close_entry_year = fields.Integer ( string="Close Entry Year" ,compute="calc_close_date",store=True, readonly=False,searchable=True )
+    close_entry_date = fields.Date (string="Close Entry Date" ,store=True, readonly=False ,searchable=True)
+    close_entry_year = fields.Integer ( string="Close Entry Year" ,store=True, readonly=False,searchable=True 
     date = fields.Datetime ( string='Date' )
     review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Assigned To' , readonly=False ,
                                           domain=[('job_id' , '=' , 'مدير مراجعة')] )
@@ -187,8 +189,11 @@ class SaleOrder ( models.Model ) :
             rec.close_entry_date = move.date if move else False
             if rec.close_entry_date:
                 rec.close_entry_year=rec.close_entry_date.year
+                print('DEBUG: Sale Order ID:', rec.id, 'Move ID:', move.id, 'Move Name:', move.name)
             else :
                 rec.close_entry_year=False
+                print('DEBUG: Sale Order ID:', rec.id, 'No move found with journal 165')
+                
             
             
             
