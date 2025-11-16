@@ -246,7 +246,8 @@ class SaleOrder ( models.Model ) :
             ])
             #order.invoice_attachements_ids  = attachments
             # إذا attachments هو recordset من ir.attachment
-            order.invoice_attachements_ids = [(6, 0, attachments.ids)]
+            if attachments:
+               order.sudo().invoice_attachements_ids = [(6, 0, attachments.ids)]
 
             
     @api.model
