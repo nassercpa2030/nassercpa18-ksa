@@ -177,6 +177,7 @@ class SaleOrder ( models.Model ) :
         compute="_compute_second_line_name",
         store=True
      )
+    invoice_attachements_ids = fields.Many2many(commodel_name='ir.attachment', string='Invoice Attachments', compute='_compute_invoice_attachments',store=True)
     
     is_journal_state_not_posted = fields.Boolean ( compute='_compute_is_journal_state_not_posted' ,
                                                    string='Journal State' , default=True )
@@ -235,7 +236,34 @@ class SaleOrder ( models.Model ) :
           # rec.taxed_price1=rec.price1*1.15
           # rec.taxed_price2=rec.price2*1.15
           # rec.taxed_price3=rec.price3*1.15 
+    
+    @api.depends('invoice_ids')
+    def _compute_invoice_attachments(self):
+        for order in self:
+            attachments = self.env['ir.attachment'].search([
+                ('res_model', '=', 'account.move'),
+                ('res_id', 'in', order.invoice_ids.ids)
+            ])
+            order.invoice_attachment_ids = attachments
             
+    @api.model
+    def create(self, vals):
+        record = super().create(vals)
+        record._link_custom_attachments_to_chatter()
+        return record
+
+    def write(self, vals):
+        res = super().write(vals)
+        self._link_custom_attachments_to_chatter()
+        return res
+
+    def _link_custom_attachments_to_chatter(self):
+        for rec in self:
+            if rec.invoice_attachment_ids:
+                for attachment in rec.invoice_attachment_ids:
+                    attachment.write({'res_model': 'sale.order', 'res_id': rec.id})  
+
+    
     @api.onchange ( 'journal_entry_data' )
     @api.depends ( 'journal_entry_data' )
     def _compute_is_journal_state_not_posted(self) :
