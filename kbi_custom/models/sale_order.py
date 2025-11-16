@@ -59,7 +59,7 @@ class SaleOrder ( models.Model ) :
     #close_entry_date = fields.Date (string="Close Entry Date" ,compute="calc_close_date",store=True, readonly=True ,searchable=True)
     #close_entry_year = fields.Integer ( string="Close Entry Year" ,compute="calc_close_date",store=True, readonly=False,searchable=True )
     close_entry_date = fields.Date (string="Close Entry Date" ,store=True, readonly=False ,searchable=True)
-    close_entry_year = fields.Integer ( string="Close Entry Year" ,store=True, readonly=False,searchable=True 
+    close_entry_year = fields.Integer ( string="Close Entry Year" ,store=True, readonly=False,searchable=True )
     date = fields.Datetime ( string='Date' )
     review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Assigned To' , readonly=False ,
                                           domain=[('job_id' , '=' , 'مدير مراجعة')] )
