@@ -185,7 +185,7 @@ class SaleOrder ( models.Model ) :
     
     def calc_close_date(self):
         for rec in self:
-            move = self.env['account.move'].search([('sale_order_id_finance', '=', rec.id),('journal_id', '=', 165)], limit=1)
+            move = self.env['account.move'].search([('sale_order_id_finance', '=', rec.id),('journal_id', '=', 165),('state', '=', 'posted'), ('date', '!=', False) ], limit=1)
             rec.close_entry_date = move.date if move else False
             if rec.close_entry_date:
                 rec.close_entry_year=rec.close_entry_date.year
