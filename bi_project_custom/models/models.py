@@ -177,7 +177,7 @@ class SaleOrder ( models.Model ) :
         compute="_compute_second_line_name",
         store=True
      )
-    invoice_attachements_ids = fields.Many2many(commodel_name='ir.attachment', string='Invoice Attachments', compute='_compute_invoice_attachments')
+    invoice_attachements_ids = fields.Many2many(commodel_name='ir.attachment', string='Invoice Attachments', compute='_compute_invoice_attachments',store=True)
     
     is_journal_state_not_posted = fields.Boolean ( compute='_compute_is_journal_state_not_posted' ,
                                                    string='Journal State' , default=True )
