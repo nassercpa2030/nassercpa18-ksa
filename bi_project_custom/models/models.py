@@ -244,7 +244,7 @@ class SaleOrder ( models.Model ) :
                 ('res_model', '=', 'account.move'),
                 ('res_id', 'in', order.invoice_ids.ids)
             ])
-            order.invoice_attachment_ids = attachments
+            order.invoice_attachements_ids  = attachments
             
     @api.model
     def create(self, vals):
@@ -259,8 +259,8 @@ class SaleOrder ( models.Model ) :
 
     def _link_custom_attachments_to_chatter(self):
         for rec in self:
-            if rec.invoice_attachment_ids:
-                for attachment in rec.invoice_attachment_ids:
+            if rec.invoice_attachements_ids :
+                for attachment in rec.invoice_attachements_ids :
                     attachment.write({'res_model': 'sale.order', 'res_id': rec.id})  
 
     
