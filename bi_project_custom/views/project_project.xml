@@ -27,12 +27,12 @@
                        options='{"max_value": 1.0}'
                        style="width: 100%; font-weight: bold;"
                        readonly="0"/>
-                <field name="close_type"
+                <!-- field name="close_type"
                        readonly="1"
                        options="{'invisible': ['|', ('stage_name','!=','قيد مالي'), ('files_state','!=','not_done')]}"
                        style="background-color: #dc3545; color: white; font-weight: bold; padding: 6px; border-radius: 6px;"
                        placeholder="قيد إغلاق مؤجل"
-                       invisible="1"/>
+                       invisible="1"/-->
             </xpath>
 
             <!-- إضافة حقل التاريخ المالي -->
