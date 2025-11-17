@@ -29,7 +29,7 @@
                        readonly="0"/>
                 <field name="close_type"
                        readonly="1"
-                       modifiers="{'invisible': ['|', ('stage_name','!=','قيد مالي'), ('files_state','!=','not_done')]}"
+                       options="{'invisible': ['|', ('stage_name','!=','قيد مالي'), ('files_state','!=','not_done')]}"
                        style="background-color: #dc3545; color: white; font-weight: bold; padding: 6px; border-radius: 6px;"
                        placeholder="قيد إغلاق مؤجل"/>
             </xpath>
