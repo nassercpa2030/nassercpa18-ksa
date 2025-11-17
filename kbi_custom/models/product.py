@@ -23,11 +23,7 @@ class ProductTemplate(models.Model):
     
     @api.depends("name")
     def get_public_name(self):
-        if self.name !="" :
-            self.public_name= self.name[10:] 
-        else:
-            self.public_name= self.name
-            
+        rec.name[10:] if isinstance(rec.name, str) else False
         
 class ProductProduct(models.Model):
     _inherit = 'product.product'
