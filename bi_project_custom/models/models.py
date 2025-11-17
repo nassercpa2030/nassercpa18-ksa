@@ -208,7 +208,7 @@ class SaleOrder ( models.Model ) :
         ('not_done' , '(مستثني)غير مكتمل') ,
         ('last_done' , '(مستثني) مكتمل-مدفوع') ,
         ('last_notdone' , '( مستثني ) مكتمل-غيرمدفوع') ,
-    ] , string="Project Files State" , compute='_compute_project_files_state' , store=True )
+    ] , string="Project Files State" , compute='_compute_project_files_state' , store=True,searchable=True )
 
     # file_state_history = fields.Char(compute='_compute_project_files_state', string='File_state History')
     @api.depends ( 'project_ids.files_state' )
