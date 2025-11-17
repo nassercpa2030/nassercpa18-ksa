@@ -23,7 +23,7 @@ class ProjectProject ( models.Model ) :
                                       ondelete='set null' )
     manager_id = fields.Integer(String="Manager_id",related="user_id.id",store=True,readonly=False,ondelete='set null')
     # adding field close_type
-    close_type = fields.Text ( string="Close Type" , default="قيد إغلاق مؤجل" , readonly=True )
+    close_type = fields.Text ( string="Close Type" , default="قيد إغلاق مؤجل" , readonly=False )
     # إضافة حقل paid_percent محسوب بناءً على paid_percent في sale_order
     paid_percent = fields.Float (
         string="Paid Percent" ,
