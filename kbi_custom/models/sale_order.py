@@ -145,7 +145,7 @@ class SaleOrder ( models.Model ) :
         ('not_done' , '(مستثني)غير مكتمل') ,
         ('last_done' , '(مستثني) مكتمل-مدفوع') ,
         ('last_notdone' , '( مستثني ) مكتمل-غيرمدفوع') ,
-    ] , string="Project Files State" , store=True )
+    ] , string="Project Files State" , store=True,searchable=True )
     # identifying new variable not signed by _customer
     state = fields.Selection (
         [('draft' , 'Quotation') , ('to approve' , 'To Approve') , ('done' , 'Locked') , ('sale' , 'Sales Order') ,
