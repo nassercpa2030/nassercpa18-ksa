@@ -50,12 +50,25 @@ class ResPartner ( models.Model ) :
                 ('res_id', '=', rec.id)
             ])
 
-    @api.constrains ( 'number_700' )
-    def _check700_number(self) :
-        pattern = r'^7\d*$'
-        for rec in self :
-            if rec.number_700 and not re.match ( pattern , rec.number_700 ) :
-                raise ValidationError ( "You must enter numbers only and start with 7" )
+    @api.constrains('number_700', 'cr_number_sale', 'company_type')
+    def _check_numbers(self):
+        pattern_700 = r'^7\d*$'
+        pattern_cr = r'^\d+$'  # مثال: CR number لازم يكون أرقام فقط
+
+        for rec in self:
+            # ===== number_700 =====
+            if rec.company_type != 'person' and not rec.number_700:
+                raise ValidationError("حقل Number 700 مطلوب لغير الأشخاص.")
+            if rec.number_700 and not re.match(pattern_700, rec.number_700):
+                raise ValidationError("Number 700 must start with 7 and contain numbers only.")
+
+            # ===== cr_number_sale =====
+            if rec.company_type != 'person' and not rec.cr_number_sale:
+                raise ValidationError("حقل CR Number Sale مطلوب لغير الأشخاص.")
+            if rec.cr_number_sale and not re.match(pattern_cr, rec.cr_number_sale):
+                raise ValidationError("CR Number Sale must contain numbers only.")
+
+                
 
     @api.depends ( 'manager_id' )
     def _compute_manager_name(self) :
