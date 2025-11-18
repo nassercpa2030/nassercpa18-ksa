@@ -13,7 +13,7 @@
                    
                             <field name='nationality' modifiers="{'invisible': [('is_broker', '=', True)]}"/>
                             <field name="is_broker"/>
-                            <field name="number_700" style ="font-weight:bold; font-size:14px;"/>
+                            <field name="number_700" style ="font-weight:bold; font-size:14px;" options="{'required': [('company_type', '=','company')]}"/>
                             <field name="agreement_id" modifiers="{'invisible': [('is_broker', '=', True)]}"/>
                 </xpath>
             </field>
