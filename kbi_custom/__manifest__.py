@@ -38,6 +38,6 @@
         'views/order_verify.xml',
         'views/report_vendor_batch_bill.xml',
         'views/motalba_all.xml',
-        'report_template.xml',
+        'views/report_template.xml',
     ],
    }
