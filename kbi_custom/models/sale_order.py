@@ -611,7 +611,7 @@ class SaleOrder ( models.Model ) :
             'type' : 'ir.actions.act_window' ,
             'view_mode' : 'list,form' ,
             'res_model' : 'account.payment' ,
-            'domain' : ['|',('sale_order_id' , 'in' , self.ids),('sale_order_ids', 'in', self.ids)] ,
+            'domain' : ['|',('sale_order_id' , 'in' , self.ids),('sale_order_ids.sale_order_id', 'in', self.ids)] ,
             #'domain' : ['|',('sale_order_id' , 'in' , self.ids),'&',('sale_order_id', '=', False),('amount','=','0')] ,
             #'domain': ['|',('sale_order_ids', 'in', [self.id] if self.id else []),('id', '=', 0)],
             'context' : {
