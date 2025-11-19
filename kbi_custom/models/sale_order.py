@@ -246,13 +246,10 @@ class SaleOrder ( models.Model ) :
            rec.taxed_price2=rec.price2*1.15
            rec.taxed_price3=rec.price3*1.15 
 
-    @api.depends('name')
+    @api.depends('journal_entry_count')
     def compute_journal_entry_count_finance(self) :
         for order in self :
-            order.journal_entry_count_finance = self.env['account.move'].search_count (
-                [('invoice_origin' , '=' , order.name) , ('move_type' , '=' , 'entry') ,
-                 ('journal_id' , 'in' , [162 , 161 , 160 , 165])] )
-            
+            order.journal_entry_count_finance = order.journal_entry_count            
     def _compute_contact_manager_team(self) :
         for rec in self :
             # إذا عنده أوامر بيع، نأخذ الفريق من آخر أمر بيع
