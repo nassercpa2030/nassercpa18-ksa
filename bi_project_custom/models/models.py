@@ -125,7 +125,7 @@ class ProjectStagesRouteRule ( models.Model ) :
 class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
-    journal_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string='Journal Entries' )
+    journal_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string='عدد قيود الإغلاق' ,searchable=True)
     is_project_close_stage = fields.Boolean ( compute='_compute_is_project_close_stage' ,
                                               string='Is Project in Close Stage' )
     journal_entry_data = fields.Many2many ( comodel_name='account.move' , compute='_compute_journal_entry_data' ,
