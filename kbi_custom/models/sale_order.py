@@ -46,7 +46,7 @@ class SaleOrder ( models.Model ) :
     close_entry_date_refrence = fields.Date ( string="close_entry_date_refrence" , readonly=False , required=False ,
                                               store=True )
     invoice_status_refrence = fields.Char ( 'invoice_status_refrence' , readonly=False , required=False , store=True )
-    journal_entry_count_finance = fields.Integer ( compute='compute_journal_entry_count_finance' , string='عدد قيود الإغلاق' ,searchable=True)
+    journal_entry_count_finance = fields.Integer ( compute='compute_journal_entry_count_finance' , string='عدد قيود الإغلاق' ,searchable=True,store=True)
     project_budget_refrence = fields.Float ( 'project_budget_refrence' , store=True , readonly=False )
     payment_count_reference = fields.Integer ( 'payment_count_reference' , store=True , readonly=False )
     customer_test_refrence = fields.Char ( 'customer_test_refrence' , store=True , readonly=False )
