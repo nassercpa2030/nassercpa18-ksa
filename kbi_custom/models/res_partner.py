@@ -50,7 +50,7 @@ class ResPartner ( models.Model ) :
                 ('res_id', '=', rec.id)
             ])
 
-    @api.constrains('number_700', 'cr_number_sale', 'company_type', 'user_ids')
+    @api.constrains('number_700', 'cr_number_sale', 'company_type')
     def _check_numbers(self):
         pattern_700 = r'^7\d*$'
         pattern_cr = r'^\d+$'
@@ -63,8 +63,8 @@ class ResPartner ( models.Model ) :
             if self.env.user in admin_group.users:
                 continue
 
-            # تحقق من المستخدمين المسموح لهم
-            user_not_allowed = not any(user.id in allowed_user_ids for user in rec.user_ids)
+            # تحقق من الـ allowed_user_ids للمستخدم الحالي
+            user_not_allowed = self.env.user.id not in allowed_user_ids
 
             # ===== number_700 =====
             if rec.company_type != 'person' and user_not_allowed and not rec.number_700:
@@ -75,7 +75,7 @@ class ResPartner ( models.Model ) :
             # ===== cr_number_sale =====
             if rec.company_type != 'person' and user_not_allowed and not rec.cr_number_sale:
                 raise ValidationError("حقل CR Number Sale مطلوب لغير الأشخاص.")
-            if rec.cr_number_sale and not re.match(pattern_cr, rec.cr_number_sale):
+            if rec.cr_number_sale and not re.match(pattern_cr, pattern_cr):
                 raise ValidationError("CR Number Sale must contain numbers only.")
 
                 
