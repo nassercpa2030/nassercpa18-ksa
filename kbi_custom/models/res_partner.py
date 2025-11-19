@@ -56,8 +56,14 @@ class ResPartner ( models.Model ) :
         pattern_cr = r'^\d+$'
 
         allowed_user_ids = [2, 394, 18]
+        admin_group = self.env.ref('base.group_system')  # مجموعة الـ Admin
 
         for rec in self:
+            # إذا المستخدم الحالي Admin → تخطى التحقق
+            if self.env.user in admin_group.users:
+                continue
+
+            # تحقق من المستخدمين المسموح لهم
             user_not_allowed = not any(user.id in allowed_user_ids for user in rec.user_ids)
 
             # ===== number_700 =====
