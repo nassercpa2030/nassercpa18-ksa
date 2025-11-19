@@ -139,7 +139,7 @@ class CrmLead(models.Model):
     agreement_id = fields.Many2one('kbi.sale.agreement', string='Agreement', readonly=True)
     agreement_id = fields.Many2one('kbi.sale.agreement', string='Agreement', readonly=True)
     last_contracting_date = fields.Date(string="Last Contracting Date", default=fields.Date.today)
-    name_clean = fields.Char(string="Clean Name", compute="_compute_name_clean")
+    name_clean = fields.Char(string="Clean Name", compute="_compute_name_clean",searchable=True,store=True)
     with_agreement = fields.Boolean(string='With Agreement')
     join_old = fields.Boolean(string='Join Old Orders')
     agreement_notes = fields.Char(string="Agreement Notes", compute='_compute_can_with_agreement')
