@@ -63,20 +63,22 @@ class ResPartner ( models.Model ) :
             if self.env.user in admin_group.users:
                 continue
 
-            # تحقق من الـ allowed_user_ids للمستخدم الحالي
+            # إذا المستخدم الحالي غير مسموح له
             user_not_allowed = self.env.user.id not in allowed_user_ids
 
             # ===== number_700 =====
-            if rec.company_type != 'person' and user_not_allowed and not rec.number_700:
-                raise ValidationError("حقل Number 700 مطلوب لغير الأشخاص.")
-            if rec.number_700 and not re.match(pattern_700, rec.number_700):
-                raise ValidationError("Number 700 must start with 7 and contain numbers only.")
+            if rec.company_type != 'person' and user_not_allowed:
+                if not rec.number_700:
+                    raise ValidationError("حقل Number 700 مطلوب لغير الأشخاص وغير المسؤولين.")
+                if not re.match(pattern_700, rec.number_700):
+                    raise ValidationError("Number 700 must start with 7 and contain numbers only.")
 
             # ===== cr_number_sale =====
-            if rec.company_type != 'person' and user_not_allowed and not rec.cr_number_sale:
-                raise ValidationError("حقل CR Number Sale مطلوب لغير الأشخاص.")
-            if rec.cr_number_sale and not re.match(pattern_cr, pattern_cr):
-                raise ValidationError("CR Number Sale must contain numbers only.")
+            if rec.company_type != 'person' and user_not_allowed:
+                if not rec.cr_number_sale:
+                    raise ValidationError("حقل CR Number Sale مطلوب لغير الأشخاص وغير المسؤولين.")
+                if not re.match(pattern_cr, rec.cr_number_sale):
+                    raise ValidationError("CR Number Sale must contain numbers only.")
 
                 
 
