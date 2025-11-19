@@ -246,6 +246,7 @@ class SaleOrder ( models.Model ) :
            rec.taxed_price2=rec.price2*1.15
            rec.taxed_price3=rec.price3*1.15 
 
+    @api.depends('name')
     def compute_journal_entry_count_finance(self) :
         for order in self :
             order.journal_entry_count_finance = self.env['account.move'].search_count (
