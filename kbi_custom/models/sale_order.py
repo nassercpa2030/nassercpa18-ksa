@@ -249,7 +249,8 @@ class SaleOrder ( models.Model ) :
     @api.depends('journal_entry_count')
     def compute_journal_entry_count_finance(self) :
         for order in self :
-            order.journal_entry_count_finance = order.journal_entry_count            
+            order.journal_entry_count_finance = order.journal_entry_count     
+            
     def _compute_contact_manager_team(self) :
         for rec in self :
             # إذا عنده أوامر بيع، نأخذ الفريق من آخر أمر بيع
