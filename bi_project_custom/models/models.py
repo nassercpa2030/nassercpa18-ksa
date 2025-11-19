@@ -389,8 +389,8 @@ class SaleOrder ( models.Model ) :
                  ('journal_id' , 'in' , [162 , 161 , 160 , 165])] )
             # ['|',('sale_order_id', '=', self.id),('invoice_origin', '=', self.name), ('move_type', '=', 'entry'), ('journal_id', 'in', [162,161,160,165])])
 
-     @api.depends('journal_entry_count')
-     def compute_journal_entry_count_finance(self) :
+    @api.depends('journal_entry_count')
+    def compute_journal_entry_count_finance(self) :
         for order in self :
             order.journal_entry_count_finance = order.journal_entry_count
             
