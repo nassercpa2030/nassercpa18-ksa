@@ -76,7 +76,7 @@ class CrmLead(models.Model):
     capital=fields.Float(string="Capital",store=True)#إجمالي العائد
     city_modified=fields.Char(string="City Modified",store=True)
     state_modified=fields.Char(string="State Modified",store=True)
-    main_region=fields.Char(string="Main Region")
+    main_region=fields.Char(string="Main Region",index=True)
     crm_lead_id = fields.Many2one(comodel_name='crm.lead', string='Project')
     user_id = fields.Many2one(comodel_name='res.users', string='User')
     source_stage_id = fields.Many2one(comodel_name='crm.stage', string='Source Stage')
