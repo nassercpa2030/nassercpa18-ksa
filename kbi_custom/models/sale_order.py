@@ -46,7 +46,7 @@ class SaleOrder ( models.Model ) :
     close_entry_date_refrence = fields.Date ( string="close_entry_date_refrence" , readonly=False , required=False ,
                                               store=True )
     invoice_status_refrence = fields.Char ( 'invoice_status_refrence' , readonly=False , required=False , store=True )
-    journal_entry_count_finance = fields.Integer ( compute='compute_journal_entry_count_finance' , string='عدد قيود الإغلاق' ,searchable=True,store=True)
+    journal_entry_count_finance = fields.Integer ( compute='compute_journal_entry_count_finance' , string='عدد قيود الإغلاق' ,store=True)
     project_budget_refrence = fields.Float ( 'project_budget_refrence' , store=True , readonly=False )
     payment_count_reference = fields.Integer ( 'payment_count_reference' , store=True , readonly=False )
     customer_test_refrence = fields.Char ( 'customer_test_refrence' , store=True , readonly=False )
@@ -249,7 +249,7 @@ class SaleOrder ( models.Model ) :
     def compute_journal_entry_count_finance(self) :
         for order in self :
             order.journal_entry_count_finance = self.env['account.move'].search_count (
-                [('invoice_origin' , '=' , self.name) , ('move_type' , '=' , 'entry') ,
+                [('invoice_origin' , '=' , order.name) , ('move_type' , '=' , 'entry') ,
                  ('journal_id' , 'in' , [162 , 161 , 160 , 165])] )
             
     def _compute_contact_manager_team(self) :
