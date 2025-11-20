@@ -162,7 +162,8 @@ class CloseEntryWizard(models.TransientModel):
             }
             move = AccountMove.create(move_vals)
             move.action_post()
-
+            if move.state == 'posted':
+               sale_order.journal_entry_count_finance = sale_order.journal_entry_count_finance + 1
             wizard.sale_order_id.project_ids.write({'has_closed_entry': True})
 
     def close_entry(self):
@@ -237,6 +238,7 @@ class CloseEntryWizard(models.TransientModel):
 
             move = AccountMove.create(move_vals)
             move.action_post()
-
+            if move.state == 'posted':
+               sale_order.journal_entry_count_finance = sale_order.journal_entry_count_finance + 1
             # تحديث المشاريع المرتبطة بالـ Sale Order
             sale_order.project_ids.write({'has_closed_entry': True})
