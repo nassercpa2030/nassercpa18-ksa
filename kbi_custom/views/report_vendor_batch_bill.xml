@@ -53,6 +53,7 @@
                                 <th style="padding: 8px; text-align: center;">قيمة العقد</th>
                                 <th style="padding: 8px; text-align: center;">نسبة العمولة</th>
                                 <th style="padding: 8px; text-align: center;">قيمة فاتورة المسوق</th>
+                                <th style="padding: 8px; text-align: center;">المبلغ المستحق</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -73,15 +74,20 @@
                                     <td style="padding: 8px; text-align: left;">
                                         <span t-field="bill.amount_total" t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/>
                                     </td>
+                                      <td style="padding: 8px; text-align: left;">
+                                        <span t-field="bill.amount_residual_signed" t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/>
+                                    </td>
+                                    
                                     <!-- تحديث المجموع -->
                                     <t t-set="total_sum" t-value="total_sum + (bill.amount_total or 0.0)"  />
+                                    <t t-set="amount_residual_sig" t-value="amount_residual_sig + (bill.amount_residual_signed or 0.0)"  />
                                 </tr>
                             </t>
                             
                               <tr style="font-weight:bold; border-top: 2px solid black;">
-                                <td colspan="6" style="text-align:right; padding:8px;">  إجمالي المبلغ المستحق:</td>
+                                <td colspan="7" style="text-align:right; padding:8px;">  إجمالي المبلغ المستحق:</td>
                                 <td style="padding:8px; text-align:left;">
-                                    <span t-esc="'{:,.2f}'.format(amount_residual_signed or 0.0)"  />
+                                    <span t-esc="'{:,.2f}'.format(amount_residual_sig or 0.0)"  />
                                 </td>
                             </tr>
                             <!-- صف المجموع النهائي -->
