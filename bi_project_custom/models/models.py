@@ -9,7 +9,7 @@ class AccountMove ( models.Model ) :
 
     sale_order_id = fields.Many2one ( 'sale.order' , string='Sales Order' , ondelete='set null' )
     
-     def _update_sale_order_count_on_change(self, old_state=None):
+    def _update_sale_order_count_on_change(self, old_state=None):
         for move in self:
 
             # لازم يكون ليه فاتورة أصل
