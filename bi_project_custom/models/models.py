@@ -8,35 +8,20 @@ class AccountMove ( models.Model ) :
     _inherit = 'account.move'
 
     sale_order_id = fields.Many2one ( 'sale.order' , string='Sales Order' , ondelete='set null' )
-    
-    def _update_sale_order_count_on_change(self, old_state=None):
-        for move in self:
 
-            # لازم يكون ليه فاتورة أصل
-            if not move.invoice_origin:
-                continue
+    def unlink(self):
+      journal_ids = [160, 161, 162, 165]
 
+      for move in self:
+        if move.state == 'posted' and move.invoice_origin:
             sale_order = self.env['sale.order'].search([('name', '=', move.invoice_origin)], limit=1)
-            if not sale_order:
-                continue
-
-            is_valid_journal = move.journal_id.id in self.JOURNAL_IDS
-
-            # 1) لو اتغير من DRAFT → POSTED → زوّد
-            if old_state == 'draft' and move.state == 'posted' and is_valid_journal:
-                sale_order.journal_entry_count_finance += 1
-
-            # 2) لو اتغير من POSTED → DRAFT → ناقص
-            if old_state == 'posted' and move.state == 'draft' and is_valid_journal:
+            if sale_order and move.journal_id.id in journal_ids:
                 sale_order.journal_entry_count_finance -= 1
 
-            # 3) لو اتغير الـ journal_id
-            if hasattr(move, "_old_journal_id") and move._old_journal_id != move.journal_id.id:
-                if move._old_journal_id in self.JOURNAL_IDS:
-                    sale_order.journal_entry_count_finance -= 1
-                if move.journal_id.id in self.JOURNAL_IDS and move.state == 'posted':
-                    sale_order.journal_entry_count_finance += 1
+      return super().unlink()
 
+    
+    
 
 class ProjectProject ( models.Model ) :
     _inherit = 'project.project'
