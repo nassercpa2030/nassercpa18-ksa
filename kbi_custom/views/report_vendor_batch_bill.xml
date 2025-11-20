@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+     <template id="remove_all_headers" inherit_id="web.external_layout_standard">
+        <xpath expr="//div[@class='header']" position="replace">
+        </xpath>
+    </template>
     <!-- تعريف التقرير وربطه بنموذج فواتير الموردين -->
     <record id = "action_report_vendor_batch_bill_report" model="ir.actions.report">
         <field name="name">طلب صرف عمولة مسوق بالقطعة</field>
