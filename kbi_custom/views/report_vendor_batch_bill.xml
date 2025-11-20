@@ -59,6 +59,7 @@
                         <tbody>
                             <!-- تهيئة متغير المجموع -->
                             <t t-set="total_sum" t-value="0.0"/> 
+                            <t t-set="amount_residual_sig" t-value="0.0"/> 
 
                             <!-- المرور على جميع الفواتير -->
                             <t t-foreach="docs" t-as="bill">
