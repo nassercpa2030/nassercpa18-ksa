@@ -87,16 +87,18 @@
                             </t>
                             
                               <tr style="font-weight:bold; border-top: 2px solid black;">
-                                <td colspan="7" style="text-align:right; padding:8px;">  إجمالي المبلغ المستحق:</td>
+                                <td colspan="7" style="text-align:right; padding:8px;" decoration_success="1">  إجمالي المبلغ المستحق:</td>
                                 <td style="padding:8px; text-align:left;">
                                     <span t-esc="'{:,.2f}'.format(amount_residual_sig or 0.0)"  />
+                                     <b>SR</b>
                                 </td>
                             </tr>
                             <!-- صف المجموع النهائي -->
                             <tr style="font-weight:bold; border-top: 2px solid black;">
-                                <td colspan="6" style="text-align:right; padding:8px;">إجمالي المبالغ:</td>
+                                <td colspan="6" style="text-align:right; padding:8px;" decoration_danger="1">إجمالي المبالغ:</td>
                                 <td style="padding:8px; text-align:left;">
                                     <span t-esc="'{:,.2f}'.format(total_sum or 0.0)"  />
+                                    <b>SR</b>
                                 </td>
                             </tr>
                              
