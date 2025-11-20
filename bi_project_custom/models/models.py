@@ -14,7 +14,7 @@ class AccountMove ( models.Model ) :
 
       for move in self:
         if move.state == 'posted' and move.invoice_origin:
-            sale_order = self.env['sale.order'].search([('name', '=', move.invoice_origin)], limit=1)
+            sale_order = self.env['sale.order'].search([('id', '=', move.sale_order_id_finance)], limit=1)
             if sale_order and move.journal_id.id in journal_ids:
                 sale_order.journal_entry_count_finance -= 1
 
