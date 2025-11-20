@@ -144,7 +144,8 @@ class SaleOrder ( models.Model ) :
    
     journal_entry_data = fields.Many2many ( comodel_name='account.move' , compute='_compute_journal_entry_data' ,
                                             string='Journal Data Lines' )
-    journal_entry_count_finance = fields.Integer (string='عدد قيود الإغلاق',compute='compute_journal_entry_count_finance',store=True)
+    #journal_entry_count_finance = fields.Integer (string='عدد قيود الإغلاق',compute='compute_journal_entry_count_finance',store=True)
+    journal_entry_count_finance = fields.Integer (string='عدد قيود الإغلاق',store=True)
     broker_percentage_ =fields.Float(string="Broker Percentage",readonly=False,compute="compute_broker_percentage")
     first_dofaa=fields.Boolean(store=True,default=False,string="1")
     second_dofaa=fields.Boolean(store=True,default=True,string="2")
