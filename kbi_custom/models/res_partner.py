@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import models , fields , api
+from odoo import models , fields , api, _
 from odoo.exceptions import ValidationError
 import re
 
@@ -27,6 +27,7 @@ class ResPartner ( models.Model ) :
     manager_team = fields.Many2one ( comodel_name="res.users" , string='Manager' ,
                                      related="x_studio_related_field_7pm_1j7mp6p7k" , store=True , readonly=False )
     is_broker = fields.Boolean ( string='Broker' )
+    ref= fields.Char(string=_("1 Audit No"),store=True,index=True)
     name_english = fields.Char ( String="English name" , readonly=False , store=True )
     partner_vat_placeholder = fields.Char ( string="Vat Number" , readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
