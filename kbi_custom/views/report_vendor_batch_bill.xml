@@ -81,7 +81,7 @@
                               <tr style="font-weight:bold; border-top: 2px solid black;">
                                 <td colspan="6" style="text-align:right; padding:8px;">  إجمالي المبلغ المستحق:</td>
                                 <td style="padding:8px; text-align:left;">
-                                    <span t-esc="'{:,.2f}'.format(amount_residual or 0.0)"  />
+                                    <span t-esc="'{:,.2f}'.format(amount_residual_signed or 0.0)"  />
                                 </td>
                             </tr>
                             <!-- صف المجموع النهائي -->
