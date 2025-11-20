@@ -2,7 +2,7 @@
 <odoo>
      <template id="remove_all_headers" inherit_id="web.external_layout_standard">
         <xpath expr="//div[contains(@class,'page_header')]" position="replace"/>
-        </xpath>
+       
     </template>
     <!-- تعريف التقرير وربطه بنموذج فواتير الموردين -->
     <record id = "action_report_vendor_batch_bill_report" model="ir.actions.report">
