@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
      <template id="remove_all_headers" inherit_id="web.external_layout_standard">
-      <xpath expr="//div[starts-with(@class,'header')]" position="replace"/>
+          <xpath expr="//div[starts-with(@class,'header')]" position="replace" fallback="ignore"/>
        
     </template>
     <!-- تعريف التقرير وربطه بنموذج فواتير الموردين -->
