@@ -128,9 +128,10 @@ class SaleOrder ( models.Model ) :
     journal_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string='عدد قيود الإغلاق' ,index=True)
     is_project_close_stage = fields.Boolean ( compute='_compute_is_project_close_stage' ,
                                               string='Is Project in Close Stage' )
-    journal_entry_count_finance = fields.Integer ( compute='compute_journal_entry_count_finance' , string='عدد قيود الإغلاق' ,store=True)
+   
     journal_entry_data = fields.Many2many ( comodel_name='account.move' , compute='_compute_journal_entry_data' ,
                                             string='Journal Data Lines' )
+    journal_entry_count_finance = fields.Integer (string='عدد قيود الإغلاق',related='journal_entry_count',store=True)
     broker_percentage_ =fields.Float(string="Broker Percentage",readonly=False,compute="compute_broker_percentage")
     first_dofaa=fields.Boolean(store=True,default=False,string="1")
     second_dofaa=fields.Boolean(store=True,default=True,string="2")
@@ -389,10 +390,10 @@ class SaleOrder ( models.Model ) :
                  ('journal_id' , 'in' , [162 , 161 , 160 , 165])] )
             # ['|',('sale_order_id', '=', self.id),('invoice_origin', '=', self.name), ('move_type', '=', 'entry'), ('journal_id', 'in', [162,161,160,165])])
 
-    @api.depends('journal_entry_count')
-    def compute_journal_entry_count_finance(self) :
-        for order in self :
-            order.journal_entry_count_finance = order.journal_entry_count
+    #@api.depends('journal_entry_count')
+    #def compute_journal_entry_count_finance(self) :
+        #for order in self :
+            #order.journal_entry_count_finance = order.journal_entry_count
             
     def action_view_journal_entries(self) :
         self.ensure_one ()
