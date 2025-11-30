@@ -285,6 +285,29 @@ class SaleOrder ( models.Model ) :
                 for attachment in rec.invoice_attachements_ids :
                     attachment.write({'res_model': 'sale.order', 'res_id': rec.id})  
 
+    def _is_admin(self):
+        return self.env.user.has_group('base.group_system')
+
+    @api.constrains('partner_id', 'user_id')
+    def _check_partner_manager(self):
+        for order in self:
+
+            # ✅ Admin مسموح
+            if order._is_admin():
+                continue
+
+            # ✅ لازم يكون فيه عميل ومستخدم
+            if not order.partner_id or not order.user_id:
+                continue
+
+            manager = order.partner_id.manager_id
+
+            # ✅ لو العميل له manager والمستخدم مختلف
+            if manager and manager.id != order.user_id.id:
+                raise ValidationError(
+                    _("لا يجوز عمل أوردر لهذا العميل لأنه يخص المستخدم: %s\nبرجاء مراجعته لإجراء أي تعديل")
+                    % manager.name
+                )
     
     @api.onchange ( 'journal_entry_data' )
     @api.depends ( 'journal_entry_data' )
