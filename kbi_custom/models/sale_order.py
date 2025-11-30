@@ -424,7 +424,13 @@ class SaleOrder ( models.Model ) :
     def compute_can_edit_approve(self) :
         for rec in self :
             rec.can_edit_approve = self.env.user.has_group ( 'kbi_custom.can_edit_approve_route_in_sale' )
-
+            
+    @api.depends ( 'user_id' )     
+    def action_set_manager_id_sale(self):
+        for rec in self:
+            if not rec.manager_id_sale and rec.user_id:
+                rec.manager_id_sale = rec.user_id.id
+    
     @api.depends ( 'partner_id' )
     def _compute_payment_ids(self) :
         for rec in self :
