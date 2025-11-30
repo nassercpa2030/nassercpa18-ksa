@@ -303,7 +303,7 @@ class SaleOrder ( models.Model ) :
             manager = order.partner_id.manager_id
 
             # ✅ لو العميل له manager والمستخدم مختلف
-            if manager and manager.id != order.user_id.id:
+            if manager and manager != order.user_id.id:
                 raise ValidationError(
                     _("لا يجوز عمل أوردر لهذا العميل لأنه يخص المستخدم: %s\nبرجاء مراجعته لإجراء أي تعديل")
                     % manager.name
