@@ -300,14 +300,17 @@ class SaleOrder ( models.Model ) :
             if not order.partner_id or not order.user_id:
                 continue
 
-            manager = order.partner_id.manager_id
+            manager_id = order.partner_id.manager_id
 
             # ✅ لو العميل له manager والمستخدم مختلف
-            if manager and manager != order.user_id.id:
-                raise ValidationError(
-                    _("لا يجوز عمل أوردر لهذا العميل لأنه يخص المستخدم: %s\nبرجاء مراجعته لإجراء أي تعديل")
-                    % manager.name
-                )
+            if manager_id and manager_id != order.user_id.id:
+               manager_user = self.env['res.users'].browse(manager_id)
+               manager_name = manager_user.name if manager_user.exists() else str(manager_id)
+
+               raise ValidationError(
+                _("لا يجوز عمل أوردر لهذا العميل لأنه يخص المستخدم: %s\nبرجاء مراجعته لإجراء أي تعديل")
+                % manager_name
+               )
     
     @api.onchange ( 'journal_entry_data' )
     @api.depends ( 'journal_entry_data' )
