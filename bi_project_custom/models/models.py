@@ -253,11 +253,6 @@ class SaleOrder ( models.Model ) :
           # rec.taxed_price1=rec.price1*1.15
           # rec.taxed_price2=rec.price2*1.15
           # rec.taxed_price3=rec.price3*1.15 
-
-   @api.onchange ('partner_id')        
-   def get_manger_from_customer(self):
-        for order in self:
-            order.user_id = order.partner_id.manager_id if order.partner_id else self.env.user
             
     @api.depends('invoice_ids')
     def _compute_invoice_attachments(self):
@@ -292,6 +287,11 @@ class SaleOrder ( models.Model ) :
 
     def _is_admin(self):
         return self.env.user.has_group('base.group_system')
+        
+    @api.onchange ('partner_id')        
+    def get_manger_from_customer(self):
+        for order in self:
+            order.user_id = order.partner_id.manager_id if order.partner_id else self.env.user
 
     @api.constrains('partner_id', 'user_id')
     def _check_partner_manager(self):
