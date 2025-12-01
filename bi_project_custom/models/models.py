@@ -253,7 +253,12 @@ class SaleOrder ( models.Model ) :
           # rec.taxed_price1=rec.price1*1.15
           # rec.taxed_price2=rec.price2*1.15
           # rec.taxed_price3=rec.price3*1.15 
-    
+
+   @api.onchange ('partner_id')        
+   def get_manger_from_customer(self):
+        for order in self:
+            order.user_id = order.partner_id.manager_id if order.partner_id else self.env.user
+            
     @api.depends('invoice_ids')
     def _compute_invoice_attachments(self):
         for order in self:
@@ -325,7 +330,8 @@ class SaleOrder ( models.Model ) :
                 if lines.qty_invoiced > 0.0 :
                     total_2 += lines.price_subtotal
             rec.is_journal_state_not_posted = total_1 != total_2
-            
+                    
+        
     def action_print_mutalba_report(self):
         report = self.env['ir.actions.report'].browse(1079)
         return report.report_action(self)    
