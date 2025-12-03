@@ -291,7 +291,10 @@ class SaleOrder ( models.Model ) :
     @api.onchange ('partner_id')        
     def get_manger_from_customer(self):
         for order in self:
-            order.user_id = order.partner_id.manager_id if order.partner_id else self.env.user
+           if order.partner_id and order.partner_id.manager_id:
+               order.user_id = order.partner_id.manager_id 
+           else:
+               order.user_id = self.env.user
 
     @api.constrains('partner_id', 'user_id')
     def _check_partner_manager(self):
