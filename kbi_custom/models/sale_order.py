@@ -161,7 +161,18 @@ class SaleOrder ( models.Model ) :
     ass_to_percentage = fields.Integer ( "Ass_to Percentage" )
     ass_to = fields.Float (string="Ass_to",compute="_compute_ass_to",store=True )
     ass_from = fields.Float ( string="Ass_from",compute="_compute_ass_to",store=True )
+    #################### multi_services ############
     multi_service = fields.Boolean ( string="Multi_Service" )
+    mulit_service_no = fields.Integer( string="No of Services" , readonly=False )
+    service1 =fields.Many2one ( comodel_name='product.product',readonly=False , string="Service1",searchable=True )
+    service2 =fields.Many2one ( comodel_name='product.product' , readonly=False,string="Service2",searchable=True )
+    service3 =fields.Many2one ( comodel_name='product.product' ,readonly=False, string="Service3",searchable=True )
+    service4 =fields.Many2one ( comodel_name='product.product' , readonly=False, string="Service4",searchable=True )
+    service_price1=fields.Float(string="Price1",readonly=False,store=True)
+    service_price2=fields.Float(string="Price2",readonly=False,store=True)
+    service_price3=fields.Float(string="Price3",readonly=False,store=True)
+    service_price4=fields.Float(string="Price4",readonly=False,store=True)
+    ###########################
     multi_years = fields.Boolean ( string="Multi_Years" )
     multi_years_no = fields.Integer ( sring="Multi Years No" )
     mulit_year1 = fields.Integer ( string="Year1" , readonly=False )
