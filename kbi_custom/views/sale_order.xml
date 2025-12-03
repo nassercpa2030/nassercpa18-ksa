@@ -184,6 +184,16 @@
                             </group>
                         </group>
                     </page>
+                     <page string="Multi services">
+                        <group>
+                            <group>
+                                <field name="sign_qrcode" widget="image"/>
+                            </group>
+                            <group>
+                                <field name="uuid" readonly="1"/>
+                            </group>
+                        </group>
+                    </page>
                 </xpath>
             </field>
         </record>
