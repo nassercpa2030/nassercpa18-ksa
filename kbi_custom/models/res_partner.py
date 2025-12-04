@@ -21,6 +21,11 @@ class Recruiter ( models.Model ) :
     _inherit = 'hr.job'
     recruiter_id = fields.Many2one ( 'hr.employee',string="Recruiter",readonly=False)
     interviewer_ids = fields.Many2many ( 'hr.employee',string="Interviewers",readonly=False , domain=lambda self: [('id', 'in', self.env['hr.employee'].sudo().search([]).ids)])
+    
+class Recruiter ( models.Model ) :
+    _inherit = 'hr.employee'
+    def _remove_recruitment_interviewers(self):
+        return True
 
 
 class ResPartner ( models.Model ) :
