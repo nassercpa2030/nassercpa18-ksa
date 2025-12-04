@@ -19,7 +19,7 @@ class ResCity ( models.Model ) :
     
 class Recruiter ( models.Model ) :
     _inherit = 'hr.job'
-     user_id = fields.Many2one ( string="Recruiter" , comodel_name="hr.employee" ,readonly=False)
+    user_id = fields.Many2one ( string="Recruiter" , comodel_name="hr.employee" ,readonly=False)
 
 
 class ResPartner ( models.Model ) :
