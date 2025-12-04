@@ -20,6 +20,7 @@ class ResCity ( models.Model ) :
 class Recruiter ( models.Model ) :
     _inherit = 'hr.job'
     recruiter_id = fields.Many2one ( 'hr.employee',string="Recruiter",readonly=False)
+    interviewer_ids = fields.Many2one ( 'hr.employee',string="Interviewers",readonly=False)
 
 
 class ResPartner ( models.Model ) :
