@@ -24,6 +24,9 @@ class Recruiter ( models.Model ) :
     
 class Recruiter ( models.Model ) :
     _inherit = 'hr.employee'
+    def _create_recruitment_interviewers(self):
+        return True
+
     def _remove_recruitment_interviewers(self):
         return True
 
