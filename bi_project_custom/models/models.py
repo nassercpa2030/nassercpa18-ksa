@@ -139,6 +139,7 @@ class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
     journal_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string='عدد قيود الإغلاق' ,index=True,searchable=True)
+    close_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string=' قيود الإغلاق' ,store=True)
     is_project_close_stage = fields.Boolean ( compute='_compute_is_project_close_stage' ,
                                               string='Is Project in Close Stage' )
    
@@ -439,6 +440,7 @@ class SaleOrder ( models.Model ) :
                 [('invoice_origin' , '=' , self.name) , ('move_type' , '=' , 'entry') ,
                  ('journal_id' , 'in' , [162 , 161 , 160 , 165])] )
             # ['|',('sale_order_id', '=', self.id),('invoice_origin', '=', self.name), ('move_type', '=', 'entry'), ('journal_id', 'in', [162,161,160,165])])
+              order.close_entry_count =  order.journal_entry_count
 
     #@api.depends('journal_entry_count')
     #def compute_journal_entry_count_finance(self) :
