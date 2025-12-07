@@ -437,7 +437,7 @@ class SaleOrder ( models.Model ) :
     def _compute_journal_entry_count(self) :
         for order in self :
             count = self.env['account.move'].search_count (
-                [('invoice_origin' , '=' , self.name) , ('move_type' , '=' , 'entry') ,
+                [('invoice_origin' , '=' , order.name) , ('move_type' , '=' , 'entry') ,
                  ('journal_id' , 'in' , [162 , 161 , 160 , 165])] )
             # ['|',('sale_order_id', '=', self.id),('invoice_origin', '=', self.name), ('move_type', '=', 'entry'), ('journal_id', 'in', [162,161,160,165])])
             order.close_entry_count = count
