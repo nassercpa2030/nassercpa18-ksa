@@ -440,7 +440,7 @@ class SaleOrder ( models.Model ) :
                 [('invoice_origin' , '=' , self.name) , ('move_type' , '=' , 'entry') ,
                  ('journal_id' , 'in' , [162 , 161 , 160 , 165])] )
             # ['|',('sale_order_id', '=', self.id),('invoice_origin', '=', self.name), ('move_type', '=', 'entry'), ('journal_id', 'in', [162,161,160,165])])
-              order.close_entry_count =  order.journal_entry_count
+            order.close_entry_count =  order.journal_entry_count
 
     #@api.depends('journal_entry_count')
     #def compute_journal_entry_count_finance(self) :
