@@ -138,7 +138,7 @@ class ProjectStagesRouteRule ( models.Model ) :
 class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
-    journal_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string='عدد قيود الإغلاق' ,index=True)
+    journal_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string='عدد قيود الإغلاق' ,index=True,searchable=True)
     is_project_close_stage = fields.Boolean ( compute='_compute_is_project_close_stage' ,
                                               string='Is Project in Close Stage' )
    
