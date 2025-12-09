@@ -501,6 +501,7 @@ class SaleOrder ( models.Model ) :
             rec.paid_percentage_refrence=rec.paid_percent
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
+            rec. paid_total_refrence=paid_total
 
             # تحديث convert_orders بناءً على paid_total
             previous_convert = rec.convert_orders
