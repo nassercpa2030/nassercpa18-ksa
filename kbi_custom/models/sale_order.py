@@ -77,8 +77,8 @@ class SaleOrder ( models.Model ) :
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreement' )
     payment_ids = fields.Many2many ( 'account.payment' , string='Payments' , compute='_compute_payment_ids' )
     payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
-    paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count",index=True )
-    unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count",index=True )
+    paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count",searchable=True )
+    unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count",searchable=True )
     paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" )
     auditor = fields.Many2one ( string="Auditor" , comodel_name="hr.employee" ,
                                 domain=[('job_id' , '!=' , 'مدير مراجعة')] )
