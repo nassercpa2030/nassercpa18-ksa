@@ -17,6 +17,54 @@ class ResCity ( models.Model ) :
 class ResCity ( models.Model ) :
     _inherit = 'res.users'
     
+    
+class HrPayslip(models.Model):
+    _inherit = 'hr.payslip'
+
+    def action_payslip_done(self):
+        result = super().action_payslip_done()
+
+        for slip in self:
+            employee = slip.employee_id
+            if not employee:
+                continue
+
+            # جلب partner الموظف
+            # لو الموظف عنده partner_id استخدمه
+            employee_partner = getattr(employee, 'user_id', False) and getattr(employee.user_id, 'partner_id', False)
+
+            # لو مفيش partner → أنشئ واحد جديد
+            if not employee_partner:
+                employee_partner = self.env['res.partner'].create({
+                    'name': employee.name,
+                    'email': getattr(employee, 'work_email', False),
+                    'phone': getattr(employee, 'work_phone', False),
+                    'is_company': False,
+                })
+
+            # ربط partner بالقيد
+            move = slip.move_id
+            if not move:
+                continue
+
+            move.partner_id = employee_partner.id
+            if analytic_account_id:
+               move.analytic_distribution = [(6, 0, [analytic_account_id.id])]
+            move.line_ids.write({
+            'partner_id': employee_partner.id,
+            'analytic_distribution': [(6, 0, [analytic_account_id.id])] if analytic_account_id else False
+            })
+
+            move.line_ids.write({'partner_id': employee_partner.id})
+
+            _logger.info(
+                "Partner for payslip %s updated to employee partner %s",
+                slip.number,
+                employee_partner.name
+            )
+
+        return result
+
 
 class Recruiter(models.Model):
     _inherit = 'hr.employee'
