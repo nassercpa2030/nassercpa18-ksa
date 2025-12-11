@@ -17,6 +17,14 @@ class ResCity ( models.Model ) :
 class ResCity ( models.Model ) :
     _inherit = 'res.users'
     
+
+class Recruiter(models.Model):
+    _inherit = 'hr.employee'
+
+    analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan', help="Same field as in Journal Entry (account.move) for analytic distribution",placeholder="Enter Analytic Plan")
+    analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' , domain="[('plan_id', '=', analytic_plan)]" , readonly=False , store=True )
+
+
 class Recruiter ( models.Model ) :
     _inherit = 'hr.job'
     recruiter_id = fields.Many2one ( 'hr.employee',string="Recruiter",readonly=False)
