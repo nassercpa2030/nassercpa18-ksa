@@ -85,16 +85,18 @@ class AccountMoveLine ( models.Model ) :
         for line in self :
             info_list = []
             if line.analytic_distribution :
-                # تحويل المفاتيح من str إلى int
                 for aid_str , percent in line.analytic_distribution.items () :
-                    aid = int ( aid_str )
-                    account = self.env['account.analytic.account'].browse ( aid )
-                    if account.exists () :
-                        # الشكل: ID - الاسم - النسبة%
-                        #info_list.append ( f"{aid} - {account.name} ({percent}%)" )
-                        info_list.append ( f"{account.name} ({percent}%)" )
+                    # تقسيم أي IDs مفصولة بفاصلة
+                    for aid_part in aid_str.split ( ',' ) :
+                        try :
+                            aid = int ( aid_part.strip () )
+                            account = self.env['account.analytic.account'].browse ( aid )
+                            if account.exists () :
+                                # الشكل: الاسم + النسبة
+                                info_list.append ( f"{account.name} ({percent}%)" )
+                        except ValueError :
+                            continue  # تجاهل أي قيم غير صالحة
 
-            # دمج كل الحسابات في نص واحد مفصول بفاصلة
             line.analytic_account_name = ', '.join ( info_list )
     
 
