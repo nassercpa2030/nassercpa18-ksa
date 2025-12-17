@@ -102,6 +102,7 @@ class AccountPayment(models.Model):
     sale_order_ids = fields.One2many('account.payment.sale', 'payment_id', string='Lines')
     multi_sale = fields.Boolean(string='Multi Sale', default=False)
     from_sale = fields.Boolean(string='From Sale', default=False)
+    destination_account_id= fields.Many2one('account.account',string='Destination Account',readonly=False ,domain=[("user_type_id.type", 'in',['asset_receivable','asset_cash'])],store=True)
     #journal_id= fields.Many2one('account.journal',string="دفتر اليومية ",domain=[('id', 'in', available_journal_ids)],default=False,readonly=False,store=True)
     journal_id= fields.Many2one('account.journal',string="دفتر اليومية ",default=False,readonly=False,store=True)
     amount = fields.Monetary(currency_field='currency_id', store=True)
