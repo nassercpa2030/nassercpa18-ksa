@@ -103,14 +103,14 @@ class AccountPayment(models.Model):
     multi_sale = fields.Boolean(string='Multi Sale', default=False)
     from_sale = fields.Boolean(string='From Sale', default=False)
     #journal_id= fields.Many2one('account.journal',string="دفتر اليومية ",domain=[('id', 'in', available_journal_ids)],default=False,readonly=False,store=True)
-    journal_id= fields.Many2one('account.journal',string="دفتر اليومية ",default=lambda self: self.env['account.journal'].browse(153),readonly=False,store=True)
+    journal_id= fields.Many2one('account.journal',string="دفتر اليومية ",default=False,readonly=False,store=True)
     amount = fields.Monetary(currency_field='currency_id', store=True)
     convert_orders = fields.Boolean(
         string="تحويل الأوردرات لعقود",
         default=False,
         help="عند تفعيل هذا الاختيار، سيتم تنفيذ Server Action لتحويل الأوردرات المرتبطة إلى مشاريع."
     )
-    destination_account_id= fields.Many2one('account.account',string='Destination Account',readonly=False ,default=lambda self: self.env['account.account'].browse(1142),domain=[("account_type", 'in',['asset_receivable','asset_cash'])],store=True)
+    destination_account_id= fields.Many2one('account.account',string='Destination Account',readonly=False ,domain=[("account_type", 'in',['asset_receivable','asset_cash'])],store=True)
 
     @api.onchange('journal_id')
     def _change_destination_account(self):
@@ -120,6 +120,7 @@ class AccountPayment(models.Model):
                     #rec.destination_account_id = self.env['account.account'].browse(1142)
                     #rec.destination_account_id = 1142
                     rec.partner_id = 80000
+                    rec.destination_account_id = self.env['account.account'].browse(1142)
             else:
                 rec.destination_account_id = False
 
