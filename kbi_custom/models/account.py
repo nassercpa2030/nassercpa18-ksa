@@ -77,6 +77,25 @@ class AccountMoveLine ( models.Model ) :
         store=True ,
         readonly=False
     )
+    analytic_account_name = fields.Char ( string="Analytic Account" , compute="compute_analytic_account_name" ,
+                                          store=True )
+
+    @api.depends ( 'analytic_distribution' )
+    def compute_analytic_account_name(self) :
+        for line in self :
+            info_list = []
+            if line.analytic_distribution :
+                # تحويل المفاتيح من str إلى int
+                for aid_str , percent in line.analytic_distribution.items () :
+                    aid = int ( aid_str )
+                    account = self.env['account.analytic.account'].browse ( aid )
+                    if account.exists () :
+                        # الشكل: ID - الاسم - النسبة%
+                        #info_list.append ( f"{aid} - {account.name} ({percent}%)" )
+                        info_list.append ( f"{account.name} ({percent}%)" )
+
+            # دمج كل الحسابات في نص واحد مفصول بفاصلة
+            line.analytic_account_name = ', '.join ( info_list )
     
 
 
