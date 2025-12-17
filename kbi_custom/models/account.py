@@ -148,12 +148,12 @@ class AccountPayment(models.Model):
 class HrExpenseSheet ( models.Model ) :
     _inherit = 'hr.expense.sheet'
     employee_journal_id=fields.Many2one('account.journal',string="دفتر اليومية ",domain=[],default=False,readonly=False,store=True) 
-    journal_use = fields.Boolean(string="", default=False,readonly=False,store=True)
+    #journal_use = fields.Boolean(string="", default=False,readonly=False,store=True)
     
     @api.onchange('employee_id')
     def compute_journal_from_employee(self):
         for rec in self:
-            if rec.employee_id.id == 600 and rec.journal_use: 
+            if rec.employee_id.id == 600 : 
                 journal = self.env['account.journal'].browse(153)
                 rec.employee_journal_id = journal if journal.exists() else False
             else:
