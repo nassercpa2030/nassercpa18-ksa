@@ -77,22 +77,7 @@ class AccountMoveLine ( models.Model ) :
         store=True ,
         readonly=False
     )
-    analytic_account_name = fields.Char(string="Analytic Account",compute="compute_analytic_account_name",store=True)
     
-    @api.depends('analytic_distribution')
-    def compute_analytic_account_name(self):
-      for rec in self:
-          names = []
-          if rec.analytic_distribution:
-              # keys = analytic_account_id كنص
-              analytic_ids = [int(k) for k in rec.analytic_distribution.keys()]
-
-              accounts = self.env['analytic.account'].browse(analytic_ids)
-              names = accounts.mapped('name')
-
-            # لو فيه أكتر من حساب
-              rec.analytic_account_name = ', '.join(names)
-
 
 
 
