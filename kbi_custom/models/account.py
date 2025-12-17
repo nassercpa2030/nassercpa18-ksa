@@ -152,14 +152,14 @@ class HrExpenseSheet ( models.Model ) :
     @api.depends('expense_line_ids.employee_id')
     def _compute_employee_journal(self):
         journal_153 = self.env['account.journal'].browse(153)
-
         for sheet in self:
             sheet.employee_journal_id = False
-
             for expense in sheet.expense_line_ids:
                 if expense.employee_id and expense.employee_id.id == 600:
-                    sheet.employee_journal_id = journal_153 if journal_153.exists() else False
+                    if journal_153.exists():
+                        sheet.employee_journal_id = journal_153
                     break
+                    
     #@api.onchange('employee_id')
     #def compute_journal_from_employee(self):
         #for rec in self:
