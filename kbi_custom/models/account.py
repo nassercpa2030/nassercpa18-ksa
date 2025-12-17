@@ -152,7 +152,7 @@ class HrExpenseSheet ( models.Model ) :
     @api.onchange('employee_id')
     def compute_journal_from_employee(self):
         for rec in self:
-            if rec.employee_id == 600 :
+            if rec.employee_id.id == 600 :
                 journal = self.env['account.journal'].browse(153)
                 rec.employee_journal_id = journal if journal.exists() else False
             else:
