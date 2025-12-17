@@ -9,9 +9,11 @@ class AccountMove ( models.Model ) :
 
     broker_sale_id = fields.Many2one ( 'sale.order' , string='Broker Sale' )
     sale_order_test = fields.Char ( string='Sale Order Test' , readonly=False , required=False )
-    x_studio_auto_code=  fields.Char(string="order name")
-    sale_order_id_finance = fields.Many2one ( 'sale.order' , string='أمر البيع' , compute='_compute_sale_order_id' ,readonly=False,index=True )
-    vendor_attachment= fields.Binary(string='Attachment',compute='compute_vendor_attachements',store=True,readonly=False)
+    x_studio_auto_code = fields.Char ( string="order name" )
+    sale_order_id_finance = fields.Many2one ( 'sale.order' , string='أمر البيع' , compute='_compute_sale_order_id' ,
+                                              readonly=False , index=True )
+    vendor_attachment = fields.Binary ( string='Attachment' , compute='compute_vendor_attachements' , store=True ,
+                                        readonly=False )
     invoice_count_odoo16 = fields.Integer ( string="" , store=True )
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
     analytic_acc_desc = fields.Char (
@@ -28,15 +30,14 @@ class AccountMove ( models.Model ) :
         if autopost_bills_wizard := self._show_autopost_bills_wizard () :
             return autopost_bills_wizard
         return True
-        
-    @api.depends ( 'partner_id' )    
-    def compute_vendor_attachements(self):
-        for rec in self:
-            if rec.partner_id.image_1920:
-               rec.vendor_attachment = rec.partner_id.image_1920
-            else:
-               rec.vendor_attachment = False
-             
+
+    @api.depends ( 'partner_id' )
+    def compute_vendor_attachements(self) :
+        for rec in self :
+            if rec.partner_id.image_1920 :
+                rec.vendor_attachment = rec.partner_id.image_1920
+            else :
+                rec.vendor_attachment = False
 
     @api.depends ( 'invoice_origin' )
     def _compute_sale_order_id(self) :
@@ -44,7 +45,7 @@ class AccountMove ( models.Model ) :
             order = False
             if move.invoice_origin :
                 order = self.env['sale.order'].search ( [('name' , '=' , move.invoice_origin)] , limit=1 )
-            move.sale_order_id_finance  = order
+            move.sale_order_id_finance = order
 
     def _compute_analytic_distribution(self) :
         for rec in self :
@@ -70,7 +71,7 @@ class AccountMoveLine ( models.Model ) :
     x_studio_analytic_account_test = fields.Char ( string="analytic_Test" ,
                                                    related='sale_order_id.analytic_account_id.display_name' ,
                                                    store=True )
-    sale_order_id = fields.Many2one ('sale.order' , string='Sale Order' , domain="[('partner_id','=',partner_id)]" )
+    sale_order_id = fields.Many2one ( 'sale.order' , string='Sale Order' , domain="[('partner_id','=',partner_id)]" )
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
     analytic_acc_desc_line = fields.Char (
         string="Analytic Description" ,
@@ -98,9 +99,6 @@ class AccountMoveLine ( models.Model ) :
                             continue  # تجاهل أي قيم غير صالحة
 
             line.analytic_account_name = ', '.join ( info_list )
-    
-
-
 
 
 class AccountPayment ( models.Model ) :
@@ -122,14 +120,14 @@ class AccountPayment ( models.Model ) :
         help="عند تفعيل هذا الاختيار، سيتم تنفيذ Server Action لتحويل الأوردرات المرتبطة إلى مشاريع."
     )
 
-   @api.onchange ( 'journal_id' )
-   def _change_destination_account(self) :
+    @api.onchange ( 'journal_id' )
+    def _change_destination_account(self) :
         for rec in self :
             if rec.journal_id :
-                if  rec.journal_id == 153 :
+                if rec.journal_id == 153 :
                     rec.destination_account_id = 1144
             else :
-                    rec.destination_account_id = False
+                rec.destination_account_id = False
 
     @api.onchange ( 'sale_order_id' )
     def _change_memo(self) :
@@ -152,7 +150,9 @@ class AccountPayment ( models.Model ) :
                 if rec.amount != 0 :
                     rec.amount = 0
 
-    # التحقق من أن amount لا يتجاوز amount_due عند تعديل amount
+
+
+# التحقق من أن amount لا يتجاوز amount_due عند تعديل amount
 
 
 # @api.onchange ( 'amount' )
