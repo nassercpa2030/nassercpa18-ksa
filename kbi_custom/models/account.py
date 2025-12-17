@@ -116,7 +116,7 @@ class AccountPayment(models.Model):
         for rec in self:
             if rec.journal_id:
                 if rec.journal_id.id == 153:
-                    rec.destination_account_id = 1142
+                    rec.destination_account_id = self.env['account.account'].browse(1142)
                     rec.partner_id = 80000
             else:
                 rec.destination_account_id = False
