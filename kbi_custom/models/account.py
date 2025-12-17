@@ -102,6 +102,7 @@ class AccountPayment(models.Model):
     sale_order_ids = fields.One2many('account.payment.sale', 'payment_id', string='Lines')
     multi_sale = fields.Boolean(string='Multi Sale', default=False)
     from_sale = fields.Boolean(string='From Sale', default=False)
+    journal_id= fields.Many2one('account.journal',string="دفتر اليومية ",domain=[('id', 'in', available_journal_ids)],default=False,readonly=False,store=True)
     amount = fields.Monetary(currency_field='currency_id', store=True)
     convert_orders = fields.Boolean(
         string="تحويل الأوردرات لعقود",
@@ -114,7 +115,8 @@ class AccountPayment(models.Model):
         for rec in self:
             if rec.journal_id:
                 if rec.journal_id.id == 153:
-                    rec.destination_account_id = 1144
+                    rec.destination_account_id = 1142
+                    rec.partner_id = 80000
             else:
                 rec.destination_account_id = False
 
