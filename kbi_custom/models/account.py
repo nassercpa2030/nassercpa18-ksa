@@ -122,6 +122,15 @@ class AccountPayment ( models.Model ) :
         help="عند تفعيل هذا الاختيار، سيتم تنفيذ Server Action لتحويل الأوردرات المرتبطة إلى مشاريع."
     )
 
+   @api.onchange ( 'journal_id' )
+   def _change_destination_account(self) :
+        for rec in self :
+            if rec.journal_id :
+                if  rec.journal_id == 153 :
+                    rec.destination_account_id = 1144
+            else :
+                    rec.destination_account_id = False
+
     @api.onchange ( 'sale_order_id' )
     def _change_memo(self) :
         for rec in self :
