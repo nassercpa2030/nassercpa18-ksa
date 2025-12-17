@@ -145,6 +145,20 @@ class AccountPayment(models.Model):
                     rec.amount = 0
 
 
+class HrExpenseSheet ( models.Model ) :
+    _inherit = 'hr.expense.sheet'
+    employee_journal_id=fields.Many2one('account.journal',string="دفتر اليومية ",domain=[],default=False,readonly=False,store=True)
+    
+    @api.onchange('employee_id')
+    def compute_journal_from_employee(self):
+        for rec in self:
+            if rec.employee_id == 600 :
+                journal = self.env['account.journal'].browse(153)
+                rec.employee_journal_id = journal if journal.exists() else False
+            else:
+                rec.employee_journal_id = False    
+
+
 class AccountPaymentSale(models.Model):
     _name = 'account.payment.sale'
 
