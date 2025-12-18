@@ -142,7 +142,7 @@ class SaleOrder ( models.Model ) :
     close_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string=' قيود الإغلاق' ,store=True)
     is_project_close_stage = fields.Boolean ( compute='_compute_is_project_close_stage' ,
                                               string='Is Project in Close Stage' )
-   
+    final_close_entry_date = fields.Date(string="تاريخ قيد الايراد",compute='compute_final_close_entry_date',store=True)
     journal_entry_data = fields.Many2many ( comodel_name='account.move' , compute='_compute_journal_entry_data' ,
                                             string='Journal Data Lines' )
     #journal_entry_count_finance = fields.Integer (string='عدد قيود الإغلاق',compute='compute_journal_entry_count_finance',store=True)
@@ -470,6 +470,16 @@ class SaleOrder ( models.Model ) :
             # 'domain': ['|',('sale_order_id', '=', self.id),('invoice_origin', '=', self.name), ('journal_id', 'in', [162,161,160,165])],
             'context' : {'default_sale_order_id' : self.id} ,
         }
+
+     @api.depends('name')  # أو أي حقل يربط بالسيل أوردر
+     def _compute_journal_165_date(self):
+        for order in self:
+            # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
+            moves = self.env['account.move'].search([
+                ('invoice_origin', '=', order.name),
+                ('journal_id', '=', 165)
+            ], order='date asc', limit=1)  # ممكن تختار أول قيد حسب التاريخ
+            order.journal_165_date = moves.date if moves else False
 
 
     def action_close_journal_entries(self) :
