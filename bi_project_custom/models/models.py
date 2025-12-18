@@ -6,15 +6,15 @@ from odoo.exceptions import ValidationError
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # =========================
-    # Basic Fields
-    # =========================
+    # ------------------------------------------------------------
+    # Fields
+    # ------------------------------------------------------------
 
     journal_entry_count = fields.Integer(
         compute='_compute_journal_entry_count',
         string='عدد قيود الإغلاق',
-        index=True,
-        searchable=True
+        store=False,
+        index=True
     )
 
     close_entry_count = fields.Integer(
@@ -23,13 +23,8 @@ class SaleOrder(models.Model):
         store=True
     )
 
-    is_project_close_stage = fields.Boolean(
-        compute='_compute_is_project_close_stage',
-        string='Is Project in Close Stage'
-    )
-
     journal_entry_data = fields.Many2many(
-        comodel_name='account.move',
+        'account.move',
         compute='_compute_journal_entry_data',
         string='Journal Data Lines'
     )
@@ -39,10 +34,15 @@ class SaleOrder(models.Model):
         store=True
     )
 
-    one_audit_number = fields.Char(
-        string="رقم ون أودت",
-        related="partner_id.ref",
-        index=True
+    is_project_close_stage = fields.Boolean(
+        compute='_compute_is_project_close_stage',
+        string='Is Project in Close Stage'
+    )
+
+    is_journal_state_not_posted = fields.Boolean(
+        compute='_compute_is_journal_state_not_posted',
+        string='Journal State',
+        default=True
     )
 
     broker_percentage_ = fields.Float(
@@ -51,9 +51,15 @@ class SaleOrder(models.Model):
         store=True
     )
 
-    # =========================
-    # Compute Journal Entries
-    # =========================
+    one_audit_number = fields.Char(
+        string="رقم ون أودت",
+        related="partner_id.ref",
+        index=True
+    )
+
+    # ------------------------------------------------------------
+    # Journal Entries
+    # ------------------------------------------------------------
 
     @api.depends('name')
     def _compute_journal_entry_data(self):
@@ -77,29 +83,35 @@ class SaleOrder(models.Model):
             order.journal_entry_count = count
             order.close_entry_count = count
 
-    # =========================
-    # Project Close Logic (SAFE)
-    # =========================
+    # ------------------------------------------------------------
+    # Project Close Logic (SAFE – no deep depends)
+    # ------------------------------------------------------------
 
     @api.depends(
-        'project_ids.stage_id.closing_stage',
+        'project_ids.stage_id',
         'project_ids.has_closed_entry',
         'project_ids.paid_percent',
         'project_ids.files_state'
     )
     def _compute_is_project_close_stage(self):
         Move = self.env['account.move']
-        for order in self:
-            # Default from projects
-            order.is_project_close_stage = any(
-                project.stage_id.closing_stage and
-                not project.has_closed_entry and
-                project.paid_percent >= 1.0 and
-                project.files_state == 'done'
-                for project in order.project_ids
-            )
 
-            # Check unposted journal entries
+        for order in self:
+            order.is_project_close_stage = False
+
+            # 1️⃣ From project data
+            for project in order.project_ids:
+                if (
+                    project.stage_id
+                    and project.stage_id.closing_stage
+                    and not project.has_closed_entry
+                    and project.paid_percent >= 1.0
+                    and project.files_state == 'done'
+                ):
+                    order.is_project_close_stage = True
+                    break
+
+            # 2️⃣ From unposted journal entries
             moves = Move.search([
                 ('invoice_origin', '=', order.name),
                 ('move_type', '=', 'entry'),
@@ -108,29 +120,9 @@ class SaleOrder(models.Model):
             if any(move.state != 'posted' for move in moves):
                 order.is_project_close_stage = True
 
-    # =========================
-    # Broker Percentage
-    # =========================
-
-    @api.depends('amount_untaxed', 'broker_amount')
-    def compute_broker_percentage(self):
-        for record in self:
-            if record.amount_untaxed and record.broker_amount:
-                record.broker_percentage_ = (
-                    record.broker_amount / record.amount_untaxed
-                ) * 100
-            else:
-                record.broker_percentage_ = 0.0
-
-    # =========================
-    # Journal State Check
-    # =========================
-
-    is_journal_state_not_posted = fields.Boolean(
-        compute='_compute_is_journal_state_not_posted',
-        string='Journal State',
-        default=True
-    )
+    # ------------------------------------------------------------
+    # Journal vs Invoice Check
+    # ------------------------------------------------------------
 
     @api.depends(
         'journal_entry_data.state',
@@ -153,19 +145,33 @@ class SaleOrder(models.Model):
 
             rec.is_journal_state_not_posted = posted_total != invoiced_total
 
-    # =========================
+    # ------------------------------------------------------------
+    # Broker Percentage
+    # ------------------------------------------------------------
+
+    @api.depends('amount_untaxed', 'broker_amount')
+    def compute_broker_percentage(self):
+        for rec in self:
+            if rec.amount_untaxed and rec.broker_amount:
+                rec.broker_percentage_ = (
+                    rec.broker_amount / rec.amount_untaxed
+                ) * 100
+            else:
+                rec.broker_percentage_ = 0.0
+
+    # ------------------------------------------------------------
     # Actions
-    # =========================
+    # ------------------------------------------------------------
 
     def action_close_journal_entries(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
             'name': 'Close Journal Entries',
-            'view_mode': 'form',
             'res_model': 'close.entry.wizard',
-            'context': {'default_sale_order_id': self.id},
+            'view_mode': 'form',
             'target': 'new',
+            'context': {'default_sale_order_id': self.id},
         }
 
     def action_open_close_entry_wizard_deffered(self):
@@ -179,5 +185,5 @@ class SaleOrder(models.Model):
             'view_id': self.env.ref(
                 'bi_project_custom.view_close_entry_wizard_form_deffered'
             ).id,
-            'context': {'default_sale_order_id': self.id}
+            'context': {'default_sale_order_id': self.id},
         }
