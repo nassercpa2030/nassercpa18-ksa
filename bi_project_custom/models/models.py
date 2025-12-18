@@ -111,7 +111,7 @@ class SaleOrder(models.Model):
                                          searchable=True)
     close_entry_count = fields.Integer(compute='_compute_journal_entry_count', string=' قيود الإغلاق', store=True)
     is_project_close_stage = fields.Boolean(compute='_compute_is_project_close_stage', string='Is Project in Close Stage')
-    final_close_entry_date = fields.Date(string="تاريخ قيد الايراد", compute='compute_final_close_entry_date', store=True)
+    #final_close_entry_date = fields.Date(string="تاريخ قيد الايراد", compute='compute_final_close_entry_date', store=True)
     journal_entry_data = fields.Many2many(comodel_name='account.move', compute='_compute_journal_entry_data',
                                           string='Journal Data Lines')
     journal_entry_count_finance = fields.Integer(string='عدد قيود الإغلاق', store=True)
@@ -150,14 +150,14 @@ class SaleOrder(models.Model):
         for order in self:
             order.project_files_state = order.project_ids[:1].files_state if order.project_ids else False
 
-    @api.depends('name')
-    def compute_final_close_entry_date(self):
-        for order in self:
-            moves = self.env['account.move'].search([
-                ('invoice_origin', '=', order.name),
-                ('journal_id', '=', 165)
-            ], order='date asc', limit=1)
-            order.final_close_entry_date = moves.date if moves else False
+   # @api.depends('name')
+    #def compute_final_close_entry_date(self):
+        #for order in self:
+           # moves = self.env['account.move'].search([
+               # ('invoice_origin', '=', order.name),
+                #('journal_id', '=', 165)
+           # ], order='date asc', limit=1)
+           # order.final_close_entry_date = moves.date if moves else False
 
     @api.onchange('amount_untaxed', 'broker_amount')
     @api.depends('amount_untaxed', 'broker_amount')
