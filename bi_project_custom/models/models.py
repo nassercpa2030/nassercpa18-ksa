@@ -233,7 +233,17 @@ class SaleOrder ( models.Model ) :
     def _compute_project_files_state(self) :
         for order in self :
             order.project_files_state = order.project_ids[:1].files_state if order.project_ids else False
-            
+
+    @api.depends('name')  # أو أي حقل يربط بالسيل أوردر
+    def compute_final_close_entry_date(self):
+         for order in self:
+             # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
+             moves = self.env['account.move'].search([
+                 ('invoice_origin', '=', order.name),
+                 ('journal_id', '=', 165)
+             ], order='date asc', limit=1)  # ممكن تختار أول قيد حسب التاريخ
+             order.journal_165_date = moves.date if moves else False
+
     @api.onchange ( 'amount_untaxed','broker_amount' )       
     @api.depends( 'amount_untaxed','broker_amount' )     
     def compute_broker_percentage(self):
@@ -296,17 +306,6 @@ class SaleOrder ( models.Model ) :
                order.user_id = order.partner_id.manager_id 
            else:
                order.user_id = self.env.user
-
-
-    @api.depends('name')  # أو أي حقل يربط بالسيل أوردر
-    def compute_final_close_entry_date(self):
-         for order in self:
-             # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
-             moves = self.env['account.move'].search([
-                 ('invoice_origin', '=', order.name),
-                 ('journal_id', '=', 165)
-             ], order='date asc', limit=1)  # ممكن تختار أول قيد حسب التاريخ
-             order.journal_165_date = moves.date if moves else False
 
 
     @api.constrains('partner_id', 'user_id')
