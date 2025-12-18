@@ -298,8 +298,8 @@ class SaleOrder ( models.Model ) :
                order.user_id = self.env.user
 
 
-     @api.depends('name')  # أو أي حقل يربط بالسيل أوردر
-     def compute_final_close_entry_date(self):
+    @api.depends('name')  # أو أي حقل يربط بالسيل أوردر
+    def compute_final_close_entry_date(self):
          for order in self:
              # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
              moves = self.env['account.move'].search([
