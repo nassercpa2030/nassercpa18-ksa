@@ -157,7 +157,7 @@ class SaleOrder(models.Model):
                 ('invoice_origin', '=', order.name),
                 ('journal_id', '=', 165)
             ], order='date asc', limit=1)
-            order.journal_165_date = moves.date if moves else False
+            order.final_close_entry_date = moves.date if moves else False
 
     @api.onchange('amount_untaxed', 'broker_amount')
     @api.depends('amount_untaxed', 'broker_amount')
@@ -279,14 +279,6 @@ class SaleOrder(models.Model):
                 if data.state != 'posted':
                     order.is_project_close_stage = True
 
-    @api.depends('name')
-    def _compute_journal_165_date(self):
-        for order in self:
-            moves = self.env['account.move'].search([
-                ('invoice_origin', '=', order.name),
-                ('journal_id', '=', 165)
-            ], order='date asc', limit=1)
-            order.journal_165_date = moves.date if moves else False
 
     def action_close_journal_entries(self):
         self.ensure_one()
