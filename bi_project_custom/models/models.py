@@ -234,8 +234,8 @@ class SaleOrder ( models.Model ) :
         for order in self :
             order.project_files_state = order.project_ids[:1].files_state if order.project_ids else False
 
-    @api.depends('name')  # أو أي حقل يربط بالسيل أوردر
-    def compute_final_close_entry_date(self):
+   @api.depends('name')  # أو أي حقل يربط بالسيل أوردر
+   def compute_final_close_entry_date(self):
          for order in self:
              # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
              moves = self.env['account.move'].search([
