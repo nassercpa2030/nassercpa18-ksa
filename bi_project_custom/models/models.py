@@ -123,8 +123,8 @@ class SaleOrder(models.Model):
     second_line_name = fields.Char(string="Second Line Description", compute="_compute_second_line_name", store=True)
     first_line_untaxed = fields.Float(string="First Line Untaxed", compute="_compute_second_line_name", store=True)
     second_line_untaxed = fields.Float(string="Second Line Untaxed", compute="_compute_second_line_name", store=True)
-    first_line_taxed = fields.Float(string="Second Line Untaxed", compute="_compute_second_line_name", store=True)
-    second_line_taxed = fields.Float(string="Second Line Untaxed", compute="_compute_second_line_name", store=True)
+    first_line_taxed = fields.Float(string="First Line Taxed", compute="_compute_second_line_name", store=True)
+    second_line_taxed = fields.Float(string="Second Line Taxed", compute="_compute_second_line_name", store=True)
     first_line_taxes = fields.Integer(string="First Line Taxe", compute="_compute_second_line_name", store=True)
     second_line_taxes = fields.Integer(string="Second Line Taxe", compute="_compute_second_line_name", store=True)
     invoice_attachements_ids = fields.Many2many('ir.attachment', 'sale_order_invoice_attachment_rel', 'sale_order_id',
@@ -285,3 +285,28 @@ class SaleOrder(models.Model):
             moves = self.env['account.move'].search([
                 ('invoice_origin', '=', order.name),
                 ('journal_id', '=', 165)
+            ], order='date asc', limit=1)
+            order.journal_165_date = moves.date if moves else False
+
+    def action_close_journal_entries(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Close Journal Entries',
+            'view_mode': 'form',
+            'res_model': 'close.entry.wizard',
+            'context': {'default_sale_order_id': self.id},
+            'target': 'new',
+        }
+
+    def action_open_close_entry_wizard_deffered(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Close Entry Deffered',
+            'res_model': 'close.entry.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'view_id': self.env.ref('bi_project_custom.view_close_entry_wizard_form_deffered').id,
+            'context': {'default_sale_order_id': self.id}
+        }
