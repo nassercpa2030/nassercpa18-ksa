@@ -471,8 +471,8 @@ class SaleOrder ( models.Model ) :
             'context' : {'default_sale_order_id' : self.id} ,
         }
 
-     @api.depends('name')  # أو أي حقل يربط بالسيل أوردر
-     def _compute_journal_165_date(self):
+    @api.depends('name')  # أو أي حقل يربط بالسيل أوردر
+    def _compute_journal_165_date(self):
         for order in self:
             # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
             moves = self.env['account.move'].search([
