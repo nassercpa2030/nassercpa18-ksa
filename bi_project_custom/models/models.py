@@ -297,6 +297,18 @@ class SaleOrder ( models.Model ) :
            else:
                order.user_id = self.env.user
 
+
+     @api.depends('name')  # أو أي حقل يربط بالسيل أوردر
+     def _compute_journal_165_date(self):
+         for order in self:
+             # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
+             moves = self.env['account.move'].search([
+                 ('invoice_origin', '=', order.name),
+                 ('journal_id', '=', 165)
+             ], order='date asc', limit=1)  # ممكن تختار أول قيد حسب التاريخ
+             order.journal_165_date = moves.date if moves else False
+
+
     @api.constrains('partner_id', 'user_id')
     def _check_partner_manager(self):
         for order in self:
