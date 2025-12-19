@@ -724,7 +724,7 @@ class SaleOrder ( models.Model ) :
     year2=fields.Char(string="Year_2",readonly=False,deFault=False)
     year3=fields.Char(string="Year_3",readonly=False,deFault=False)
     uuid = fields.Char ( string='UUID' )
-    final_close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , compute='_compute_final_close_entry_date',readonly=False,index=True,store=True)
+    final_close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , compute='_compute_final_close_entry_date',readonly=False,index=True,searchable=True)
     validity_date = fields.Date ( string='Validity Date' ,
                                   default=fields.Date.today () + datetime.timedelta ( days=30 ) )
     project_files_state = fields.Selection ( [
