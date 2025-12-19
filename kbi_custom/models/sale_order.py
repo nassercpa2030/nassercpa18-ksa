@@ -724,7 +724,7 @@ class SaleOrder ( models.Model ) :
     year3=fields.Char(string="Year_3",readonly=False,deFault=False)
     uuid = fields.Char ( string='UUID' )
     final_close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , compute='_compute_final_close_entry_date',readonly=False,index=True,searchable=True)
-    close_entry_date = fields.Date (string="Close Entry Date" ,related="final_close_entry_date" ,store=True, readonly=False ,searchable=True)
+    close_entry_date = fields.Date (string="Close Entry Date" ,store=True, readonly=False ,searchable=True)
     close_entry_year = fields.Integer ( string="Close Entry Year" ,store=True, readonly=False,searchable=True )
     validity_date = fields.Date ( string='Validity Date' ,
                                   default=fields.Date.today () + datetime.timedelta ( days=30 ) )
@@ -741,6 +741,15 @@ class SaleOrder ( models.Model ) :
                 ('journal_id' , 'in' , [165,160,162])
             ] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
             order.final_close_entry_date = moves.date if moves else False
+
+    @api.depends('final_close_entry_date')
+    def _compute_final_close_entry_date(self):
+        for rec in self:
+            # هنا تحسب final_close_entry_date
+            rec.final_close_entry_date = fields.Date.today()  # مثال لحسابها
+            # لو close_entry_date فاضي، انسخه
+            if not rec.close_entry_date:
+                rec.close_entry_date = rec.final_close_entry_date
             
     
     @api.depends('audit_date')
