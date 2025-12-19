@@ -733,26 +733,33 @@ class SaleOrder ( models.Model ) :
         ('not_done' , '(مستثني)غير مكتمل') ,
     ] , string="Project Files State" , store=True )
 
-    @api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
-    def _compute_final_close_entry_date(self) :
-        for order in self :
-            moves = self.env['account.move'].search ( [  # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
-                ('invoice_origin' , '=' , order.name) ,
-                ('journal_id' , 'in' , [165,160,162])
-            ] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
-            order.final_close_entry_date = moves.date if moves else False
+    #@api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
+    #def _compute_final_close_entry_date(self) :
+        #for order in self :
+            #moves = self.env['account.move'].search ( [  # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
+                #('invoice_origin' , '=' , order.name) ,
+                #('journal_id' , 'in' , [165,160,162])
+            #] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
+           # order.final_close_entry_date = moves.date if moves else False
 
-    @api.model
-    def create(self, vals):
-        order = super().create(vals)
-        order._compute_final_close_entry_date()
-        return order
+    @api.depends('name')
+    def _compute_final_close_entry_date(self):
+        # نجيب كل الحركات مرة واحدة بدل ما نعمل search لكل order على حدة
+        orders = self.filtered(lambda o: o.name)
+        if not orders:
+            return
 
-    def write(self, vals):
-        res = super().write(vals)
-        self._compute_final_close_entry_date()
-        return res
-            
+        # جميع الحركات المرتبطة بهذه الأوردرات
+        moves = self.env['account.move'].search([
+            ('invoice_origin', 'in', orders.mapped('name')),
+            ('journal_id', 'in', [165, 160, 162])
+        ], order='date asc')
+
+        # نربط كل حركة بأوردرها
+        move_dict = {}
+        for move in moves:
+            if move.invoice_origin not i
+    
 
     
    # @api.depends('final_close_entry_date')
