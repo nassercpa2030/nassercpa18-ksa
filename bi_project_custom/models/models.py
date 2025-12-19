@@ -238,15 +238,15 @@ class SaleOrder ( models.Model ) :
             
 
     def action_close_journal_entries(self) :
-    self.ensure_one ()
-    return {
-        'type' : 'ir.actions.act_window' ,
-        'name' : 'Close Journal Entries' ,
-        'view_mode' : 'form' ,
-        'res_model' : 'close.entry.wizard' ,
-        'context' : {'default_sale_order_id' : self.id} ,
-        'target' : 'new' ,
-    }
+        self.ensure_one ()
+        return {
+           'type' : 'ir.actions.act_window' ,
+           'name' : 'Close Journal Entries' ,
+           'view_mode' : 'form' ,
+           'res_model' : 'close.entry.wizard' ,
+           'context' : {'default_sale_order_id' : self.id} ,
+           'target' : 'new' ,
+              }
     
     @api.onchange ( 'amount_untaxed' , 'broker_amount' )
     @api.depends ( 'amount_untaxed' , 'broker_amount' )
