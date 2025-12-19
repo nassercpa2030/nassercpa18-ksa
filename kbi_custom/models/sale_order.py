@@ -758,7 +758,11 @@ class SaleOrder ( models.Model ) :
         # نربط كل حركة بأوردرها
         move_dict = {}
         for move in moves:
-            if move.invoice_origin not i
+            if move.invoice_origin not in move_dict:
+                move_dict[move.invoice_origin] = move.date
+                
+        for order in orders:        
+            order.final_close_entry_date = move_dict.get(order.name, False)
     
 
     
