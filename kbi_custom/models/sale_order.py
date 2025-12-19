@@ -731,6 +731,16 @@ class SaleOrder ( models.Model ) :
         ('done' , 'طبيعي') ,
         ('not_done' , '(مستثني)غير مكتمل') ,
     ] , string="Project Files State" , store=True )
+
+   @api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
+   def _compute_final_close_entry_date(self) :
+        for order in self :
+            moves = self.env['account.move'].search ( [  # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
+                ('invoice_origin' , '=' , order.name) ,
+                ('journal_id' , '=' , 165)
+            ] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
+            order.final_close_entry_date = moves.date if moves else False
+            
     
     @api.depends('audit_date')
     def compute_audit_year(self):
@@ -741,14 +751,7 @@ class SaleOrder ( models.Model ) :
                #rec.account_year = fields.Date.today ().year
                 rec.account_year = False
                 
-   @api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
-   def _compute_final_close_entry_date(self) :
-        for order in self :
-            moves = self.env['account.move'].search ( [  # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
-                ('invoice_origin' , '=' , order.name) ,
-                ('journal_id' , '=' , 165)
-            ] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
-            order.final_close_entry_date = moves.date if moves else False        
+       
     def action_open_close_entry_wizard_deffered(self) :
         self.ensure_one ()
         return {
