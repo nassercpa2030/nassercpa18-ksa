@@ -59,8 +59,7 @@ class SaleOrder ( models.Model ) :
     audit_date = fields.Date ( string='Audit Date' , readonly=False , required=True , store=True )
     #close_entry_date = fields.Date (string="Close Entry Date" ,compute="calc_close_date",store=True, readonly=True ,searchable=True)
     #close_entry_year = fields.Integer ( string="Close Entry Year" ,compute="calc_close_date",store=True, readonly=False,searchable=True )
-    close_entry_date = fields.Date (string="Close Entry Date" ,store=True, readonly=False ,searchable=True)
-    close_entry_year = fields.Integer ( string="Close Entry Year" ,store=True, readonly=False,searchable=True )
+
     date = fields.Datetime ( string='Date' )
     review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Assigned To' , readonly=False ,
                                           domain=[('job_id' , '=' , 'مدير مراجعة')] )
@@ -725,6 +724,8 @@ class SaleOrder ( models.Model ) :
     year3=fields.Char(string="Year_3",readonly=False,deFault=False)
     uuid = fields.Char ( string='UUID' )
     final_close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , compute='_compute_final_close_entry_date',readonly=False,index=True,searchable=True)
+    close_entry_date = fields.Date (string="Close Entry Date" ,related="final_close_entry_date" ,store=True, readonly=False ,searchable=True)
+    close_entry_year = fields.Integer ( string="Close Entry Year" ,store=True, readonly=False,searchable=True )
     validity_date = fields.Date ( string='Validity Date' ,
                                   default=fields.Date.today () + datetime.timedelta ( days=30 ) )
     project_files_state = fields.Selection ( [
