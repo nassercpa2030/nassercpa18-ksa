@@ -737,7 +737,7 @@ class SaleOrder ( models.Model ) :
         for order in self :
             moves = self.env['account.move'].search ( [  # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
                 ('invoice_origin' , '=' , order.name) ,
-                ('journal_id' , 'in' , [165,160])
+                ('journal_id' , 'in' , [165,160,162])
             ] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
             order.final_close_entry_date = moves.date if moves else False
             
