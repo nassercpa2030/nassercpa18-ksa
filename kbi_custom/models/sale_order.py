@@ -741,7 +741,7 @@ class SaleOrder ( models.Model ) :
                 ('journal_id' , 'in' , [165,160,162])
             ] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
             order.final_close_entry_date = moves.date if moves else False
-            order.close_entry_date = order.final_close_entry_date
+            order.close_entry_date = moves.date if moves else False
     
    # @api.depends('final_close_entry_date')
     #def _compute_final_close_entry_date(self):
