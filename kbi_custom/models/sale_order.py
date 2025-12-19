@@ -742,10 +742,10 @@ class SaleOrder ( models.Model ) :
             ] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
             order.final_close_entry_date = moves.date if moves else False
 
-    @api.depends('final_close_entry_date')
-    def _compute_final_close_entry_date(self):
-        for rec in self:
-            rec.close_entry_date = rec.final_close_entry_date
+   # @api.depends('final_close_entry_date')
+    #def _compute_final_close_entry_date(self):
+     #   for rec in self:
+      #      rec.close_entry_date = rec.final_close_entry_date
             
     
     @api.depends('audit_date')
