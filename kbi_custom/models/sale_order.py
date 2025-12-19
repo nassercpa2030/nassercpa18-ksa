@@ -736,16 +736,19 @@ class SaleOrder ( models.Model ) :
     @api.depends('name')
     def _compute_final_close_entry_date(self):
         for order in self:
+            # تنظيف الاسم من مسافات إضافية وتحويله لأحرف صغيرة
+            order_name_clean = (order.name or '').strip().lower()
+
             # البحث عن أول قيد مرتبط بالـ Sale Order
             move = self.env['account.move'].search([
-                ('invoice_origin', '=', order.name),
-                ('journal_id', 'in', [165, 160, 162])
+                ('invoice_origin', 'ilike', order_name_clean),  # بحث غير حساس لحالة الأحرف
+                ('journal_id', 'in', [165, 160, 162])          # حسب Journals اللي انت عايزهم
             ], order='date asc', limit=1)
-            
-            # ضبط التاريخ في الحقول
+
             date_value = move.date if move else False
             order.final_close_entry_date = date_value
             order.close_entry_date = date_value
+        
     #@api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
     #def _compute_final_close_entry_date(self) :
         #for order in self :
