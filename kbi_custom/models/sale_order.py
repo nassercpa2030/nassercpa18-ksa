@@ -724,6 +724,7 @@ class SaleOrder ( models.Model ) :
     year2=fields.Char(string="Year_2",readonly=False,deFault=False)
     year3=fields.Char(string="Year_3",readonly=False,deFault=False)
     uuid = fields.Char ( string='UUID' )
+    final_close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , compute='_compute_final_close_entry_date',readonly=False,index=True )
     validity_date = fields.Date ( string='Validity Date' ,
                                   default=fields.Date.today () + datetime.timedelta ( days=30 ) )
     project_files_state = fields.Selection ( [
@@ -740,7 +741,14 @@ class SaleOrder ( models.Model ) :
                #rec.account_year = fields.Date.today ().year
                 rec.account_year = False
                 
-            
+   @api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
+   def _compute_final_close_entry_date(self) :
+        for order in self :
+            moves = self.env['account.move'].search ( [  # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
+                ('invoice_origin' , '=' , order.name) ,
+                ('journal_id' , '=' , 165)
+            ] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
+            order.final_close_entry_date = moves.date if moves else False        
     def action_open_close_entry_wizard_deffered(self) :
         self.ensure_one ()
         return {
@@ -756,14 +764,14 @@ class SaleOrder ( models.Model ) :
             }
         }
 
-    @api.depends ( 'name' )
-    def _compute_invoice_count_odoo16(self) :
+    @api.depends ( 'name' )  
+    def _compute_journal_165_date(self) :
         for order in self :
-            invoices = self.env['account.move'].search ( [
-                ('sale_order_test' , '=' , order.name.strip ()) ,
-                ('move_type' , '=' , 'out_invoice')
-            ] )
-            order.invoice_count_odoo16 = len ( invoices )
+            moves = self.env['account.move'].search ( [    # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
+                ('invoice_origin' , '=' , order.name) ,
+                ('journal_id' , '=' , 165)
+            ] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
+            order.journal_165_date = moves.date if moves else False
 
     def action_open_print_sale_wizard(self) :
         return {
