@@ -235,7 +235,19 @@ class SaleOrder ( models.Model ) :
     def _compute_project_files_state(self) :
         for order in self :
             order.project_files_state = order.project_ids[:1].files_state if order.project_ids else False
+            
 
+    def action_close_journal_entries(self) :
+    self.ensure_one ()
+    return {
+        'type' : 'ir.actions.act_window' ,
+        'name' : 'Close Journal Entries' ,
+        'view_mode' : 'form' ,
+        'res_model' : 'close.entry.wizard' ,
+        'context' : {'default_sale_order_id' : self.id} ,
+        'target' : 'new' ,
+    }
+    
     @api.onchange ( 'amount_untaxed' , 'broker_amount' )
     @api.depends ( 'amount_untaxed' , 'broker_amount' )
     def compute_broker_percentage(self) :
