@@ -747,7 +747,7 @@ class SaleOrder ( models.Model ) :
 
             date_value = move.date if move else False
             order.final_close_entry_date = date_value
-            order.close_entry_date = date_value
+            order.close_entry_date = order.final_close_entry_date
         
     #@api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
     #def _compute_final_close_entry_date(self) :
