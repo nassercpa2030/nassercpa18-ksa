@@ -732,8 +732,8 @@ class SaleOrder ( models.Model ) :
         ('not_done' , '(مستثني)غير مكتمل') ,
     ] , string="Project Files State" , store=True )
 
-   @api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
-   def _compute_final_close_entry_date(self) :
+    @api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
+    def _compute_final_close_entry_date(self) :
         for order in self :
             moves = self.env['account.move'].search ( [  # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
                 ('invoice_origin' , '=' , order.name) ,
