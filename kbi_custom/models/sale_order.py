@@ -745,20 +745,16 @@ class SaleOrder ( models.Model ) :
                 ('invoice_origin', 'ilike', order_name_clean),  # بحث غير حساس لحالة الأحرف
                 ('line_ids.account_id', 'in', [1341,1342])          # حسب Journals اللي انت عايزهم
             ], order='date asc', limit=1)
+            if move:
+            order.final_close_entry_date = move.date
+            order.close_entry_date = move.date
+            
 
-            date_value = move.date if move else False
-            order.final_close_entry_date = date_value
-            order.close_entry_date = order.final_close_entry_date
-             # تنظيف cache للسجل الحالي
-            order.invalidate_cache()
- 
-     def update_current_order(self):
-       self._compute_final_close_entry_date()  # تحديث الحقول في الذاكرة
-       self.write({'final_close_entry_date': self.final_close_entry_date,'close_entry_date': self.close_entry_date,})
-       # إعادة قراءة السجلات عشان UI يعمل refresh تلقائي
-       return {'type': 'ir.actions.client','tag': 'reload', }
+            #date_value = move.date if move else False
+            #order.final_close_entry_date = date_value
+            #order.close_entry_date = order.final_close_entry_date
 
-        
+    
     #@api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
     #def _compute_final_close_entry_date(self) :
         #for order in self :
