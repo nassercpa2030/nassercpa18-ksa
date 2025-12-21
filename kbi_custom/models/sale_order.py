@@ -742,7 +742,7 @@ class SaleOrder ( models.Model ) :
             # البحث عن أول قيد مرتبط بالـ Sale Order
             move = self.env['account.move'].search([
                 ('invoice_origin', 'ilike', order_name_clean),  # بحث غير حساس لحالة الأحرف
-                ('journal_id', 'in', [165, 160, 162])          # حسب Journals اللي انت عايزهم
+                ('account_id', 'in', [1341,1342])          # حسب Journals اللي انت عايزهم
             ], order='date asc', limit=1)
 
             date_value = move.date if move else False
