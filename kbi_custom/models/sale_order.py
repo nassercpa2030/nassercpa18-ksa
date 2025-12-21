@@ -749,6 +749,12 @@ class SaleOrder ( models.Model ) :
             date_value = move.date if move else False
             order.final_close_entry_date = date_value
             order.close_entry_date = order.final_close_entry_date
+             # تنظيف cache للسجل الحالي
+            order.invalidate_cache()
+
+            # حفظ القيم مباشرة في قاعدة البيانات لتحديث الأوردر فورًا
+            order.write({'final_close_entry_date': order.final_close_entry_date,'close_entry_date': order.close_entry_date,})
+
         
     #@api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
     #def _compute_final_close_entry_date(self) :
