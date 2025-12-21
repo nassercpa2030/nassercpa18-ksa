@@ -745,9 +745,10 @@ class SaleOrder ( models.Model ) :
                 ('invoice_origin', 'ilike', order_name_clean),  # بحث غير حساس لحالة الأحرف
                 ('line_ids.account_id', 'in', [1341,1342])          # حسب Journals اللي انت عايزهم
             ], order='date asc', limit=1)
+            
             if move:
-            order.final_close_entry_date = move.date
-            order.close_entry_date = move.date
+               order.final_close_entry_date = move.date
+               order.close_entry_date = move.date
             
 
             #date_value = move.date if move else False
