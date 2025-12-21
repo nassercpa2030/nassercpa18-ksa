@@ -751,13 +751,20 @@ class SaleOrder ( models.Model ) :
             order.close_entry_date = order.final_close_entry_date
              # تنظيف cache للسجل الحالي
             order.invalidate_cache()
+ 
+   def update_current_order(self):
+    self._compute_final_close_entry_date()  # تحديث الحقول في الذاكرة
+    self.write({
+        'final_close_entry_date': self.final_close_entry_date,
+        'close_entry_date': self.close_entry_date,
+    })
+    # إعادة قراءة السجلات عشان UI يعمل refresh تلقائي
+    return {
+        'type': 'ir.actions.client',
+        'tag': 'reload',
+    }
 
-            
-    def update_current_order(self):
-        self._compute_final_close_entry_date()  # تحديث الحقول في الذاكرة
-        self.write({})  # حفظ الحقول المحسوبة في قاعدة البيانات
-
-    
+        
     #@api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
     #def _compute_final_close_entry_date(self) :
         #for order in self :
