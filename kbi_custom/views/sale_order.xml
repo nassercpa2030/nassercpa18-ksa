@@ -95,6 +95,7 @@
                     <field name="account_year" modifiers="{'readonly':[('from_crm','=',True)]}"/>
                     <field name="from_crm" invisible="1"/>
                     <field name="contract_signature"/>
+                    <field name="old_manager" widget="badge" decoration_info="1" />
                 </xpath>
 
                 <!-- Hide some fields in order_line -->
