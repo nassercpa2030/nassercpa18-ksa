@@ -752,10 +752,12 @@ class SaleOrder ( models.Model ) :
              # تنظيف cache للسجل الحالي
             order.invalidate_cache()
 
-            # حفظ القيم مباشرة في قاعدة البيانات لتحديث الأوردر فورًا
-            order.write({'final_close_entry_date': order.final_close_entry_date,'close_entry_date': order.close_entry_date,})
+            
+    def update_current_order(self):
+        self._compute_final_close_entry_date()  # تحديث الحقول في الذاكرة
+        self.write({})  # حفظ الحقول المحسوبة في قاعدة البيانات
 
-        
+    
     #@api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
     #def _compute_final_close_entry_date(self) :
         #for order in self :
