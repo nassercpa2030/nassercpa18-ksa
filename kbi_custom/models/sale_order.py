@@ -183,6 +183,7 @@ class SaleOrder ( models.Model ) :
     ass_visible = fields.Boolean ( string="Visible" , compute='_compute_ass_visible' )
     partner_id = fields.Many2one ( string="Customer" , comodel_name="res.partner" , strore=True , required=False ,
                                    readonly=False )
+    old_manager= fields.Char ( string="المدير القديم" , readonly=False , store=True,searchable=True ,index=True )
     customer_english_name = fields.Char ( string="Customer_English_Name" , related="partner_id.name_english" ,
                                           store=True , readonly=False )
 
