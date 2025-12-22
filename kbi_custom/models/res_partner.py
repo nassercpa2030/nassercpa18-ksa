@@ -80,11 +80,6 @@ class Recruiter(models.Model):
         for rec in self :
             rec.wage = rec.contract_id.wage if rec.contract_id else 0.0
             #rec.housing_allowance = rec.contract_id.l10n_sa_housing_allowance if rec.contract_id else 0.0اً
-           if rec.contract_id:
-              rec.housing_allowance = getattr(rec.contract_id, 'l10n_sa_housing_allowance', 0.0)
-           else:
-              rec.housing_allowance = 0.0
-
             #rec.other_allowance = rec.contract_id.l10n_sa_other_allowances if rec.contract_id else 0.0
 
 
