@@ -72,15 +72,15 @@ class Recruiter(models.Model):
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan', help="Same field as in Journal Entry (account.move) for analytic distribution",placeholder="Enter Analytic Plan")
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' , domain="[('plan_id', '=', analytic_plan)]" , readonly=False , store=True )
     wage = fields.Float ( 'الأساسي' , help="Same field as Wage for employee contract" , compute="get_employee_wage" ,readonly=False , store=True )
-    housing_allowance=fields.Float('بدل السكن ',help="Same field as housing allowance for employee contract", compute="get_employee_wage" ,readonly=False , store=True)
-    other_allowance=fields.Float('بدلات أخري ',help="Same field as Other allowance for employee contract", compute="get_employee_wage" ,readonly=False , store=True)
+    #housing_allowance=fields.Float('بدل السكن ',help="Same field as housing allowance for employee contract", compute="get_employee_wage" ,readonly=False , store=True)
+    #other_allowance=fields.Float('بدلات أخري ',help="Same field as Other allowance for employee contract", compute="get_employee_wage" ,readonly=False , store=True)
     
     @api.depends ('contract_id')
     def get_employee_wage(self) :
         for rec in self :
             rec.wage = rec.contract_id.wage if rec.contract_id else 0.0
-            rec.housing_allowance = rec.contract_id.l10n_sa_housing_allowance if rec.contract_id else 0.0
-            rec.other_allowance = rec.contract_id.l10n_sa_other_allowances if rec.contract_id else 0.0
+            #rec.housing_allowance = rec.contract_id.l10n_sa_housing_allowance if rec.contract_id else 0.0
+            #rec.other_allowance = rec.contract_id.l10n_sa_other_allowances if rec.contract_id else 0.0
 
 
 
