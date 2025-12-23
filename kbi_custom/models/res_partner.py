@@ -17,7 +17,8 @@ class ResCity ( models.Model ) :
 class ResCity ( models.Model ) :
     _inherit = 'res.users'
     
-    
+
+
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
@@ -65,15 +66,22 @@ class HrPayslip(models.Model):
 
         return result
 
-
+# ---------------- EMPLOYEE Contract -----------------
+class Recruiter ( models.Model ) :
+    _inherit = 'hr.contract'
+    housing_allowance=fields.Monetary('بدل السكن ',help="Same field as housing allowance for employee contract" ,readonly=False , store=True)
+    transportation_allowance=fields.Monetary('بدل المواصلات',help="Same field as housing allowance for employee contract" ,readonly=False , store=True)
+    other_allowance=fields.Monetary('بدلات أخري ',help="Same field as Other allowance for employee contract" ,readonly=False , store=True)
+# ---------------- EMPLOYEES  -----------------   
 class Recruiter(models.Model):
     _inherit = 'hr.employee'
 
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan', help="Same field as in Journal Entry (account.move) for analytic distribution",placeholder="Enter Analytic Plan")
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' , domain="[('plan_id', '=', analytic_plan)]" , readonly=False , store=True )
     wage = fields.Float ( 'الأساسي' , help="Same field as Wage for employee contract" , compute="get_employee_wage" ,readonly=False , store=True )
-    housing_allowance=fields.Float('بدل السكن ',help="Same field as housing allowance for employee contract", compute="get_employee_wage" ,readonly=False , store=True)
-    other_allowance=fields.Float('بدلات أخري ',help="Same field as Other allowance for employee contract", compute="get_employee_wage" ,readonly=False , store=True)
+    housing_allowance=fields.Monetary('بدل السكن ',related="contract_id.housing_allowance",help="Same field as housing allowance for employee contract" ,readonly=False , store=True)
+    other_allowance=fields.Monetary('بدلات أخري ',related="contract_id.other_allowance",help="Same field as Other allowance for employee contract" ,readonly=False , store=True)
+    transportation_allowance=fields.Monetary('بدل المواصلات',related="contract_id.transportation_allowance",help="Same field as housing allowance for employee contract" ,readonly=False , store=True)
     
     @api.depends ('contract_id')
     def get_employee_wage(self) :
