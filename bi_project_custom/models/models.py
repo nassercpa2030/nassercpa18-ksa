@@ -297,41 +297,25 @@ class SaleOrder ( models.Model ) :
             if rec.invoice_attachements_ids :
                 for attachment in rec.invoice_attachements_ids :
                     attachment.write ( {'res_model' : 'sale.order' , 'res_id' : rec.id} )
-                              
-            if attachment.type == 'binary' and attachment.datas:
-                try:
-                    base64.b64decode(attachment.datas, validate=True)
-                except Exception as e:
-                    _logger.warning(
-                        "Skipping invalid attachment %s on Sale Order %s: %s",
-                        attachment.name, rec.name, e
-                    )
-                    continue
-
-                # 3️⃣ ربط نفس المرفق بكل الفواتير المرتبطة
-                for invoice in rec.invoice_ids:
-                    # نتأكد أنه ما فيه duplicate بنفس الاسم
-                    existing = self.env['ir.attachment'].search([
-                        ('res_model', '=', 'account.move'),
-                        ('res_id', '=', invoice.id),
-                        ('name', '=', attachment.name)
-                    ], limit=1)
-
-                    if existing:
-                        # لو موجود، ممكن نحدث الـ datas لو مختلفة
-                        if existing.datas != attachment.datas:
-                            existing.write({'datas': attachment.datas})
-                    else:
-                        self.env['ir.attachment'].create({
-                            'name': attachment.name,
-                            'type': attachment.type,
-                            'datas': attachment.datas,
-                            'mimetype': attachment.mimetype,
-                            'res_model': 'account.move',
-                            'res_id': invoice.id,
-                        })
                     
-                   
+                    if attachment.type == 'binary' and attachment.datas:
+                         try:
+                              base64.b64decode(attachment.datas, validate=True)
+                         except Exception as e:
+                              _logger.warning(
+                                  "Skipping invalid attachment %s on Sale Order %s: %s",
+                                   attachment.name, rec.name, e )
+                             continue
+                    for invoice in rec.invoice_ids:
+                         existing = self.env['ir.attachment'].search([
+                                 ('res_model', '=', 'account.move'),('res_id', '=', invoice.id),('name', '=', attachment.name)], limit=1)
+                         if existing:
+                            if existing.datas != attachment.datas:
+                               existing.write({'datas': attachment.datas})
+                                
+                         else:
+                              self.env['ir.attachment'].create({'name': attachment.name,'type': attachment.type,'datas': attachment.datas,'mimetype': attachment.mimetype,'res_model': 'account.move''res_id': invoice.id,})
+                       
 
     
     def _is_admin(self) :
