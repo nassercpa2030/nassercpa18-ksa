@@ -140,8 +140,8 @@ class SaleOrder ( models.Model ) :
     close_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string=' قيود الإغلاق' , store=True )
     is_project_close_stage = fields.Boolean ( compute='_compute_is_project_close_stage' ,
                                               string='Is Project in Close Stage' )
-    #final_close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , compute='compute_final_close_entry_date' ,
-                                           #store=True )
+    # final_close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , compute='compute_final_close_entry_date' ,
+    # store=True )
     journal_entry_data = fields.Many2many ( comodel_name='account.move' , compute='_compute_journal_entry_data' ,
                                             string='Journal Data Lines' )
     # journal_entry_count_finance = fields.Integer (string='عدد قيود الإغلاق',compute='compute_journal_entry_count_finance',store=True)
@@ -235,19 +235,18 @@ class SaleOrder ( models.Model ) :
     def _compute_project_files_state(self) :
         for order in self :
             order.project_files_state = order.project_ids[:1].files_state if order.project_ids else False
-            
 
     def action_close_journal_entries(self) :
         self.ensure_one ()
         return {
-           'type' : 'ir.actions.act_window' ,
-           'name' : 'Close Journal Entries' ,
-           'view_mode' : 'form' ,
-           'res_model' : 'close.entry.wizard' ,
-           'context' : {'default_sale_order_id' : self.id} ,
-           'target' : 'new' ,
-              }
-    
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'Close Journal Entries' ,
+            'view_mode' : 'form' ,
+            'res_model' : 'close.entry.wizard' ,
+            'context' : {'default_sale_order_id' : self.id} ,
+            'target' : 'new' ,
+        }
+
     @api.onchange ( 'amount_untaxed' , 'broker_amount' )
     @api.depends ( 'amount_untaxed' , 'broker_amount' )
     def compute_broker_percentage(self) :
@@ -294,34 +293,50 @@ class SaleOrder ( models.Model ) :
 
     def _link_custom_attachments_to_chatter(self) :
         for rec in self :
-            if rec.invoice_attachements_ids :
-                for attachment in rec.invoice_attachements_ids :
-                    attachment.write ( {'res_model' : 'sale.order' , 'res_id' : rec.id} )
-                    
-                    if attachment.type == 'binary' and attachment.datas:
-                         try:
-                              base64.b64decode(attachment.datas, validate=True)
-                         except Exception as e:
-                              _logger.warning(
-                                  "Skipping invalid attachment %s on Sale Order %s: %s",
-                                   attachment.name, rec.name, e )
-                             continue
-                    for invoice in rec.invoice_ids:
-                         existing = self.env['ir.attachment'].search([
-                                 ('res_model', '=', 'account.move'),('res_id', '=', invoice.id),('name', '=', attachment.name)], limit=1)
-                         if existing:
-                            if existing.datas != attachment.datas:
-                               existing.write({'datas': attachment.datas})
-                                
-                         else:
-                              self.env['ir.attachment'].create({'name': attachment.name,'type': attachment.type,'datas': attachment.datas,'mimetype': attachment.mimetype,'res_model': 'account.move','res_id': invoice.id,})
-                       
+            attachments = rec.invoice_attachements_ids.filtered ( lambda a : a.type == 'binary' and a.datas )
+            if not attachments :
+                continue
 
-    
+            # ربط كل المرفقات بالسيل اوردر نفسه
+            attachments.write ( {'res_model' : 'sale.order' , 'res_id' : rec.id} )
+
+            # معالجة كل فاتورة مرة واحدة
+            for invoice in rec.invoice_ids :
+                for attachment in attachments :
+                    try :
+                        base64.b64decode ( attachment.datas , validate=True )
+                    except Exception as e :
+                        _logger.warning (
+                            "Skipping invalid attachment %s on Sale Order %s: %s" ,
+                            attachment.name , rec.name , e
+                        )
+                        continue
+
+                    # نتأكد أنه ما فيه duplicate بنفس الاسم على الفاتورة
+                    existing = invoice.message_ids.mapped ( 'attachment_ids' ).filtered (
+                        lambda a : a.name == attachment.name )
+                    if existing :
+                        if existing.datas != attachment.datas :
+                            existing.write ( {'datas' : attachment.datas} )
+                    else :
+                        self.env['ir.attachment'].create ( {
+                            'name' : attachment.name ,
+                            'type' : attachment.type ,
+                            'datas' : attachment.datas ,
+                            'mimetype' : attachment.mimetype ,
+                            'res_model' : 'account.move' ,
+                            'res_id' : invoice.id ,
+                        } )
+
+    #def _link_custom_attachments_to_chatter(self) :
+        #for rec in self :
+            #if rec.invoice_attachements_ids :
+                #for attachment in rec.invoice_attachements_ids :
+                    #attachment.write ( {'res_model' : 'sale.order' , 'res_id' : rec.id} )
+
+
     def _is_admin(self) :
         return self.env.user.has_group ( 'base.group_system' )
-
-     
 
     @api.onchange ( 'partner_id' )
     def get_manger_from_customer(self) :
@@ -503,15 +518,15 @@ class SaleOrder ( models.Model ) :
             'context' : {'default_sale_order_id' : self.id} ,
         }
 
-    #@api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
-    #def _compute_journal_165_date(self) :
-        #for order in self :
-            # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
-            #moves = self.env['account.move'].search ( [
-              #  ('invoice_origin' , '=' , order.name) ,
-             #   ('journal_id' , '=' , 165)
-            #] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
-           # order.journal_165_date = moves.date if moves else False
+    # @api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
+    # def _compute_journal_165_date(self) :
+    # for order in self :
+    # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
+    # moves = self.env['account.move'].search ( [
+    #  ('invoice_origin' , '=' , order.name) ,
+    #   ('journal_id' , '=' , 165)
+    # ] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
+    # order.journal_165_date = moves.date if moves else False
 
 
 def action_close_journal_entries(self) :
