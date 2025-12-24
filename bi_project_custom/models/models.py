@@ -288,9 +288,10 @@ class SaleOrder ( models.Model ) :
                     } )
 
             for invoice in order.invoice_ids :
-                for attachment in order.invoice_attachements_ids :
-                # نسخ المرفق بدل تغييره لتجنب فقدان أي روابط سابقة
-                    attachment.copy ( {'res_model' : 'account.move' , 'res_id' : invoice.id} )
+                existing_attachment_ids = invoice.attachment_ids.ids  # المرفقات الحالية للفاتورة
+                for attachment in order.invoice_attachements_ids:
+                    if attachment.id not in existing_attachment_ids:
+                        attachment.copy({'res_model': 'account.move', 'res_id': invoice.id})
             # order.sudo().invoice_attachements_ids = [(6, 0, attachments.ids)]
 
     @api.model
