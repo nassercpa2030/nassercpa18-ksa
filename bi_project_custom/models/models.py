@@ -286,6 +286,11 @@ class SaleOrder ( models.Model ) :
                         'res_model': 'sale.order',
                         'res_id': order.id
                     })
+
+         for invoice in order.invoice_ids:
+                for attachment in order.invoice_attachements_ids:
+                    # نسخ المرفق بدل تغييره لتجنب فقدان أي روابط سابقة
+                    attachment.copy({'res_model': 'account.move', 'res_id': invoice.id})
                 # order.sudo().invoice_attachements_ids = [(6, 0, attachments.ids)]
     
     @api.model
@@ -304,8 +309,6 @@ class SaleOrder ( models.Model ) :
         for rec in self :
             if rec.invoice_attachements_ids :
                 for attachment in rec.invoice_attachements_ids :
-                    original_res_model = attachment._origin.res_model
-                    original_res_id = attachment._origin.res_id
                     attachment.write ( {'res_model' : 'sale.order' , 'res_id' : rec.id} )
 
    
