@@ -297,13 +297,15 @@ class SaleOrder ( models.Model ) :
             if rec.invoice_attachements_ids :
                 for attachment in rec.invoice_attachements_ids :
                     attachment.write ( {'res_model' : 'sale.order' , 'res_id' : rec.id} )
-                    
                     for invoice in rec.invoice_ids:
-                        if attachment not in invoice.attachment_ids:
-                           attachment.write({'res_model': 'account.move', 'res_id': invoice.id})
+                        exists = self.env['ir.attachment'].search([('res_model', '=', 'account.move'),('res_id', '=', invoice.id),('name', '=', attachment.name)], limit=1)
+                        if not exists:
+                           self.env['ir.attachment'].create({'name': attachment.name,'type': attachment.type, 'datas': attachment.datas,'mimetype': attachment.mimetype, 'res_model': 'account.move','res_id': invoice.id, })
 
     def _is_admin(self) :
         return self.env.user.has_group ( 'base.group_system' )
+
+     
 
     @api.onchange ( 'partner_id' )
     def get_manger_from_customer(self) :
