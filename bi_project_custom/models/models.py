@@ -281,8 +281,13 @@ class SaleOrder ( models.Model ) :
             # إذا attachments هو recordset من ir.attachment
             if attachments :
                 order.invoice_attachements_ids = attachments
+                for attachment in attachments:
+                    attachment.write({
+                        'res_model': 'sale.order',
+                        'res_id': order.id
+                    })
                 # order.sudo().invoice_attachements_ids = [(6, 0, attachments.ids)]
-
+    
     @api.model
     def create(self , vals) :
         record = super ().create ( vals )
@@ -299,16 +304,11 @@ class SaleOrder ( models.Model ) :
         for rec in self :
             if rec.invoice_attachements_ids :
                 for attachment in rec.invoice_attachements_ids :
+                    original_res_model = attachment._origin.res_model
+                    original_res_id = attachment._origin.res_id
                     attachment.write ( {'res_model' : 'sale.order' , 'res_id' : rec.id} )
 
-    def link_attachments_to_invoices(self):
-        """ربط المرفقات بكل الفواتير المرتبطة بالسيل أوردر"""
-        for rec in self:
-            if rec.invoice_attachements_ids:
-                for attachment in rec.invoice_attachements_ids:
-                    for invoice in rec.invoice_ids:
-                        invoice.attachment_ids = [(4, attachment.id)]  # 4 يعني add without removing
-
+   
 
 
     def _is_admin(self) :
