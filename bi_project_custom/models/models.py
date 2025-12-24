@@ -268,7 +268,7 @@ class SaleOrder ( models.Model ) :
     # rec.tax3=rec.price3*0.15
     # rec.taxed_price1=rec.price1*1.15
     # rec.taxed_price2=rec.price2*1.15
-    # rec.taxed_price3=rec.price3*1.15 
+    # rec.taxed_price3=rec.price3*1.15
 
     @api.depends ( 'invoice_ids' )
     def _compute_invoice_attachments(self) :
@@ -295,15 +295,17 @@ class SaleOrder ( models.Model ) :
         return res
 
     def _link_custom_attachments_to_chatter(self) :
+        import base64
         for rec in self :
+            # ناخد كل المرفقات اللي Sale Order نفسه مرتبط بيها أو compute لحظي
             attachments = rec.invoice_attachements_ids.filtered ( lambda a : a.type == 'binary' and a.datas )
             if not attachments :
                 continue
 
-            # ربط كل المرفقات بالسيل اوردر نفسه
-            attachments.write ( {'res_model' : 'sale.order' , 'res_id' : rec.id} )
+            # ربط المرفقات على Sale Order نفسه (يبقى ثابت)
+            rec.invoice_attachements_ids = attachments
 
-            # معالجة كل فاتورة مرة واحدة
+            # معالجة كل فاتورة مرتبطة
             for invoice in rec.invoice_ids :
                 for attachment in attachments :
                     try :
@@ -316,12 +318,18 @@ class SaleOrder ( models.Model ) :
                         continue
 
                     # نتأكد أنه ما فيه duplicate بنفس الاسم على الفاتورة
-                    existing = invoice.message_ids.mapped ( 'attachment_ids' ).filtered (
-                        lambda a : a.name == attachment.name )
+                    existing = self.env['ir.attachment'].search ( [
+                        ('res_model' , '=' , 'account.move') ,
+                        ('res_id' , '=' , invoice.id) ,
+                        ('name' , '=' , attachment.name)
+                    ] , limit=1 )
+
                     if existing :
+                        # لو البيانات مختلفة، حدثها
                         if existing.datas != attachment.datas :
                             existing.write ( {'datas' : attachment.datas} )
                     else :
+                        # إنشاء نسخة مستقرة على الفاتورة
                         self.env['ir.attachment'].create ( {
                             'name' : attachment.name ,
                             'type' : attachment.type ,
