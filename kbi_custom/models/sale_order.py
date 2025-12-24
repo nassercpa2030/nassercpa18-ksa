@@ -410,22 +410,43 @@ class SaleOrder ( models.Model ) :
       res = super ().create ( vals_list )
       res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
       return res
+        
+     
+     
+    #def compute_sign_qrcode(self) :
+      #for rec in self :
+        #qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
+        #base_url = self.env['ir.config_parameter'].sudo ().get_param ( 'web.base.url' )
+        #qr_code.add_data ( f'{base_url}//order/verify/{rec.uuid}' )
+        #qr_code.make ( fit=True )
+        #qr_img = qr_code.make_image ()
+        #im = qr_img._img.convert ( "RGB" )
+        #buffered = BytesIO ()
+        #im.save ( buffered , format="png" )
+        #qr_image = base64.b64encode ( buffered.getvalue () ).decode ( 'ascii' )
+        #rec.sign_qrcode = qr_image
 
 
     def compute_sign_qrcode(self) :
+      base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url') 
+      qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
       for rec in self :
-        qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
-        base_url = self.env['ir.config_parameter'].sudo ().get_param ( 'web.base.url' )
+        if rec.sign_qrcode or not rec.uuid:
+            continue
+        qr_code.clear()    
+        #base_url = self.env['ir.config_parameter'].sudo ().get_param ( 'web.base.url' )
         qr_code.add_data ( f'{base_url}//order/verify/{rec.uuid}' )
         qr_code.make ( fit=True )
-        qr_img = qr_code.make_image ()
-        im = qr_img._img.convert ( "RGB" )
+        #qr_img = qr_code.make_image ()
+        #im = qr_img._img.convert ( "RGB" )
+        img=qr_code.make_image(
+            fill_color="black",
+            back_color="white"
+        ).convert("RGB")
         buffered = BytesIO ()
-        im.save ( buffered , format="png" )
-        qr_image = base64.b64encode ( buffered.getvalue () ).decode ( 'ascii' )
-        rec.sign_qrcode = qr_image
-
-
+        img.save ( buffered , format="png" )
+        rec.sign_qrcode = base64.b64encode ( buffered.getvalue () ).decode ( 'ascii' )
+          
     @api.depends ( 'user_id' )
     def compute_can_edit_analytic(self) :
       for rec in self :
