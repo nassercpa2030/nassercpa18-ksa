@@ -2,7 +2,7 @@ from odoo import models , fields , api , _
 from odoo.exceptions import ValidationError
 import logging
 
-_logger = logging.getLogger(__name__)
+_logger = logging.getLogger ( __name__ )
 
 
 class AccountMove ( models.Model ) :
@@ -281,18 +281,18 @@ class SaleOrder ( models.Model ) :
             # إذا attachments هو recordset من ir.attachment
             if attachments :
                 order.invoice_attachements_ids = attachments
-                for attachment in attachments:
-                    attachment.write({
-                        'res_model': 'sale.order',
-                        'res_id': order.id
-                    })
+                for attachment in attachments :
+                    attachment.write ( {
+                        'res_model' : 'sale.order' ,
+                        'res_id' : order.id
+                    } )
 
-         for invoice in order.invoice_ids:
-             for attachment in order.invoice_attachements_ids:
-                    # نسخ المرفق بدل تغييره لتجنب فقدان أي روابط سابقة
-                 attachment.copy({'res_model': 'account.move', 'res_id': invoice.id})
-                # order.sudo().invoice_attachements_ids = [(6, 0, attachments.ids)]
-    
+            for invoice in order.invoice_ids :
+                for attachment in order.invoice_attachements_ids :
+                # نسخ المرفق بدل تغييره لتجنب فقدان أي روابط سابقة
+                    attachment.copy ( {'res_model' : 'account.move' , 'res_id' : invoice.id} )
+            # order.sudo().invoice_attachements_ids = [(6, 0, attachments.ids)]
+
     @api.model
     def create(self , vals) :
         record = super ().create ( vals )
@@ -304,15 +304,11 @@ class SaleOrder ( models.Model ) :
         self._link_custom_attachments_to_chatter ()
         return res
 
-    
     def _link_custom_attachments_to_chatter(self) :
         for rec in self :
             if rec.invoice_attachements_ids :
                 for attachment in rec.invoice_attachements_ids :
                     attachment.write ( {'res_model' : 'sale.order' , 'res_id' : rec.id} )
-
-   
-
 
     def _is_admin(self) :
         return self.env.user.has_group ( 'base.group_system' )
