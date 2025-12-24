@@ -281,17 +281,17 @@ class SaleOrder ( models.Model ) :
             # إذا attachments هو recordset من ir.attachment
             if attachments :
                 order.invoice_attachements_ids = attachments
-                for attachment in attachments :
-                    attachment.write ( {
-                        'res_model' : 'sale.order' ,
-                        'res_id' : order.id
-                    } )
+                #for attachment in attachments :
+                   # attachment.write ( {
+                       # 'res_model' : 'sale.order' ,
+                       # 'res_id' : order.id
+                   # } )
 
-            #for invoice in order.invoice_ids :
-               # existing_attachment_ids = invoice.attachment_ids.ids  # المرفقات الحالية للفاتورة
-                #for attachment in order.invoice_attachements_ids:
-                  #  if attachment.id not in existing_attachment_ids:
-                       # attachment.copy({'res_model': 'account.move', 'res_id': invoice.id})
+            for invoice in order.invoice_ids :
+                existing_attachment_ids = invoice.attachment_ids.ids  # المرفقات الحالية للفاتورة
+                for attachment in order.invoice_attachements_ids:
+                    if attachment.id not in existing_attachment_ids:
+                        attachment.copy({'res_model': 'account.move', 'res_id': invoice.id})
             # order.sudo().invoice_attachements_ids = [(6, 0, attachments.ids)]
 
     @api.model
