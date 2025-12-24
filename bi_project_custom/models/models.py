@@ -297,6 +297,10 @@ class SaleOrder ( models.Model ) :
             if rec.invoice_attachements_ids :
                 for attachment in rec.invoice_attachements_ids :
                     attachment.write ( {'res_model' : 'sale.order' , 'res_id' : rec.id} )
+                    
+                    for invoice in rec.invoice_ids:
+                        if attachment not in invoice.attachment_ids:
+                           attachment.write({'res_model': 'account.move', 'res_id': invoice.id})
 
     def _is_admin(self) :
         return self.env.user.has_group ( 'base.group_system' )
