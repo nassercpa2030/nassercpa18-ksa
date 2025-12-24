@@ -314,7 +314,7 @@ class SaleOrder ( models.Model ) :
                                existing.write({'datas': attachment.datas})
                                 
                          else:
-                              self.env['ir.attachment'].create({'name': attachment.name,'type': attachment.type,'datas': attachment.datas,'mimetype': attachment.mimetype,'res_model': 'account.move''res_id': invoice.id,})
+                              self.env['ir.attachment'].create({'name': attachment.name,'type': attachment.type,'datas': attachment.datas,'mimetype': attachment.mimetype,'res_model': 'account.move','res_id': invoice.id,})
                        
 
     
