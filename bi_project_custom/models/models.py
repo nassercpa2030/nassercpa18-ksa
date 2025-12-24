@@ -294,56 +294,21 @@ class SaleOrder ( models.Model ) :
         self._link_custom_attachments_to_chatter ()
         return res
 
+    
     def _link_custom_attachments_to_chatter(self) :
-        import base64
         for rec in self :
-            # ناخد كل المرفقات اللي Sale Order نفسه مرتبط بيها أو compute لحظي
-            attachments = rec.invoice_attachements_ids.filtered ( lambda a : a.type == 'binary' and a.datas )
-            if not attachments :
-                continue
+            if rec.invoice_attachements_ids :
+                for attachment in rec.invoice_attachements_ids :
+                    attachment.write ( {'res_model' : 'sale.order' , 'res_id' : rec.id} )
 
-            # ربط المرفقات على Sale Order نفسه (يبقى ثابت)
-            rec.invoice_attachements_ids = attachments
+    def link_attachments_to_invoices(self):
+        """ربط المرفقات بكل الفواتير المرتبطة بالسيل أوردر"""
+        for rec in self:
+            if rec.invoice_attachements_ids:
+                for attachment in rec.invoice_attachements_ids:
+                    for invoice in rec.invoice_ids:
+                        invoice.attachment_ids = [(4, attachment.id)]  # 4 يعني add without removing
 
-            # معالجة كل فاتورة مرتبطة
-            for invoice in rec.invoice_ids :
-                for attachment in attachments :
-                    try :
-                        base64.b64decode ( attachment.datas , validate=True )
-                    except Exception as e :
-                        _logger.warning (
-                            "Skipping invalid attachment %s on Sale Order %s: %s" ,
-                            attachment.name , rec.name , e
-                        )
-                        continue
-
-                    # نتأكد أنه ما فيه duplicate بنفس الاسم على الفاتورة
-                    existing = self.env['ir.attachment'].search ( [
-                        ('res_model' , '=' , 'account.move') ,
-                        ('res_id' , '=' , invoice.id) ,
-                        ('name' , '=' , attachment.name)
-                    ] , limit=1 )
-
-                    if existing :
-                        # لو البيانات مختلفة، حدثها
-                        if existing.datas != attachment.datas :
-                            existing.write ( {'datas' : attachment.datas} )
-                    else :
-                        # إنشاء نسخة مستقرة على الفاتورة
-                        self.env['ir.attachment'].create ( {
-                            'name' : attachment.name ,
-                            'type' : attachment.type ,
-                            'datas' : attachment.datas ,
-                            'mimetype' : attachment.mimetype ,
-                            'res_model' : 'account.move' ,
-                            'res_id' : invoice.id ,
-                        } )
-
-    #def _link_custom_attachments_to_chatter(self) :
-        #for rec in self :
-            #if rec.invoice_attachements_ids :
-                #for attachment in rec.invoice_attachements_ids :
-                    #attachment.write ( {'res_model' : 'sale.order' , 'res_id' : rec.id} )
 
 
     def _is_admin(self) :
