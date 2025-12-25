@@ -40,41 +40,7 @@ class AccountMove(models.Model):
             rec.vendor_attachment = rec.partner_id.image_1920 or False
 
     
-    def action_post(self) :
-        res = super ().action_post ()
-
-        for move in self :
-            sale_order = move.sale_order_id
-            if not sale_order :
-                continue
-
-            # 🔹 تأكيد Sale Order إذا لم يكن confirmed
-            if sale_order.state != 'sale' :
-                try :
-                    sale_order.action_confirm ()
-                except Exception as e :
-                    _logger.warning ( f"Cannot confirm Sale Order {sale_order.name}: {e}" )
-                    continue  # نكمل للـ move التالي
-
-            # 🔹 تعديل أول line qty_delivered = 0 → 1
-            first_line = sale_order.order_line.filtered ( lambda l : l.qty_delivered == 0 )[:1]
-            if first_line :
-                first_line.write ( {'qty_delivered' : 1} )
-
-            # 🔹 إنشاء الفاتورة بأمان
-            try :
-                if hasattr ( sale_order , 'create_invoices' ) :
-                    invoices = sale_order.create_invoices ()
-                    for invoice in invoices :
-                        # تعديل كل invoice_line_ids → price_unit = move.amount
-                        invoice.invoice_line_ids.write ( {'price_unit' : move.amount} )
-            except Exception as e :
-                _logger.warning ( f"Cannot create invoice for Sale Order {sale_order.name}: {e}" )
-                continue
-
-        return res
-
-        
+   
     @api.depends('invoice_origin')
     def _compute_sale_order_id(self):
         for move in self:
