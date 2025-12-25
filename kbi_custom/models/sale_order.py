@@ -1030,6 +1030,7 @@ class SaleOrder ( models.Model ) :
                 'default_sale_order_id': self.id,
                 'default_partner_id': self.partner_id.id if self.partner_id else False,
                 'default_payment_type': 'inbound',
+                'default_date':False,
                 # 'default_amount': 0.0,  # اختياري حسب الحاجة
                }
              }
