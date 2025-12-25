@@ -39,6 +39,34 @@ class AccountMove(models.Model):
         for rec in self:
             rec.vendor_attachment = rec.partner_id.image_1920 or False
 
+    
+    def action_post(self):
+        res = super(AccountMove, self).action_post()
+
+        for move in self:
+            if move.move_type != 'out_payment':
+                continue
+
+            sale_order = move.sale_order_id
+            if not sale_order:
+                continue
+
+            # أول order line qty_delivered = 0 → خليها 1
+            first_line = sale_order.order_line.filtered(lambda l: l.qty_delivered == 0)[:1]
+            if first_line:
+                first_line.write({'qty_delivered': 1})
+
+            # تأكد Sale Order confirmed
+            if sale_order.state != 'sale':
+                sale_order.action_confirm()
+
+            # إنشاء الفاتورة
+            if hasattr(sale_order, 'create_invoices'):
+                invoices = sale_order.create_invoices()
+                for invoice in invoices:
+                    invoice.invoice_line_ids.write({'price_unit': move.amount})
+
+        return res
     @api.depends('invoice_origin')
     def _compute_sale_order_id(self):
         for move in self:
