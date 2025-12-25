@@ -407,6 +407,7 @@ class SaleOrder ( models.Model ) :
                 'message' : _ ( 'العقد تم عمله بإنتظار السداد' ) ,
                 'type' : 'success' ,  # success, warning, danger, info
                 'sticky' : False ,  # لو True الرسالة تظل حتى يغلقها المستخدم
+                'next': {'type': 'ir.actions.client', 'tag': 'reload'} 
             }
         }
 
