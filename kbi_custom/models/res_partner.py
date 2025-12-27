@@ -121,8 +121,9 @@ class ResPartner ( models.Model ) :
     manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' , compute="action_search_manager" ,
                                      store=True , readonly=False )
     manager_id = fields.Integer ( string="Manager Id" , store=True , readonly=False )
-    cr_number_sale = fields.Char ( related="sale_order_ids.cr_number_sale" , string="Commercial number" ,
-                                   readonly=False , store=True )
+    #cr_number_sale = fields.Char ( related="sale_order_ids.cr_number_sale" , string="Commercial number" ,
+                                  # readonly=False , store=True )
+    cr_number_sale = fields.Char ( string="Commercial number" ,compute="_compute_cr_number_sale", readonly=False , store=True )
     property_account_payable_id = fields.Many2one ( comodel_name="account.account" ,
                                                     domain=[('code' , '=' , '21011001')] , store=True , readonly=False ,
                                                     string='Account Payable' ,
@@ -138,6 +139,13 @@ class ResPartner ( models.Model ) :
                 ('res_id', '=', rec.id)
             ])
 
+    
+    @api.depends('sale_order_ids')
+    def _compute_cr_number_sale(self):
+        for partner in self:
+            partner.cr_number_sale = partner.sale_order_ids[-1].cr_number_sale if partner.sale_order_ids else False
+
+    
     @api.constrains('number_700', 'cr_number_sale', 'company_type')
     def _check_numbers(self):
         pattern_700 = r'^7\d*$'
