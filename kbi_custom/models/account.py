@@ -162,15 +162,15 @@ class HrExpenseSheet ( models.Model ) :
                 rec.employee_journal_id = False    
 
 
-class AccountProfitLossReport ( models.AbstractModel ) :
-    _inherit = 'account.asset'
+#class Assets_count ( models.AbstractModel ) :
+    #_inherit = 'account.asset'
 
-    analytic_acc_desc = fields.Char (
-        string="Analytic Description" ,
+    #analytic_acc_desc = fields.Char (
+        #string="Analytic Description" ,
         #related='distribution_analytic_account_ids.display_name' ,
         #compute='_compute_analytic_distribution',
-        store=True ,
-        readonly=False )
+        #store=True ,
+        #readonly=False )
 
 
     
