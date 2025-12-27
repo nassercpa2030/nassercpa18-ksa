@@ -764,17 +764,12 @@ class SaleOrder ( models.Model ) :
             # البحث عن أول قيد مرتبط بالـ Sale Order
             move = self.env['account.move'].search([
                 ('invoice_origin', 'ilike', order_name_clean),  # بحث غير حساس لحالة الأحرف
-                ('line_ids.account_id', 'in', [1341,1342])          # حسب Journals اللي انت عايزهم
+                ('journal_id' , 'in' , [165,160,162])
+                #('line_ids.account_id', 'in', [1341,1342])          # حسب Journals اللي انت عايزهم
             ], order='date asc', limit=1)
             
             if move:
                order.final_close_entry_date = move.date
-               order.close_entry_date = move.date
-            
-
-            #date_value = move.date if move else False
-            #order.final_close_entry_date = date_value
-            #order.close_entry_date = order.final_close_entry_date
 
     
     #@api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
