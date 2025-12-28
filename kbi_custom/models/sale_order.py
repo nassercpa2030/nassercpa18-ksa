@@ -389,7 +389,8 @@ class SaleOrder ( models.Model ) :
             partner = self.env['res.partner'].search([('number_700', '=', order.number_700_sale)], limit=1)
           if not partner and order.cr_number_sale:
             partner = self.env['res.partner'].search(
-                [('l10n_sa_additional_identification_number', '=', order.cr_number_sale)], limit=1
+                [('cr_number_sale', '=', order.cr_number_sale)], limit=1
+                #[('l10n_sa_additional_identification_number', '=', order.cr_number_sale)], limit=1
              )
 
           if partner:
