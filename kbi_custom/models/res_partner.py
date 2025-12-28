@@ -171,7 +171,8 @@ class ResPartner ( models.Model ) :
 
             # ===== cr_number_sale =====
             if rec.company_type != 'person' and user_not_allowed:
-                #if not rec.cr_number_sale:
+                if not rec.cr_number_sale:
+                    continue
                    # raise ValidationError("حقل CR Number Sale مطلوب لغير الأشخاص وغير المسؤولين.")
                 if not re.match(pattern_cr, rec.cr_number_sale):
                     raise ValidationError("CR Number Sale must contain numbers only.")
