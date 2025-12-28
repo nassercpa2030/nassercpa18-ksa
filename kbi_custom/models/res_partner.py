@@ -105,6 +105,20 @@ class Recruiter ( models.Model ) :
     def _remove_recruitment_interviewers(self):
         return True
 
+ ################## HR ATTACHMENTS###################
+class HrAttachement ( models.Model ) :
+    _inherit = 'hr.salary.attachment'
+    monthly_amount= fields.Monetary(
+        string="Amount",
+        required=True,           # الحقل إجباري
+        readonly=False,          # يمكن تعديله
+        store=True,              # يُخزن في قاعدة البيانات
+        index=True,              # يتم فهرسته
+        copy=True,               # يتم نسخه عند نسخ السجل
+        tracking=True,           # تتبع التغييرات
+        currency_field='currency_id')
+
+
 
 class ResPartner ( models.Model ) :
     _inherit = 'res.partner'
