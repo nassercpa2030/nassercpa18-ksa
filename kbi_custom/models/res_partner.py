@@ -174,8 +174,8 @@ class ResPartner ( models.Model ) :
                 if not rec.cr_number_sale:
                     continue
                    # raise ValidationError("حقل CR Number Sale مطلوب لغير الأشخاص وغير المسؤولين.")
-                if not re.match(pattern_cr, rec.cr_number_sale):
-                    raise ValidationError("CR Number Sale must contain numbers only.")
+               # if not re.match(pattern_cr, rec.cr_number_sale):
+                    #raise ValidationError("CR Number Sale must contain numbers only.")
 
                 
 
