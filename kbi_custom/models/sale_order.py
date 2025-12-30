@@ -10,10 +10,7 @@ import qrcode
 from odoo import models , fields , api , _
 from odoo.exceptions import ValidationError
 
-
 # from odoo.tools.populate import compute
-
-
 class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
@@ -78,7 +75,7 @@ class SaleOrder ( models.Model ) :
     payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
     paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count",searchable=True )
     unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count",searchable=True )
-    paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" )
+    paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" ,sorted=True)
     auditor = fields.Many2one ( string="Auditor" , comodel_name="hr.employee" ,
                                 domain=[('job_id' , '!=' , 'مدير مراجعة')] )
     #invoice_ids = fields.Many2many ( 'account.move' , compute="compute_invoice_ids" , readonly=True , store=True ,
