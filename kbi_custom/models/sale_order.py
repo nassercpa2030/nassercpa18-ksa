@@ -101,14 +101,14 @@ class SaleOrder ( models.Model ) :
     reject_reason = fields.Text ( string='Reject Reason' )
     broker_id = fields.Many2one ( comodel_name='res.partner' , string='Salesperson' ,
                                   domain="[('is_broker', '=', True)]" )
-    number_700_sale = fields.Char ( related='partner_id.number_700' , string="700 Number" , readonly=False ,
+    number_700_sale = fields.Char ( related='partner_id.number_700' , string="(700) الرقم الموحد" , readonly=False ,
                                     required=True , store=True )
     manager_id_sale = fields.Integer ( related="partner_id.manager_id" , string="Manager Id" , store=True ,
                                        readonly=False )
     contact_manager_team = fields.Many2one ( comodel_name="res.users" , related="user_id" ,
                                              string="contact_manager_team" , store=True , readonly=False )
     # cr_number_sale =fields.Char(related='partner_id.cr_number_sale',string="Customer CR Number",readonly=False,store=True)
-    cr_number_sale = fields.Char ( string="Customer CR Number" , readonly=False , store=True )
+    cr_number_sale = fields.Char ( string="رقم السجل التجاري",related='partner_id.cr_number_sale' , readonly=False , store=True )
     broker_amount = fields.Float ( string='Broker Amount' , tracking=True )
     broker_invoiced_amount = fields.Float ( string='قيمة إستحقاق فاتورة المسوق' , compute="_compute_broker_invoiced_amount",searchable=True )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
