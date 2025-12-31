@@ -31,8 +31,7 @@ class SaleOrder ( models.Model ) :
     project_file_state_test = fields.Char ( "Project File State Demo" , readonly=False , required=False , store=True )
     project_stage_test = fields.Char ( "Project Stage Demo" , readonly=False , required=False , store=True )
     #first_payment_date_test = fields.Date ( string="First Payment Test" , readonly=False , required=False , store=True )
-    #first_payment_test2 = fields.Boolean ( string="first Payment amount test" , readonly=False , required=False ,
-                                           store=True )
+    #first_payment_test2 = fields.Boolean ( string="first Payment amount test" , readonly=False , required=False , store=True )
     first_payment_original = fields.Float ( string="first_payment_original" , readonly=False , required=False ,
                                             store=True )
     first_payment_journal_test = fields.Char ( 'First Payment Journal Name' , readonly=False , store=True )
