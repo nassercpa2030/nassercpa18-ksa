@@ -123,7 +123,7 @@
     <div class="row">
         <div class="col">
             <label for="first_payment_date" string="First Payment: "/>
-            <field name="first_payment_date"/>
+            <field name="first_payment_date" options="{'field':'date'}"/>
         </div>
         <div class="col">
             <label for="unpaid_total" string="Unpaid: "/>
