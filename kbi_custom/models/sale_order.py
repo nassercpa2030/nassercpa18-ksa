@@ -119,8 +119,8 @@ class SaleOrder ( models.Model ) :
                                          compute="_compute_first_payment_id" )
     first_payment_code = fields.Char ( string="First Payment Code" , compute="_compute_payment_count" )
     first_payment_code_date = fields.Date ( string='First Journal Date' , compute='_compute_payment_count' )
-    first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
-    first_payment_amount = fields.Monetary ( string='First Payment Amount' , related='first_payment_id.amount' )
+    first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' ,stored=True,index=True)
+    first_payment_amount = fields.Monetary ( string='First Payment Amount' , related='first_payment_id.amount',stored=True,index=True )
     # first_payment_date = fields.Date ( string='First Payment Date' , compute='_compute_first_payment_fields' )
     # first_payment_amount = fields.Monetary ( string='First Payment Amount' , compute='_compute_first_payment_fields' )
 
