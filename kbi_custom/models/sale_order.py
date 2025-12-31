@@ -508,8 +508,8 @@ class SaleOrder ( models.Model ) :
                 first_line = move_lines.sorted('date')[0]
                 rec.first_payment_code = first_line.move_id
                 rec.first_payment_code_date = first_line.date
-                rec.first_payment_date = first_line.date
-                rec.first_payment_amount = first_line.amount
+                #rec.first_payment_date = first_line.date
+                #rec.first_payment_amount = first_line.amount
             else:
                 rec.first_payment_code = False
                 rec.first_payment_code_date = False
@@ -691,8 +691,7 @@ class SaleOrder ( models.Model ) :
     # contract_date = fields.Date(string='Contract Date')
     audit_date = fields.Date ( string='Audit Date' )
     #account_year = fields.Integer ( string='Year' , required=True , default=lambda self : fields.Date.today ().year )
-    account_year = fields.Integer ( string='Year' , required=True , compute='compute_audit_year' )
-   
+    account_year = fields.Integer ( string='Year' , required=True , compute='compute_audit_year',index=True )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreement' )
     payment_ids = fields.Many2many ( 'account.payment' , string='Payments' , compute='_compute_payment_ids' )
     payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
