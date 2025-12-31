@@ -479,8 +479,14 @@ class SaleOrder ( models.Model ) :
     def _compute_first_payment_id(self) :
         for rec in self :
             #rec.first_payment_id = self.env['account.payment'].search ( [('id' , 'in' , rec.payment_ids.ids)] ,order="date asc" , limit=1 )
-            payments = rec.payment_ids.filtered(lambda p: p.state == 'posted' and p.date).sorted(key=lambda p: p.date)
-            rec.first_payment_id = payments[0] if payments else False
+            # نفلتر الدفعات اللي مدفوعة فقط
+            paid_payments = rec.payment_ids.filtered(lambda p: p.state == 'posted')
+            if paid_payments:
+                # نجيب أقدم دفعة مدفوعة
+                first_payment = min(paid_payments, key=lambda p: p.date or fields.Date.today())
+                rec.first_payment_id = first_payment
+            else:
+                rec.first_payment_id = False
             
 
     @api.depends('payment_ids')
