@@ -475,11 +475,13 @@ class SaleOrder ( models.Model ) :
 
             rec.payment_ids = [(6 , 0 , payments)]
 
-    @api.depends ( 'payment_ids' , 'order_line.move_ids' )
+    @api.depends ( 'payment_ids' , 'order_line.move_ids','payment_ids.state' )
     def _compute_first_payment_id(self) :
         for rec in self :
-            rec.first_payment_id = self.env['account.payment'].search ( [('id' , 'in' , rec.payment_ids.ids)] ,
-                                                                        order="date asc" , limit=1 )
+            #rec.first_payment_id = self.env['account.payment'].search ( [('id' , 'in' , rec.payment_ids.ids)] ,order="date asc" , limit=1 )
+             payments = rec.payment_ids.filtered( lambda p: p.state == 'posted' and p.date).sorted(key=lambda p: p.date)
+             rec.first_payment_id = payments.sorted(key=lambda p: p.date)[:1] if payments else False
+            
 
     @api.depends('payment_ids')
     def _compute_payment_count(self):
