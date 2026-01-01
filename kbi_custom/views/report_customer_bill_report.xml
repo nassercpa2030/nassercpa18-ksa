@@ -6,7 +6,7 @@
         <field name="name">فاتورة ضريبية</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">kbi_custom.report_customer_bill_template</field>
+        <field name="report_name">saudi_einvoice_knk.report_customer_bill_template</field>
         <field name="print_report_name">'فاتورة عميل.pdf'</field>
         <field name="binding_model_id" ref="account.model_account_move"/>
         <field name="binding_type">report</field>
@@ -105,7 +105,8 @@
                             <p><strong>الإجمالي الكلي: <span t-esc="docs[0].amount_total"/> SAR</strong></p>
                         </div>
                         <div style="text-align:center;">
-                            <img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % docs[0].l10n_sa_qr_code"/>
+                            <!--img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % docs[0].l10n_sa_qr_code"/-->
+                           <img t-if="doc.get_qr_code()" style="display:block;" t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s'%('QR', doc.get_qr_code(), 110, 110)"/>
                             <p style="font-size:10px;">Scan for ZATCA Invoice</p>
                         </div>
                     </div>
