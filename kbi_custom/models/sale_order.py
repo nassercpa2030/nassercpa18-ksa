@@ -30,7 +30,7 @@ class SaleOrder ( models.Model ) :
     image_one_audit = fields.Binary ( string="صورة ميل ون أودت" , stored=True )
     project_file_state_test = fields.Char ( "Project File State Demo" , readonly=False , required=False , store=True )
     project_stage_test = fields.Char ( "Project Stage Demo" , readonly=False , required=False , store=True )
-    #first_payment_date_test = fields.Date ( string="First Payment Test" , readonly=False , required=False , store=True )
+    
     #first_payment_test2 = fields.Boolean ( string="first Payment amount test" , readonly=False , required=False , store=True )
   
     first_payment_journal_test = fields.Char ( 'First Payment Journal Name' , readonly=False , store=True )
@@ -122,7 +122,8 @@ class SaleOrder ( models.Model ) :
     first_payment_amount = fields.Monetary ( string='First Payment Amount' , related='first_payment_id.amount',stored=True,index=True )
     # first_payment_date = fields.Date ( string='First Payment Date' , compute='_compute_first_payment_fields' )
     # first_payment_amount = fields.Monetary ( string='First Payment Amount' , compute='_compute_first_payment_fields' )
-    first_payment_original = fields.Date ( string="first_payment_original" , readonly=False , required=False ,
+    first_payment_date_test = fields.Date ( string="تاريخ أول دفعة " , readonly=False , required=False , store=True )
+    first_payment_original = fields.Float ( string="first_payment_original" , readonly=False , required=False ,
                                             store=True )
     project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
                                          related='project_ids.stage_id' , store=True , groups='base.group_user' )
@@ -479,7 +480,7 @@ class SaleOrder ( models.Model ) :
     def _compute_first_payment_id(self) :
         for rec in self :
             rec.first_payment_id = self.env['account.payment'].search ( [('id' , 'in' , rec.payment_ids.ids)] ,order="date asc" , limit=1 )
-            rec.first_payment_original=rec.first_payment_id.date
+            rec.first_payment_date_test=rec.first_payment_id.date
             
             
 
