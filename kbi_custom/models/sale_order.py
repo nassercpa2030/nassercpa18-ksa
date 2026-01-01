@@ -10,14 +10,11 @@ import qrcode
 from odoo import models , fields , api , _
 from odoo.exceptions import ValidationError
 
-
 # from odoo.tools.populate import compute
-
-
 class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
-    contract_date = fields.Date ( string='Contract Date' , readonly=False )
+    contract_date = fields.Date ( string='Contract Date' , readonly=False ,required=True )
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
     convert_orders = fields.Boolean (
         string="تحويل الأوردرات لعقود" ,
@@ -33,11 +30,9 @@ class SaleOrder ( models.Model ) :
     image_one_audit = fields.Binary ( string="صورة ميل ون أودت" , stored=True )
     project_file_state_test = fields.Char ( "Project File State Demo" , readonly=False , required=False , store=True )
     project_stage_test = fields.Char ( "Project Stage Demo" , readonly=False , required=False , store=True )
-    first_payment_date_test = fields.Date ( string="First Payment Test" , readonly=False , required=False , store=True )
-    first_payment_test2 = fields.Boolean ( string="first Payment amount test" , readonly=False , required=False ,
-                                           store=True )
-    first_payment_original = fields.Float ( string="first_payment_original" , readonly=False , required=False ,
-                                            store=True )
+    
+    #first_payment_test2 = fields.Boolean ( string="first Payment amount test" , readonly=False , required=False , store=True )
+  
     first_payment_journal_test = fields.Char ( 'First Payment Journal Name' , readonly=False , store=True )
     unpaid_total_refrence = fields.Float ( 'unpaid_total_refrence' , store=True , readonly=False )
     paid_total_refrence = fields.Float ( 'paid_total_refrence' , store=True , readonly=False )
@@ -59,8 +54,7 @@ class SaleOrder ( models.Model ) :
     audit_date = fields.Date ( string='Audit Date' , readonly=False , required=True , store=True )
     #close_entry_date = fields.Date (string="Close Entry Date" ,compute="calc_close_date",store=True, readonly=True ,searchable=True)
     #close_entry_year = fields.Integer ( string="Close Entry Year" ,compute="calc_close_date",store=True, readonly=False,searchable=True )
-    close_entry_date = fields.Date (string="Close Entry Date" ,store=True, readonly=False ,searchable=True)
-    close_entry_year = fields.Integer ( string="Close Entry Year" ,store=True, readonly=False,searchable=True )
+
     date = fields.Datetime ( string='Date' )
     review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Assigned To' , readonly=False ,
                                           domain=[('job_id' , '=' , 'مدير مراجعة')] )
@@ -79,7 +73,7 @@ class SaleOrder ( models.Model ) :
     payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
     paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count",searchable=True )
     unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count",searchable=True )
-    paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" )
+    paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" ,sorted=True)
     auditor = fields.Many2one ( string="Auditor" , comodel_name="hr.employee" ,
                                 domain=[('job_id' , '!=' , 'مدير مراجعة')] )
     #invoice_ids = fields.Many2many ( 'account.move' , compute="compute_invoice_ids" , readonly=True , store=True ,
@@ -106,14 +100,14 @@ class SaleOrder ( models.Model ) :
     reject_reason = fields.Text ( string='Reject Reason' )
     broker_id = fields.Many2one ( comodel_name='res.partner' , string='Salesperson' ,
                                   domain="[('is_broker', '=', True)]" )
-    number_700_sale = fields.Char ( related='partner_id.number_700' , string="700 Number" , readonly=False ,
+    number_700_sale = fields.Char ( related='partner_id.number_700' , string="(700) الرقم الموحد" , readonly=False ,
                                     required=True , store=True )
     manager_id_sale = fields.Integer ( related="partner_id.manager_id" , string="Manager Id" , store=True ,
                                        readonly=False )
     contact_manager_team = fields.Many2one ( comodel_name="res.users" , related="user_id" ,
                                              string="contact_manager_team" , store=True , readonly=False )
     # cr_number_sale =fields.Char(related='partner_id.cr_number_sale',string="Customer CR Number",readonly=False,store=True)
-    cr_number_sale = fields.Char ( string="Customer CR Number" , readonly=False , store=True )
+    cr_number_sale = fields.Char ( string="رقم السجل التجاري",related='partner_id.cr_number_sale' , readonly=False , store=True )
     broker_amount = fields.Float ( string='Broker Amount' , tracking=True )
     broker_invoiced_amount = fields.Float ( string='قيمة إستحقاق فاتورة المسوق' , compute="_compute_broker_invoiced_amount",searchable=True )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
@@ -124,11 +118,13 @@ class SaleOrder ( models.Model ) :
                                          compute="_compute_first_payment_id" )
     first_payment_code = fields.Char ( string="First Payment Code" , compute="_compute_payment_count" )
     first_payment_code_date = fields.Date ( string='First Journal Date' , compute='_compute_payment_count' )
-    first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
-    first_payment_amount = fields.Monetary ( string='First Payment Date' , related='first_payment_id.amount' )
+    first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' ,stored=True,index=True)
+    first_payment_amount = fields.Monetary ( string='First Payment Amount' , related='first_payment_id.amount',stored=True,index=True )
     # first_payment_date = fields.Date ( string='First Payment Date' , compute='_compute_first_payment_fields' )
     # first_payment_amount = fields.Monetary ( string='First Payment Amount' , compute='_compute_first_payment_fields' )
-
+    first_payment_date_test = fields.Date ( string="تاريخ أول دفعة " , readonly=False , required=False , store=True )
+    first_payment_original = fields.Float ( string="first_payment_original" , readonly=False , required=False ,
+                                            store=True )
     project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
                                          related='project_ids.stage_id' , store=True , groups='base.group_user' )
     # close_type = fields.Char(comodel_name='project.project.close_type',string='Close_type', related='close_type', store=True)
@@ -137,6 +133,7 @@ class SaleOrder ( models.Model ) :
     can_edit_approve = fields.Boolean ( string='Can Edit Approve Route' , compute='compute_can_edit_approve' , )
     print_history_ids = fields.One2many ( comodel_name='sale.order.print.history' , inverse_name='sale_id' ,
                                           string='Print History' )
+    invoice_count_odoo16 = fields.Integer ( string="" , compute="_compute_invoice_count_odoo16" , store=True )
     sign_qrcode = fields.Binary ( string='Sign QR Code' , compute='compute_sign_qrcode' , store=False )
     uuid = fields.Char ( string='UUID' )
     validity_date = fields.Date ( string='Validity Date' ,
@@ -184,6 +181,7 @@ class SaleOrder ( models.Model ) :
     ass_visible = fields.Boolean ( string="Visible" , compute='_compute_ass_visible' )
     partner_id = fields.Many2one ( string="Customer" , comodel_name="res.partner" , strore=True , required=False ,
                                    readonly=False )
+    old_manager= fields.Char (string="المدير القديم", store=True,searchable=True,index=True,default="لا يوجد", readonly=False )
     customer_english_name = fields.Char ( string="Customer_English_Name" , related="partner_id.name_english" ,
                                           store=True , readonly=False )
 
@@ -389,7 +387,8 @@ class SaleOrder ( models.Model ) :
             partner = self.env['res.partner'].search([('number_700', '=', order.number_700_sale)], limit=1)
           if not partner and order.cr_number_sale:
             partner = self.env['res.partner'].search(
-                [('l10n_sa_additional_identification_number', '=', order.cr_number_sale)], limit=1
+                [('cr_number_sale', '=', order.cr_number_sale)], limit=1
+                #[('l10n_sa_additional_identification_number', '=', order.cr_number_sale)], limit=1
              )
 
           if partner:
@@ -410,8 +409,9 @@ class SaleOrder ( models.Model ) :
       res = super ().create ( vals_list )
       res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
       return res
-
-
+        
+     
+     
     def compute_sign_qrcode(self) :
       for rec in self :
         qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
@@ -425,7 +425,27 @@ class SaleOrder ( models.Model ) :
         qr_image = base64.b64encode ( buffered.getvalue () ).decode ( 'ascii' )
         rec.sign_qrcode = qr_image
 
-
+    
+    #def compute_sign_qrcode(self) :   
+      #base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url') 
+      #qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
+      #for rec in self :
+        #if rec.sign_qrcode or not rec.uuid:
+            #continue
+        #qr_code.clear()    
+        #base_url = self.env['ir.config_parameter'].sudo ().get_param ( 'web.base.url' )
+        #qr_code.add_data ( f'{base_url}//order/verify/{rec.uuid}' )
+        #qr_code.make ( fit=True )
+        #qr_img = qr_code.make_image ()
+        #im = qr_img._img.convert ( "RGB" )
+        #img=qr_code.make_image(
+            #fill_color="black",
+            #back_color="white"
+        #).convert("RGB")
+        #buffered = BytesIO ()
+        #img.save ( buffered , format="png" )
+       #rec.sign_qrcode = base64.b64encode ( buffered.getvalue () ).decode ( 'ascii' )
+          
     @api.depends ( 'user_id' )
     def compute_can_edit_analytic(self) :
       for rec in self :
@@ -459,8 +479,10 @@ class SaleOrder ( models.Model ) :
     @api.depends ( 'payment_ids' , 'order_line.move_ids' )
     def _compute_first_payment_id(self) :
         for rec in self :
-            rec.first_payment_id = self.env['account.payment'].search ( [('id' , 'in' , rec.payment_ids.ids)] ,
-                                                                        order="date asc" , limit=1 )
+            rec.first_payment_id = self.env['account.payment'].search ( [('id' , 'in' , rec.payment_ids.ids)] ,order="date asc" , limit=1 )
+            rec.first_payment_date_test=rec.first_payment_id.date
+            
+            
 
     @api.depends('payment_ids')
     def _compute_payment_count(self):
@@ -489,6 +511,8 @@ class SaleOrder ( models.Model ) :
                 first_line = move_lines.sorted('date')[0]
                 rec.first_payment_code = first_line.move_id
                 rec.first_payment_code_date = first_line.date
+                #rec.first_payment_date = first_line.date
+                #rec.first_payment_amount = first_line.amount
             else:
                 rec.first_payment_code = False
                 rec.first_payment_code_date = False
@@ -670,8 +694,7 @@ class SaleOrder ( models.Model ) :
     # contract_date = fields.Date(string='Contract Date')
     audit_date = fields.Date ( string='Audit Date' )
     #account_year = fields.Integer ( string='Year' , required=True , default=lambda self : fields.Date.today ().year )
-    account_year = fields.Integer ( string='Year' , required=True , compute='compute_audit_year' )
-   
+    account_year = fields.Integer ( string='Year' , required=True , compute='compute_audit_year',index=True )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreement' )
     payment_ids = fields.Many2many ( 'account.payment' , string='Payments' , compute='_compute_payment_ids' )
     payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
@@ -686,7 +709,6 @@ class SaleOrder ( models.Model ) :
     amount_due = fields.Float ( string='Amount Due' , compute="_compute_amount_due" )
     #project_name = fields.Char ( string='Project Name' )
     #project_code = fields.Char ( string='Project Code' )
-    invoice_count_odoo16 = fields.Integer ( string="" , compute="_compute_invoice_count_odoo16" , store=True )
     # invoice_count=fields.Integer(string="",store=True,readonly=False)
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
@@ -724,12 +746,48 @@ class SaleOrder ( models.Model ) :
     year2=fields.Char(string="Year_2",readonly=False,deFault=False)
     year3=fields.Char(string="Year_3",readonly=False,deFault=False)
     uuid = fields.Char ( string='UUID' )
+    final_close_entry_date = fields.Date (string=" تاريخ قيد الايراد", compute='_compute_final_close_entry_date',readonly=False,index=True,searchable=True)
+    close_entry_date = fields.Date ( string="تاريخ قيد الايراد",store=True,related="final_close_entry_date", readonly=False ,index=True,searchable=True)
+    close_entry_year = fields.Integer ( string="Close Entry Year" ,store=True, readonly=False,searchable=True )
     validity_date = fields.Date ( string='Validity Date' ,
                                   default=fields.Date.today () + datetime.timedelta ( days=30 ) )
     project_files_state = fields.Selection ( [
         ('done' , 'طبيعي') ,
         ('not_done' , '(مستثني)غير مكتمل') ,
     ] , string="Project Files State" , store=True )
+
+    @api.depends('name')
+    def _compute_final_close_entry_date(self):
+        for order in self:
+            # تنظيف الاسم من مسافات إضافية وتحويله لأحرف صغيرة
+            order_name_clean = (order.name or '').strip().lower()
+
+            # البحث عن أول قيد مرتبط بالـ Sale Order
+            move = self.env['account.move'].search([
+                ('invoice_origin', 'ilike', order_name_clean),  # بحث غير حساس لحالة الأحرف
+                ('journal_id' , 'in' , [165,160,162])
+                #('line_ids.account_id', 'in', [1341,1342])          # حسب Journals اللي انت عايزهم
+            ], order='date asc', limit=1)
+            
+            if move:
+               order.final_close_entry_date = move.date
+
+    
+    #@api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
+    #def _compute_final_close_entry_date(self) :
+        #for order in self :
+            #moves = self.env['account.move'].search ( [  # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
+                #('invoice_origin' , '=' , order.name) ,
+                #('journal_id' , 'in' , [165,160,162])
+            #] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
+            #order.final_close_entry_date = moves.date if moves else False
+            #order.close_entry_date = moves.date if moves else False
+    
+   # @api.depends('final_close_entry_date')
+    #def _compute_final_close_entry_date(self):
+     #   for rec in self:
+      #      rec.close_entry_date = rec.final_close_entry_date
+            
     
     @api.depends('audit_date')
     def compute_audit_year(self):
@@ -740,7 +798,7 @@ class SaleOrder ( models.Model ) :
                #rec.account_year = fields.Date.today ().year
                 rec.account_year = False
                 
-            
+       
     def action_open_close_entry_wizard_deffered(self) :
         self.ensure_one ()
         return {
@@ -756,14 +814,14 @@ class SaleOrder ( models.Model ) :
             }
         }
 
-    @api.depends ( 'name' )
-    def _compute_invoice_count_odoo16(self) :
+    @api.depends ( 'name' )  
+    def _compute_journal_165_date(self) :
         for order in self :
-            invoices = self.env['account.move'].search ( [
-                ('sale_order_test' , '=' , order.name.strip ()) ,
-                ('move_type' , '=' , 'out_invoice')
-            ] )
-            order.invoice_count_odoo16 = len ( invoices )
+            moves = self.env['account.move'].search ( [    # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
+                ('invoice_origin' , '=' , order.name) ,
+                ('journal_id' , '=' , 165)
+            ] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
+            order.journal_165_date = moves.date if moves else False
 
     def action_open_print_sale_wizard(self) :
         return {
@@ -968,6 +1026,7 @@ class SaleOrder ( models.Model ) :
                 'default_sale_order_id': self.id,
                 'default_partner_id': self.partner_id.id if self.partner_id else False,
                 'default_payment_type': 'inbound',
+                'default_date':False,
                 # 'default_amount': 0.0,  # اختياري حسب الحاجة
                }
              }

@@ -17,7 +17,8 @@ class ResCity ( models.Model ) :
 class ResCity ( models.Model ) :
     _inherit = 'res.users'
     
-    
+
+
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
@@ -65,12 +66,30 @@ class HrPayslip(models.Model):
 
         return result
 
-
+# ---------------- EMPLOYEE Contract -----------------
+class Recruiter ( models.Model ) :
+    _inherit = 'hr.contract'
+    housing_allowance=fields.Monetary('بدل السكن ',help="Same field as housing allowance for employee contract" ,readonly=False , store=True)
+    transportation_allowance=fields.Monetary('بدل المواصلات',help="Same field as housing allowance for employee contract" ,readonly=False , store=True)
+    other_allowance=fields.Monetary('بدلات أخري ',help="Same field as Other allowance for employee contract" ,readonly=False , store=True)
+# ---------------- EMPLOYEES  -----------------   
 class Recruiter(models.Model):
     _inherit = 'hr.employee'
 
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan', help="Same field as in Journal Entry (account.move) for analytic distribution",placeholder="Enter Analytic Plan")
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' , domain="[('plan_id', '=', analytic_plan)]" , readonly=False , store=True )
+    wage = fields.Float ( 'الأساسي' , help="Same field as Wage for employee contract" , compute="get_employee_wage" ,readonly=False , store=True )
+    housing_allowance=fields.Monetary('بدل السكن ',related="contract_id.housing_allowance",help="Same field as housing allowance for employee contract" ,readonly=False , store=True)
+    other_allowance=fields.Monetary('بدلات أخري ',related="contract_id.other_allowance",help="Same field as Other allowance for employee contract" ,readonly=False , store=True)
+    transportation_allowance=fields.Monetary('بدل المواصلات',related="contract_id.transportation_allowance",help="Same field as housing allowance for employee contract" ,readonly=False , store=True)
+    
+    @api.depends ('contract_id')
+    def get_employee_wage(self) :
+        for rec in self :
+            rec.wage = rec.contract_id.wage if rec.contract_id else 0.0
+            #rec.housing_allowance = rec.contract_id.l10n_sa_housing_allowance if rec.contract_id else 0.0اً
+            #rec.other_allowance = rec.contract_id.l10n_sa_other_allowances if rec.contract_id else 0.0
+
 
 
 class Recruiter ( models.Model ) :
@@ -86,6 +105,20 @@ class Recruiter ( models.Model ) :
     def _remove_recruitment_interviewers(self):
         return True
 
+ ################## HR ATTACHMENTS###################
+class HrAttachement ( models.Model ) :
+    _inherit = 'hr.salary.attachment'
+    monthly_amount= fields.Monetary(
+        string="Amount",
+        required=True,           # الحقل إجباري
+        readonly=False,          # يمكن تعديله
+        store=True,              # يُخزن في قاعدة البيانات
+        index=True,              # يتم فهرسته
+        copy=True,               # يتم نسخه عند نسخ السجل
+        tracking=True,           # تتبع التغييرات
+        currency_field='currency_id')
+
+
 
 class ResPartner ( models.Model ) :
     _inherit = 'res.partner'
@@ -96,15 +129,16 @@ class ResPartner ( models.Model ) :
                                      related="x_studio_related_field_7pm_1j7mp6p7k" , store=True , readonly=False )
     is_broker = fields.Boolean ( string='Broker' )
     ref= fields.Char(string=_("1 Audit No"),store=True,index=True)
-    name_english = fields.Char ( String="English name" , readonly=False , store=True )
+    name_english = fields.Char ( string="English name" , readonly=False , store=True )
     partner_vat_placeholder = fields.Char ( string="Vat Number" , readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
     manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' , compute="action_search_manager" ,
                                      store=True , readonly=False )
     manager_id = fields.Integer ( string="Manager Id" , store=True , readonly=False )
-    cr_number_sale = fields.Char ( related="sale_order_ids.cr_number_sale" , string="Commercial number" ,
-                                   readonly=False , store=True )
-    property_account_payable_id = fields.Many2one ( commodel_name="account.account" ,
+    #cr_number_sale = fields.Char ( related="sale_order_ids.cr_number_sale" , string="Commercial number" ,
+                                  # readonly=False , store=True )
+    cr_number_sale = fields.Char ( string="Commercial number" ,compute="_compute_cr_number_sale", readonly=False , store=True )
+    property_account_payable_id = fields.Many2one ( comodel_name="account.account" ,
                                                     domain=[('code' , '=' , '21011001')] , store=True , readonly=False ,
                                                     string='Account Payable' ,
                                                     default=lambda self : self.env['account.account'].search (
@@ -119,6 +153,13 @@ class ResPartner ( models.Model ) :
                 ('res_id', '=', rec.id)
             ])
 
+    
+    @api.depends('sale_order_ids')
+    def _compute_cr_number_sale(self):
+        for partner in self:
+            partner.cr_number_sale = partner.sale_order_ids[-1].cr_number_sale if partner.sale_order_ids else False
+
+    
     @api.constrains('number_700', 'cr_number_sale', 'company_type')
     def _check_numbers(self):
         pattern_700 = r'^7\d*$'
@@ -145,9 +186,10 @@ class ResPartner ( models.Model ) :
             # ===== cr_number_sale =====
             if rec.company_type != 'person' and user_not_allowed:
                 if not rec.cr_number_sale:
-                    raise ValidationError("حقل CR Number Sale مطلوب لغير الأشخاص وغير المسؤولين.")
-                if not re.match(pattern_cr, rec.cr_number_sale):
-                    raise ValidationError("CR Number Sale must contain numbers only.")
+                    continue
+                   # raise ValidationError("حقل CR Number Sale مطلوب لغير الأشخاص وغير المسؤولين.")
+               # if not re.match(pattern_cr, rec.cr_number_sale):
+                    #raise ValidationError("CR Number Sale must contain numbers only.")
 
                 
 

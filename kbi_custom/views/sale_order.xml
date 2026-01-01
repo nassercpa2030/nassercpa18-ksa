@@ -95,6 +95,7 @@
                     <field name="account_year" modifiers="{'readonly':[('from_crm','=',True)]}"/>
                     <field name="from_crm" invisible="1"/>
                     <field name="contract_signature"/>
+                    <field name="old_manager" widget="badge" decoration_info="1" />
                 </xpath>
 
                 <!-- Hide some fields in order_line -->
@@ -122,7 +123,7 @@
     <div class="row">
         <div class="col">
             <label for="first_payment_date" string="First Payment: "/>
-            <field name="first_payment_date"/>
+            <field name="first_payment_date" options="{'field':'date'}"/>
         </div>
         <div class="col">
             <label for="unpaid_total" string="Unpaid: "/>

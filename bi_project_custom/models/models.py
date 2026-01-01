@@ -1,7 +1,8 @@
-
 from odoo import models , fields , api , _
 from odoo.exceptions import ValidationError
+import logging
 
+_logger = logging.getLogger(__name__)
 
 
 class AccountMove ( models.Model ) :
@@ -9,19 +10,17 @@ class AccountMove ( models.Model ) :
 
     sale_order_id = fields.Many2one ( 'sale.order' , string='Sales Order' , ondelete='set null' )
 
-    def unlink(self):
-      journal_ids = [160, 161, 162, 165]
+    def unlink(self) :
+        journal_ids = [160 , 161 , 162 , 165]
 
-      for move in self:
-        if move.state == 'posted' and move.invoice_origin:
-            sale_order = self.env['sale.order'].search([('id', '=', move.sale_order_id_finance)], limit=1)
-            if sale_order and move.journal_id.id in journal_ids:
-                sale_order.journal_entry_count_finance -= 1
+        for move in self :
+            if move.state == 'posted' and move.invoice_origin :
+                sale_order = self.env['sale.order'].search ( [('id' , '=' , move.sale_order_id_finance)] , limit=1 )
+                if sale_order and move.journal_id.id in journal_ids :
+                    sale_order.journal_entry_count_finance -= 1
 
-      return super().unlink()
+        return super ().unlink ()
 
-    
-    
 
 class ProjectProject ( models.Model ) :
     _inherit = 'project.project'
@@ -34,7 +33,8 @@ class ProjectProject ( models.Model ) :
     stage_name = fields.Char ( string='Stage Name' , related='stage_id.name' , store=False )
     sale_order_id = fields.Many2one ( commodel_name='sale.order' , string="Sales Order" , store=True ,
                                       ondelete='set null' )
-    manager_id = fields.Integer(String="Manager_id",related="user_id.id",store=True,readonly=False,ondelete='set null')
+    manager_id = fields.Integer ( String="Manager_id" , related="user_id.id" , store=True , readonly=False ,
+                                  ondelete='set null' )
     # adding field close_type
     close_type = fields.Text ( string="Close Type" , default="قيد إغلاق مؤجل" , readonly=False )
     # إضافة حقل paid_percent محسوب بناءً على paid_percent في sale_order
@@ -138,82 +138,87 @@ class ProjectStagesRouteRule ( models.Model ) :
 class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
-    journal_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string='عدد قيود الإغلاق' ,index=True,searchable=True)
-    close_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string=' قيود الإغلاق' ,store=True)
+    journal_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string='عدد قيود الإغلاق' ,
+                                           index=True , searchable=True )
+    close_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string=' قيود الإغلاق' , store=True )
     is_project_close_stage = fields.Boolean ( compute='_compute_is_project_close_stage' ,
                                               string='Is Project in Close Stage' )
-   
+    # final_close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , compute='compute_final_close_entry_date' ,
+    # store=True )
     journal_entry_data = fields.Many2many ( comodel_name='account.move' , compute='_compute_journal_entry_data' ,
                                             string='Journal Data Lines' )
-    #journal_entry_count_finance = fields.Integer (string='عدد قيود الإغلاق',compute='compute_journal_entry_count_finance',store=True)
-    journal_entry_count_finance = fields.Integer (string='عدد قيود الإغلاق',store=True)
-    one_audit_number= fields.Char(string="رقم ون أودت",related="partner_id.ref",index=True)
-    broker_percentage_ =fields.Float(string="Broker Percentage",readonly=False,compute="compute_broker_percentage")
-    first_dofaa=fields.Boolean(store=True,default=False,string="1")
-    second_dofaa=fields.Boolean(store=True,default=True,string="2")
+    # journal_entry_count_finance = fields.Integer (string='عدد قيود الإغلاق',compute='compute_journal_entry_count_finance',store=True)
+    journal_entry_count_finance = fields.Integer ( string='عدد قيود الإغلاق' , store=True )
+    one_audit_number = fields.Char ( string="رقم ون أودت" , related="partner_id.ref" , index=True )
+    broker_percentage_ = fields.Float ( string="Broker Percentage" , readonly=False ,
+                                        compute="compute_broker_percentage" )
+    first_dofaa = fields.Boolean ( store=True , default=False , string="1" )
+    second_dofaa = fields.Boolean ( store=True , default=True , string="2" )
     # first and second dofaa name
-    first_line_name = fields.Char(
-        string="First Line Description",
-        compute="_compute_second_line_name",
+    first_line_name = fields.Char (
+        string="First Line Description" ,
+        compute="_compute_second_line_name" ,
         store=True
     )
-    second_line_name = fields.Char(
-        string="Second Line Description",
-        compute="_compute_second_line_name",
+    second_line_name = fields.Char (
+        string="Second Line Description" ,
+        compute="_compute_second_line_name" ,
         store=True
     )
     # first and second dofaa untaxed
-    first_line_untaxed = fields.Float(
-        string="First Line Untaxed",
-        compute="_compute_second_line_name",
+    first_line_untaxed = fields.Float (
+        string="First Line Untaxed" ,
+        compute="_compute_second_line_name" ,
         store=True
-     )
-    second_line_untaxed = fields.Float(
-        string="Second Line Untaxed",
-        compute="_compute_second_line_name",
+    )
+    second_line_untaxed = fields.Float (
+        string="Second Line Untaxed" ,
+        compute="_compute_second_line_name" ,
         store=True
-     )
+    )
     # first and second dofaa taxed
-    first_line_taxed = fields.Float(
-        string="Second Line Untaxed",
-        compute="_compute_second_line_name",
+    first_line_taxed = fields.Float (
+        string="Second Line Untaxed" ,
+        compute="_compute_second_line_name" ,
         store=True
-     )
-    second_line_taxed = fields.Float(
-        string="Second Line Untaxed",
-        compute="_compute_second_line_name",
+    )
+    second_line_taxed = fields.Float (
+        string="Second Line Untaxed" ,
+        compute="_compute_second_line_name" ,
         store=True
-     )
+    )
     # first and second dofaa taxes
-    first_line_taxes = fields.Integer(
-        string="First Line Taxe",
-        compute="_compute_second_line_name",
+    first_line_taxes = fields.Integer (
+        string="First Line Taxe" ,
+        compute="_compute_second_line_name" ,
         store=True
-     )
-    second_line_taxes = fields.Integer(
-        string="Second Line Taxe",
-        compute="_compute_second_line_name",
+    )
+    second_line_taxes = fields.Integer (
+        string="Second Line Taxe" ,
+        compute="_compute_second_line_name" ,
         store=True
-     )
-    invoice_attachements_ids = fields.Many2many('ir.attachment', 'sale_order_invoice_attachment_rel', 'sale_order_id', 'attachment_id',string='Invoice Attachments', compute='_compute_invoice_attachments',store=True)
-    
+    )
+    invoice_attachements_ids = fields.Many2many ( 'ir.attachment' , 'sale_order_invoice_attachment_rel' ,
+                                                  'sale_order_id' , 'attachment_id' , string='Invoice Attachments' ,
+                                                  compute='_compute_invoice_attachments' , store=True )
+
     is_journal_state_not_posted = fields.Boolean ( compute='_compute_is_journal_state_not_posted' ,
                                                    string='Journal State' , default=True )
-    
-    #price1=fields.Float(string="Untaxed Price1",readonly=False,deFault=False)
-    #price2=fields.Float(string="Untaxed Price2",readonly=False,deFault=False)
-    #price3=fields.Float(string="Untaxed Price3",readonly=False,deFault=False)
-    #year1=fields.Char(string="Year_1",readonly=False,deFault=False)
-    #year2=fields.Char(string="Year_2",readonly=False,deFault=False)
-    #year3=fields.Char(string="Year_3",readonly=False,deFault=False)
-  
-    tax1=fields.Float(string="Tax1",readonly=False,compute="compute_taxed_price",store=True)
-    tax2=fields.Float(string="Tax2",readonly=False,compute="compute_taxed_price",store=True)
-    tax3=fields.Float(string="Tax3",readonly=False,compute="compute_taxed_price",store=True)
-    #taxed_price1=fields.Float(string="Taxed Price1",readonly=False,compute="compute_taxed_price",store=True)
-    #taxed_price2=fields.Float(string="Taxed Price2",readonly=False,compute="compute_taxed_price",store=True)
-    #taxed_price3=fields.Float(string="Taxed Price3",readonly=False,compute="compute_taxed_price",store=True)
-    
+
+    # price1=fields.Float(string="Untaxed Price1",readonly=False,deFault=False)
+    # price2=fields.Float(string="Untaxed Price2",readonly=False,deFault=False)
+    # price3=fields.Float(string="Untaxed Price3",readonly=False,deFault=False)
+    # year1=fields.Char(string="Year_1",readonly=False,deFault=False)
+    # year2=fields.Char(string="Year_2",readonly=False,deFault=False)
+    # year3=fields.Char(string="Year_3",readonly=False,deFault=False)
+
+    tax1 = fields.Float ( string="Tax1" , readonly=False , compute="compute_taxed_price" , store=True )
+    tax2 = fields.Float ( string="Tax2" , readonly=False , compute="compute_taxed_price" , store=True )
+    tax3 = fields.Float ( string="Tax3" , readonly=False , compute="compute_taxed_price" , store=True )
+    # taxed_price1=fields.Float(string="Taxed Price1",readonly=False,compute="compute_taxed_price",store=True)
+    # taxed_price2=fields.Float(string="Taxed Price2",readonly=False,compute="compute_taxed_price",store=True)
+    # taxed_price3=fields.Float(string="Taxed Price3",readonly=False,compute="compute_taxed_price",store=True)
+
     team_id = fields.Many2one ( 'crm.team' , string='Sales Team' , readonly=False )
     user_id = fields.Many2one ( 'res.users' , string="Manager" , compute='_compute_user_id' ,
                                 store=True , readonly=False , precompute=True , index=True ,
@@ -226,101 +231,121 @@ class SaleOrder ( models.Model ) :
         ('not_done' , '(مستثني)غير مكتمل') ,
         ('last_done' , '(مستثني) مكتمل-مدفوع') ,
         ('last_notdone' , '( مستثني ) مكتمل-غيرمدفوع') ,
-    ] , string="Project Files State" , compute='_compute_project_files_state' , store=True,searchable=True )
+    ] , string="Project Files State" , compute='_compute_project_files_state' , store=True , searchable=True )
 
     # file_state_history = fields.Char(compute='_compute_project_files_state', string='File_state History')
     @api.depends ( 'project_ids.files_state' )
     def _compute_project_files_state(self) :
         for order in self :
             order.project_files_state = order.project_ids[:1].files_state if order.project_ids else False
-            
-    @api.onchange ( 'amount_untaxed','broker_amount' )       
-    @api.depends( 'amount_untaxed','broker_amount' )     
-    def compute_broker_percentage(self):
-        for record in self:
-            if record.amount_untaxed and record.broker_amount:
+
+    def action_close_journal_entries(self) :
+        self.ensure_one ()
+        return {
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'Close Journal Entries' ,
+            'view_mode' : 'form' ,
+            'res_model' : 'close.entry.wizard' ,
+            'context' : {'default_sale_order_id' : self.id} ,
+            'target' : 'new' ,
+        }
+
+    @api.onchange ( 'amount_untaxed' , 'broker_amount' )
+    @api.depends ( 'amount_untaxed' , 'broker_amount' )
+    def compute_broker_percentage(self) :
+        for record in self :
+            if record.amount_untaxed and record.broker_amount :
                 record.broker_percentage_ = (record.broker_amount / record.amount_untaxed) * 100
-            else:
+            else :
                 record.broker_percentage_ = False
 
-            
-    #@api.onchange ( 'price1','price2','price3' )
-    #@api.depends ( 'price1','price2','price3' )
-    #def compute_taxed_price(self) :
-        #for rec in self :
-          # rec.tax1=rec.price1*0.15
-          # rec.tax2=rec.price2*0.15
-          # rec.tax3=rec.price3*0.15
-          # rec.taxed_price1=rec.price1*1.15
-          # rec.taxed_price2=rec.price2*1.15
-          # rec.taxed_price3=rec.price3*1.15 
-            
-    @api.depends('invoice_ids')
-    def _compute_invoice_attachments(self):
-        for order in self:
-            attachments = self.env['ir.attachment'].search([
-                ('res_model', '=', 'account.move'),
-                ('res_id', 'in', order.invoice_ids.ids)
-            ])
-            #order.invoice_attachements_ids  = attachments
-            # إذا attachments هو recordset من ir.attachment
-            if attachments:
-               order.invoice_attachements_ids = attachments
-               #order.sudo().invoice_attachements_ids = [(6, 0, attachments.ids)]
+    # @api.onchange ( 'price1','price2','price3' )
+    # @api.depends ( 'price1','price2','price3' )
+    # def compute_taxed_price(self) :
+    # for rec in self :
+    # rec.tax1=rec.price1*0.15
+    # rec.tax2=rec.price2*0.15
+    # rec.tax3=rec.price3*0.15
+    # rec.taxed_price1=rec.price1*1.15
+    # rec.taxed_price2=rec.price2*1.15
+    # rec.taxed_price3=rec.price3*1.15
 
-            
+    @api.depends ( 'invoice_ids' )
+    def _compute_invoice_attachments(self) :
+        for order in self :
+            attachments = self.env['ir.attachment'].search ( [
+                ('res_model' , '=' , 'account.move') ,
+                ('res_id' , 'in' , order.invoice_ids.ids)
+            ] )
+            if attachments :
+                order.invoice_attachements_ids = attachments
+                for attachment in attachments :
+                    attachment.write ( {
+                        'res_model' : 'sale.order' ,
+                        'res_id' : order.id
+                    } )
+
     @api.model
-    def create(self, vals):
-        record = super().create(vals)
-        record._link_custom_attachments_to_chatter()
+    def create(self , vals) :
+        record = super ().create ( vals )
+        record._link_custom_attachments_to_chatter ()
         return record
 
-    def write(self, vals):
-        res = super().write(vals)
-        self._link_custom_attachments_to_chatter()
+    def write(self , vals) :
+        res = super ().write ( vals )
+        self._link_custom_attachments_to_chatter ()
         return res
 
-    def _link_custom_attachments_to_chatter(self):
-        for rec in self:
+    def _link_custom_attachments_to_chatter(self) :
+        for rec in self :
             if rec.invoice_attachements_ids :
                 for attachment in rec.invoice_attachements_ids :
-                    attachment.write({'res_model': 'sale.order', 'res_id': rec.id})  
+                    attachment.write ( {
+                        'res_model' : 'sale.order' ,
+                        'res_id' : rec.id
+                    } )
+    #def _link_custom_attachments_to_chatter(self) :
+        #for rec in self :
+            #if rec.invoice_attachements_ids :
+                #for attachment in rec.invoice_attachements_ids :
+                    #attachment.write ( {'res_model' : 'sale.order' , 'res_id' : rec.id} )
 
-    def _is_admin(self):
-        return self.env.user.has_group('base.group_system')
-        
-    @api.onchange ('partner_id')        
-    def get_manger_from_customer(self):
-        for order in self:
-           if order.partner_id and order.partner_id.manager_id:
-               order.user_id = order.partner_id.manager_id 
-           else:
-               order.user_id = self.env.user
 
-    @api.constrains('partner_id', 'user_id')
-    def _check_partner_manager(self):
-        for order in self:
+    def _is_admin(self) :
+        return self.env.user.has_group ( 'base.group_system' )
+
+    @api.onchange ( 'partner_id' )
+    def get_manger_from_customer(self) :
+        for order in self :
+            if order.partner_id and order.partner_id.manager_id :
+                order.user_id = order.partner_id.manager_id
+            else :
+                order.user_id = self.env.user
+
+    @api.constrains ( 'partner_id' , 'user_id' )
+    def _check_partner_manager(self) :
+        for order in self :
 
             # ✅ Admin مسموح
-            if order._is_admin():
+            if order._is_admin () :
                 continue
 
             # ✅ لازم يكون فيه عميل ومستخدم
-            if not order.partner_id or not order.user_id:
+            if not order.partner_id or not order.user_id :
                 continue
 
             manager_id = order.partner_id.manager_id
 
             # ✅ لو العميل له manager والمستخدم مختلف
-            if manager_id and manager_id != order.user_id.id:
-               manager_user = self.env['res.users'].browse(manager_id)
-               manager_name = manager_user.name if manager_user.exists() else str(manager_id)
+            if manager_id and manager_id != order.user_id.id :
+                manager_user = self.env['res.users'].browse ( manager_id )
+                manager_name = manager_user.name if manager_user.exists () else str ( manager_id )
 
-               raise ValidationError(
-                _("لا يجوز عمل أوردر لهذا العميل لأنه يخص المستخدم: %s\nبرجاء مراجعته لإجراء أي تعديل")
-                % manager_name
-               )
-    
+                raise ValidationError (
+                    _ ( "لا يجوز عمل أوردر لهذا العميل لأنه يخص المستخدم: %s\nبرجاء مراجعته لإجراء أي تعديل" )
+                    % manager_name
+                )
+
     @api.onchange ( 'journal_entry_data' )
     @api.depends ( 'journal_entry_data' )
     def _compute_is_journal_state_not_posted(self) :
@@ -334,34 +359,34 @@ class SaleOrder ( models.Model ) :
                 if lines.qty_invoiced > 0.0 :
                     total_2 += lines.price_subtotal
             rec.is_journal_state_not_posted = total_1 != total_2
-                    
-        
-    def action_print_mutalba_report(self):
-        report = self.env['ir.actions.report'].browse(1079)
-        return report.report_action(self)    
 
-    #@api.multi
-    @api.depends('order_line')
-    def _compute_second_line_name(self):
-        for order in self:
-            if len(order.order_line) >= 1:
+    def action_print_mutalba_report(self) :
+        report = self.env['ir.actions.report'].browse ( 1079 )
+        return report.report_action ( self )
+
+        # @api.multi
+
+    @api.depends ( 'order_line' )
+    def _compute_second_line_name(self) :
+        for order in self :
+            if len ( order.order_line ) >= 1 :
                 order.first_line_name = order.order_line[0].product_id.name
                 order.first_line_taxed = order.order_line[0].price_total
                 order.first_line_untaxed = order.order_line[0].price_subtotal
                 order.first_line_taxes = order.order_line[0].price_tax
-                
-            else:
+
+            else :
                 order.first_line_name = False
 
-            if len(order.order_line) >= 2:
+            if len ( order.order_line ) >= 2 :
                 order.second_line_name = order.order_line[1].product_id.name
-                #order.second_line_name = order.order_line[1].name
+                # order.second_line_name = order.order_line[1].name
                 order.second_line_taxed = order.order_line[1].price_total
                 order.second_line_untaxed = order.order_line[1].price_subtotal
-                order.second_line_taxes =order.order_line[0].price_tax
-            else:
+                order.second_line_taxes = order.order_line[0].price_tax
+            else :
                 order.second_line_name = False
-                
+
     def _compute_journal_entry_data(self) :
         for date in self :
             date.journal_entry_data = self.env['account.move'].search (
@@ -382,6 +407,7 @@ class SaleOrder ( models.Model ) :
                 'message' : _ ( 'العقد تم عمله بإنتظار السداد' ) ,
                 'type' : 'success' ,  # success, warning, danger, info
                 'sticky' : False ,  # لو True الرسالة تظل حتى يغلقها المستخدم
+                'next': {'type': 'ir.actions.client', 'tag': 'reload'} 
             }
         }
 
@@ -433,7 +459,6 @@ class SaleOrder ( models.Model ) :
                 if data.state != 'posted' :
                     order.is_project_close_stage = True
 
-
     def _compute_journal_entry_count(self) :
         for order in self :
             count = self.env['account.move'].search_count (
@@ -441,24 +466,23 @@ class SaleOrder ( models.Model ) :
                  ('journal_id' , 'in' , [162 , 161 , 160 , 165])] )
             # ['|',('sale_order_id', '=', self.id),('invoice_origin', '=', self.name), ('move_type', '=', 'entry'), ('journal_id', 'in', [162,161,160,165])])
             order.close_entry_count = count
-            order.journal_entry_count= count
+            order.journal_entry_count = count
 
-    #@api.depends('journal_entry_count')
-    #def compute_journal_entry_count_finance(self) :
-        #for order in self :
-            #order.journal_entry_count_finance = order.journal_entry_count
-    
-    @api.depends('name')
-    def compute_journal_entry_count_finance(self):
-       Move = self.env['account.move']
-       for order in self:
-           order.journal_entry_count_finance = Move.search_count([
-            ('invoice_origin', '=', order.name),
-            ('move_type', '=', 'entry'),          # قيد عادي
-            ('journal_id' , 'in' , [162 , 161 , 160 , 165]),      # لو عامل فلاغ للقيود
-            ])
+    # @api.depends('journal_entry_count')
+    # def compute_journal_entry_count_finance(self) :
+    # for order in self :
+    # order.journal_entry_count_finance = order.journal_entry_count
 
-            
+    @api.depends ( 'name' )
+    def compute_journal_entry_count_finance(self) :
+        Move = self.env['account.move']
+        for order in self :
+            order.journal_entry_count_finance = Move.search_count ( [
+                ('invoice_origin' , '=' , order.name) ,
+                ('move_type' , '=' , 'entry') ,  # قيد عادي
+                ('journal_id' , 'in' , [162 , 161 , 160 , 165]) ,  # لو عامل فلاغ للقيود
+            ] )
+
     def action_view_journal_entries(self) :
         self.ensure_one ()
         return {
@@ -471,31 +495,40 @@ class SaleOrder ( models.Model ) :
             'context' : {'default_sale_order_id' : self.id} ,
         }
 
+    # @api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
+    # def _compute_journal_165_date(self) :
+    # for order in self :
+    # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
+    # moves = self.env['account.move'].search ( [
+    #  ('invoice_origin' , '=' , order.name) ,
+    #   ('journal_id' , '=' , 165)
+    # ] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
+    # order.journal_165_date = moves.date if moves else False
 
-    def action_close_journal_entries(self) :
-        self.ensure_one ()
-        return {
-            'type' : 'ir.actions.act_window' ,
-            'name' : 'Close Journal Entries' ,
-            'view_mode' : 'form' ,
-            'res_model' : 'close.entry.wizard' ,
-            'context' : {'default_sale_order_id' : self.id} ,
-            'target' : 'new' ,
+
+def action_close_journal_entries(self) :
+    self.ensure_one ()
+    return {
+        'type' : 'ir.actions.act_window' ,
+        'name' : 'Close Journal Entries' ,
+        'view_mode' : 'form' ,
+        'res_model' : 'close.entry.wizard' ,
+        'context' : {'default_sale_order_id' : self.id} ,
+        'target' : 'new' ,
+    }
+
+
+def action_open_close_entry_wizard_deffered(self) :
+    self.ensure_one ()
+    return {
+        'type' : 'ir.actions.act_window' ,
+        'name' : 'Close Entry Deffered' ,
+        'res_model' : 'close.entry.wizard' ,
+        'view_mode' : 'form' ,
+        'target' : 'new' ,
+        'view_id' : self.env.ref ( 'bi_project_custom.view_close_entry_wizard_form_deffered' ).id ,
+        # لو عندك view مخصص
+        'context' : {
+            'default_sale_order_id' : self.id ,
         }
-
-
-    def action_open_close_entry_wizard_deffered(self) :
-        self.ensure_one ()
-        return {
-            'type' : 'ir.actions.act_window' ,
-            'name' : 'Close Entry Deffered' ,
-            'res_model' : 'close.entry.wizard' ,
-            'view_mode' : 'form' ,
-            'target' : 'new' ,
-            'view_id' : self.env.ref ( 'bi_project_custom.view_close_entry_wizard_form_deffered' ).id ,
-            # لو عندك view مخصص
-            'context' : {
-                'default_sale_order_id' : self.id ,
-            }
-        }
-
+    }
