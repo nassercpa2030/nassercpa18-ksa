@@ -14,7 +14,7 @@ from odoo.exceptions import ValidationError
 class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
-    contract_date = fields.Date ( string='Contract Date' , readonly=False )
+    contract_date = fields.Date ( string='Contract Date' , readonly=False ,required=True )
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
     convert_orders = fields.Boolean (
         string="تحويل الأوردرات لعقود" ,
@@ -122,7 +122,7 @@ class SaleOrder ( models.Model ) :
     first_payment_amount = fields.Monetary ( string='First Payment Amount' , related='first_payment_id.amount',stored=True,index=True )
     # first_payment_date = fields.Date ( string='First Payment Date' , compute='_compute_first_payment_fields' )
     # first_payment_amount = fields.Monetary ( string='First Payment Amount' , compute='_compute_first_payment_fields' )
-    first_payment_original = fields.Float ( string="first_payment_original" , readonly=False , required=False ,
+    first_payment_original = fields.Date ( string="first_payment_original" , readonly=False , required=False ,
                                             store=True )
     project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
                                          related='project_ids.stage_id' , store=True , groups='base.group_user' )
