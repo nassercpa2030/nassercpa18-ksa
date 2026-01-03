@@ -22,8 +22,7 @@
         'report/invoice_default_attach.xml',
         'report/simpli_vat_invoice_report.xml',
         'views/res_company_view.xml',
-        'views/report_customer_bill_report.xml',
-'
+       
     ],
     'assets': {
         'web.assets_common': [
@@ -31,5 +30,5 @@
         ],
     },
     'images': ['static/description/banner.gif'],
-    'installable': True
+    'installable': True,
 }
