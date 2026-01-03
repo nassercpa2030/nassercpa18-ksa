@@ -2,8 +2,10 @@
 <odoo>
     <template id="external_layout_seti">
         <t t-call="web.basic_layout">
+            
+            <!-- ضبط المتغيرات مع التحقق من وجود o -->
             <t t-set="o" t-value="o"/>
-            <t t-set="company" t-value="o.company_id"/>
+            <t t-set="company" t-value="o.company_id if o else None"/>
 
             <style>
                 /* إزالة أي مسافة أعلى وأسفل */
@@ -67,33 +69,35 @@
             </style>
 
             <!-- الهيدر: بيانات الشركة والعميل -->
-           <header>
-    <div class="company-info">
-        <img t-if="company and company.logo" t-att-src="'data:image/png;base64,%s' % company.logo"/>
-        <p>
-            <strong t-esc="company.name"/>
-            <br/>السجل التجاري: <span t-esc="company.company_registry or '-'"/>
-            <br/>VAT: <span t-esc="company.vat or '-'"/>
-            <br/>العنوان: <span t-esc="company.street or '-'"/>
-        </p>
-    </div>
-    <div class="client-info" t-if="o">
-        <p>
-            <strong>فاتورة إلى:</strong>
-            <br/>الاسم: <span t-esc="o.partner_id.name"/>
-            <br/>العنوان: <span t-esc="o.partner_id.street or '-'"/>
-            <br/>السجل التجاري: <span t-esc="o.partner_id.company_registry or '-'"/>
-            <br/>VAT: <span t-esc="o.partner_id.vat or '-'"/>
-            <br/><strong>رقم الفاتورة:</strong> <span t-esc="o.name"/>
-            <br/><strong>تاريخ الفاتورة:</strong> <span t-esc="o.invoice_date"/>
-        </p>
-    </div>
-    <div class="client-info" t-else="">
-        <p>لا توجد بيانات فاتورة.</p>
-    </div>
-</header>
+            <header>
+                <div class="company-info" t-if="company">
+                    <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo"/>
+                    <p>
+                        <strong t-esc="company.name"/>
+                        <br/>السجل التجاري: <span t-esc="company.company_registry or '-'"/>
+                        <br/>VAT: <span t-esc="company.vat or '-'"/>
+                        <br/>العنوان: <span t-esc="company.street or '-'"/>
+                    </p>
+                </div>
+                <div class="company-info" t-else="">
+                    <p>لا توجد بيانات الشركة.</p>
+                </div>
 
-
+                <div class="client-info" t-if="o">
+                    <p>
+                        <strong>فاتورة إلى:</strong>
+                        <br/>الاسم: <span t-esc="o.partner_id.name or '-'"/>
+                        <br/>العنوان: <span t-esc="o.partner_id.street or '-'"/>
+                        <br/>السجل التجاري: <span t-esc="o.partner_id.company_registry or '-'"/>
+                        <br/>VAT: <span t-esc="o.partner_id.vat or '-'"/>
+                        <br/><strong>رقم الفاتورة:</strong> <span t-esc="o.name or '-'"/>
+                        <br/><strong>تاريخ الفاتورة:</strong> <span t-esc="o.invoice_date or '-'"/>
+                    </p>
+                </div>
+                <div class="client-info" t-else="">
+                    <p>لا توجد بيانات فاتورة.</p>
+                </div>
+            </header>
 
             <!-- المحتوى الرئيسي -->
             <div class="page">
