@@ -13,10 +13,9 @@
     <template id="report_customer_bill_template">
         <t t-set="company" t-value="docs[0].company_id"/>
         <t t-call="web.external_layout_standard">
-            <!-- تصحيح: إضافة main حول المحتوى -->
             <main>
                 <div class="page">
-                    <!-- Header: بيانات الشركة شمال وبيانات العميل يمين -->
+                    <!-- Header -->
                     <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:10px; direction: rtl;">
                         <div style="text-align:left;">
                             <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo"
@@ -77,11 +76,11 @@
                             </t>
                             <tr style="font-weight:bold; border-top:2px solid black;">
                                 <td colspan="7" style="text-align:right;">إجمالي المبلغ المستحق:</td>
-                                <td><span t-esc="'{:,.2f}'.format(amount_residual_sig or 0.0)'"/> SR</td>
+                                <td><span t-esc="'{:,.2f}'.format(amount_residual_sig or 0.0)"/> SR</td>
                             </tr>
                             <tr style="font-weight:bold; border-top:2px solid black;">
                                 <td colspan="6" style="text-align:right;">إجمالي المبالغ:</td>
-                                <td><span t-esc="'{:,.2f}'.format(total_sum or 0.0)'"/> SR</td>
+                                <td><span t-esc="'{:,.2f}'.format(total_sum or 0.0)"/> SR</td>
                             </tr>
                         </tbody>
                     </table>
@@ -116,7 +115,6 @@
                         <div style="width:33%; text-align:center;"><span style="text-decoration: underline;">مراجعة</span></div>
                         <div style="width:33%; text-align:left;"><span style="text-decoration: underline;">إعتماد</span></div>
                     </div>
-
                 </div>
             </main>
         </t>
