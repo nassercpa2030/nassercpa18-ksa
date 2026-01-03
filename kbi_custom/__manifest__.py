@@ -38,6 +38,7 @@
         'views/order_verify.xml',
         'views/report_vendor_batch_bill.xml',
         'views/motalba_all.xml',
+        'views/paperformat.xml',
         'views/external_layout_seti.xml',
         'views/report_customer_invoice_report2.xml',
         
