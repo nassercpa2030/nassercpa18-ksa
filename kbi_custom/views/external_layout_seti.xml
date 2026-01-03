@@ -5,10 +5,109 @@
             <t t-set="o" t-value="o"/>
             <t t-set="company" t-value="o.company_id"/>
 
-            <!-- إلغاء الهيدر والفوتر -->
             <style>
-                header, footer {display:none;}
+                /* إزالة المسافة العلوية */
+                body {
+                    margin-top: 0 !important;
+                    padding-top: 0 !important;
+                }
+
+                /* تصميم الهيدر ليحتوي بيانات الشركة والعميل */
+                header {
+                    display: block;
+                    padding: 0;
+                    margin-bottom: 10px;
+                }
+
+                .header-content {
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 10px;
+                    direction: rtl;
+                }
+
+                .company-info {
+                    text-align: left;
+                    width: 50%;
+                }
+
+                .company-info img {
+                    max-height: 60px;
+                    max-width: 150px;
+                    object-fit: contain;
+                    display: block;
+                    margin: 0 auto 5px auto;
+                }
+
+                .client-info {
+                    text-align: right;
+                    width: 50%;
+                }
+
+                /* الفوتر يظهر رقم الصفحة */
+                footer {
+                    display: block !important;
+                    text-align: center;
+                    font-size: 10px;
+                    color: #555;
+                    border-top: 1px solid #ccc;
+                    padding-top: 5px;
+                }
+
+                /* رسالة شكر أسفل الفاتورة */
+                .thank-you {
+                    text-align: center;
+                    font-size: 12px;
+                    margin-top: 10px;
+                    margin-bottom: 5px;
+                    font-style: italic;
+                    color: #333;
+                }
+
+                /* الحفاظ على الجوانب */
+                .page {
+                    margin-left: auto;
+                    margin-right: auto;
+                    padding-left: 15px;
+                    padding-right: 15px;
+                }
             </style>
+
+            <!-- الهيدر: بيانات الشركة والعميل -->
+            <header>
+                <div class="header-content">
+                    <div class="company-info">
+                        <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo"/>
+                        <p>
+                            <strong t-esc="company.name"/>
+                            <br/>السجل التجاري: <span t-esc="company.company_registry or '-'"/>
+                            <br/>VAT: <span t-esc="company.vat or '-'"/>
+                            <br/>العنوان: <span t-esc="company.street or '-'"/>
+                        </p>
+                    </div>
+                    <div class="client-info">
+                        <p>
+                            <strong>فاتورة إلى:</strong>
+                            <br/>الاسم: <span t-esc="o.partner_id.name"/>
+                            <br/>العنوان: <span t-esc="o.partner_id.street or '-'"/>
+                            <br/>السجل التجاري: <span t-esc="o.partner_id.company_registry or '-'"/>
+                            <br/>VAT: <span t-esc="o.partner_id.vat or '-'"/>
+                            <br/><strong>رقم الفاتورة:</strong> <span t-esc="o.name"/>
+                            <br/><strong>تاريخ الفاتورة:</strong> <span t-esc="o.invoice_date"/>
+                        </p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Footer + رسالة شكر -->
+            <t t-set="footer_html">
+                <div class="thank-you">
+                    شكراً لتعاملكم معنا، نتمنى لكم دوام النجاح والتوفيق
+                </div>
+                <footer>
+                    Page <span class="page"/> / <span class="pageCount"/>
+                </footer>
+            </t>
 
             <t t-raw="0"/>
         </t>
