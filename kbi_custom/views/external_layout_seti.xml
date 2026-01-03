@@ -5,9 +5,19 @@
             <t t-set="o" t-value="o"/>
             <t t-set="company" t-value="o.company_id"/>
 
-            <!-- إلغاء الهيدر والفوتر -->
+            <!-- إزالة الهيدر والفوتر تماماً -->
+            <t t-set="no_header_footer" t-value="True"/>
+
+            <!-- مسح أي padding من البودي -->
             <style>
-                header, footer {display:none;}
+                body {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+                .page {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
             </style>
 
             <t t-raw="0"/>
