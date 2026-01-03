@@ -2,7 +2,7 @@
 <odoo>
      
     <!-- تعريف تقرير وربطه بنموذج فواتير العملاء -->
-    <record id="action_report_customer_bill_report" model="ir.actions.report">
+    <record id="action_report_customer_bill_template" model="ir.actions.report">
         <field name="name">فاتورة ضريبية</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
