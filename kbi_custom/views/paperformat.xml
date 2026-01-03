@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Paperformat مخصص: A4 بدون هوامش -->
-    <record id="paperformat_zero_margin" model="report.paperformat">
-        <field name="name">Zero Margin A4</field>
-        <field name="page_width">210</field>   <!-- عرض الصفحة بالملم -->
-        <field name="page_height">297</field>  <!-- طول الصفحة بالملم -->
-        <field name="margin_top">0</field>
-        <field name="margin_bottom">0</field>
-        <field name="margin_left">0</field>
-        <field name="margin_right">0</field>
-    </record>
+   <record id="paperformat_zero_margin" model="report.paperformat">
+    <field name="name">Zero Margin Custom</field>
+    <field name="page_width">210</field>
+    <field name="page_height">297</field>
+    <field name="margin_top">0</field>
+    <field name="margin_bottom">0</field>
+    <field name="margin_left">0</field>
+    <field name="margin_right">0</field>
+</record>
+
 </odoo>
+
