@@ -21,7 +21,7 @@
         <t t-call="kbi_custom.external_layout_seti">
             <t t-foreach="docs" t-as="o">
 
-                <div class="page">
+                <div class="page" style="margin:0; padding:0;">
                     <link rel="stylesheet" href="/kbi_custom/static/src/css/style.css"/>
 
                     <!-- عنوان الفاتورة -->
