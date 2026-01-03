@@ -22,16 +22,15 @@
                     <!-- Header: بيانات الشركة شمال وبيانات العميل يمين -->
                     <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:10px; direction: rtl;">
                         <!-- شمال: بيانات الشركة + لوجو -->
-                        <div style="text-align:left;">
-                            <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" 
-                                 style="max-height:60px; max-width:150px; object-fit:contain; margin-bottom:5px;"/>
-                            <p style="margin:0;">
-                                <strong t-esc="company.name"/>
-                                <br/> السجل التجاري: <span t-esc="company.company_registry or '-'"/>
-                                <br/> الرقم الضريبي: <span t-esc="company.vat or '-'"/>
-                                <br/> العنوان: <span t-esc="company.street or '-'"/>
-                            </p>
-                        </div>
+                        <!--div style="text-align:left;"-->
+                            <!--img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" style="max-height:60px; max-width:150px; object-fit:contain; margin-bottom:5px;"/-->
+                            <!--p style="margin:0;"-->
+                                <!--strong t-esc="company.name"/-->
+                                <!--br/> السجل التجاري: <span t-esc="company.company_registry or '-'"/-->
+                                <!--br/> الرقم الضريبي: <span t-esc="company.vat or '-'"/-->
+                                <!--br/> العنوان: <span t-esc="company.street or '-'"/-->
+                            <!--/p-->
+                        <!--/div-->
 
                         <!-- يمين: بيانات العميل كاملة -->
                         <div style="text-align:right;">
