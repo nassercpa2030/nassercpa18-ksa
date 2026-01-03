@@ -68,27 +68,31 @@
 
             <!-- الهيدر: بيانات الشركة والعميل -->
             <header>
-                <div class="company-info">
-                    <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo"/>
-                    <p>
-                        <strong t-esc="company.name"/>
-                        <br/>السجل التجاري: <span t-esc="company.company_registry or '-'"/>
-                        <br/>VAT: <span t-esc="company.vat or '-'"/>
-                        <br/>العنوان: <span t-esc="company.street or '-'"/>
-                    </p>
-                </div>
-                <div class="client-info">
-                    <p>
-                        <strong>فاتورة إلى:</strong>
-                        <br/>الاسم: <span t-esc="o.partner_id.name"/>
-                        <br/>العنوان: <span t-esc="o.partner_id.street or '-'"/>
-                        <br/>السجل التجاري: <span t-esc="o.partner_id.company_registry or '-'"/>
-                        <br/>VAT: <span t-esc="o.partner_id.vat or '-'"/>
-                        <br/><strong>رقم الفاتورة:</strong> <span t-esc="o.name"/>
-                        <br/><strong>تاريخ الفاتورة:</strong> <span t-esc="o.invoice_date"/>
-                    </p>
-                </div>
-            </header>
+    <div class="company-info">
+        <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo"/>
+        <p>
+            <strong t-esc="company.name"/>
+            <br/>السجل التجاري: <span t-esc="company.company_registry or '-'"/>
+            <br/>VAT: <span t-esc="company.vat or '-'"/>
+            <br/>العنوان: <span t-esc="company.street or '-'"/>
+        </p>
+    </div>
+    <div class="client-info">
+        <p t-if="o">
+            <strong>فاتورة إلى:</strong>
+            <br/>الاسم: <span t-esc="o.partner_id.name"/>
+            <br/>العنوان: <span t-esc="o.partner_id.street or '-'"/>
+            <br/>السجل التجاري: <span t-esc="o.partner_id.company_registry or '-'"/>
+            <br/>VAT: <span t-esc="o.partner_id.vat or '-'"/>
+            <br/><strong>رقم الفاتورة:</strong> <span t-esc="o.name"/>
+            <br/><strong>تاريخ الفاتورة:</strong> <span t-esc="o.invoice_date"/>
+        </p>
+        <p t-else="">
+            لا توجد بيانات فاتورة.
+        </p>
+    </div>
+</header>
+
 
             <!-- المحتوى الرئيسي -->
             <div class="page">
