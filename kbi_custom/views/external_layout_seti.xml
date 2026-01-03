@@ -1,25 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="external_layout_seti">
-        <t t-call="web.minimal_layout"> <!-- استخدام minimal_layout لإزالة الهيدر والفوتر -->
+        <t t-call="web.basic_layout">
             <t t-set="o" t-value="o"/>
             <t t-set="company" t-value="o.company_id"/>
 
-            <!-- إزالة المسافة من فوق فقط -->
             <style>
+                /* إزالة المسافة العلوية */
                 body {
                     margin-top: 0 !important;
                     padding-top: 0 !important;
                 }
 
-                /* حافظ على المسافة الجانبية الطبيعية */
+                /* إخفاء الهيدر */
+                header { display: none !important; }
+
+                /* الفوتر يظهر رقم الصفحة */
+                footer {
+                    display: block !important;
+                    text-align: center;
+                    font-size: 10px;
+                    color: #555;
+                    border-top: 1px solid #ccc;
+                    padding-top: 5px;
+                }
+
+                /* الحفاظ على الجوانب */
                 .page {
                     margin-left: auto;
                     margin-right: auto;
                     padding-left: 15px;
                     padding-right: 15px;
                 }
+
+                /* رسالة شكر أسفل الفاتورة */
+                .thank-you {
+                    text-align: center;
+                    font-size: 12px;
+                    margin-top: 10px;
+                    margin-bottom: 5px;
+                    font-style: italic;
+                    color: #333;
+                }
             </style>
+
+            <!-- Footer + رسالة شكر -->
+            <t t-set="footer_html">
+                <div class="thank-you">
+                    شكراً لتعاملكم معنا، نتمنى لكم دوام النجاح والتوفيق
+                </div>
+                <footer>
+                    Page <span class="page"/> / <span class="pageCount"/>
+                </footer>
+            </t>
 
             <t t-raw="0"/>
         </t>
