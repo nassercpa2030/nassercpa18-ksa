@@ -11,6 +11,14 @@
                     margin-top: 0 !important;
                     padding-top: 0 !important;
                 }
+
+                /* حافظ على المسافة الجانبية الطبيعية */
+                .page {
+                    margin-left: auto;
+                    margin-right: auto;
+                    padding-left: 15px;
+                    padding-right: 15px;
+                }
             </style>
 
             <t t-raw="0"/>
