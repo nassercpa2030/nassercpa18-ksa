@@ -1,0 +1,11 @@
+<odoo>
+    <record id="paperformat_zero_margin" model="report.paperformat">
+        <field name="name">Zero Margin</field>
+        <field name="page_height">297</field> <!-- طول الصفحة A4 -->
+        <field name="page_width">210</field>  <!-- عرض الصفحة A4 -->
+        <field name="margin_top">0</field>    <!-- لا مسافة فوق -->
+        <field name="margin_bottom">0</field> <!-- لا مسافة تحت -->
+        <field name="margin_left">0</field>
+        <field name="margin_right">0</field>
+    </record>
+</odoo>
