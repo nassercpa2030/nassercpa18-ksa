@@ -4,15 +4,26 @@
     <!-- ============================= -->
     <!-- Report Action -->
     <!-- ============================= -->
-    <record id="action_report_tax_invoice_kbi" model="ir.actions.report">
-        <field name="name">فاتورة عميل ضريبية</field>
-        <field name="model">account.move</field>
-        <field name="report_type">qweb-pdf</field>
-        <field name="report_name">kbi_custom.report_tax_invoice_document</field>
-        <field name="report_file">kbi_custom.report_tax_invoice_document</field>
-        <field name="binding_model_id" ref="account.model_account_move"/>
-        <field name="binding_type">report</field>
+    <!--record id="action_report_tax_invoice_kbi" model="ir.actions.report"-->
+        <!--field name="name">فاتورة عميل ضريبية</field-->
+        <!--field name="model">account.move</field-->
+        <!--field name="report_type">qweb-pdf</field-->
+        <!--field name="report_name">kbi_custom.report_tax_invoice_document</field-->
+        <!--field name="report_file">kbi_custom.report_tax_invoice_document</field-->
+        <!--field name="binding_model_id" ref="account.model_account_move"/-->
+        <!--field name="binding_type">report</field-->
+    <!--/record-->
+    <record id="action_report_customer_bill_template" model="ir.actions.report">
+    <field name="name">فاتورة ضريبية</field>
+    <field name="model">account.move</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">kbi_custom.external_layout_seti</field>
+    <field name="print_report_name">'فاتورة - %s' % (object.name)</field>
+    <field name="paperformat_id" ref="kbi_custom.paperformat_zero_margin"/>
+    <field name="header">False</field>
+    <field name="footer">False</field>
     </record>
+
 
     <!-- ============================= -->
     <!-- QWEB REPORT -->
