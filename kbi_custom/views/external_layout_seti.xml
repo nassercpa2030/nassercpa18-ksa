@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="external_layout_seti">
+        <t t-call="web.basic_layout">
+            <t t-set="o" t-value="o"/>
+            <t t-set="company" t-value="o.company_id"/>
+
+            <!-- إلغاء الهيدر والفوتر -->
+            <style>
+                header, footer {display:none;}
+            </style>
+
+            <t t-raw="0"/>
+        </t>
+    </template>
+</odoo>
