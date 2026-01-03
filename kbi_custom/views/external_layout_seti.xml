@@ -6,24 +6,20 @@
             <t t-set="company" t-value="o.company_id"/>
 
             <style>
-                /* إزالة المسافة العلوية */
-                body {
-                    margin-top: 0 !important;
-                    padding-top: 0 !important;
+                /* إزالة أي مسافة أعلى وأسفل */
+                html, body {
+                    margin: 0;
+                    padding: 0;
                 }
 
                 /* تصميم الهيدر ليحتوي بيانات الشركة والعميل */
                 header {
-                    display: block;
-                    padding: 0;
-                    margin-bottom: 10px;
-                }
-
-                .header-content {
                     display: flex;
                     justify-content: space-between;
                     font-size: 10px;
                     direction: rtl;
+                    padding: 0;
+                    margin: 0 0 10px 0;
                 }
 
                 .company-info {
@@ -36,7 +32,7 @@
                     max-width: 150px;
                     object-fit: contain;
                     display: block;
-                    margin: 0 auto 5px auto;
+                    margin-bottom: 5px;
                 }
 
                 .client-info {
@@ -58,58 +54,55 @@
                 .thank-you {
                     text-align: center;
                     font-size: 12px;
-                    margin-top: 10px;
-                    margin-bottom: 5px;
+                    margin: 10px 0 5px 0;
                     font-style: italic;
                     color: #333;
                 }
 
                 /* الحفاظ على الجوانب */
                 .page {
-                    margin-left: auto;
-                    margin-right: auto;
-                    padding-left: 15px;
-                    padding-right: 15px;
+                    margin: 0;
+                    padding: 0 15px;
                 }
             </style>
 
             <!-- الهيدر: بيانات الشركة والعميل -->
             <header>
-                <div class="header-content">
-                    <div class="company-info">
-                        <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo"/>
-                        <p>
-                            <strong t-esc="company.name"/>
-                            <br/>السجل التجاري: <span t-esc="company.company_registry or '-'"/>
-                            <br/>VAT: <span t-esc="company.vat or '-'"/>
-                            <br/>العنوان: <span t-esc="company.street or '-'"/>
-                        </p>
-                    </div>
-                    <div class="client-info">
-                        <p>
-                            <strong>فاتورة إلى:</strong>
-                            <br/>الاسم: <span t-esc="o.partner_id.name"/>
-                            <br/>العنوان: <span t-esc="o.partner_id.street or '-'"/>
-                            <br/>السجل التجاري: <span t-esc="o.partner_id.company_registry or '-'"/>
-                            <br/>VAT: <span t-esc="o.partner_id.vat or '-'"/>
-                            <br/><strong>رقم الفاتورة:</strong> <span t-esc="o.name"/>
-                            <br/><strong>تاريخ الفاتورة:</strong> <span t-esc="o.invoice_date"/>
-                        </p>
-                    </div>
+                <div class="company-info">
+                    <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo"/>
+                    <p>
+                        <strong t-esc="company.name"/>
+                        <br/>السجل التجاري: <span t-esc="company.company_registry or '-'"/>
+                        <br/>VAT: <span t-esc="company.vat or '-'"/>
+                        <br/>العنوان: <span t-esc="company.street or '-'"/>
+                    </p>
+                </div>
+                <div class="client-info">
+                    <p>
+                        <strong>فاتورة إلى:</strong>
+                        <br/>الاسم: <span t-esc="o.partner_id.name"/>
+                        <br/>العنوان: <span t-esc="o.partner_id.street or '-'"/>
+                        <br/>السجل التجاري: <span t-esc="o.partner_id.company_registry or '-'"/>
+                        <br/>VAT: <span t-esc="o.partner_id.vat or '-'"/>
+                        <br/><strong>رقم الفاتورة:</strong> <span t-esc="o.name"/>
+                        <br/><strong>تاريخ الفاتورة:</strong> <span t-esc="o.invoice_date"/>
+                    </p>
                 </div>
             </header>
 
-            <!-- Footer + رسالة شكر -->
-            <t t-set="footer_html">
-                <div class="thank-you">
-                    شكراً لتعاملكم معنا، نتمنى لكم دوام النجاح والتوفيق
-                </div>
-                <footer>
-                    Page <span class="page"/> / <span class="pageCount"/>
-                </footer>
-            </t>
+            <!-- المحتوى الرئيسي -->
+            <div class="page">
+                <t t-raw="0"/>
+            </div>
 
-            <t t-raw="0"/>
+            <!-- Footer + رسالة شكر -->
+            <div class="thank-you">
+                شكراً لتعاملكم معنا، نتمنى لكم دوام النجاح والتوفيق
+            </div>
+            <footer>
+                Page <span class="page"/> / <span class="pageCount"/>
+            </footer>
+
         </t>
     </template>
 </odoo>
