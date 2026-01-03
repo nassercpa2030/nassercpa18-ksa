@@ -12,6 +12,7 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     invoice_date_supply = fields.Datetime('Date Of Supply',related="invoice_date",store=True)
+    sale_order_test = fields.Char(string='Sale Order Test', readonly=False, required=False)
 
     # def action_invoice_tax_report(self, type):
     #     self.ensure_one()
