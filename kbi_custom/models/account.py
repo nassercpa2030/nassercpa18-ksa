@@ -26,7 +26,7 @@ class AccountMove ( models.Model ) :
         readonly=False
     )
 
-    @api.model
+
     def get_qr_code_knk(self):
         def get_qr_encoding(tag, field):
             company_name_byte_array = field.encode('UTF-8')
