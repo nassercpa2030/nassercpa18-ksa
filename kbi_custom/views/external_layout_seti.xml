@@ -1,22 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="external_layout_seti">
-        <t t-call="web.basic_layout">
+        <t t-call="web.minimal_layout"> <!-- استخدام minimal_layout لإزالة الهيدر والفوتر -->
             <t t-set="o" t-value="o"/>
             <t t-set="company" t-value="o.company_id"/>
 
-            <!-- إزالة الهيدر والفوتر تماماً -->
-            <t t-set="no_header_footer" t-value="True"/>
-
-            <!-- مسح أي padding من البودي -->
+            <!-- إزالة المسافة من فوق فقط -->
             <style>
                 body {
-                    margin: 0 !important;
-                    padding: 0 !important;
-                }
-                .page {
-                    margin: 0 !important;
-                    padding: 0 !important;
+                    margin-top: 0 !important;
+                    padding-top: 0 !important;
                 }
             </style>
 
