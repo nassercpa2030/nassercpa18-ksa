@@ -2,7 +2,7 @@
 
 from odoo import models , fields , api
 from odoo.exceptions import ValidationError
-
+import base64
 
 class AccountMove ( models.Model ) :
     _inherit = 'account.move'
