@@ -2,12 +2,12 @@
 <odoo>
     <template id="external_layout_seti">
         <t t-call="web.basic_layout">
+            <!-- تعيين الشركة لاستخدامها في الفوتر والهيدر -->
             <t t-set="company" t-value="o.company_id"/>
 
             <style>
                 /* استيراد خط Tajawal */
-               
-                @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
 
                 html, body {
                     margin: 0;
@@ -15,17 +15,17 @@
                     direction: rtl;
                     font-family: 'Tajawal', Arial, sans-serif;
                     color: #555555;
+                    font-size: 12px;
                 }
 
                 body {
-                    font-size: 12px;
                     margin-bottom: 90px; /* مساحة كافية للفوتر */
                 }
 
                 .page {
                     font-size: 12px;
                     line-height: 1.6;
-                    margin-bottom: 40px;
+                    margin-bottom: 20px;
                 }
 
                 strong {
@@ -33,6 +33,7 @@
                     color: #333333;
                 }
 
+                /* ================= HEADER ================= */
                 table.header-table {
                     width: 100%;
                     border-collapse: collapse;
@@ -50,13 +51,18 @@
 
                 .company-info { text-align: right; }
                 .client-info { text-align: left; }
-                img.company-logo { max-height: 80px; max-width: 180px; display: block; }
 
-                /* FOOTER */
+                img.company-logo {
+                    max-height: 80px;
+                    max-width: 180px;
+                    display: block;
+                }
+
+                /* ================= FOOTER ================= */
                 table.footer-table {
                     width: 100%;
                     border-collapse: collapse;
-                    font-size: 11px; /* حجم الخط للفوتر */
+                    font-size: 11px;
                     font-family: 'Tajawal', Arial, sans-serif;
                     background-color: #f2f2f2;
                     margin-top: 10px;
@@ -68,6 +74,10 @@
                 table.footer-table td {
                     padding: 5px 10px;
                 }
+
+                /* أرقام الصفحة */
+                .page-number:before { content: counter(page); }
+                .total-pages:before { content: counter(pages); }
 
             </style>
 
@@ -121,6 +131,8 @@
                             <t t-if="company.email"> | Email: <t t-esc="company.email"/></t>
                             <t t-if="company.website"> | <t t-esc="company.website"/></t>
                         </strong>
+                        <br/>
+                        <span>صفحة <span class="page-number"/> من <span class="total-pages"/></span>
                     </td>
                 </tr>
             </table>
