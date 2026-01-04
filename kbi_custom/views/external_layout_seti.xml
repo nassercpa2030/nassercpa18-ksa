@@ -122,8 +122,9 @@
 
                     <td class="company-info">
                         <div>
-                            <img t-if="company.logo"
-                                 t-att-src="'data:image/png;base64,%s' % company.logo"/>
+                            <!--img t-if="company.logo"
+                                 t-att-src="'data:image/png;base64,%s' % company.logo"/-->
+                            <img t-field="company.logo" t-options="{'widget':'image', 'alt':'Logo'}" style="max-height:80px; max-width:180px; display:block;"/>
                         </div>
                         <strong t-esc="company.name"/><br/>
                         <t t-if="company.company_registry">
