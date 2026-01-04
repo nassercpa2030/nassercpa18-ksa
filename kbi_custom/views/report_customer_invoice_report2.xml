@@ -26,7 +26,6 @@
                 <style>
                  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
 
-
                     body, table, td, th {
                         font-family: 'Tajawal', sans-serif;
                         font-size: 13px;
@@ -83,7 +82,7 @@
                 </style>
 
                 <!-- ================= Body الصفحة ================= -->
-                <div class="page" style="margin:0;padding:0 0 90px 0;">
+                <div class="page" style="margin:0;padding:0 0 120px 0;">
 
                     <!-- عنوان الفاتورة -->
                     <table>
@@ -157,30 +156,30 @@
                     <!-- QR + Subtotal + VAT في صف واحد -->
                     <table class="qr-subtotal-vat">
                         <tr>
-                            <td class="qr-code">
+                            <!-- QR على الشمال -->
+                            <td class="qr-code" style="width:30%;">
                                 <img t-if="o.get_qr_code()" 
                                      t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % o.get_qr_code()"
                                      style="border:1px solid #ccc;padding:4px;"/>
-                                   <img t-if="o.get_qr_code()"
-                             t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % o.get_qr_code()"
-                             style="border:1px solid #ccc;padding:4px;"/>
                             </td>
-                            <td class="subtotal-vat">
-                                <table style="border:none;width:100%;">
+
+                            <!-- الإجماليات على اليمين -->
+                            <td class="subtotal-vat" style="width:70%;">
+                                <table style="border:1px solid #ccc; width:100%; border-collapse:collapse;">
                                     <tr>
-                                        <td>Subtotal:</td>
+                                        <td>Subtotal (Excl. VAT)</td>
                                         <td style="text-align:right;">
                                             <span t-field="o.amount_untaxed" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>VAT:</td>
+                                        <td>VAT</td>
                                         <td style="text-align:right;">
                                             <span t-esc="tax_total" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                         </td>
                                     </tr>
                                     <tr style="font-weight:bold;">
-                                        <td>Total Amount:</td>
+                                        <td>Total Amount</td>
                                         <td style="text-align:right;">
                                             <span t-field="o.amount_total" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                         </td>
@@ -189,6 +188,12 @@
                             </td>
                         </tr>
                     </table>
+
+                    <!-- سطر شكر ورد بعد QR والإجماليات -->
+                    <div class="thank-you" style="margin-top:20px;">
+                        <strong>نشكر تعاملکم معنا 🌸</strong>
+                        <div class="decor">❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀</div>
+                    </div>
 
                     <!-- ملاحظات ZATCA -->
                     <p style="margin-top:10px;font-size:11px;">
@@ -207,8 +212,6 @@
                         border-top: 2px dotted #666;
                         background: #fff;
                     ">
-                        <strong>نشكر تعاملکم معنا 🌸</strong>
-                        <div class="decor">❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀</div>
                         <strong>
                             <t t-esc="o.company_id.name"/>
                             <t t-if="o.company_id.phone"> | Tel: <t t-esc="o.company_id.phone"/></t>
