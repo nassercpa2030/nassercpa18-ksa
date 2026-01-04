@@ -9,22 +9,37 @@
                     margin: 0;
                     padding: 0;
                     direction: rtl;
-                    font-size: 10px;
                 }
 
-                /* HEADER TABLE */
+                body {
+                    font-size: 12px;
+                }
+
+                .page {
+                    font-size: 12px;
+                    line-height: 1.6;
+                    margin-bottom: 40px; /* مساحة للفوتر */
+                }
+
+                strong {
+                    font-size: 13px;
+                }
+
+                /* HEADER */
                 table.header-table {
                     width: 100%;
                     border-collapse: collapse;
-                    margin-bottom: 10px;
+                    margin-bottom: 12px;
                 }
+
                 table.header-table td {
-                    vertical-align: top;
                     width: 50%;
+                    vertical-align: top;
                 }
 
                 .company-info {
                     text-align: left;
+                    padding-top: 12px;
                 }
 
                 .client-info {
@@ -32,53 +47,50 @@
                 }
 
                 /* FOOTER */
-                footer {
+                .footer {
                     position: fixed;
                     bottom: 0;
                     left: 0;
                     right: 0;
                     text-align: center;
-                    font-size: 9px;
+                    font-size: 10px;
                     border-top: 1px solid #ccc;
-                    padding-top: 4px;
-                }
-
-                .page {
-                    margin-bottom: 30px; /* مساحة للفوتر */
+                    padding-top: 5px;
                 }
             </style>
 
             <!-- ================= HEADER ================= -->
             <table class="header-table">
-                <tr style="width:100%;">
-    <!-- العميل (يمين) -->
-    <td class="client-info" style="width:50%; vertical-align:top; text-align:right;">
-        <strong>فاتورة إلى:</strong><br/>
-        <span t-esc="o.partner_id.name"/><br/>
-        <span t-if="o.partner_id.street" t-esc="o.partner_id.street"/><br/>
-        <t t-if="o.partner_id.vat">
-            VAT: <span t-esc="o.partner_id.vat"/><br/>
-        </t>
-        <strong>رقم الفاتورة:</strong> <span t-esc="o.name"/><br/>
-        <strong>التاريخ:</strong> <span t-esc="o.invoice_date"/>
-    </td>
+                <tr>
+                    <td class="client-info">
+                        <strong>فاتورة إلى:</strong><br/>
+                        <span t-esc="o.partner_id.name"/><br/>
+                        <span t-if="o.partner_id.street" t-esc="o.partner_id.street"/><br/>
+                        <t t-if="o.partner_id.vat">
+                            VAT: <span t-esc="o.partner_id.vat"/><br/>
+                        </t>
+                        <strong>رقم الفاتورة:</strong>
+                        <span t-esc="o.name"/><br/>
+                        <strong>التاريخ:</strong>
+                        <span t-esc="o.invoice_date"/>
+                    </td>
 
-    <!-- الشركة (شمال) -->
-    <td class="company-info" style="width:50%; vertical-align:top; text-align:left;">
-        <img t-if="company.logo"
-             t-att-src="'data:image/png;base64,%s' % company.logo"
-             style="max-height:60px; margin-bottom:5px;"/><br/>
+                    <td class="company-info">
+                        <div>
+                            <img t-if="company.logo"
+                                 t-att-src="'data:image/png;base64,%s' % company.logo"
+                                 style="max-height:65px; display:block;"/>
+                        </div>
 
-        <strong t-esc="company.name"/><br/>
-        <t t-if="company.company_registry">
-            CR: <span t-esc="company.company_registry"/><br/>
-        </t>
-        <t t-if="company.vat">
-            VAT: <span t-esc="company.vat"/>
-        </t>
-    </td>
-</tr>
-
+                        <strong t-esc="company.name"/><br/>
+                        <t t-if="company.company_registry">
+                            CR: <span t-esc="company.company_registry"/><br/>
+                        </t>
+                        <t t-if="company.vat">
+                            VAT: <span t-esc="company.vat"/>
+                        </t>
+                    </td>
+                </tr>
             </table>
 
             <!-- ================= BODY ================= -->
@@ -87,9 +99,9 @@
             </div>
 
             <!-- ================= FOOTER ================= -->
-            <footer>
+            <div class="footer">
                 صفحة <span class="page"/> / <span class="pageCount"/>
-            </footer>
+            </div>
 
         </t>
     </template>
