@@ -7,11 +7,11 @@
             <style>
                 @page {
                     size: A4;
-                    margin: 20mm 15mm 25mm 15mm;
+                    margin: 25mm 15mm 25mm 15mm;
                     @bottom-center {
                         content: "صفحة " counter(page) " / " counter(pages);
                         font-size: 10px;
-                        color: #003366; /* أزرق غامق */
+                        color: #555555;
                     }
                 }
 
@@ -20,7 +20,7 @@
                     padding: 0;
                     direction: rtl;
                     font-family: Arial, sans-serif;
-                    color: #003366; /* اللون الأساسي للأزرق */
+                    color: #555555;
                 }
 
                 body {
@@ -35,35 +35,47 @@
 
                 strong {
                     font-size: 13px;
-                    color: #0055AA; /* أزرق متوسط */
+                    color: #333333;
                 }
 
-                /* HEADER */
+                /* HEADER TITLES */
+                .header-titles {
+                    width: 100%;
+                    margin-top: 60px; /* زحزحة الهيدر من فوق أكثر */
+                    margin-bottom: 5px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    color: #333333;
+                }
+
+                .header-titles td {
+                    width: 50%;
+                    padding: 5px 10px; /* زيادة الحشو من اليمين واليسار */
+                }
+
+                /* HEADER TABLE */
                 table.header-table {
                     width: 100%;
                     border-collapse: collapse;
                     margin-bottom: 15px;
-                    margin-top: 20px;
-                    outline: 1px solid #3399FF; /* إطار أزرق حول الهيدر */
+                    outline: 1px solid #AAAAAA;
                     padding: 5px;
                 }
 
                 table.header-table td {
                     width: 50%;
                     vertical-align: top;
-                    padding: 5px;
+                    padding: 10px; /* زيادة المسافة داخل الخلايا من الحواف */
                 }
 
                 .company-info {
                     text-align: left;
-                    padding-top: 10px;
-                    outline: 1px dashed #3399FF; /* إطار نقطي أزرق حول بيانات الشركة */
+                    outline: 1px dashed #AAAAAA;
                 }
 
                 .client-info {
                     text-align: right;
-                    padding-top: 10px;
-                    outline: 1px dashed #3399FF; /* إطار نقطي أزرق حول بيانات العميل */
+                    outline: 1px dashed #AAAAAA;
                 }
 
                 img {
@@ -77,13 +89,21 @@
                     width: 100%;
                     text-align: center;
                     font-size: 10px;
-                    border-top: 2px solid #3399FF; /* خط أزرق */
+                    border-top: 1px solid #AAAAAA;
                     padding-top: 5px;
                     margin-top: 10px;
-                    outline: 1px solid #3399FF; /* إطار أزرق حول الفوتر */
-                    color: #003366;
+                    outline: 1px solid #AAAAAA;
+                    color: #555555;
                 }
             </style>
+
+            <!-- ================= HEADER TITLES ================= -->
+            <table class="header-titles">
+                <tr>
+                    <td style="text-align:left;">بيانات الشركة</td>
+                    <td style="text-align:right;">بيانات العميل</td>
+                </tr>
+            </table>
 
             <!-- ================= HEADER ================= -->
             <table class="header-table">
@@ -96,8 +116,8 @@
                         <t t-if="o.partner_id.vat">
                             <strong>VAT: <span t-esc="o.partner_id.vat"/></strong><br/>
                         </t>
-                        <strong>رقم الفاتورة:</strong> <span t-esc="o.name"/><br/>
-                        <strong>التاريخ:</strong> <span t-esc="o.invoice_date"/>
+                        <!--strong>رقم الفاتورة:</strong> <span t-esc="o.name"/><br/-->
+                        <!--strong>التاريخ:</strong> <span t-esc="o.invoice_date"/-->
                     </td>
 
                     <td class="company-info">
