@@ -9,9 +9,7 @@
                     size: A4;
                     margin: 25mm 15mm 25mm 15mm;
                     @bottom-center {
-                        content: "صفحة " counter(page) " / " counter(pages);
-                        font-size: 10px;
-                        color: #555555;
+                        content: "";
                     }
                 }
 
@@ -25,6 +23,7 @@
 
                 body {
                     font-size: 12px;
+                    margin-bottom: 60px; /* مساحة كافية للفوتر */
                 }
 
                 .page {
@@ -38,21 +37,6 @@
                     color: #333333;
                 }
 
-                /* HEADER TITLES */
-                .header-titles {
-                    width: 100%;
-                    margin-top: 60px; /* زحزحة الهيدر من فوق أكثر */
-                    margin-bottom: 5px;
-                    font-size: 16px;
-                    font-weight: bold;
-                    color: #333333;
-                }
-
-                .header-titles td {
-                    width: 50%;
-                    padding: 5px 10px; /* زيادة الحشو من اليمين واليسار */
-                }
-
                 /* HEADER TABLE */
                 table.header-table {
                     width: 100%;
@@ -60,81 +44,81 @@
                     margin-bottom: 15px;
                     outline: 1px solid #AAAAAA;
                     padding: 5px;
+                    font-weight: bold;
+                    background-color: #cce6ff; /* خلفية أزرق فاتح */
                 }
 
                 table.header-table td {
                     width: 50%;
                     vertical-align: top;
-                    padding: 10px; /* زيادة المسافة داخل الخلايا من الحواف */
+                    padding: 10px;
+                    border: 1px solid #AAAAAA; /* Outline حول كل خلية */
                 }
 
                 .company-info {
                     text-align: left;
-                    outline: 1px dashed #AAAAAA;
                 }
 
                 .client-info {
                     text-align: right;
-                    outline: 1px dashed #AAAAAA;
                 }
 
-                img {
-                    max-height: 65px;
-                    max-width: 200px;
+                img.company-logo {
+                    max-height: 80px;
+                    max-width: 180px;
                     display: block;
                 }
 
-                /* FOOTER */
+                /* FOOTER ثابت في أسفل الصفحة */
                 .footer {
-                    width: 100%;
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 40px;
                     text-align: center;
                     font-size: 10px;
                     border-top: 1px solid #AAAAAA;
                     padding-top: 5px;
-                    margin-top: 10px;
-                    outline: 1px solid #AAAAAA;
-                    color: #555555;
+                    color: #333333;
+                    font-weight: bold;
+                    background-color: #cce6ff; /* خلفية أزرق فاتح */
+                    border: 1px solid #AAAAAA; /* Outline */
                 }
-            </style>
 
-            <!-- ================= HEADER TITLES ================= -->
-            <table class="header-titles">
-                <tr>
-                    <td style="text-align:left;">بيانات الشركة</td>
-                    <td style="text-align:right;">بيانات العميل</td>
-                </tr>
-            </table>
+            </style>
 
             <!-- ================= HEADER ================= -->
             <table class="header-table">
                 <tr>
+                    <td class="company-info">
+                        <strong>بيانات الشركة</strong><br/><br/>
+                        <div>
+                            <!-- دعم PNG و JPEG -->
+                            <img t-if="company.logo"
+                                 t-att-src="'data:image/png;base64,%s' % company.logo"
+                                 class="company-logo"/>
+                            <img t-if="not company.logo and company.logo_jpeg"
+                                 t-att-src="'data:image/jpeg;base64,%s' % company.logo_jpeg"
+                                 class="company-logo"/>
+                        </div>
+                        <strong t-esc="company.name"/><br/>
+                        <t t-if="company.company_registry">
+                            <strong>CR: <span t-esc="company.company_registry"/></strong><br/>
+                        </t>
+                        <t t-if="company.vat">
+                            <strong>VAT: <span t-esc="company.vat"/></strong>
+                        </t>
+                    </td>
+
                     <td class="client-info">
+                        <strong>بيانات العميل</strong><br/><br/>
                         <strong><span t-esc="o.partner_id.name"/></strong><br/>
                         <t t-if="o.partner_id.street">
                             <strong><span t-esc="o.partner_id.street"/></strong><br/>
                         </t>
                         <t t-if="o.partner_id.vat">
                             <strong>VAT: <span t-esc="o.partner_id.vat"/></strong><br/>
-                        </t>
-                        <!--strong>رقم الفاتورة:</strong> <span t-esc="o.name"/><br/-->
-                        <!--strong>التاريخ:</strong> <span t-esc="o.invoice_date"/-->
-                    </td>
-
-                    <td class="company-info">
-                        <div>
-                            <!--img t-if="company.logo"
-                                 t-att-src="'data:image/png;base64,%s' % company.logo"/-->
-                        <img t-if="company.logo"
-     t-att-src="'data:image/jpeg;base64,%s' % company.logo"
-     style="max-height:80px; max-width:180px; display:block;"/>
-
-                        </div>
-                        <strong t-esc="company.name"/><br/>
-                        <t t-if="company.company_registry">
-                            CR: <span t-esc="company.company_registry"/><br/>
-                        </t>
-                        <t t-if="company.vat">
-                            VAT: <span t-esc="company.vat"/>
                         </t>
                     </td>
                 </tr>
@@ -147,7 +131,7 @@
 
             <!-- ================= FOOTER ================= -->
             <div class="footer">
-                صفحة <span class="page"/> / <span class="pageCount"/>
+                <strong>صفحة <span class="page"/> / <span class="pageCount"/></strong>
             </div>
 
         </t>
