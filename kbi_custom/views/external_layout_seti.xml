@@ -5,10 +5,22 @@
             <t t-set="company" t-value="o.company_id"/>
 
             <style>
+                @page {
+                    size: A4;
+                    margin: 20mm 15mm 25mm 15mm;
+                    @bottom-center {
+                        content: "صفحة " counter(page) " / " counter(pages);
+                        font-size: 10px;
+                        color: #003366; /* أزرق غامق */
+                    }
+                }
+
                 html, body {
                     margin: 0;
                     padding: 0;
                     direction: rtl;
+                    font-family: Arial, sans-serif;
+                    color: #003366; /* اللون الأساسي للأزرق */
                 }
 
                 body {
@@ -18,44 +30,58 @@
                 .page {
                     font-size: 12px;
                     line-height: 1.6;
-                    margin-bottom: 40px; /* مساحة للفوتر */
+                    margin-bottom: 40px;
                 }
 
                 strong {
                     font-size: 13px;
+                    color: #0055AA; /* أزرق متوسط */
                 }
 
                 /* HEADER */
                 table.header-table {
                     width: 100%;
                     border-collapse: collapse;
-                    margin-bottom: 12px;
+                    margin-bottom: 15px;
+                    margin-top: 20px;
+                    outline: 1px solid #3399FF; /* إطار أزرق حول الهيدر */
+                    padding: 5px;
                 }
 
                 table.header-table td {
                     width: 50%;
                     vertical-align: top;
+                    padding: 5px;
                 }
 
                 .company-info {
                     text-align: left;
-                    padding-top: 12px;
+                    padding-top: 10px;
+                    outline: 1px dashed #3399FF; /* إطار نقطي أزرق حول بيانات الشركة */
                 }
 
                 .client-info {
                     text-align: right;
+                    padding-top: 10px;
+                    outline: 1px dashed #3399FF; /* إطار نقطي أزرق حول بيانات العميل */
+                }
+
+                img {
+                    max-height: 65px;
+                    max-width: 200px;
+                    display: block;
                 }
 
                 /* FOOTER */
                 .footer {
-                    position: fixed;
-                    bottom: 0;
-                    left: 0;
-                    right: 0;
+                    width: 100%;
                     text-align: center;
                     font-size: 10px;
-                    border-top: 1px solid #ccc;
+                    border-top: 2px solid #3399FF; /* خط أزرق */
                     padding-top: 5px;
+                    margin-top: 10px;
+                    outline: 1px solid #3399FF; /* إطار أزرق حول الفوتر */
+                    color: #003366;
                 }
             </style>
 
@@ -63,26 +89,22 @@
             <table class="header-table">
                 <tr>
                     <td class="client-info">
-                        <strong>
-                        <span t-esc="o.partner_id.name"/>  </strong><br/>
-                       <strong> <span t-if="o.partner_id.street" t-esc="o.partner_id.street"/></strong><br/>
-                        <t t-if="o.partner_id.vat">
-                          <strong>  VAT: <span t-esc="o.partner_id.vat"/></strong><br/>
+                        <strong><span t-esc="o.partner_id.name"/></strong><br/>
+                        <t t-if="o.partner_id.street">
+                            <strong><span t-esc="o.partner_id.street"/></strong><br/>
                         </t>
-                        <strong>رقم الفاتورة:</strong><br/>
-                       <strong> <span t-esc="o.name"/></strong><br/>
-                        <strong>التاريخ:</strong><br/>
-                        <strong><span t-esc="o.invoice_date"/></strong>
-                      
+                        <t t-if="o.partner_id.vat">
+                            <strong>VAT: <span t-esc="o.partner_id.vat"/></strong><br/>
+                        </t>
+                        <strong>رقم الفاتورة:</strong> <span t-esc="o.name"/><br/>
+                        <strong>التاريخ:</strong> <span t-esc="o.invoice_date"/>
                     </td>
 
                     <td class="company-info">
                         <div>
                             <img t-if="company.logo"
-                                 t-att-src="'data:image/png;base64,%s' % company.logo"
-                                 style="max-height:65px; display:block;"/>
+                                 t-att-src="'data:image/png;base64,%s' % company.logo"/>
                         </div>
-
                         <strong t-esc="company.name"/><br/>
                         <t t-if="company.company_registry">
                             CR: <span t-esc="company.company_registry"/><br/>
