@@ -22,64 +22,108 @@
         <t t-foreach="docs" t-as="o">
             <t t-call="kbi_custom.external_layout_seti">
 
-                <!-- تكبير الخط -->
+                <!-- خط عربي وتكبير الخط -->
                 <style>
-                    body, table, td {
+                    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+
+                    body, table, td, th {
+                        font-family: 'Tajawal', sans-serif;
                         font-size: 13px;
                     }
+
                     th {
-                        font-size: 13.5px;
                         font-weight: bold;
+                        font-size: 13.5px;
+                        background:#DCDCDC;
+                    }
+
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+
+                    td, th {
+                        padding:5px;
+                        border:1px solid #ccc;
+                        text-align:right;
+                    }
+
+                    .qr-subtotal-vat {
+                        width: 100%;
+                        margin-top:15px;
+                        border-collapse: collapse;
+                    }
+
+                    .qr-subtotal-vat td {
+                        border:none;
+                        padding:5px;
+                    }
+
+                    .subtotal-vat {
+                        text-align:right;
+                        font-weight:bold;
+                    }
+
+                    .qr-code {
+                        text-align:left;
+                    }
+
+                    .thank-you {
+                        margin-top:20px;
+                        text-align:center;
+                        font-size:12px;
+                    }
+
+                    .thank-you .decor {
+                        color:#c71585;
+                        margin-top:5px;
+                        letter-spacing:2px;
                     }
                 </style>
 
-                <!-- الصفحة -->
+                <!-- ================= Body الصفحة ================= -->
                 <div class="page" style="margin:0;padding:0 0 90px 0;">
 
                     <!-- عنوان الفاتورة -->
-                    <table style="width:100%;border:1px solid #999;margin-top:10px;">
+                    <table>
                         <tr>
-                            <td style="text-align:center;font-weight:bold;background:#DCDCDC;padding:8px;">
+                            <td colspan="8" style="text-align:center;font-weight:bold;padding:8px;">
                                 Tax Invoice / فاتورة ضريبية
                             </td>
                         </tr>
                     </table>
 
                     <!-- بيانات الفاتورة -->
-                    <table style="width:100%;margin-top:12px;">
+                    <table style="margin-top:12px;">
                         <tr>
                             <td width="50%">
                                 <strong>
-                                    Date:
-                                    <span t-field="o.invoice_date"/><br/>
-                                    Payment Terms:
-                                    <span t-field="o.invoice_payment_term_id.name"/>
+                                    Date: <span t-field="o.invoice_date"/><br/>
+                                    Payment Terms: <span t-field="o.invoice_payment_term_id.name"/>
                                 </strong>
                             </td>
                             <td width="50%" style="text-align:left;">
                                 <strong>
-                                    Invoice No:
-                                    <span t-field="o.name"/>
+                                    Invoice No: <span t-field="o.name"/>
                                 </strong>
                             </td>
                         </tr>
                     </table>
 
                     <!-- جدول البنود -->
-                    <table style="width:100%;margin-top:15px;border-collapse:collapse;" border="1">
-                        <thead style="background:#DCDCDC;display:table-header-group;">
+                    <table style="margin-top:15px;">
+                        <thead>
                             <tr>
-                                <th style="width:30%;text-align:right;">الوصف</th>
-                                <th style="width:25%;text-align:right;">الخدمة المقدمة</th>
+                                <th style="width:30%;">الوصف</th>
+                                <th style="width:25%;">الخدمة المقدمة</th>
                                 <th style="width:10%;text-align:center;">الكمية</th>
-                                <th style="width:15%;text-align:right;">سعر الوحدة</th>
-                                <th style="width:15%;text-align:right;">الإجمالي</th>
+                                <th style="width:15%;">سعر الوحدة</th>
+                                <th style="width:15%;">الإجمالي</th>
                                 <th style="width:5%;text-align:center;">VAT %</th>
-                                <th style="width:10%;text-align:right;">VAT</th>
-                                <th style="width:15%;text-align:right;">Total</th>
+                                <th style="width:10%;">VAT</th>
+                                <th style="width:15%;">Total</th>
                             </tr>
                         </thead>
-
                         <tbody>
                             <t t-set="tax_total" t-value="0"/>
                             <tr t-foreach="o.invoice_line_ids" t-as="l">
@@ -93,93 +137,83 @@
                                 </td>
                                 <td style="text-align:center;"><span t-field="l.quantity"/></td>
                                 <td style="text-align:right;">
-                                    <span t-field="l.price_unit"
-                                          t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                    <span t-field="l.price_unit" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                 </td>
                                 <td style="text-align:right;">
-                                    <span t-field="l.price_subtotal"
-                                          t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                    <span t-field="l.price_subtotal" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                 </td>
                                 <td style="text-align:center;"><t t-esc="line_tax"/>%</td>
                                 <td style="text-align:right;">
-                                    <span t-esc="line_tax_amount"
-                                          t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                    <span t-esc="line_tax_amount" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                 </td>
                                 <td style="text-align:right;">
-                                    <span t-esc="l.price_subtotal + line_tax_amount"
-                                          t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                    <span t-esc="l.price_subtotal + line_tax_amount" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <!-- الإجماليات -->
-                    <table style="width:100%;margin-top:12px;" border="1">
+                    <!-- QR + Subtotal + VAT في صف واحد -->
+                    <table class="qr-subtotal-vat">
                         <tr>
-                            <td>Subtotal (Excl. VAT)</td>
-                            <td style="text-align:right;">
-                                <span t-field="o.amount_untaxed"
-                                      t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                            <td class="qr-code">
+                                <img t-if="o.get_qr_code()" 
+                                     t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % o.get_qr_code()"
+                                     style="border:1px solid #ccc;padding:4px;"/>
                             </td>
-                        </tr>
-                        <tr>
-                            <td>VAT</td>
-                            <td style="text-align:right;">
-                                <span t-esc="tax_total"
-                                      t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                            </td>
-                        </tr>
-                        <tr style="font-weight:bold;">
-                            <td>Total Amount</td>
-                            <td style="text-align:right;">
-                                <span t-field="o.amount_total"
-                                      t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                            <td class="subtotal-vat">
+                                <table style="border:none;width:100%;">
+                                    <tr>
+                                        <td>Subtotal:</td>
+                                        <td style="text-align:right;">
+                                            <span t-field="o.amount_untaxed" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>VAT:</td>
+                                        <td style="text-align:right;">
+                                            <span t-esc="tax_total" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                    <tr style="font-weight:bold;">
+                                        <td>Total Amount:</td>
+                                        <td style="text-align:right;">
+                                            <span t-field="o.amount_total" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                </table>
                             </td>
                         </tr>
                     </table>
 
-                    <!-- QR -->
-                    <div style="margin-top:15px;">
-                        <img t-if="o.get_qr_code()"
-                             t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % o.get_qr_code()"
-                             style="border:1px solid #ccc;padding:4px;"/>
-                    </div>
-
+                    <!-- ملاحظات ZATCA -->
                     <p style="margin-top:10px;font-size:11px;">
                         فاتورة ضريبية صادرة وفق متطلبات هيئة الزكاة والضريبة والجمارك (ZATCA)
                     </p>
 
-                </div>
-
-                <!-- ================= FOOTER ================= -->
-                <div style="
-                    position: fixed;
-                    bottom: 0;
-                    left: 0;
-                    right: 0;
-                    text-align: center;
-                    font-size: 11px;
-                    padding-top: 8px;
-                    border-top: 2px dotted #666;
-                    background: #fff;
-                ">
-                    <strong>
-                        نشكركم لاختياركم خدماتنا 🌸<br/>
-                        Thank you for choosing our services
-                    </strong>
-
-                    <div style="letter-spacing:2px;margin:5px 0;">
-                        ..............................................................
+                    <!-- ================= FOOTER ================= -->
+                    <div style="
+                        position: fixed;
+                        bottom: 0;
+                        left: 0;
+                        right: 0;
+                        text-align: center;
+                        font-size: 11px;
+                        padding-top: 8px;
+                        border-top: 2px dotted #666;
+                        background: #fff;
+                    ">
+                        <strong>نشكر تعاملکم معنا 🌸</strong>
+                        <div class="decor">❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀</div>
+                        <strong>
+                            <t t-esc="o.company_id.name"/>
+                            <t t-if="o.company_id.phone"> | Tel: <t t-esc="o.company_id.phone"/></t>
+                            <t t-if="o.company_id.email"> | Email: <t t-esc="o.company_id.email"/></t>
+                            <t t-if="o.company_id.website"> | <t t-esc="o.company_id.website"/></t>
+                        </strong>
                     </div>
 
-                    <strong>
-                        <t t-esc="o.company_id.name"/>
-                        <t t-if="o.company_id.phone"> | Tel: <t t-esc="o.company_id.phone"/></t>
-                        <t t-if="o.company_id.email"> | Email: <t t-esc="o.company_id.email"/></t>
-                        <t t-if="o.company_id.website"> | <t t-esc="o.company_id.website"/></t>
-                    </strong>
                 </div>
-
             </t>
         </t>
     </template>
