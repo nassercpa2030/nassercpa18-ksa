@@ -108,11 +108,11 @@
                             <strong>CR: <span t-esc="company.company_registry"/></strong><br/>
                         </t>
                            <t t-if="company.street">
-                            <strong> <span t-esc="company.street"/> , <span t-esc="company.state_id"/></strong><br/>
-                               <strong></strong><span t-esc="company.state_id"/><br/>
+                            <strong> <span t-esc="company.street"/> , <span t-esc="company.state_id.name"/></strong><br/>
+                               <strong></strong><span t-esc="company.country_id.name"/><br/>
                         </t>
                         <t t-if="company.vat">
-                            <strong>VAT: <span t-esc="company.vat"/></strong><br/>
+                            <strong>VAT(الرقم الضريبي): <span t-esc="company.vat"/></strong><br/>
                         </t>
                     </td>
 
@@ -124,13 +124,13 @@
                             <strong><span t-esc="o.partner_id.street"/></strong><br/>
                         </t>
                         <t t-if="o.partner_id.cr_number_sale">
-                            <strong>CR:<span t-esc="o.partner_id.cr_number_sale"/></strong><br/>
+                            <strong>CR(السجل التجاري):<span t-esc="o.partner_id.cr_number_sale"/></strong><br/>
                         </t>
                           <t t-if="o.partner_id.number_700">
-                            <strong>Unified_number:<span t-esc="o.partner_id.number_700"/></strong><br/>
+                            <strong>Unified_number(الرقم الموحد):<span t-esc="o.partner_id.number_700"/></strong><br/>
                         </t>
                         <t t-if="o.partner_id.vat">
-                            <strong>VAT: <span t-esc="o.partner_id.vat"/></strong><br/>
+                            <strong>VAT(الرقم الضربيي): <span t-esc="o.partner_id.vat"/></strong><br/>
                         </t>
                     </td>
                 </tr>
@@ -150,7 +150,7 @@
     <t t-if="company.email"><span>Email: <t t-esc="company.email"/></span></t>
     <t t-if="company.website"><span>Website: <t t-esc="company.website"/></span></t>
     <span style="background-color: #d9d9d9; padding: 2px 6px; border-radius: 4px;">
-        <strong>صفحة <span class="page"/> / <span class="pageCount"/></strong>
+        <span class="pageCount"/></strong>  / <strong>صفحة <span class="page"/> 
     </span>
 </div>
 
