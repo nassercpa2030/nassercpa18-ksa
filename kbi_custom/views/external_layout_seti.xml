@@ -108,11 +108,11 @@
                             <strong>CR: <span t-esc="company.company_registry"/></strong><br/>
                         </t>
                            <t t-if="company.street">
-                            <strong> <span t-esc="company.street"/> , <span t-esc="company.state_id.name"/></strong><br/>
-                               <strong></strong><span t-esc="company.country_id.name"/><br/>
+                            <strong> <span t-esc="company.street"/> , <span t-esc="company.state_id.name"/>,<span t-esc="company.country_id.name"/></strong><br/>
+                            
                         </t>
                         <t t-if="company.vat">
-                            <strong>VAT(الرقم الضريبي): <span t-esc="company.vat"/></strong><br/>
+                            <strong>(VAT)الرقم الضربيي: <span t-esc="company.vat"/></strong><br/>
                         </t>
                     </td>
 
@@ -124,13 +124,13 @@
                             <strong><span t-esc="o.partner_id.street"/></strong><br/>
                         </t>
                         <t t-if="o.partner_id.cr_number_sale">
-                            <strong>CR(السجل التجاري):<span t-esc="o.partner_id.cr_number_sale"/></strong><br/>
+                            <strong>(CR)السجل التجاري:<span t-esc="o.partner_id.cr_number_sale"/></strong><br/>
                         </t>
                           <t t-if="o.partner_id.number_700">
-                            <strong>Unified_number(الرقم الموحد):<span t-esc="o.partner_id.number_700"/></strong><br/>
+                            <strong>(UN)الرقم الموحد:<span t-esc="o.partner_id.number_700"/></strong><br/>
                         </t>
                         <t t-if="o.partner_id.vat">
-                            <strong>VAT(الرقم الضربيي): <span t-esc="o.partner_id.vat"/></strong><br/>
+                            <strong>(VAT)الرقم الضربيي: <span t-esc="o.partner_id.vat"/></strong><br/>
                         </t>
                     </td>
                 </tr>
