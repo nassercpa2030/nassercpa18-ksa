@@ -61,7 +61,7 @@
                 </style>
 
                 <!-- ================= Body الصفحة ================= -->
-                <div class="page" style="margin:0;padding:0 0 150px 0;">
+                <div class="page" style="margin:0;padding:0 0 180px 0;">
 
                     <!-- عنوان الفاتورة -->
                     <table>
@@ -132,51 +132,50 @@
                         </tbody>
                     </table>
 
-                    <!-- QR + Subtotal + VAT في صف واحد بنفس المستوى -->
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
-                        <!-- QR على الشمال -->
-                        <div style="flex:0 0 auto; text-align:left;">
-                            <img t-if="o.get_qr_code()" 
-                                 t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % o.get_qr_code()"
-                                 style="border:1px solid #ccc;padding:4px;"/>
-                        </div>
-
-                        <!-- الإجماليات على اليمين -->
-                        <div style="flex:0 0 auto; text-align:right;">
-                            <table style="border:1px solid #ccc; border-collapse:collapse; min-width:200px;">
-                                <tr>
-                                    <td>Subtotal / الإجمالي قبل الضريبة</td>
-                                    <td style="text-align:right;">
-                                        <span t-field="o.amount_untaxed" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>VAT / الضريبة</td>
-                                    <td style="text-align:right;">
-                                        <span t-esc="tax_total" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                                    </td>
-                                </tr>
-                                <tr style="font-weight:bold;">
-                                    <td>Total Amount / المجموع الكلي</td>
-                                    <td style="text-align:right;">
-                                        <span t-field="o.amount_total" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
+                    <!-- الإجماليات -->
+                    <div style="margin-top:15px; text-align:right;">
+                        <table style="border:1px solid #ccc; border-collapse:collapse; min-width:200px; display:inline-block;">
+                            <tr>
+                                <td>Subtotal / الإجمالي قبل الضريبة</td>
+                                <td style="text-align:right;">
+                                    <span t-field="o.amount_untaxed" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>VAT / الضريبة</td>
+                                <td style="text-align:right;">
+                                    <span t-esc="tax_total" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                </td>
+                            </tr>
+                            <tr style="font-weight:bold;">
+                                <td>Total Amount / المجموع الكلي</td>
+                                <td style="text-align:right;">
+                                    <span t-field="o.amount_total" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
 
-                    <!-- ملاحظات ZATCA -->
-                    <p style="margin-top:10px;font-size:11px;">
-                        فاتورة ضريبية صادرة وفق متطلبات هيئة الزكاة والضريبة والجمارك (ZATCA)
-                        <br/>
-                        Tax Invoice issued in accordance with ZATCA requirements
-                    </p>
+                    <!-- QR تحت الإجماليات بمسافة كبيرة -->
+                    <div style="margin-top:25px; text-align:left;">
+                        <img t-if="o.get_qr_code()" 
+                             t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % o.get_qr_code()"
+                             style="border:1px solid #ccc;padding:4px;"/>
+                    </div>
 
-                    <!-- سطر شكر ورد بعد كل شيء مع مسافة كبيرة -->
-                    <div class="thank-you" style="margin-top:30px;">
-                        <strong>🌸 نشكر تعاملکم معنا / Thank you for choosing our services 🌸</strong>
-                        <div class="decor">❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀❀ ❀ ❀ ❀</div>
+                    <!-- مسافة بين QR وملاحظة ZATCA -->
+                    <div style="margin-top:30px;">
+                        <p style="font-size:11px;">
+                            فاتورة ضريبية صادرة وفق متطلبات هيئة الزكاة والضريبة والجمارك (ZATCA)
+                            <br/>
+                            Tax Invoice issued in accordance with ZATCA requirements
+                        </p>
+                    </div>
+
+                    <!-- سطر شكر ورد بعد كل شيء -->
+                    <div class="thank-you" style="margin-top:40px;">
+                        <strong>نشكر تعاملکم معنا / Thank you for choosing our services 🌸</strong>
+                        <div class="decor">❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀</div>
                     </div>
 
                     <!-- ================= FOOTER ================= -->
