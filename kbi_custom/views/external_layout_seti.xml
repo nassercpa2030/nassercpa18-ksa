@@ -107,6 +107,10 @@
                         <t t-if="company.company_registry">
                             <strong>CR: <span t-esc="company.company_registry"/></strong><br/>
                         </t>
+                           <t t-if="company.street">
+                            <strong> <span t-esc="company.street"/> , <span t-esc="company.state_id"/></strong><br/>
+                               <strong></strong><span t-esc="company.state_id"/><br/>
+                        </t>
                         <t t-if="company.vat">
                             <strong>VAT: <span t-esc="company.vat"/></strong><br/>
                         </t>
@@ -118,6 +122,12 @@
                         <strong><span t-esc="o.partner_id.name"/></strong><br/>
                         <t t-if="o.partner_id.street">
                             <strong><span t-esc="o.partner_id.street"/></strong><br/>
+                        </t>
+                        <t t-if="o.partner_id.cr_number_sale">
+                            <strong>CR:<span t-esc="o.partner_id.cr_number_sale"/></strong><br/>
+                        </t>
+                          <t t-if="o.partner_id.number_700">
+                            <strong>Unified_number:<span t-esc="o.partner_id.number_700"/></strong><br/>
                         </t>
                         <t t-if="o.partner_id.vat">
                             <strong>VAT: <span t-esc="o.partner_id.vat"/></strong><br/>
