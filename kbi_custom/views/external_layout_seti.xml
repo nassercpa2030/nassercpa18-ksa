@@ -104,12 +104,13 @@
                                  class="company-logo"/>
                         </div>
                         <strong t-esc="company.name"/><br/>
-                        <t t-if="company.company_registry">
-                            <strong>CR: <span t-esc="company.company_registry"/></strong><br/>
-                        </t>
+                        
                            <t t-if="company.street">
                             <strong> <span t-esc="company.street"/> , <span t-esc="company.state_id.name"/>,<span t-esc="company.country_id.name"/></strong><br/>
                             
+                        </t>
+                        <t t-if="company.company_registry">
+                             <strong>(CR)السجل التجاري:<span t-esc="company.company_registry"/></strong><br/>
                         </t>
                         <t t-if="company.vat">
                             <strong>(VAT)الرقم الضربيي: <span t-esc="company.vat"/></strong><br/>
