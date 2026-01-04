@@ -5,6 +5,8 @@
             <t t-set="company" t-value="o.company_id"/>
 
             <style>
+                @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+
                 @page {
                     size: A4;
                     margin: 25mm 15mm 25mm 15mm;
@@ -21,7 +23,7 @@
 
                 body {
                     font-size: 12px;
-                    margin-bottom: 100px; /* مساحة كافية للفوتر */
+                    margin-bottom: 80px; /* مساحة كافية للفوتر */
                 }
 
                 .page {
@@ -41,26 +43,20 @@
                     border-collapse: collapse;
                     margin-bottom: 15px;
                     font-weight: bold;
-                    background-color: #e0e0e0; /* خلفية رمادية */
-                    border: 1px solid #999999; /* إطار رمادي */
+                    background-color: #e0e0e0;
+                    border: 1px solid #999999;
+                    font-family: 'Tajawal', Arial, sans-serif;
                 }
 
                 table.header-table td {
                     width: 50%;
                     vertical-align: top;
                     padding: 10px;
-                    border: 1px solid #999999; /* خطوط داخلية رمادية */
+                    border: 1px solid #999999;
                 }
 
-                .company-info {
-                    text-align: right; /* الشركة على اليمين */
-                    font-size: 13px;
-                }
-
-                .client-info {
-                    text-align: left; /* العميل على اليسار */
-                    font-size: 13px;
-                }
+                .company-info { text-align: right; font-size: 13px; }
+                .client-info { text-align: left; font-size: 13px; }
 
                 img.company-logo {
                     max-height: 80px;
@@ -69,35 +65,35 @@
                     margin-bottom: 5px;
                 }
 
-                /* FOOTER ثابت في أسفل الصفحة */
-                .footer {
+                /* FOOTER جدول صف واحد */
+                table.footer-table {
+                    width: 100%;
                     position: fixed;
                     bottom: 0;
                     left: 0;
                     right: 0;
-                    height: auto;
-                    text-align: center;
-                    font-size: 11px;
+                    border-collapse: collapse;
+                    font-family: 'Tajawal', Arial, sans-serif;
+                    font-size: 10px; /* أصغر حجم خط */
+                    background-color: #f0f0f0;
                     border-top: 1px solid #999999;
-                    padding: 8px 5px 5px 5px;
-                    color: #333333;
-                    font-weight: bold;
-                    background-color: #f0f0f0; /* رمادي فاتح */
                 }
 
-                .footer strong {
-                    font-size: 12px;
+                table.footer-table td {
+                    padding: 5px 10px;
+                    text-align: center;
+                    border: none;
+                    color: #333333;
+                    font-weight: bold;
                 }
             </style>
 
             <!-- ================= HEADER ================= -->
             <table class="header-table">
                 <tr>
-                    <!-- الشركة على اليمين -->
                     <td class="company-info">
                         <strong>بيانات الشركة / Company Info</strong><br/><br/>
                         <div>
-                            <!-- دعم PNG و JPEG -->
                             <img t-if="company.logo"
                                  t-att-src="'data:image/png;base64,%s' % company.logo"
                                  class="company-logo"/>
@@ -113,8 +109,6 @@
                             <strong>الضريبي / VAT: <span t-esc="company.vat"/></strong>
                         </t>
                     </td>
-
-                    <!-- العميل على اليسار -->
                     <td class="client-info">
                         <strong>بيانات العميل / Customer Info</strong><br/><br/>
                         <strong><span t-esc="o.partner_id.name"/></strong><br/>
@@ -134,16 +128,20 @@
             </div>
 
             <!-- ================= FOOTER ================= -->
-            <div class="footer">
-                <strong>
-                    <t t-esc="o.company_id.name"/>
-                    <t t-if="o.company_id.phone"> | Tel: <t t-esc="o.company_id.phone"/></t>
-                    <t t-if="o.company_id.email"> | Email: <t t-esc="o.company_id.email"/></t>
-                    <t t-if="o.company_id.website"> | <t t-esc="o.company_id.website"/></t>
-                </strong>
-                <br/>
-                <strong>صفحة <span class="page"/> / <span class="pageCount"/></strong>
-            </div>
+            <table class="footer-table">
+                <tr>
+                    <td>
+                        <strong>
+                            <t t-esc="o.company_id.name"/>
+                            <t t-if="o.company_id.phone"> | Tel: <t t-esc="o.company_id.phone"/></t>
+                            <t t-if="o.company_id.email"> | Email: <t t-esc="o.company_id.email"/></t>
+                            <t t-if="o.company_id.website"> | <t t-esc="o.company_id.website"/></t>
+                        </strong>
+                        <br/>
+                        <strong>صفحة <span class="page"/> / <span class="pageCount"/></strong>
+                    </td>
+                </tr>
+            </table>
 
         </t>
     </template>
