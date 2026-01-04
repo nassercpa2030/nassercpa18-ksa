@@ -63,16 +63,17 @@
             <table class="header-table">
                 <tr>
                     <td class="client-info">
-                        <strong>فاتورة إلى:</strong><br/>
-                        <span t-esc="o.partner_id.name"/><br/>
-                        <span t-if="o.partner_id.street" t-esc="o.partner_id.street"/><br/>
+                        <strong>
+                        <span t-esc="o.partner_id.name"/>  </strong><br/>
+                       <strong> <span t-if="o.partner_id.street" t-esc="o.partner_id.street"/></strong><br/>
                         <t t-if="o.partner_id.vat">
-                            VAT: <span t-esc="o.partner_id.vat"/><br/>
+                          <strong>  VAT: <span t-esc="o.partner_id.vat"/></strong><br/>
                         </t>
-                        <strong>رقم الفاتورة:</strong>
-                        <span t-esc="o.name"/><br/>
-                        <strong>التاريخ:</strong>
-                        <span t-esc="o.invoice_date"/>
+                        <strong>رقم الفاتورة:</strong><br/>
+                       <strong> <span t-esc="o.name"/></strong><br/>
+                        <strong>التاريخ:</strong><br/>
+                        <strong><span t-esc="o.invoice_date"/></strong>
+                      
                     </td>
 
                     <td class="company-info">
