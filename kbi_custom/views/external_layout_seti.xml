@@ -6,7 +6,7 @@
 
             <style>
                 /* استيراد خط Tajawal */
-                @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
 
                 html, body {
                     margin: 0;
@@ -18,7 +18,7 @@
 
                 body {
                     font-size: 12px;
-                    margin-bottom: 90px; /* مساحة كافية للفوتر */
+                    margin-bottom: 120px; /* مساحة كافية للفوتر */
                 }
 
                 .page {
@@ -62,21 +62,29 @@
                     display: block;
                 }
 
-                /* FOOTER */
-                table.footer-table {
+                /* FOOTER ثابت في أسفل الصفحة */
+                .footer {
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 50px;
+                    background-color: #f2f2f2;
+                    font-size: 10px;
+                    text-align: center;
+                    line-height: 1.3;
+                    border-top: 1px solid #999999;
+                }
+
+                .footer table {
                     width: 100%;
                     border-collapse: collapse;
-                    font-size: 10px;
-                    background-color: #f2f2f2;
-                    margin-top: 10px;
                 }
 
-                table.footer-table td {
-                    padding: 5px 10px;
+                .footer td {
+                    padding: 3px 5px;
                     text-align: center;
-                    border: none;
                 }
-
             </style>
 
             <!-- ================= HEADER ================= -->
@@ -122,18 +130,20 @@
             </div>
 
             <!-- ================= FOOTER ================= -->
-            <table class="footer-table">
-                <tr>
-                    <td>
-                        <strong>
-                            <t t-esc="o.company_id.name"/>
-                            <t t-if="o.company_id.phone"> | Tel: <t t-esc="o.company_id.phone"/></t>
-                            <t t-if="o.company_id.email"> | Email: <t t-esc="o.company_id.email"/></t>
-                            <t t-if="o.company_id.website"> | <t t-esc="o.company_id.website"/></t>
-                        </strong>
-                    </td>
-                </tr>
-            </table>
+            <div class="footer">
+                <table>
+                    <tr>
+                        <td>
+                            <strong>
+                                <t t-esc="o.company_id.name"/>
+                                <t t-if="o.company_id.phone"> | Tel: <t t-esc="o.company_id.phone"/></t>
+                                <t t-if="o.company_id.email"> | Email: <t t-esc="o.company_id.email"/></t>
+                                <t t-if="o.company_id.website"> | <t t-esc="o.company_id.website"/></t>
+                            </strong>
+                        </td>
+                    </tr>
+                </table>
+            </div>
 
         </t>
     </template>
