@@ -6,7 +6,7 @@
 
             <style>
                 /* استيراد خط Tajawal */
-                @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
 
                 html, body {
                     margin: 0;
@@ -32,13 +32,12 @@
                     color: #333333;
                 }
 
-                /* HEADER TABLE */
                 table.header-table {
                     width: 100%;
                     border-collapse: collapse;
                     margin-bottom: 15px;
                     font-weight: bold;
-                    background-color: #dcdcdc; /* رمادي */
+                    background-color: #dcdcdc;
                     border: 1px solid #999999;
                 }
 
@@ -48,34 +47,25 @@
                     padding: 10px;
                 }
 
-                .company-info {
-                    text-align: right; /* الشركة على اليمين */
-                }
-
-                .client-info {
-                    text-align: left; /* العميل على اليسار */
-                }
-
-                img.company-logo {
-                    max-height: 80px;
-                    max-width: 180px;
-                    display: block;
-                }
+                .company-info { text-align: right; }
+                .client-info { text-align: left; }
+                img.company-logo { max-height: 80px; max-width: 180px; display: block; }
 
                 /* FOOTER */
                 table.footer-table {
                     width: 100%;
                     border-collapse: collapse;
-                    font-size: 10px;
+                    font-size: 11px; /* حجم الخط للفوتر */
+                    font-family: 'Tajawal', Arial, sans-serif;
                     background-color: #f2f2f2;
                     margin-top: 10px;
+                    text-align: center;
+                    font-weight: bold;
+                    border-top: 1px solid #999999;
                 }
 
                 table.footer-table td {
                     padding: 5px 10px;
-                    text-align: center;
-                    border: none;
-                    font-size: 10px;
                 }
 
             </style>
@@ -83,7 +73,6 @@
             <!-- ================= HEADER ================= -->
             <table class="header-table">
                 <tr>
-                    <!-- الشركة على اليمين -->
                     <td class="company-info">
                         <strong>Company Info / بيانات الشركة</strong><br/><br/>
                         <div>
@@ -103,7 +92,6 @@
                         </t>
                     </td>
 
-                    <!-- العميل على اليسار -->
                     <td class="client-info">
                         <strong>Customer Info / بيانات العميل</strong><br/><br/>
                         <strong><span t-esc="o.partner_id.name"/></strong><br/>
@@ -119,7 +107,7 @@
 
             <!-- ================= BODY ================= -->
             <div class="page">
-                <t t-raw="0"/>
+                <t t-raw="doc_body"/>
             </div>
 
             <!-- ================= FOOTER ================= -->
@@ -127,10 +115,10 @@
                 <tr>
                     <td>
                         <strong>
-                            <t t-esc="o.company_id.name"/>
-                            <t t-if="o.company_id.phone"> | Tel: <t t-esc="o.company_id.phone"/></t>
-                            <t t-if="o.company_id.email"> | Email: <t t-esc="o.company_id.email"/></t>
-                            <t t-if="o.company_id.website"> | <t t-esc="o.company_id.website"/></t>
+                            <t t-esc="company.name"/>
+                            <t t-if="company.phone"> | Tel: <t t-esc="company.phone"/></t>
+                            <t t-if="company.email"> | Email: <t t-esc="company.email"/></t>
+                            <t t-if="company.website"> | <t t-esc="company.website"/></t>
                         </strong>
                     </td>
                 </tr>
