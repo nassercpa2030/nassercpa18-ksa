@@ -51,48 +51,61 @@
                         </tr>
                     </table>
 
-                    <!-- جدول البنود -->
-                    <table class="table table-bordered" style="width:100%;margin-top:15px;">
-                        <thead style="background:#DCDCDC;">
-                            <tr>
-                                <th>الوصف</th>
-                                <th>الكمية</th>
-                                <th>سعر الوحدة</th>
-                                <th>الإجمالي</th>
-                                <th>VAT %</th>
-                                <th>VAT</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-set="tax_total" t-value="0"/>
-                            <tr t-foreach="o.invoice_line_ids" t-as="l">
-                                <t t-set="line_tax" t-value="sum(t.amount for t in l.tax_ids)"/>
-                                <t t-set="line_tax_amount" t-value="l.price_subtotal * line_tax / 100"/>
-                                <t t-set="tax_total" t-value="tax_total + line_tax_amount"/>
+                  <table class="table table-bordered" style="width:100%;margin-top:15px;border-collapse:collapse;">
+    <thead style="background:#DCDCDC; display: table-header-group;">
+        <tr>
+           
+            <th style="width:30%; padding:5px; text-align:right;">الوصف</th>
+             <th style="width:25%; padding:5px; text-align:right;">الخدمة المقدمة</th>
+            <th style="width:10%; padding:5px; text-align:center;">الكمية</th>
+            <th style="width:15%; padding:5px; text-align:right;">سعر الوحدة</th>
+            <th style="width:15%; padding:5px; text-align:right;">الإجمالي</th>
+            <th style="width:5%; padding:5px; text-align:center;">VAT %</th>
+            <th style="width:10%; padding:5px; text-align:right;">VAT</th>
+            <th style="width:15%; padding:5px; text-align:right;">Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        <t t-set="tax_total" t-value="0"/>
+        <tr t-foreach="o.invoice_line_ids" t-as="l">
+            <t t-set="line_tax" t-value="sum(t.amount for t in l.tax_ids)"/>
+            <t t-set="line_tax_amount" t-value="l.price_subtotal * line_tax / 100"/>
+            <t t-set="tax_total" t-value="tax_total + line_tax_amount"/>
 
-                                <td><span t-field="l.name"/></td>
-                                <td class="text-center"><span t-field="l.quantity"/></td>
-                                <td class="text-end">
-                                    <span t-field="l.price_unit"
-                                          t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                                </td>
-                                <td class="text-end">
-                                    <span t-field="l.price_subtotal"
-                                          t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                                </td>
-                                <td class="text-center"><span t-esc="line_tax"/>%</td>
-                                <td class="text-end">
-                                    <span t-esc="line_tax_amount"
-                                          t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                                </td>
-                                <td class="text-end">
-                                    <span t-esc="l.price_subtotal + line_tax_amount"
-                                          t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- عمود الوصف -->
+            <td style="padding:5px;">
+                <span t-field="l.name"/>
+            </td>
+            <!-- عمود الخدمة المقدمة -->
+            <td style="padding:5px;">
+                <t t-esc="l.sale_line_ids and l.sale_line_ids[0].order_id.auto_project_name or ''"/>
+            </td>
+
+        
+
+            <!-- باقي الأعمدة -->
+            <td style="padding:5px; text-align:center;"><span t-field="l.quantity"/></td>
+            <td style="padding:5px; text-align:right;">
+                <span t-field="l.price_unit"
+                      t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+            </td>
+            <td style="padding:5px; text-align:right;">
+                <span t-field="l.price_subtotal"
+                      t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+            </td>
+            <td style="padding:5px; text-align:center;"><span t-esc="line_tax"/>%</td>
+            <td style="padding:5px; text-align:right;">
+                <span t-esc="line_tax_amount"
+                      t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+            </td>
+            <td style="padding:5px; text-align:right;">
+                <span t-esc="l.price_subtotal + line_tax_amount"
+                      t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
 
                     <!-- الإجماليات -->
                     <table class="table table-bordered" style="width:100%;margin-top:10px;">
