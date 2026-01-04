@@ -8,7 +8,6 @@
         <field name="name">فاتورة ضريبية</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
-        <!-- مهم جداً: اسم تقرير الـ QWEB -->
         <field name="report_name">kbi_custom.report_tax_invoice_document</field>
         <field name="print_report_name">'فاتورة - %s' % (object.name)</field>
         <field name="paperformat_id" ref="kbi_custom.paperformat_zero_margin"/>
@@ -23,117 +22,124 @@
         <t t-foreach="docs" t-as="o">
             <t t-call="kbi_custom.external_layout_seti">
 
-                <div class="page" style="margin:0;padding:0;">
+                <!-- تكبير الخط -->
+                <style>
+                    body, table, td {
+                        font-size: 13px;
+                    }
+                    th {
+                        font-size: 13.5px;
+                        font-weight: bold;
+                    }
+                </style>
+
+                <!-- الصفحة -->
+                <div class="page" style="margin:0;padding:0 0 90px 0;">
 
                     <!-- عنوان الفاتورة -->
                     <table style="width:100%;border:1px solid #999;margin-top:10px;">
                         <tr>
-                            <td style="text-align:center;font-weight:bold;background:#DCDCDC;padding:6px;">
+                            <td style="text-align:center;font-weight:bold;background:#DCDCDC;padding:8px;">
                                 Tax Invoice / فاتورة ضريبية
                             </td>
                         </tr>
                     </table>
 
                     <!-- بيانات الفاتورة -->
-                    <table style="width:100%;margin-top:10px;">
+                    <table style="width:100%;margin-top:12px;">
                         <tr>
                             <td width="50%">
-                                <strong>Invoice To:</strong><br/>
-                                <span t-field="o.partner_id.name"/><br/>
-                                <span t-field="o.partner_id.street"/><br/>
-                                VAT: <span t-field="o.partner_id.vat"/>
+                                <strong>
+                                    Date:
+                                    <span t-field="o.invoice_date"/><br/>
+                                    Payment Terms:
+                                    <span t-field="o.invoice_payment_term_id.name"/>
+                                </strong>
                             </td>
-                            <td width="50%">
-                                Invoice No: <strong><span t-field="o.name"/></strong><br/>
-                                Date: <span t-field="o.invoice_date"/><br/>
-                                Payment Terms: <span t-field="o.invoice_payment_term_id.name"/>
+                            <td width="50%" style="text-align:left;">
+                                <strong>
+                                    Invoice No:
+                                    <span t-field="o.name"/>
+                                </strong>
                             </td>
                         </tr>
                     </table>
 
-                  <table class="table table-bordered" style="width:100%;margin-top:15px;border-collapse:collapse;">
-    <thead style="background:#DCDCDC; display: table-header-group;">
-        <tr>
-           
-            <th style="width:30%; padding:5px; text-align:right;">الوصف</th>
-             <th style="width:25%; padding:5px; text-align:right;">الخدمة المقدمة</th>
-            <th style="width:10%; padding:5px; text-align:center;">الكمية</th>
-            <th style="width:15%; padding:5px; text-align:right;">سعر الوحدة</th>
-            <th style="width:15%; padding:5px; text-align:right;">الإجمالي</th>
-            <th style="width:5%; padding:5px; text-align:center;">VAT %</th>
-            <th style="width:10%; padding:5px; text-align:right;">VAT</th>
-            <th style="width:15%; padding:5px; text-align:right;">Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        <t t-set="tax_total" t-value="0"/>
-        <tr t-foreach="o.invoice_line_ids" t-as="l">
-            <t t-set="line_tax" t-value="sum(t.amount for t in l.tax_ids)"/>
-            <t t-set="line_tax_amount" t-value="l.price_subtotal * line_tax / 100"/>
-            <t t-set="tax_total" t-value="tax_total + line_tax_amount"/>
+                    <!-- جدول البنود -->
+                    <table style="width:100%;margin-top:15px;border-collapse:collapse;" border="1">
+                        <thead style="background:#DCDCDC;display:table-header-group;">
+                            <tr>
+                                <th style="width:30%;text-align:right;">الوصف</th>
+                                <th style="width:25%;text-align:right;">الخدمة المقدمة</th>
+                                <th style="width:10%;text-align:center;">الكمية</th>
+                                <th style="width:15%;text-align:right;">سعر الوحدة</th>
+                                <th style="width:15%;text-align:right;">الإجمالي</th>
+                                <th style="width:5%;text-align:center;">VAT %</th>
+                                <th style="width:10%;text-align:right;">VAT</th>
+                                <th style="width:15%;text-align:right;">Total</th>
+                            </tr>
+                        </thead>
 
-                <!-- عمود الوصف -->
-            <td style="padding:5px;">
-                <span t-field="l.name"/>
-            </td>
-            <!-- عمود الخدمة المقدمة -->
-            <td style="padding:5px;">
-                <t t-esc="l.sale_line_ids and l.sale_line_ids[0].order_id.project_name or ''"/>
-            </td>
+                        <tbody>
+                            <t t-set="tax_total" t-value="0"/>
+                            <tr t-foreach="o.invoice_line_ids" t-as="l">
+                                <t t-set="line_tax" t-value="sum(t.amount for t in l.tax_ids)"/>
+                                <t t-set="line_tax_amount" t-value="l.price_subtotal * line_tax / 100"/>
+                                <t t-set="tax_total" t-value="tax_total + line_tax_amount"/>
 
-        
-
-            <!-- باقي الأعمدة -->
-            <td style="padding:5px; text-align:center;"><span t-field="l.quantity"/></td>
-            <td style="padding:5px; text-align:right;">
-                <span t-field="l.price_unit"
-                      t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-            </td>
-            <td style="padding:5px; text-align:right;">
-                <span t-field="l.price_subtotal"
-                      t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-            </td>
-            <td style="padding:5px; text-align:center;"><span t-esc="line_tax"/>%</td>
-            <td style="padding:5px; text-align:right;">
-                <span t-esc="line_tax_amount"
-                      t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-            </td>
-            <td style="padding:5px; text-align:right;">
-                <span t-esc="l.price_subtotal + line_tax_amount"
-                      t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-            </td>
-        </tr>
-    </tbody>
-</table>
-
+                                <td><span t-field="l.name"/></td>
+                                <td>
+                                    <t t-esc="l.sale_line_ids and l.sale_line_ids[0].order_id.project_name or ''"/>
+                                </td>
+                                <td style="text-align:center;"><span t-field="l.quantity"/></td>
+                                <td style="text-align:right;">
+                                    <span t-field="l.price_unit"
+                                          t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                </td>
+                                <td style="text-align:right;">
+                                    <span t-field="l.price_subtotal"
+                                          t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                </td>
+                                <td style="text-align:center;"><t t-esc="line_tax"/>%</td>
+                                <td style="text-align:right;">
+                                    <span t-esc="line_tax_amount"
+                                          t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                </td>
+                                <td style="text-align:right;">
+                                    <span t-esc="l.price_subtotal + line_tax_amount"
+                                          t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
 
                     <!-- الإجماليات -->
-                    <table class="table table-bordered" style="width:100%;margin-top:10px;">
+                    <table style="width:100%;margin-top:12px;" border="1">
                         <tr>
                             <td>Subtotal (Excl. VAT)</td>
-                            <td class="text-end">
+                            <td style="text-align:right;">
                                 <span t-field="o.amount_untaxed"
                                       t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                             </td>
                         </tr>
                         <tr>
                             <td>VAT</td>
-                            <td class="text-end">
+                            <td style="text-align:right;">
                                 <span t-esc="tax_total"
                                       t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                             </td>
                         </tr>
                         <tr style="font-weight:bold;">
                             <td>Total Amount</td>
-                            <td class="text-end">
+                            <td style="text-align:right;">
                                 <span t-field="o.amount_total"
                                       t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                             </td>
                         </tr>
                     </table>
 
-                    <!-- QR Code أسفل شمال -->
-                    <div style="margin-top:15px;display:flex;justify-content:flex-start;">
+                    <!-- QR -->
+                    <div style="margin-top:15px;">
                         <img t-if="o.get_qr_code()"
                              t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % o.get_qr_code()"
                              style="border:1px solid #ccc;padding:4px;"/>
@@ -144,6 +150,36 @@
                     </p>
 
                 </div>
+
+                <!-- ================= FOOTER ================= -->
+                <div style="
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    text-align: center;
+                    font-size: 11px;
+                    padding-top: 8px;
+                    border-top: 2px dotted #666;
+                    background: #fff;
+                ">
+                    <strong>
+                        نشكركم لاختياركم خدماتنا 🌸<br/>
+                        Thank you for choosing our services
+                    </strong>
+
+                    <div style="letter-spacing:2px;margin:5px 0;">
+                        ..............................................................
+                    </div>
+
+                    <strong>
+                        <t t-esc="company.name"/>
+                        <t t-if="company.phone"> | Tel: <t t-esc="company.phone"/></t>
+                        <t t-if="company.email"> | Email: <t t-esc="company.email"/></t>
+                        <t t-if="company.website"> | <t t-esc="company.website"/></t>
+                    </strong>
+                </div>
+
             </t>
         </t>
     </template>
