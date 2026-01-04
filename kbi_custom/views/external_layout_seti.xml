@@ -5,13 +5,8 @@
             <t t-set="company" t-value="o.company_id"/>
 
             <style>
-                @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
-
-                @page {
-                    size: A4;
-                    margin: 25mm 15mm 25mm 15mm;
-                    @bottom-center { content: ""; }
-                }
+                /* استيراد خط Tajawal */
+                @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
 
                 html, body {
                     margin: 0;
@@ -23,7 +18,7 @@
 
                 body {
                     font-size: 12px;
-                    margin-bottom: 80px; /* مساحة كافية للفوتر */
+                    margin-bottom: 90px; /* مساحة كافية للفوتر */
                 }
 
                 .page {
@@ -43,56 +38,53 @@
                     border-collapse: collapse;
                     margin-bottom: 15px;
                     font-weight: bold;
-                    background-color: #e0e0e0;
+                    background-color: #dcdcdc; /* رمادي */
                     border: 1px solid #999999;
-                    font-family: 'Tajawal', Arial, sans-serif;
                 }
 
                 table.header-table td {
                     width: 50%;
                     vertical-align: top;
                     padding: 10px;
-                    border: 1px solid #999999;
                 }
 
-                .company-info { text-align: right; font-size: 13px; }
-                .client-info { text-align: left; font-size: 13px; }
+                .company-info {
+                    text-align: right; /* الشركة على اليمين */
+                }
+
+                .client-info {
+                    text-align: left; /* العميل على اليسار */
+                }
 
                 img.company-logo {
                     max-height: 80px;
                     max-width: 180px;
                     display: block;
-                    margin-bottom: 5px;
                 }
 
-                /* FOOTER جدول صف واحد */
+                /* FOOTER */
                 table.footer-table {
                     width: 100%;
-                    position: fixed;
-                    bottom: 0;
-                    left: 0;
-                    right: 0;
                     border-collapse: collapse;
-                    font-family: 'Tajawal', Arial, sans-serif;
-                    font-size: 10px; /* أصغر حجم خط */
-                    background-color: #f0f0f0;
-                    border-top: 1px solid #999999;
+                    font-size: 10px;
+                    background-color: #f2f2f2;
+                    margin-top: 10px;
                 }
 
                 table.footer-table td {
                     padding: 5px 10px;
                     text-align: center;
                     border: none;
-                    color: #333333;
-                    font-weight: bold;
                 }
+
             </style>
 
             <!-- ================= HEADER ================= -->
             <table class="header-table">
                 <tr>
+                    <!-- الشركة على اليمين -->
                     <td class="company-info">
-                        <strong>بيانات الشركة / Company Info</strong><br/><br/>
+                        <strong>Company Info / بيانات الشركة</strong><br/><br/>
                         <div>
                             <img t-if="company.logo"
                                  t-att-src="'data:image/png;base64,%s' % company.logo"
@@ -103,20 +95,22 @@
                         </div>
                         <strong t-esc="company.name"/><br/>
                         <t t-if="company.company_registry">
-                            <strong>السجل التجاري / CR: <span t-esc="company.company_registry"/></strong><br/>
+                            <strong>CR / السجل التجاري: <span t-esc="company.company_registry"/></strong><br/>
                         </t>
                         <t t-if="company.vat">
-                            <strong>الضريبي / VAT: <span t-esc="company.vat"/></strong>
+                            <strong>VAT / الضريبي: <span t-esc="company.vat"/></strong>
                         </t>
                     </td>
+
+                    <!-- العميل على اليسار -->
                     <td class="client-info">
-                        <strong>بيانات العميل / Customer Info</strong><br/><br/>
+                        <strong>Customer Info / بيانات العميل</strong><br/><br/>
                         <strong><span t-esc="o.partner_id.name"/></strong><br/>
                         <t t-if="o.partner_id.street">
                             <strong><span t-esc="o.partner_id.street"/></strong><br/>
                         </t>
                         <t t-if="o.partner_id.vat">
-                            <strong>الضريبي / VAT: <span t-esc="o.partner_id.vat"/></strong><br/>
+                            <strong>VAT / الضريبي: <span t-esc="o.partner_id.vat"/></strong><br/>
                         </t>
                     </td>
                 </tr>
@@ -137,8 +131,6 @@
                             <t t-if="o.company_id.email"> | Email: <t t-esc="o.company_id.email"/></t>
                             <t t-if="o.company_id.website"> | <t t-esc="o.company_id.website"/></t>
                         </strong>
-                        <br/>
-                        <strong>صفحة <span class="page"/> / <span class="pageCount"/></strong>
                     </td>
                 </tr>
             </table>
