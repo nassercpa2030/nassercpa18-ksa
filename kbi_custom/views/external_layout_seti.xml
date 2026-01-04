@@ -23,7 +23,7 @@
 
                 body {
                     font-size: 12px;
-                    margin-bottom: 60px; /* مساحة كافية للفوتر */
+                    margin-bottom: 70px; /* مساحة كافية للفوتر */
                 }
 
                 .page {
@@ -42,25 +42,24 @@
                     width: 100%;
                     border-collapse: collapse;
                     margin-bottom: 15px;
-                    outline: 1px solid #AAAAAA;
-                    padding: 5px;
                     font-weight: bold;
                     background-color: #cce6ff; /* خلفية أزرق فاتح */
+                    border: 2px solid #3399ff; /* إطار أزرق */
                 }
 
                 table.header-table td {
                     width: 50%;
                     vertical-align: top;
                     padding: 10px;
-                    border: 1px solid #AAAAAA; /* Outline حول كل خلية */
+                    border: 1px solid #3399ff; /* خطوط داخلية */
                 }
 
                 .company-info {
-                    text-align: left;
+                    text-align: right; /* الشركة على اليمين */
                 }
 
                 .client-info {
-                    text-align: right;
+                    text-align: left; /* العميل على اليسار */
                 }
 
                 img.company-logo {
@@ -78,19 +77,19 @@
                     height: 40px;
                     text-align: center;
                     font-size: 10px;
-                    border-top: 1px solid #AAAAAA;
+                    border-top: 1px solid #3399ff;
                     padding-top: 5px;
                     color: #333333;
                     font-weight: bold;
-                    background-color: #cce6ff; /* خلفية أزرق فاتح */
-                    border: 1px solid #AAAAAA; /* Outline */
+                    background-color: #cce6ff;
+                    border: 1px solid #3399ff;
                 }
-
             </style>
 
             <!-- ================= HEADER ================= -->
             <table class="header-table">
                 <tr>
+                    <!-- الشركة على اليمين -->
                     <td class="company-info">
                         <strong>بيانات الشركة</strong><br/><br/>
                         <div>
@@ -111,6 +110,7 @@
                         </t>
                     </td>
 
+                    <!-- العميل على اليسار -->
                     <td class="client-info">
                         <strong>بيانات العميل</strong><br/><br/>
                         <strong><span t-esc="o.partner_id.name"/></strong><br/>
