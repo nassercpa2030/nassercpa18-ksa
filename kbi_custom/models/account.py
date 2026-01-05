@@ -59,8 +59,8 @@ class AccountMove ( models.Model ) :
     @api.depends('finance_signiture', 'manager_signiture')  # لازم تحط الفيلدات اللي هتتابعها
     def _compute_user_signature(self):
         User = self.env['res.users']
-        finance_user = User.browse(18)  # اليوزر اللي id = 18
-        manager_user = User.browse(6)   # اليوزر اللي id = 6
+        finance_user = User.browse(18)  # اليوزر اللي id = 18 finance
+        manager_user = User.browse(561)   # اليوزر اللي id = 561 manager
 
         for rec in self:
             # لو تفعيل التوقيع مفعل، نحط التوقيع، غير كده يبقى False
