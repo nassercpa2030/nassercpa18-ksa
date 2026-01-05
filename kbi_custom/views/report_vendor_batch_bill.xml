@@ -111,12 +111,13 @@
 
 <table style="width:100%; border-collapse:collapse; border:none; direction:rtl; margin-bottom:15px;">
     <tr style="border:none; vertical-align:top;">
+
         <!-- إعداد -->
-        <td style="width:33%; text-align:right; vertical-align:top; border:none; background:none;">
+        <td style="width:33%; text-align:center; vertical-align:top; border:none; background:none; padding-right:15px;">
             <span style="text-decoration:underline; font-weight:bold;">إعداد</span><br/>
             <img t-if="docs[0].finance_assign"
                  t-att-src="image_data_uri(docs[0].finance_assign)"
-                 style="display:block; height:50px; max-width:50%; margin-top:5px;"/>
+                 style="display:block; height:50px; max-width:50%; margin:5px auto 0 auto;"/>
         </td>
 
         <!-- مراجعة -->
@@ -124,13 +125,14 @@
             <span style="text-decoration:underline; font-weight:bold;">مراجعة</span><br/>
             <img t-if="docs[0].manager_assign"
                  t-att-src="image_data_uri(docs[0].manager_assign)"
-                 style="display:block; height:50px; max-width:50%; margin-top:5px;"/>
+                 style="display:block; height:50px; max-width:50%; margin:5px auto 0 auto;"/>
         </td>
 
         <!-- اعتماد (بدون توقيع) -->
-        <td style="width:33%; text-align:left; vertical-align:top; border:none; background:none;">
+        <td style="width:33%; text-align:center; vertical-align:top; border:none; background:none; padding-left:15px;">
             <span style="text-decoration:underline; font-weight:bold;">اعتماد</span>
         </td>
+
     </tr>
 </table>
 
