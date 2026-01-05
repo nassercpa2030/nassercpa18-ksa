@@ -134,7 +134,7 @@
 
 .signature-images img {
     display: block;
-    height: 50px;
+    height: 80px;
     max-width: 80%;
     margin: 0 auto;
     padding: 0;
