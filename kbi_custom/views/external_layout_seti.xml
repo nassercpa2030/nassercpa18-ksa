@@ -97,7 +97,7 @@
         <!--strong>بيانات الشركة</strong><br/><br/-->
           <div style="text-align:center; font-weight:bold; margin-bottom:10px;">
            <strong>بيانات الشركة </strong>
-        </div
+        </div>
 
         <strong t-esc="company.name"/><br/>
 
