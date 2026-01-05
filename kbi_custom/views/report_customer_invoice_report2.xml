@@ -9,7 +9,8 @@
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">kbi_custom.report_tax_invoice_document</field>
-        <field name="print_report_name">'فاتورة - %s' % (object.name)</field>
+        <!--field name="print_report_name">'فاتورة - %s' % (object.name) ' - %s' %(object.sale_order_id_finance.partner_id) - %s' %(object.sale_order_id_finance.name)</field-->
+        <field name="print_report_name"> f"فاتورة - {object.name or ''} - {object.sale_order_id_finance.partner_id.name or ''} - {object.sale_order_id_finance.name or ''}"</field>
         <field name="paperformat_id" ref="kbi_custom.paperformat_zero_margin"/>
         <field name="binding_model_id" ref="account.model_account_move"/>
         <field name="binding_type">report</field>
