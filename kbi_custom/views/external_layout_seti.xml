@@ -94,7 +94,10 @@
      <tr>
     <!-- بيانات الشركة (يمين) -->
     <td class="company-info" style="width:35%; text-align:right; vertical-align:top;">
-        <strong>بيانات الشركة</strong><br/><br/>
+        <!--strong>بيانات الشركة</strong><br/><br/-->
+          <div style="text-align:center; font-weight:bold; margin-bottom:10px;">
+           <strong>بيانات الشركة </strong>
+        </div
 
         <strong t-esc="company.name"/><br/>
 
@@ -129,7 +132,10 @@
 
     <!-- بيانات العميل (شمال) -->
     <td class="client-info" style="width:35%; text-align:left; vertical-align:top;">
-        <strong>بيانات العميل</strong><br/><br/>
+        <!--strong>بيانات العميل</strong><br/><br/-->
+        <div style="text-align:center; font-weight:bold; margin-bottom:10px;">
+           <strong>بيانات العميل </strong>
+        </div>
 
         <strong>
             <span t-esc="o.partner_id.name"/>
@@ -172,7 +178,10 @@
 
             <!-- ================= FOOTER ================= -->
 <div class="footer" style="font-family: Verdana, Geneva, sans-serif; font-size: 10px; display: flex; justify-content: center; align-items: center; gap: 15px;">
-    <t t-if="company.name"><span><strong><t t-esc="company.name"/></strong></span></t>
+    <t t-if="company.name"><span><strong>
+        بيانات  التواصل : 
+        <!--t t-esc="company.name"/-->
+    </strong></span></t>
     <t t-if="company.phone"><span>Tel: <t t-esc="company.phone"/></span></t>
     <t t-if="company.email"><span>Email: <t t-esc="company.email"/></span></t>
     <t t-if="company.website"><span>Website: <t t-esc="company.website"/></span></t>
