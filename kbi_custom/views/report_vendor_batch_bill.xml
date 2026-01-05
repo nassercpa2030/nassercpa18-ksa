@@ -107,88 +107,61 @@
                     <hr/>
 
                     <!-- توقيع الإعداد والمراجعة والإعتماد -->
-<!-- CSS جديد للتوقيعات -->
+<!-- CSS مركزي للتوقيعات -->
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
 
-.signature-table,
-.signature-table * {
-    font-family: 'Tajawal', sans-serif !important;
-    border: 0 !important;
-    border-collapse: collapse !important;
-    border-spacing: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: none !important;
+.signature-table {
+    width: 100%;
+    direction: rtl;
+    border-collapse: collapse;
+    margin-top: 10px;
 }
 
 .signature-table td {
-    text-align: center !important;
-    vertical-align: top !important;
-    padding: 0 !important;
+    width: 33.33%;           /* كل عمود متساوي */
+    text-align: center;
+    vertical-align: top;
+    padding: 0;
 }
 
-/* الحاوية داخل كل خلية لضبط النص فوق الصورة */
 .signature-cell {
     display: flex;
-    flex-direction: column; /* عمودي: النص فوق الصورة */
-    align-items: center;    /* محاذاة للصورة والنص في الوسط */
-    gap: 3px;               /* مسافة صغيرة بين النص والصورة */
+    flex-direction: column;  /* النص فوق الصورة */
+    align-items: center;     /* محاذاة في الوسط */
+    gap: 3px;                /* مسافة صغيرة بين النص والصورة */
+    font-family: 'Tajawal', sans-serif;
 }
 
-/* زحزحة النصوص لليمين فوق الصورة */
-.signature-cell.prep {
-    margin-left: 20px; /* زحزحة إعداد */
-}
-.signature-cell.review {
-    margin-left: 20px; /* زحزحة مراجعة */
-}
-
-/* النصوص */
 .signature-cell span {
-    display: block;
-    text-decoration: underline;
     font-weight: bold;
-    margin: 0 !important;
+    text-decoration: underline;
+    margin: 0;
 }
 
-/* الصور */
 .signature-cell img {
     display: block;
     height: 50px;
     max-width: 80%;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-}
-
-.signature-table {
-    direction: rtl !important;
+    margin: 0;
+    padding: 0;
+    border: 0;
 }
 </style>
-
-<!-- جدول توقيع الإعداد والمراجعة والاعتماد -->
-<table class="signature-table" style="width:100%; margin-top:10px;">
+<table class="signature-table">
     <tr>
-        <!-- إعداد -->
-        <td  >
-            
-                <span>إعداد</span><br/>
-                <img t-if="docs[0].finance_assign"
-                     t-att-src="image_data_uri(docs[0].finance_assign)"/>
-           
+        <td>
+            <div class="signature-cell">
+                <span>إعداد</span>
+                <img t-if="docs[0].finance_assign" t-att-src="image_data_uri(docs[0].finance_assign)"/>
+            </div>
         </td>
-
-        <!-- مراجعة -->
-        <td >
-          
-                <span>مراجعة</span><br/>
-                <img t-if="docs[0].manager_assign"
-                     t-att-src="image_data_uri(docs[0].manager_assign)"/>
-           
+        <td>
+            <div class="signature-cell">
+                <span>مراجعة</span>
+                <img t-if="docs[0].manager_assign" t-att-src="image_data_uri(docs[0].manager_assign)"/>
+            </div>
         </td>
-
-        <!-- اعتماد -->
         <td>
             <div class="signature-cell">
                 <span>اعتماد</span>
