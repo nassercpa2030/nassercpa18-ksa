@@ -107,30 +107,35 @@
                     <hr/>
 
                     <!-- توقيع الإعداد والمراجعة والإعتماد -->
-                 <div style="display:flex; justify-content:space-between; margin-bottom:15px; direction:rtl;">
+                
 
-    <!-- إعداد -->
-    <div style="width:33%; text-align:right;">
-        <span style="text-decoration:underline;">إعداد</span><br/>
-        <img t-if="docs[0].manager_assign"
-             t-att-src="image_data_uri(docs[0].manager_assign)"
-             style="height:50px; max-width:50%; margin-top:5px;"/>
-    </div>
+  <table style="width:100%; border-collapse:collapse; border:none; direction:rtl; margin-bottom:15px;">
+    <tr style="border:none;">
+        <!-- إعداد -->
+        <td style="width:33%; text-align:right; vertical-align:top; font-weight:14px; border:none; background:none;">
+            <span style="text-decoration:underline;">إعداد</span><br/>
+            <img t-if="docs[0].manager_assign"
+                 t-att-src="image_data_uri(docs[0].manager_assign)"
+                 style="height:50px; max-width:50%; margin-top:5px;"/>
+        </td>
 
-    <!-- مراجعة -->
-    <div style="width:33%; text-align:center;">
-        <span style="text-decoration:underline;">مراجعة</span><br/>
-        <img t-if="docs[0].finance_assign"
-             t-att-src="image_data_uri(docs[0].finance_assign)"
-             style="height:50px; max-width:50%; margin-top:5px;"/>
-    </div>
+        <!-- مراجعة -->
+        <td style="width:33%; text-align:center; vertical-align:top; font-weight:14px; border:none; background:none;">
+            <span style="text-decoration:underline;">مراجعة</span><br/>
+            <img t-if="docs[0].finance_assign"
+                 t-att-src="image_data_uri(docs[0].finance_assign)"
+                 style="height:50px; max-width:50%; margin-top:5px;"/>
+        </td>
 
-    <!-- اعتماد (بدون توقيع) -->
-    <div style="width:33%; text-align:left;">
-        <span style="text-decoration:underline;">اعتماد</span>
-    </div>
+        <!-- اعتماد (بدون توقيع) -->
+        <td style="width:33%; text-align:left;  font-weight:14px; vertical-align:top; border:none; background:none;">
+            <span style="text-decoration:underline;">اعتماد</span>
+        </td>
+    </tr>
+</table>
 
-</div>
+
+
 
                 </div>
             </t>
