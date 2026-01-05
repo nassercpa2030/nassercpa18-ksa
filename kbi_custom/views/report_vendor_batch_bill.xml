@@ -171,7 +171,7 @@
 <table class="signature-table" style="width:100%; margin-top:10px;">
     <tr>
         <!-- إعداد -->
-        <td  class="signature-cell prep">
+        <td  >
             
                 <span>إعداد</span><br/>
                 <img t-if="docs[0].finance_assign"
@@ -180,7 +180,7 @@
         </td>
 
         <!-- مراجعة -->
-        <td class="signature-cell review">
+        <td >
           
                 <span>مراجعة</span><br/>
                 <img t-if="docs[0].manager_assign"
