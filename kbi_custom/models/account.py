@@ -18,6 +18,10 @@ class AccountMove ( models.Model ) :
         string='Attachment' , compute='compute_vendor_attachements' , store=True , readonly=False
     )
     invoice_count_odoo16 = fields.Integer ( string="" , store=True )
+    finance_signiture= fields.Boolean ( 'توقيع المالية ',default=False ,readonly=False )
+    manager_signiture= fields.Boolean ( 'توقيع مدير المجموعة ',default=False ,readonly=False )
+    finance_assign = fields.Binary ( ' ملف توقيع المالية  ',default=False, compute="_compute_user_signature" ,store=False,readonly=False )
+    manager_assign = fields.Binary ( ' ملف توقيع مدير المجموعة ',default=False ,compute="_compute_user_signature" ,store=False,readonly=False )
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
     analytic_acc_desc = fields.Char (
         string="Journal Analytic Description" ,
@@ -50,6 +54,19 @@ class AccountMove ( models.Model ) :
             qr_code_str = base64.b64encode(str_to_encode).decode('UTF-8')
             return qr_code_str
 
+    
+    # ---get financial and manager signiture for using vendor bills----#####
+    @api.depends('finance_signiture', 'manager_signiture')  # لازم تحط الفيلدات اللي هتتابعها
+    def _compute_user_signature(self):
+        User = self.env['res.users']
+        finance_user = User.browse(18)  # اليوزر اللي id = 18
+        manager_user = User.browse(6)   # اليوزر اللي id = 6
+
+        for rec in self:
+            # لو تفعيل التوقيع مفعل، نحط التوقيع، غير كده يبقى False
+            rec.finance_assign = finance_user.sign_signature if rec.finance_signiture else False
+            rec.manager_assign = manager_user.sign_signature if rec.manager_signiture else False
+            
     # def action_post(self):
     # ترحيل الفواتير فورًا مع تجاوز جميع تحقق E-Invoicing
     # self.with_context(disable_sa_edi_checks=True)._post(soft=False)
