@@ -91,50 +91,76 @@
 
             <!-- ================= HEADER ================= -->
             <table class="header-table">
-                <tr>
-                    <!-- الشركة على اليمين -->
-                    <td class="company-info">
-                        <strong>بيانات الشركة</strong><br/><br/>
-                        <div>
-                            <img t-if="company.logo"
-                                 t-att-src="'data:image/png;base64,%s' % company.logo"
-                                 class="company-logo"/>
-                            <img t-if="not company.logo and company.logo_jpeg"
-                                 t-att-src="'data:image/jpeg;base64,%s' % company.logo_jpeg"
-                                 class="company-logo"/>
-                        </div>
-                        <strong t-esc="company.name"/><br/>
-                        
-                           <t t-if="company.street">
-                            <strong> <span t-esc="company.street"/> , <span t-esc="company.state_id.name"/>,<span t-esc="company.country_id.name"/></strong><br/>
-                            
-                        </t>
-                        <t t-if="company.company_registry">
-                             <strong>(CR)السجل التجاري:<span t-esc="company.company_registry"/></strong><br/>
-                        </t>
-                        <t t-if="company.vat">
-                            <strong>(VAT)الرقم الضربيي: <span t-esc="company.vat"/></strong><br/>
-                        </t>
-                    </td>
+     <tr>
+    <!-- بيانات الشركة (يمين) -->
+    <td class="company-info" style="width:35%; text-align:right; vertical-align:top;">
+        <strong>بيانات الشركة</strong><br/><br/>
 
-                    <!-- العميل على اليسار -->
-                    <td class="client-info">
-                        <strong>بيانات العميل</strong><br/><br/>
-                        <strong><span t-esc="o.partner_id.name"/></strong><br/>
-                        <t t-if="o.partner_id.street">
-                            <strong><span t-esc="o.partner_id.street"/></strong><br/>
-                        </t>
-                        <t t-if="o.partner_id.cr_number_sale">
-                            <strong>(CR)السجل التجاري:<span t-esc="o.partner_id.cr_number_sale"/></strong><br/>
-                        </t>
-                          <t t-if="o.partner_id.number_700">
-                            <strong>(UN)الرقم الموحد:<span t-esc="o.partner_id.number_700"/></strong><br/>
-                        </t>
-                        <t t-if="o.partner_id.vat">
-                            <strong>(VAT)الرقم الضربيي: <span t-esc="o.partner_id.vat"/></strong><br/>
-                        </t>
-                    </td>
-                </tr>
+        <strong t-esc="company.name"/><br/>
+
+        <t t-if="company.street">
+            <strong>
+                <span t-esc="company.street"/> ,
+                <span t-esc="company.state_id.name"/> ,
+                <span t-esc="company.country_id.name"/>
+            </strong><br/>
+        </t>
+
+        <t t-if="company.company_registry">
+            <strong>(CR) السجل التجاري:
+                <span t-esc="company.company_registry"/>
+            </strong><br/>
+        </t>
+
+        <t t-if="company.vat">
+            <strong>(VAT) الرقم الضريبي:
+                <span t-esc="company.vat"/>
+            </strong><br/>
+        </t>
+    </td>
+
+    <!-- اللوجو (في النص) -->
+    <td style="width:30%; text-align:center; vertical-align:middle;">
+        <img t-if="company.logo"
+             t-att-src="image_data_uri(company.logo)"
+             style="height:100px; max-width:100%;"
+             alt="Company Logo"/>
+    </td>
+
+    <!-- بيانات العميل (شمال) -->
+    <td class="client-info" style="width:35%; text-align:left; vertical-align:top;">
+        <strong>بيانات العميل</strong><br/><br/>
+
+        <strong>
+            <span t-esc="o.partner_id.name"/>
+        </strong><br/>
+
+        <t t-if="o.partner_id.street">
+            <strong>
+                <span t-esc="o.partner_id.street"/>
+            </strong><br/>
+        </t>
+
+        <t t-if="o.partner_id.cr_number_sale">
+            <strong>(CR) السجل التجاري:
+                <span t-esc="o.partner_id.cr_number_sale"/>
+            </strong><br/>
+        </t>
+
+        <t t-if="o.partner_id.number_700">
+            <strong>(UN) الرقم الموحد:
+                <span t-esc="o.partner_id.number_700"/>
+            </strong><br/>
+        </t>
+
+        <t t-if="o.partner_id.vat">
+            <strong>(VAT) الرقم الضريبي:
+                <span t-esc="o.partner_id.vat"/>
+            </strong><br/>
+        </t>
+    </td>
+</tr>
+
             </table>
 
             <!-- ================= BODY ================= -->
