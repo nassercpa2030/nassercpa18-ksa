@@ -171,21 +171,21 @@
 <table class="signature-table" style="width:100%; margin-top:10px;">
     <tr>
         <!-- إعداد -->
-        <td>
-            <div class="signature-cell prep">
-                <span>إعداد</span>
+        <td  class="signature-cell prep">
+            
+                <span>إعداد</span><br/>
                 <img t-if="docs[0].finance_assign"
                      t-att-src="image_data_uri(docs[0].finance_assign)"/>
-            </div>
+           
         </td>
 
         <!-- مراجعة -->
-        <td>
-            <div class="signature-cell review">
-                <span>مراجعة</span>
+        <td class="signature-cell review">
+          
+                <span>مراجعة</span><br/>
                 <img t-if="docs[0].manager_assign"
                      t-att-src="image_data_uri(docs[0].manager_assign)"/>
-            </div>
+           
         </td>
 
         <!-- اعتماد -->
