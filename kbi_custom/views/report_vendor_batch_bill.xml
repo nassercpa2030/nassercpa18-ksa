@@ -111,12 +111,12 @@
 
 <!-- استدعاء خط Tajawal -->
 <style>
-      @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
 
 /* CSS خاص بتوقيعات التقرير */
 .signature-table,
 .signature-table * {
-    font-family: 'Tajawal', sans-serif !important;  /* الخط Tajawal */
+    font-family: 'Tajawal', sans-serif !important;
     border: 0 !important;
     border-collapse: collapse !important;
     border-spacing: 0 !important;
@@ -128,27 +128,42 @@
 .signature-table td {
     text-align: center !important;
     vertical-align: top !important;
-    padding: 0 !important;   /* إزالة أي padding داخلي */
+    padding: 0 !important;
 }
 
-.signature-table td span {
+/* الحاوية داخل كل خلية لضبط النص فوق الصورة */
+.signature-cell {
+    display: flex;
+    flex-direction: column; /* عمودي: النص فوق الصورة */
+    align-items: center;    /* محاذاة للصورة والنص في الوسط */
+    gap: 3px;               /* مسافة صغيرة بين النص والصورة */
+}
+
+/* النصوص */
+.signature-cell span {
     display: block;
     text-decoration: underline;
     font-weight: bold;
-    margin-bottom: 3px;  /* مسافة صغيرة جدًا فوق الصورة */
+    margin: 0 !important;
 }
 
-.signature-table td img {
+/* الصور */
+.signature-cell img {
     display: block;
     height: 50px;
     max-width: 80%;
-    margin: 0 auto;      /* محاذاة الصورة بالمنتصف */
+    margin: 0 !important;
     padding: 0 !important;
     border: 0 !important;
 }
 
 .signature-table {
-    direction: rtl !important;  /* اتجاه الجدول RTL */
+    direction: rtl !important;
+}
+
+/* مسافة أفقية بين الأعمدة */
+.signature-table td + td {
+    padding-left: 20px !important; /* مسافة بين الأعمدة */
 }
 </style>
 
@@ -157,21 +172,28 @@
     <tr>
         <!-- إعداد -->
         <td>
-            <span>إعداد</span>
-            <img t-if="docs[0].finance_assign"
-                 t-att-src="image_data_uri(docs[0].finance_assign)"/>
+            <div class="signature-cell">
+                <span>إعداد</span>
+                <img t-if="docs[0].finance_assign"
+                     t-att-src="image_data_uri(docs[0].finance_assign)"/>
+            </div>
         </td>
 
         <!-- مراجعة -->
         <td>
-            <span>مراجعة</span>
-            <img t-if="docs[0].manager_assign"
-                 t-att-src="image_data_uri(docs[0].manager_assign)"/>
+            <div class="signature-cell">
+                <span>مراجعة</span>
+                <img t-if="docs[0].manager_assign"
+                     t-att-src="image_data_uri(docs[0].manager_assign)"/>
+            </div>
         </td>
 
         <!-- اعتماد -->
         <td>
-            <span>اعتماد</span>
+            <div class="signature-cell">
+                <span>اعتماد</span>
+                <!-- الصورة هنا لو في اعتماد يمكن إضافة صورة لاحقاً -->
+            </div>
         </td>
     </tr>
 </table>
