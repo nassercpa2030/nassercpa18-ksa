@@ -109,12 +109,15 @@
                     <!-- توقيع الإعداد والمراجعة والإعتماد -->
                 
 
-<!-- CSS خاص بتوقيع التقرير -->
+<!-- استدعاء خط Tajawal -->
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+
 /* CSS خاص بتوقيعات التقرير */
 .signature-table,
 .signature-table * {
-    border: 0 !important;            /* إزالة أي حدود */
+    font-family: 'Tajawal', sans-serif !important;  /* الخط Tajawal */
+    border: 0 !important;
     border-collapse: collapse !important;
     border-spacing: 0 !important;
     margin: 0 !important;
@@ -122,40 +125,38 @@
     background: none !important;
 }
 
-/* تنسيق الخلايا */
 .signature-table td {
     text-align: center !important;
     vertical-align: top !important;
-    padding: 5px 10px !important;
+    padding: 0 !important;   /* إزالة أي padding داخلي */
 }
 
-/* العناوين */
 .signature-table td span {
     display: block;
     text-decoration: underline;
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-bottom: 3px;  /* مسافة صغيرة جدًا فوق الصورة */
 }
 
-/* الصور */
 .signature-table td img {
     display: block;
     height: 50px;
     max-width: 80%;
-    margin: 5px auto 0 auto;
+    margin: 0 auto;      /* محاذاة الصورة بالمنتصف */
+    padding: 0 !important;
+    border: 0 !important;
 }
 
-/* اتجاه النصوص RTL */
 .signature-table {
-    direction: rtl !important;
+    direction: rtl !important;  /* اتجاه الجدول RTL */
 }
 </style>
 
 <!-- جدول توقيع الإعداد والمراجعة والاعتماد -->
-<table class="signature-table" style="width:100%; margin-top:20px;">
+<table class="signature-table" style="width:100%; margin-top:10px;">
     <tr>
         <!-- إعداد -->
-        <td style="padding-right:15px;">
+        <td>
             <span>إعداد</span>
             <img t-if="docs[0].finance_assign"
                  t-att-src="image_data_uri(docs[0].finance_assign)"/>
@@ -169,7 +170,7 @@
         </td>
 
         <!-- اعتماد -->
-        <td style="padding-left:15px;">
+        <td>
             <span>اعتماد</span>
         </td>
     </tr>
