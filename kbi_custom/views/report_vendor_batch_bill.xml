@@ -109,7 +109,7 @@
                     <!-- توقيع الإعداد والمراجعة والإعتماد -->
 <!-- CSS جديد للتوقيعات -->
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
 
 .signature-table,
 .signature-table * {
