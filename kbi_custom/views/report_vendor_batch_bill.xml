@@ -107,13 +107,10 @@
                     <hr/>
 
                     <!-- توقيع الإعداد والمراجعة والإعتماد -->
-                
-
-<!-- استدعاء خط Tajawal -->
+<!-- CSS جديد للتوقيعات -->
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
 
-/* CSS خاص بتوقيعات التقرير */
 .signature-table,
 .signature-table * {
     font-family: 'Tajawal', sans-serif !important;
@@ -139,6 +136,14 @@
     gap: 3px;               /* مسافة صغيرة بين النص والصورة */
 }
 
+/* زحزحة النصوص لليمين فوق الصورة */
+.signature-cell.prep {
+    margin-left: 20px; /* زحزحة إعداد */
+}
+.signature-cell.review {
+    margin-left: 20px; /* زحزحة مراجعة */
+}
+
 /* النصوص */
 .signature-cell span {
     display: block;
@@ -160,11 +165,6 @@
 .signature-table {
     direction: rtl !important;
 }
-
-/* مسافة أفقية بين الأعمدة */
-.signature-table td + td {
-    padding-left: 20px !important; /* مسافة بين الأعمدة */
-}
 </style>
 
 <!-- جدول توقيع الإعداد والمراجعة والاعتماد -->
@@ -172,7 +172,7 @@
     <tr>
         <!-- إعداد -->
         <td>
-            <div class="signature-cell">
+            <div class="signature-cell prep">
                 <span>إعداد</span>
                 <img t-if="docs[0].finance_assign"
                      t-att-src="image_data_uri(docs[0].finance_assign)"/>
@@ -181,7 +181,7 @@
 
         <!-- مراجعة -->
         <td>
-            <div class="signature-cell">
+            <div class="signature-cell review">
                 <span>مراجعة</span>
                 <img t-if="docs[0].manager_assign"
                      t-att-src="image_data_uri(docs[0].manager_assign)"/>
@@ -192,13 +192,10 @@
         <td>
             <div class="signature-cell">
                 <span>اعتماد</span>
-                <!-- الصورة هنا لو في اعتماد يمكن إضافة صورة لاحقاً -->
             </div>
         </td>
     </tr>
 </table>
-
-
 
 
                 </div>
