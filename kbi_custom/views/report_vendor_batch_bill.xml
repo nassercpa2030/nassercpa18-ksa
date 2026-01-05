@@ -107,19 +107,31 @@
                     <hr/>
 
                     <!-- توقيع الإعداد والمراجعة والإعتماد -->
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; direction: rtl;">
-                        <div style="display: inline-block; width: 33%; text-align: right;">
-                            <span style="text-decoration: underline;">إعداد</span><br/>
-                             <img t-if="docs[0].manager_assign" t-att-src="image_data_uri(docs[0].manager_assign)" style="height:50px; max-width:50%;" alt="توقيع مدير المراجعة"/>
-                        </div>
-                        <div style="display: inline-block; width: 33%; text-align: center;"><br/>
-                            <span style="text-decoration: underline;">مراجعة</span>
-                                <img t-if="docs[0].finance_assign" t-att-src="image_data_uri(docs[0].finance_assign)" style="height:50px; max-width:50%;" alt="توقيع مدير المراجعة"/>
-                        </div>
-                        <div style="display: inline-block; width: 33%; text-align: left;">
-                            <span style="text-decoration: underline;">إعتماد</span>
-                        </div>
-                    </div>
+                 <div style="display:flex; justify-content:space-between; margin-bottom:15px; direction:rtl;">
+
+    <!-- إعداد -->
+    <div style="width:33%; text-align:right;">
+        <span style="text-decoration:underline;">إعداد</span><br/>
+        <img t-if="docs[0].manager_assign"
+             t-att-src="image_data_uri(docs[0].manager_assign)"
+             style="height:50px; max-width:50%; margin-top:5px;"/>
+    </div>
+
+    <!-- مراجعة -->
+    <div style="width:33%; text-align:center;">
+        <span style="text-decoration:underline;">مراجعة</span><br/>
+        <img t-if="docs[0].finance_assign"
+             t-att-src="image_data_uri(docs[0].finance_assign)"
+             style="height:50px; max-width:50%; margin-top:5px;"/>
+    </div>
+
+    <!-- اعتماد (بدون توقيع) -->
+    <div style="width:33%; text-align:left;">
+        <span style="text-decoration:underline;">اعتماد</span>
+    </div>
+
+</div>
+
                 </div>
             </t>
         </t>
