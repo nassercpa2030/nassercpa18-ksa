@@ -116,6 +116,7 @@
     direction: rtl;
     border-collapse: collapse;
     margin-top: 10px;
+    font-family: 'Tajawal', sans-serif;
 }
 
 .signature-table td {
@@ -125,51 +126,44 @@
     padding: 0;
 }
 
-.signature-cell {
-    display: flex;
-    flex-direction: column;  /* النص فوق الصورة */
-    align-items: center;     /* محاذاة في الوسط */
-    gap: 3px;                /* مسافة صغيرة بين النص والصورة */
-    font-family: 'Tajawal', sans-serif;
-}
-
-.signature-cell span {
+.signature-texts {
     font-weight: bold;
     text-decoration: underline;
-    margin: 0;
+    margin-bottom: 5px; /* مسافة بين النصوص والصور */
 }
 
-.signature-cell img {
+.signature-images img {
     display: block;
     height: 50px;
     max-width: 80%;
-    margin: 0;
+    margin: 0 auto;
     padding: 0;
     border: 0;
 }
 </style>
+
+<!-- جدول التوقيعات باستخدام صفين (tr) -->
 <table class="signature-table">
+    <!-- الصف الأول للنصوص -->
     <tr>
-        <td>
-            <div class="signature-cell">
-                <span>إعداد</span>
-                <img t-if="docs[0].finance_assign" t-att-src="image_data_uri(docs[0].finance_assign)"/>
-            </div>
+        <td class="signature-texts">إعداد</td>
+        <td class="signature-texts">مراجعة</td>
+        <td class="signature-texts">اعتماد</td>
+    </tr>
+
+    <!-- الصف الثاني للتوقيعات -->
+    <tr>
+        <td class="signature-images">
+            <img t-if="docs[0].finance_assign" t-att-src="image_data_uri(docs[0].finance_assign)"/>
         </td>
-        <td>
-            <div class="signature-cell">
-                <span>مراجعة</span>
-                <img t-if="docs[0].manager_assign" t-att-src="image_data_uri(docs[0].manager_assign)"/>
-            </div>
+        <td class="signature-images">
+            <img t-if="docs[0].manager_assign" t-att-src="image_data_uri(docs[0].manager_assign)"/>
         </td>
-        <td>
-            <div class="signature-cell">
-                <span>اعتماد</span>
-            </div>
+        <td class="signature-images">
+            <!-- صورة اعتماد لو موجودة -->
         </td>
     </tr>
 </table>
-
 
                 </div>
             </t>
