@@ -39,7 +39,7 @@
                            <!-- العمود الثاني: الصورة --> 
                            <td style="width:30%; vertical-align: top; text-align: left; padding: 5px; padding-top:-200px">
                                <t t-if="docs[0].partner_id.image_1920"> 
-                                   <img t-att-src="'data:image/png;base64,%s' % (docs[0].partner_id.image_1920.decode() if isinstance(docs[0].partner_id.image_1920, bytes) else docs[0].partner_id.image_1920)" style="max-width:300px;height:auto;max-height:300px; border:2px solid #000; image-rendering: crisp-edges"/> 
+                                   <img t-att-src="'data:image/png;base64,%s' % (docs[0].partner_id.image_1920.decode() if isinstance(docs[0].partner_id.image_1920, bytes) else docs[0].partner_id.image_1920)" style="max-width:300px;height:auto;max-height:300px; border:2px solid #000; transform: rotate(90deg);transform-origin: center;image-rendering: crisp-edges"/> 
                                </t> </td> </tr> </table>
                     <hr/>
 
