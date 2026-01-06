@@ -45,8 +45,10 @@
         border-collapse: collapse;
         margin-bottom: 15px;
         font-weight: bold;
-        background-color: #e0e0e0; /* رمادي فاتح */
-        border: 2px solid #999999; /* رمادي غامق */
+        background-color: #EAF3FF; /* أزرق فاتح*/
+       /* background-color: #e0e0e0; رمادي فاتح */
+      /* border: 2px solid #999999;  رمادي غامق */
+        border: 2px solid #2F6FB2; /* أزرق غامق */
         font-family: 'Tajawal', sans-serif;
     }
 
