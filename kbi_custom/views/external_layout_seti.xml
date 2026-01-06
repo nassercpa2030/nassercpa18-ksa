@@ -107,7 +107,7 @@
         <strong t-esc="company.name"/><br/>
 
         <t t-if="company.street">
-            <strong>
+            
                     <strong>(address)العنوان:
                 <span t-if="company.street" t-esc="company.street"/>
                 ,<span t-if="company.street2" t-esc="company.street2"/>
