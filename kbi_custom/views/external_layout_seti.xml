@@ -150,6 +150,25 @@
             <strong>
                 <span t-esc="o.partner_id.street"/>
             </strong><br/>
+              <strong>
+                <span t-esc="o.partner_id.street2"/>
+            </strong><br>
+                  <strong>
+                <span t-esc="o.partner_id.city"/>
+            </strong><br>
+                  <strong>
+                <span t-esc="o.partner_id.state_id.name"/>
+            </strong><br>
+                  <strong>
+                <span t-esc="o.partner_id.country_id.name"/>
+            </strong><br>
+                  <strong>(Email)الإيميل:
+                <span t-esc="o.partner_id.email"/>
+            </strong><br>
+                  <strong>(phone)الفون:
+                <span t-esc="o.partner_id.phone"/>
+            </strong><br>
+                         
         </t>
 
         <t t-if="o.partner_id.cr_number_sale">
@@ -169,6 +188,7 @@
                 <span t-esc="o.partner_id.vat"/>
             </strong><br/>
         </t>
+        
     </td>
 </tr>
 
