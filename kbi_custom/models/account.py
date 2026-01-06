@@ -18,8 +18,8 @@ class AccountMove ( models.Model ) :
         string='Attachment' , compute='compute_vendor_attachements' , store=True , readonly=False
     )
     invoice_count_odoo16 = fields.Integer ( string="" , store=True )
-    finance_signiture= fields.Boolean ( 'توقيع المالية ',default=False ,readonly=False )
-    manager_signiture= fields.Boolean ( 'توقيع مدير المجموعة ',default=False ,readonly=False )
+    finance_signiture= fields.Boolean ( 'توقيع المالية ',default=False ,readonly=False,index=True )
+    manager_signiture= fields.Boolean ( 'توقيع مدير المجموعة ',default=False ,readonly=False,index=True )
     finance_assign = fields.Binary ( ' ملف توقيع المالية  ',default=False, compute="_compute_user_signature" ,store=False,readonly=False )
     manager_assign = fields.Binary ( ' ملف توقيع مدير المجموعة ',default=False ,compute="_compute_user_signature" ,store=False,readonly=False )
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
