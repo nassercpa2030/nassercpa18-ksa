@@ -146,7 +146,8 @@
             <span t-esc="o.partner_id.name"/>
         </strong><br/>
 
-        <t t-if="o.partner_id.street">
+        <!--t t-if="o.partner_id.street"-->
+            <t t-if="o.partner_id">
             <strong>
                 <span t-esc="o.partner_id.street"/>
             </strong><br/>
