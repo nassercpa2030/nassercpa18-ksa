@@ -35,7 +35,9 @@
                     th {
                         font-weight: bold;
                         font-size: 13.5px;
-                        background:#DCDCDC;
+                       /* background:#DCDCDC;*/
+                         background:#EAF3FF;
+
                     }
 
                     table {
@@ -45,7 +47,8 @@
 
                     td, th {
                         padding:5px;
-                        border:1px solid #ccc;
+                      /*  border:1px solid #ccc;*/
+                        border:1px solid #2F6FB2;
                         text-align:right;
                     }
 
