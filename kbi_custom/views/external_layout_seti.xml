@@ -152,22 +152,22 @@
             </strong><br/>
               <strong>
                 <span t-esc="o.partner_id.street2"/>
-            </strong><br>
+            </strong><br/>
                   <strong>
                 <span t-esc="o.partner_id.city"/>
-            </strong><br>
+            </strong><br/>
                   <strong>
                 <span t-esc="o.partner_id.state_id.name"/>
-            </strong><br>
+            </strong><br/>
                   <strong>
                 <span t-esc="o.partner_id.country_id.name"/>
-            </strong><br>
+            </strong><br/>
                   <strong>(Email)الإيميل:
                 <span t-esc="o.partner_id.email"/>
-            </strong><br>
+            </strong><br/>
                   <strong>(phone)الفون:
                 <span t-esc="o.partner_id.phone"/>
-            </strong><br>
+            </strong><br/>
                          
         </t>
 
