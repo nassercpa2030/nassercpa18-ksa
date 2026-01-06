@@ -37,10 +37,19 @@
                                <p style="margin: 3px 0;"> مجموعة: <span t-field="docs[0].sale_order_id_finance.team_id.name"/> </p>
                            </td>
                            <!-- العمود الثاني: الصورة --> 
-                           <td style="width:30%; vertical-align: top; text-align: left; padding: 5px; padding-top:-200px">
+                            <td style="width:30%; vertical-align: top; text-align: left; padding: 5px;">
+    <t t-if="docs[0].partner_id.image_1920"> 
+        <div style="width:300px; height:300px; display:flex; align-items:center; justify-content:center; border:2px solid #000;">
+            <img t-att-src="'data:image/png;base64,%s' % (docs[0].partner_id.image_1920.decode() if isinstance(docs[0].partner_id.image_1920, bytes) else docs[0].partner_id.image_1920)"
+                 style="max-width:100%; max-height:100%; transform: rotate(90deg); transform-origin: center; image-rendering: crisp-edges;"/>
+        </div>
+    </t>
+</td>
+
+                           <!--td style="width:30%; vertical-align: top; text-align: left; padding: 5px; padding-top:-200px">
                                <t t-if="docs[0].partner_id.image_1920"> 
                                    <img t-att-src="'data:image/png;base64,%s' % (docs[0].partner_id.image_1920.decode() if isinstance(docs[0].partner_id.image_1920, bytes) else docs[0].partner_id.image_1920)" style="max-width:300px;height:auto;max-height:300px; border:2px solid #000; transform: rotate(90deg);transform-origin: center;image-rendering: crisp-edges"/> 
-                               </t> </td> </tr> </table>
+                               </t> </td--> </tr> </table>
                     <hr/>
 
                     <!-- الجدول الذي سيحتوي على البيانات -->
