@@ -104,7 +104,7 @@
     <td class="company-info" style="width:40%; text-align:right; vertical-align:top;">
         <!--strong>بيانات الشركة</strong><br/><br/-->
           <div style="text-align:center; font-weight:bold; margin-bottom:10px;">
-           <strong>بيانات الشركة </strong>
+           <!--strong>بيانات الشركة </strong-->
         </div>
 
         <strong t-esc="company.name"/><br/>
@@ -133,7 +133,7 @@
     </td>
 
     <!-- اللوجو (في النص) -->
-    <td style="width:20%; text-align:center; vertical-align:middle;">
+    <td style="width:20%; text-align:center; vertical-align:middle; background-color:white;">
         <img t-if="company.logo"
              t-att-src="image_data_uri(company.logo)"
              style="height:100%; max-width:100%;"
@@ -144,7 +144,7 @@
     <td class="client-info" style="width:40%; text-align:left; vertical-align:top;">
         <!--strong>بيانات العميل</strong><br/><br/-->
         <div style="text-align:center; font-weight:bold; margin-bottom:10px;">
-           <strong>بيانات العميل </strong>
+           <strong>العميل </strong>
         </div>
 
         <strong>
@@ -153,10 +153,10 @@
 
         <!--t t-if="o.partner_id.street"-->
             <t t-if="o.partner_id">
-            <strong>العنوان:
+            <strong>:Address
                 <span t-if="o.partner_id.street" t-esc="o.partner_id.street"/>
                 ,<span t-if="o.partner_id.street2" t-esc="o.partner_id.street2"/>
-                ,<span t-if="o.partner_id.city" t-esc="o.partner_id.city"/>
+                ,<span t-if="o.partner_id.city" t-esc="o.partner_id.city"/><br/>
                 ,<span t-if="o.partner_id.country_id.name" t-esc="o.partner_id.country_id.name"/>
             </strong><br/>
                   <strong>Email:
@@ -169,19 +169,19 @@
         </t>
 
         <t t-if="o.partner_id.cr_number_sale">
-            <strong>(CR) السجل التجاري:
+            <strong>:Commercial Registration
                 <span t-esc="o.partner_id.cr_number_sale"/>
             </strong><br/>
         </t>
 
         <t t-if="o.partner_id.number_700">
-            <strong>(UN) الرقم الموحد:
+            <strong>:Unified Number
                 <span t-esc="o.partner_id.number_700"/>
             </strong><br/>
         </t>
 
         <t t-if="o.partner_id.vat">
-            <strong>(VAT) الرقم الضريبي:
+            <strong>:VAT Number
                 <span t-esc="o.partner_id.vat"/>
             </strong><br/>
         </t>
@@ -201,15 +201,25 @@
             <!-- ================= FOOTER ================= -->
 <div class="footer" style="font-family: Verdana, Geneva, sans-serif; font-size: 10px; display: flex; justify-content: center; align-items: center; gap: 15px;">
     <t t-if="company.name"><span><strong>
-        بيانات  التواصل : 
+        <table>
         <!--t t-esc="company.name"/-->
+            <tr>
+                <td style=" width: 5%;
+        vertical-align: top;"></td>
     </strong></span></t>
-    <t t-if="company.phone"><span>Tel: <t t-esc="company.phone"/></span></t>
-    <t t-if="company.email"><span>Email: <t t-esc="company.email"/></span></t>
-    <t t-if="company.website"><span>Website: <t t-esc="company.website"/></span></t>
-    <span style="background-color: #d9d9d9; padding: 2px 6px; border-radius: 4px;">
+      <td style=" width: 30%;
+        vertical-align: top;"> <t t-if="company.phone"><span>Tel: <t t-esc="company.phone"/></span></t></td>
+       <td style=" width: 30%;
+        vertical-align: top;"> <t t-if="company.email"><span>Email: <t t-esc="company.email"/></span></t></td>
+        <td style=" width: 30%;
+        vertical-align: top;"><t t-if="company.website"><span>Website: <t t-esc="company.website"/></span></t></td>
+    <!--span style="background-color: #d9d9d9; padding: 2px 6px; border-radius: 4px;">
        <strong> <span class="pageCount"/>  / صفحة <span class="page"/> </strong>
-    </span>
+    </span-->
+        <td style=" width: 5%;
+        vertical-align: top;"></td>
+</tr>
+</table>
 </div>
 
         </t>
