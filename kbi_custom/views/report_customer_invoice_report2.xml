@@ -227,14 +227,13 @@
                              style="border:1px solid #ccc;padding:4px;"/>
                     </div>
                     </div-->
-                         <!--div style="margin-top:25px; text-align:left;"-->
-<div style="margin-top:15px; display:flex; justify-content:space-between; align-items:stretch;">
+                         <!--div style="margin-top:25px; text-align:left;"--><div style="margin-top:15px; display:flex; justify-content:space-between; align-items:stretch;">
 
-    <!-- جدول الإجماليات (70%) -->
+    <!-- جدول الإجماليات -->
     <div style="width:60%; text-align:right;">
-        <table style="border:1px solid #ccc; border-collapse:collapse; width:100%; height:100%;">
+        <table style="border:1px solid #ccc; border-collapse:collapse; width:100%;">
             <tr>
-                <td style="text-align:center;">الإجمالي قبل الضريبة</td>
+                <td>الإجمالي قبل الضريبة</td>
                 <td style="text-align:right;">
                     <span t-field="o.amount_untaxed"
                           t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
@@ -243,7 +242,7 @@
             </tr>
 
             <tr>
-                <td style="text-align:center;">الضريبة</td>
+                <td>الضريبة</td>
                 <td style="text-align:right;">
                     <span t-esc="tax_total"
                           t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
@@ -257,20 +256,19 @@
                     <span t-field="o.amount_total"
                           t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                 </td>
-                <td style="text-align:center;">Total Amount</td>
+                <td style="text-align:left;">Total Amount</td>
             </tr>
         </table>
     </div>
 
-    <!-- QR Code (30%) بنفس طول الجدول -->
+    <!-- QR Code -->
     <div style="width:40%; display:flex; justify-content:center; align-items:center; padding-left:15px;">
         <img t-if="o.get_qr_code()"
-             t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=200&amp;height=200' % o.get_qr_code()"
-             style="max-height:100%; max-width:100%; border:1px solid #ccc; padding:6px;"/>
+             t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=180&amp;height=180' % o.get_qr_code()"
+             style="width:180px; height:180px; border:1px solid #ccc; padding:6px;"/>
     </div>
 
 </div>
-
 
                    
 
