@@ -212,7 +212,7 @@
     
 
             <!-- ================= FOOTER ================= -->
-<!div class="footer"  style="font-family: Verdana, Geneva, sans-serif; font-size: 10px;">
+<div class="footer"  style="font-family: Verdana, Geneva, sans-serif; font-size: 10px;">
     <table  class="footer_blue" style="width:100%; border-collapse:collapse; text-align:center;  background-color: #EAF3FF; border-top: 1px solid #2F6FB2;">
         <tr>
             <td style="width:5%;"></td>
