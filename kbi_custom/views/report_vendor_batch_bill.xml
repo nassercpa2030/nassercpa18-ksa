@@ -168,8 +168,8 @@
         </td>
     </tr>
 </table>
-                     <div style="padding:10px;  direction: rtl; ">
-                     </div> <label>توقيع بإستلام  المبلغ :</label>
+                     <div style="padding:10px;  direction: rtl; text-align: right;">
+                     </div> <label style="text-decoration: underline;">توقيع بإستلام  المبلغ :</label>
 
                 </div>
             </t>
