@@ -126,6 +126,8 @@
     text-align: center;
     vertical-align: top;
     padding: 0;
+    border: 1px solid transparent !important;
+    outline: none !important;
 }
 
 .signature-texts {
