@@ -153,7 +153,7 @@
 
         <!--t t-if="o.partner_id.street"-->
             <t t-if="o.partner_id">
-            <strong>:Address
+            <strong>Address:
                 <span t-if="o.partner_id.street" t-esc="o.partner_id.street"/>
                 ,<span t-if="o.partner_id.street2" t-esc="o.partner_id.street2"/>
                 ,<span t-if="o.partner_id.city" t-esc="o.partner_id.city"/><br/>
@@ -199,8 +199,8 @@
     
 
             <!-- ================= FOOTER ================= -->
-<div class="footer" style="font-family: Verdana, Geneva, sans-serif; font-size: 10px;">
-    <table style="width:100%; border-collapse:collapse; text-align:center;">
+<div  style="font-family: Verdana, Geneva, sans-serif; font-size: 10px;">
+    <table class="footer" style="width:100%; border-collapse:collapse; text-align:center;">
         <tr>
             <td style="width:5%;"></td>
 
