@@ -85,10 +85,20 @@
         background-color: #EAF3FF; /* فاتح للفوتر */
         font-family: 'Tajawal', sans-serif;
     }
-    .footer_blue{
-               border-top: 1px solid #2F6FB2;
-                background-color: #EAF3FF; 
-               }
+    .footer_blue {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #EAF3FF;
+    }
+
+   .footer_blue td {
+    background-color: #EAF3FF; /* أهم سطر */
+    padding: 6px 4px;
+    text-align: center;
+    font-weight: bold;
+    border: none;
+     }
+
 
     .footer span {
         display: block;
@@ -203,7 +213,7 @@
     
 
             <!-- ================= FOOTER ================= -->
-<div class="footer"  style="font-family: Verdana, Geneva, sans-serif; font-size: 10px;">
+<!--div class="footer"  style="font-family: Verdana, Geneva, sans-serif; font-size: 10px;">
     <table  class="footer_blue" style="width:100%; border-collapse:collapse; text-align:center;">
         <tr>
             <td style="width:5%;"></td>
@@ -229,7 +239,31 @@
             <td style="width:5%;"></td>
         </tr>
     </table>
+</div-->
+            <div class="footer">
+    <table class="footer_blue">
+        <tr>
+            <td style="width:33%;">
+                <t t-if="company.phone">
+                    <span>Tel: <t t-esc="company.phone"/></span>
+                </t>
+            </td>
+
+            <td style="width:34%;">
+                <t t-if="company.email">
+                    <span>Email: <t t-esc="company.email"/></span>
+                </t>
+            </td>
+
+            <td style="width:33%;">
+                <t t-if="company.website">
+                    <span>Website: <t t-esc="company.website"/></span>
+                </t>
+            </td>
+        </tr>
+    </table>
 </div>
+
 
 
         </t>
