@@ -153,16 +153,16 @@
                     <!-- جدول البنود -->
                     <table style="margin-top:15px;">
                         <thead>
-                            <tr>
+                            <tr style="text-align:center;">
                                 <th style="width:12%;">الوصف <br/> 
                                     Description</th>
-                                <th style="width:35%;">الخدمة المقدمة <br/> Service</th>
+                                <th style="width:30%;">الخدمة المقدمة <br/> Service</th>
                                 <th style="width:8%;text-align:center;">الكمية <br/> Qty</th>
-                                <th style="width:10%;">سعر الوحدة <br/> Unit Price</th>
+                                <th style="width:13%;">سعر الوحدة <br/> Unit Price</th>
                                 <th style="width:10%;">الإجمالي <br/> Subtotal</th>
                                 <th style="width:7%;text-align:center;">VAT %<br/> نسبة الضريبة </th>
-                                <th style="width:10%;">VAT <br/> قيمة الضريبة </th>
-                                <th style="width:15%; font-weight:bold;">Total <br/> الإجمالي الفرعي</th>
+                                <th style="width:12%;">VAT <br/> قيمة الضريبة </th>
+                                <th style="width:18%; font-weight:bold;">Total <br/> الإجمالي الفرعي</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -228,14 +228,13 @@
                     </div>
                     </div-->
                          <!--div style="margin-top:25px; text-align:left;"-->
-
-                    <div style="margin-top:15px; display:flex; justify-content:space-between; align-items:flex-start;">
+<div style="margin-top:15px; display:flex; justify-content:space-between; align-items:stretch;">
 
     <!-- جدول الإجماليات (70%) -->
-    <div style="width:70%; text-align:right;">
-        <table style="border:1px solid #ccc; border-collapse:collapse; width:100%;">
+    <div style="width:60%; text-align:right;">
+        <table style="border:1px solid #ccc; border-collapse:collapse; width:100%; height:100%;">
             <tr>
-                <td>الإجمالي قبل الضريبة</td>
+                <td style="text-align:center;">الإجمالي قبل الضريبة</td>
                 <td style="text-align:right;">
                     <span t-field="o.amount_untaxed"
                           t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
@@ -244,7 +243,7 @@
             </tr>
 
             <tr>
-                <td>الضريبة</td>
+                <td style="text-align:center;">الضريبة</td>
                 <td style="text-align:right;">
                     <span t-esc="tax_total"
                           t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
@@ -258,19 +257,20 @@
                     <span t-field="o.amount_total"
                           t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                 </td>
-                <td style="text-align:left;">Total Amount</td>
+                <td style="text-align:center;">Total Amount</td>
             </tr>
         </table>
     </div>
 
-    <!-- QR Code (30%) -->
-    <div style="width:30%; text-align:left; padding-left:15px;">
+    <!-- QR Code (30%) بنفس طول الجدول -->
+    <div style="width:40%; display:flex; justify-content:center; align-items:center; padding-left:15px;">
         <img t-if="o.get_qr_code()"
-             t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % o.get_qr_code()"
-             style="border:1px solid #ccc; padding:4px;"/>
+             t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=200&amp;height=200' % o.get_qr_code()"
+             style="max-height:100%; max-width:100%; border:1px solid #ccc; padding:6px;"/>
     </div>
 
 </div>
+
 
                    
 
