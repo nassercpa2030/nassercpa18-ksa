@@ -195,7 +195,7 @@
                     </table>
 
                     <!-- الإجماليات -->
-                    <div style="margin-top:15px; text-align:right;">
+                    <!--div style="margin-top:15px; text-align:right;">
                         <table style="border:1px solid #ccc; border-collapse:collapse; min-width:200px; display:inline-block;">
                             <tr>
                                 <td>الإجمالي قبل الضريبة</td>
@@ -219,14 +219,58 @@
                                  <td style="text-align:left;">Total Amount </td>
                             </tr>
                         </table>
-                         <!-- QR تحت الإجماليات بمسافة كبيرة -->
-                    <!--div style="margin-top:25px; text-align:left;"-->
+                     
+               
                          <div style=" text-align:left;">
                         <img t-if="o.get_qr_code()" 
                              t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % o.get_qr_code()"
                              style="border:1px solid #ccc;padding:4px;"/>
                     </div>
-                    </div>
+                    </div-->
+                         <!--div style="margin-top:25px; text-align:left;"-->
+
+                    <div style="margin-top:15px; display:flex; justify-content:space-between; align-items:flex-start;">
+
+    <!-- جدول الإجماليات (70%) -->
+    <div style="width:70%; text-align:right;">
+        <table style="border:1px solid #ccc; border-collapse:collapse; width:100%;">
+            <tr>
+                <td>الإجمالي قبل الضريبة</td>
+                <td style="text-align:right;">
+                    <span t-field="o.amount_untaxed"
+                          t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                </td>
+                <td style="text-align:center;">Subtotal</td>
+            </tr>
+
+            <tr>
+                <td>الضريبة</td>
+                <td style="text-align:right;">
+                    <span t-esc="tax_total"
+                          t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                </td>
+                <td style="text-align:center;">VAT</td>
+            </tr>
+
+            <tr style="font-weight:bold;">
+                <td style="text-align:center;">المجموع الكلي</td>
+                <td style="text-align:right;">
+                    <span t-field="o.amount_total"
+                          t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                </td>
+                <td style="text-align:left;">Total Amount</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- QR Code (30%) -->
+    <div style="width:30%; text-align:left; padding-left:15px;">
+        <img t-if="o.get_qr_code()"
+             t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % o.get_qr_code()"
+             style="border:1px solid #ccc; padding:4px;"/>
+    </div>
+
+</div>
 
                    
 
@@ -241,8 +285,8 @@
 
                     <!-- سطر شكر ورد بعد كل شيء -->
                     <div class="thank-you" style="margin-top:40px;">
-                        <strong>نشكركم علي التعامل معنا / Thank you for choosing our services 🌸</strong>
-                        <div class="decor">❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀</div>
+                        <strong>🌸🌸🌸 نشكركم علي التعامل معنا / Thank you for choosing our services 🌸🌸🌸</strong>
+                        <div class="decor">❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀</div>
                     </div>
 
                     <!-- ================= FOOTER ================= -->
