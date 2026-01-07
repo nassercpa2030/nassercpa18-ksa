@@ -78,11 +78,11 @@
         height: 60px;
         text-align: center;
         font-size: 11px;
-        border-top: 1px solid #999999;
+        border-top: 1px solid #2F6FB2;
         padding-top: 5px;
         color: #333333;
         font-weight: bold;
-        background-color: #f2f2f2; /* فاتح للفوتر */
+        background-color: #EAF3FF; /* فاتح للفوتر */
         font-family: 'Tajawal', sans-serif;
     }
 
@@ -169,19 +169,19 @@
         </t>
 
         <t t-if="o.partner_id.cr_number_sale">
-            <strong>:Commercial Registration
+            <strong>Commercial Registration:
                 <span t-esc="o.partner_id.cr_number_sale"/>
             </strong><br/>
         </t>
 
         <t t-if="o.partner_id.number_700">
-            <strong>:Unified Number
+            <strong>Unified Number:
                 <span t-esc="o.partner_id.number_700"/>
             </strong><br/>
         </t>
 
         <t t-if="o.partner_id.vat">
-            <strong>:VAT Number
+            <strong>VAT Number:
                 <span t-esc="o.partner_id.vat"/>
             </strong><br/>
         </t>
@@ -200,7 +200,7 @@
 
             <!-- ================= FOOTER ================= -->
 <div class="footer" style="font-family: Verdana, Geneva, sans-serif; font-size: 10px;">
-    <table style="width:100%; border-collapse:collapse; text-align:center;">
+    <table style="width:100%; border-collapse:collapse; text-align:center;"class="footer">
         <tr>
             <td style="width:5%;"></td>
 
