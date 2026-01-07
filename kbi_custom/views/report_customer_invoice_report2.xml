@@ -69,9 +69,12 @@
 
                     <!-- عنوان الفاتورة -->
                     <table>
-                        <tr>
-                            <td colspan="8" style="text-align:center;font-weight:bold;padding:8px;">
-                                Tax Invoice / فاتورة ضريبية
+                        <tr style="width=:100%">
+                            <td colspan="8" style="text-align:center;font-weight:bold;padding:8px;width=:50%; direction: rtl; ">
+                               فاتورة ضريبية
+                            </td>
+                             <td colspan="8" style="text-align:center;font-weight:bold;padding:8px;width=:50%; direction: ltr;">
+                                Tax Invoice 
                             </td>
                         </tr>
                     </table>
@@ -151,14 +154,15 @@
                     <table style="margin-top:15px;">
                         <thead>
                             <tr>
-                                <th style="width:30%;">الوصف / Description</th>
-                                <th style="width:25%;">الخدمة المقدمة / Service</th>
-                                <th style="width:10%;text-align:center;">الكمية / Qty</th>
-                                <th style="width:15%;">سعر الوحدة / Unit Price</th>
-                                <th style="width:15%;">الإجمالي / Subtotal</th>
-                                <th style="width:5%;text-align:center;">VAT %</th>
-                                <th style="width:10%;">VAT</th>
-                                <th style="width:15%;">Total</th>
+                                <th style="width:12%;">الوصف <br/> 
+                                    Description</th>
+                                <th style="width:35%;">الخدمة المقدمة <br/> Service</th>
+                                <th style="width:8%;text-align:center;">الكمية <br/> Qty</th>
+                                <th style="width:10%;">سعر الوحدة <br/> Unit Price</th>
+                                <th style="width:10%;">الإجمالي <br/> Subtotal</th>
+                                <th style="width:7%;text-align:center;">VAT %<br/> نسبة الضريبة </th>
+                                <th style="width:10%;">VAT <br/> قيمة الضريبة </th>
+                                <th style="width:15%; font-weight:bold;">Total <br/> الإجمالي الفرعي</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -194,32 +198,37 @@
                     <div style="margin-top:15px; text-align:right;">
                         <table style="border:1px solid #ccc; border-collapse:collapse; min-width:200px; display:inline-block;">
                             <tr>
-                                <td>Subtotal / الإجمالي قبل الضريبة</td>
+                                <td>الإجمالي قبل الضريبة</td>
                                 <td style="text-align:right;">
                                     <span t-field="o.amount_untaxed" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                 </td>
+                                 <td style="text-align:center;">Subtotal </td>
                             </tr>
                             <tr>
-                                <td>VAT / الضريبة</td>
+                                <td> الضريبة</td>
                                 <td style="text-align:right;">
                                     <span t-esc="tax_total" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                     <td style="text-align:center;">VAT</td>
                                 </td>
                             </tr>
                             <tr style="font-weight:bold;">
-                                <td>Total Amount / المجموع الكلي</td>
+                                <td style="text-align:center;"> المجموع الكلي</td>
                                 <td style="text-align:right;">
                                     <span t-field="o.amount_total" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                 </td>
+                                 <td style="text-align:left;">Total Amount </td>
                             </tr>
                         </table>
-                    </div>
-
-                    <!-- QR تحت الإجماليات بمسافة كبيرة -->
-                    <div style="margin-top:25px; text-align:left;">
+                         <!-- QR تحت الإجماليات بمسافة كبيرة -->
+                    <!--div style="margin-top:25px; text-align:left;"-->
+                         <div style=" text-align:left;">
                         <img t-if="o.get_qr_code()" 
                              t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % o.get_qr_code()"
                              style="border:1px solid #ccc;padding:4px;"/>
                     </div>
+                    </div>
+
+                   
 
                     <!-- مسافة بين QR وملاحظة ZATCA -->
                     <div style="margin-top:30px;">
