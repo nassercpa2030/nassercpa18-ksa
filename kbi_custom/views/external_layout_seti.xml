@@ -85,6 +85,10 @@
         background-color: #EAF3FF; /* فاتح للفوتر */
         font-family: 'Tajawal', sans-serif;
     }
+    .footer_blue{
+               border-top: 1px solid #2F6FB2;
+                background-color: #EAF3FF; 
+               }
 
     .footer span {
         display: block;
@@ -199,8 +203,8 @@
     
 
             <!-- ================= FOOTER ================= -->
-<div  style="font-family: Verdana, Geneva, sans-serif; font-size: 10px;">
-    <table class="footer" style="width:100%; border-collapse:collapse; text-align:center;">
+<div class="footer"  style="font-family: Verdana, Geneva, sans-serif; font-size: 10px;">
+    <table  class="footer_blue" style="width:100%; border-collapse:collapse; text-align:center;">
         <tr>
             <td style="width:5%;"></td>
 
