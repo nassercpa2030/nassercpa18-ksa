@@ -200,7 +200,7 @@
 
             <!-- ================= FOOTER ================= -->
 <div class="footer" style="font-family: Verdana, Geneva, sans-serif; font-size: 10px;">
-    <table style="width:100%; border-collapse:collapse; text-align:center;"class="footer">
+    <table style="width:100%; border-collapse:collapse; text-align:center;">
         <tr>
             <td style="width:5%;"></td>
 
