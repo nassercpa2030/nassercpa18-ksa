@@ -264,7 +264,7 @@
     <!-- QR Code -->
     <div style="width:40%; display:flex; justify-content:center; align-items:center; padding-left:15px;">
         <img t-if="o.get_qr_code()"
-             t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=180&amp;height=180' % o.get_qr_code()"
+             t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=100&amp;height=100' % o.get_qr_code()"
              style="width:180px; height:180px; border:1px solid #ccc; padding:6px;"/>
     </div>
 
