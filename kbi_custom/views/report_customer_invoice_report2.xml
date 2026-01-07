@@ -154,15 +154,15 @@
                     <table style="margin-top:15px;">
                         <thead>
                             <tr style="text-align:center;">
-                                <th style="width:12%;text-align:center;">الوصف <br/> 
+                                <th style="width:11%;text-align:center;">الوصف <br/> 
                                     Description</th>
                                 <th style="width:30%;text-align:center;">الخدمة المقدمة <br/> Service</th>
                                 <th style="width:8%;text-align:center;">الكمية <br/> Qty</th>
-                                <th style="width:13%;text-align:center;">سعر الوحدة <br/> Unit Price</th>
-                                <th style="width:10%;text-align:center;">الإجمالي <br/> Subtotal</th>
-                                <th style="width:7%;text-align:center;"> نسبة الضريبة <br/>VAT %</th>
+                                <th style="width:12%;text-align:center;">سعر الوحدة <br/> Unit Price</th>
+                                <th style="width:12%;text-align:center;">الإجمالي <br/> Subtotal</th>
+                                <th style="width:12%;text-align:center;"> نسبة الضريبة <br/>VAT %</th>
                                 <th style="width:12%;text-align:center;">قيمة الضريبة <br/>VAT   </th>
-                                <th style="width:18%; font-weight:bold;text-align:center; "> الإجمالي الفرعي<br/>Total </th>
+                                <th style="width:25%; font-weight:bold; text-align:center; "> الإجمالي الفرعي<br/>Total </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -187,7 +187,7 @@
                                 <td style="text-align:center;">
                                     <span t-esc="line_tax_amount" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                 </td>
-                                <td style="text-align:center;">
+                                <td style="text-align:center;  font-weight:bold; ">
                                     <span t-esc="l.price_subtotal + line_tax_amount" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                 </td>
                             </tr>
@@ -266,7 +266,7 @@
         <td style="width:40%; text-align:left; vertical-align:top;border:none;">
             <t t-if="o.get_qr_code()">
                 <img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=100&amp;height=100' % o.get_qr_code()"
-                     style="width:100px; height:100px; border:1px solid #ccc; padding:6px;"/>
+                     style="width:100px; height:100px; border:1px solid #ccc; />
             </t>
         </td>
     </tr>
