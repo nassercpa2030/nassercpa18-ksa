@@ -266,7 +266,7 @@
         <td style="width:40%; text-align:left; vertical-align:top;border:none;">
             <t t-if="o.get_qr_code()">
                 <img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=100&amp;height=100' % o.get_qr_code()"
-                     style="width:100px; height:100px; border:1px solid #ccc; />
+                     style="width:100px; height:100px; border:1px solid #ccc;" />
             </t>
         </td>
     </tr>
