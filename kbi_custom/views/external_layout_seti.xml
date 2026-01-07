@@ -240,29 +240,51 @@
         </tr>
     </table>
 </div-->
-            <div class="footer">
-    <table class="footer_blue">
-        <tr>
-            <td style="width:33%;">
+            <div class="footer"
+     style="background-color:#EAF3FF !important;
+            border-top:2px solid #2F6FB2;
+            position:fixed;
+            bottom:0;
+            left:0;
+            right:0;
+            height:65px;">
+
+    <table style="width:100%;
+                  border-collapse:collapse;
+                  background-color:#EAF3FF !important;
+                  text-align:center;">
+
+        <tr style="background-color:#EAF3FF !important;">
+
+               <td style="width:5%;"></td>
+            <td style="width:33%;
+                       background-color:#EAF3FF !important;
+                       font-weight:bold;">
                 <t t-if="company.phone">
-                    <span>Tel: <t t-esc="company.phone"/></span>
+                    Tel: <t t-esc="company.phone"/>
                 </t>
             </td>
 
-            <td style="width:34%;">
+            <td style="width:34%;
+                       background-color:#EAF3FF !important;
+                       font-weight:bold;">
                 <t t-if="company.email">
-                    <span>Email: <t t-esc="company.email"/></span>
+                    Email: <t t-esc="company.email"/>
                 </t>
             </td>
 
-            <td style="width:33%;">
+            <td style="width:33%;
+                       background-color:#EAF3FF !important;
+                       font-weight:bold;">
                 <t t-if="company.website">
-                    <span>Website: <t t-esc="company.website"/></span>
+                    Website: <t t-esc="company.website"/>
                 </t>
             </td>
+   <td style="width:5%;"></td>
         </tr>
     </table>
 </div>
+
 
 
 
