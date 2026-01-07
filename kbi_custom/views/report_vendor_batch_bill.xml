@@ -171,8 +171,9 @@
                   
 
                 </div>
-                      <div style="padding:10px;  direction: rtl; text-align: right;">
-                     </div> <label style="text-decoration: underline; font-weight:bold;">توقيع بإستلام المبلغ :</label>
+                      <table  class="signature-table" style="padding:10px;  direction: rtl; text-align: right;">
+                           <tr> <td class="signature-texts "><label style="text-decoration: underline; font-weight:bold;">:توقيع بإستلام المبلغ </label></td><td class="signature-texts "></td><td class="signature-texts "></td></tr>
+                     </table> 
             </t>
         </t>
     </template>
