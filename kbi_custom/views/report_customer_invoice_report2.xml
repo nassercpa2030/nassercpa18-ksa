@@ -263,7 +263,7 @@
         </td>
 
         <!-- خلية QR Code 40% -->
-        <td style="width:40%; text-align:left; vertical-align:top;border:none; padding:0px;">
+        <td style="width:40%; text-align:left; vertical-align:top;border:none; padding:0px; padding-top:5px;">
             <t t-if="o.get_qr_code()">
                 <img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=190&amp;height=90' % o.get_qr_code()"
                      style="width:90px; height:90px; border:1px solid #ccc;padding:4px;" />
