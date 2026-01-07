@@ -154,15 +154,15 @@
                     <table style="margin-top:15px;">
                         <thead>
                             <tr style="text-align:center;">
-                                <th style="width:12%;">الوصف <br/> 
+                                <th style="width:12%;text-align:center;">الوصف <br/> 
                                     Description</th>
-                                <th style="width:30%;">الخدمة المقدمة <br/> Service</th>
+                                <th style="width:30%;text-align:center;">الخدمة المقدمة <br/> Service</th>
                                 <th style="width:8%;text-align:center;">الكمية <br/> Qty</th>
-                                <th style="width:13%;">سعر الوحدة <br/> Unit Price</th>
-                                <th style="width:10%;">الإجمالي <br/> Subtotal</th>
-                                <th style="width:7%;text-align:center;">VAT %<br/> نسبة الضريبة </th>
-                                <th style="width:12%;">VAT <br/> قيمة الضريبة </th>
-                                <th style="width:18%; font-weight:bold;">Total <br/> الإجمالي الفرعي</th>
+                                <th style="width:13%;text-align:center;">سعر الوحدة <br/> Unit Price</th>
+                                <th style="width:10%;text-align:center;">الإجمالي <br/> Subtotal</th>
+                                <th style="width:7%;text-align:center;"> نسبة الضريبة <br/>VAT %</th>
+                                <th style="width:12%;text-align:center;">قيمة الضريبة <br/>VAT   </th>
+                                <th style="width:18%; font-weight:bold;text-align:center; "> الإجمالي الفرعي<br/>Total </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -172,22 +172,22 @@
                                 <t t-set="line_tax_amount" t-value="l.price_subtotal * line_tax / 100"/>
                                 <t t-set="tax_total" t-value="tax_total + line_tax_amount"/>
 
-                                <td><span t-field="l.name"/></td>
-                                <td>
+                                <td style="text-align:center;"><span t-field="l.name"/></td>
+                                <td style="text-align:center;">
                                     <t t-esc="l.sale_line_ids and l.sale_line_ids[0].order_id.project_name or ''"/>
                                 </td>
                                 <td style="text-align:center;"><span t-field="l.quantity"/></td>
-                                <td style="text-align:right;">
+                                <td style="text-align:center;">
                                     <span t-field="l.price_unit" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                 </td>
-                                <td style="text-align:right;">
+                                <td style="text-align:center;">
                                     <span t-field="l.price_subtotal" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                 </td>
                                 <td style="text-align:center;"><t t-esc="line_tax"/>%</td>
-                                <td style="text-align:right;">
+                                <td style="text-align:center;">
                                     <span t-esc="line_tax_amount" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                 </td>
-                                <td style="text-align:right;">
+                                <td style="text-align:center;">
                                     <span t-esc="l.price_subtotal + line_tax_amount" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                 </td>
                             </tr>
@@ -228,7 +228,7 @@
                     </div>
                     </div-->
                          <!--div style="margin-top:25px; text-align:left;"-->
-                    <table style="width:100%; border-collapse:collapse; border:none;">
+                    <table style="width:100%; border-collapse:collapse;height:105px border:none;">
     <tr>
         <!-- خلية جدول الإجماليات 60% -->
         <td style="width:60%; vertical-align:top; text-align:right;border:none;">
@@ -239,20 +239,20 @@
                         <span t-field="o.amount_untaxed"
                               t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                     </td>
-                    <td style="text-align:center;">Subtotal</td>
+                    <td style="text-align:left;">Subtotal</td>
                 </tr>
 
                 <tr>
-                    <td>الضريبة</td>
+                    <td >الضريبة</td>
                     <td style="text-align:right;">
                         <span t-esc="tax_total"
                               t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                     </td>
-                    <td style="text-align:center;">VAT</td>
+                    <td style="text-align:left;">VAT</td>
                 </tr>
 
-                <tr style="font-weight:bold;">
-                    <td style="text-align:center;">المجموع الكلي</td>
+                <tr style="font-weight:bold; font-size:14px; text-align:center; background-color:#EAF3FF;">
+                    <td style="text-align:right;">المجموع الكلي</td>
                     <td style="text-align:right;">
                         <span t-field="o.amount_total"
                               t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
@@ -263,10 +263,10 @@
         </td>
 
         <!-- خلية QR Code 40% -->
-        <td style="width:40%; text-align:center; vertical-align:top;border:none;">
+        <td style="width:40%; text-align:left; vertical-align:top;border:none;">
             <t t-if="o.get_qr_code()">
-                <img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % o.get_qr_code()"
-                     style="width:120px; height:120px; border:1px solid #ccc; padding:6px;"/>
+                <img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=100' % o.get_qr_code()"
+                     style="width:120px; height:100px; border:1px solid #ccc; padding:6px;"/>
             </t>
         </td>
     </tr>
