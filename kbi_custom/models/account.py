@@ -4,6 +4,7 @@ from odoo import models , fields , api
 from odoo.exceptions import ValidationError
 import base64
 
+
 class AccountMove ( models.Model ) :
     _inherit = 'account.move'
 
@@ -18,10 +19,12 @@ class AccountMove ( models.Model ) :
         string='Attachment' , compute='compute_vendor_attachements' , store=True , readonly=False
     )
     invoice_count_odoo16 = fields.Integer ( string="" , store=True )
-    finance_signiture= fields.Boolean ( 'توقيع المالية ',default=False ,readonly=False,index=True )
-    manager_signiture= fields.Boolean ( 'توقيع مدير المجموعة ',default=False ,readonly=False,index=True )
-    finance_assign = fields.Binary ( ' ملف توقيع المالية  ',default=False, compute="_compute_user_signature" ,store=False,readonly=False )
-    manager_assign = fields.Binary ( ' ملف توقيع مدير المجموعة ',default=False ,compute="_compute_user_signature" ,store=False,readonly=False )
+    finance_signiture = fields.Boolean ( 'توقيع المالية ' , default=False , readonly=False , index=True )
+    manager_signiture = fields.Boolean ( 'توقيع مدير المجموعة ' , default=False , readonly=False , index=True )
+    finance_assign = fields.Binary ( ' ملف توقيع المالية  ' , default=False , compute="_compute_user_signature" ,
+                                     store=False , readonly=False )
+    manager_assign = fields.Binary ( ' ملف توقيع مدير المجموعة ' , default=False , compute="_compute_user_signature" ,
+                                     store=False , readonly=False )
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
     analytic_acc_desc = fields.Char (
         string="Journal Analytic Description" ,
@@ -30,43 +33,45 @@ class AccountMove ( models.Model ) :
         readonly=False
     )
 
-
-    def get_qr_code_knk(self):
-        def get_qr_encoding(tag, field):
-            company_name_byte_array = field.encode('UTF-8')
-            company_name_tag_encoding = tag.to_bytes(length=1, byteorder='big')
-            company_name_length_encoding = len(company_name_byte_array).to_bytes(length=1, byteorder='big')
+    def get_qr_code_knk(self) :
+        def get_qr_encoding(tag , field) :
+            company_name_byte_array = field.encode ( 'UTF-8' )
+            company_name_tag_encoding = tag.to_bytes ( length=1 , byteorder='big' )
+            company_name_length_encoding = len ( company_name_byte_array ).to_bytes ( length=1 , byteorder='big' )
             return company_name_tag_encoding + company_name_length_encoding + company_name_byte_array
-        for record in self:
+
+        for record in self :
             qr_code_str = ''
-            seller_name_enc = get_qr_encoding(1, record.company_id.display_name)
-            company_vat_enc = get_qr_encoding(2, record.company_id.vat or '')
+            seller_name_enc = get_qr_encoding ( 1 , record.company_id.display_name )
+            company_vat_enc = get_qr_encoding ( 2 , record.company_id.vat or '' )
             # date_order = fields.Datetime.from_string(record.create_date)
-            if record.invoice_date_supply:
-                time_sa = fields.Datetime.context_timestamp(self.with_context(tz='Asia/Riyadh'), record.invoice_date_supply)
-            else:
-                time_sa = fields.Datetime.context_timestamp(self.with_context(tz='Asia/Riyadh'), record.create_date)
-            timestamp_enc = get_qr_encoding(3, time_sa.isoformat())
-            invoice_total_enc = get_qr_encoding(4, str(record.amount_total))
-            total_vat_enc = get_qr_encoding(5, str(record.currency_id.round(record.amount_total - record.amount_untaxed)))
+            if record.invoice_date_supply :
+                time_sa = fields.Datetime.context_timestamp ( self.with_context ( tz='Asia/Riyadh' ) ,
+                                                              record.invoice_date_supply )
+            else :
+                time_sa = fields.Datetime.context_timestamp ( self.with_context ( tz='Asia/Riyadh' ) ,
+                                                              record.create_date )
+            timestamp_enc = get_qr_encoding ( 3 , time_sa.isoformat () )
+            invoice_total_enc = get_qr_encoding ( 4 , str ( record.amount_total ) )
+            total_vat_enc = get_qr_encoding ( 5 , str (
+                record.currency_id.round ( record.amount_total - record.amount_untaxed ) ) )
 
             str_to_encode = seller_name_enc + company_vat_enc + timestamp_enc + invoice_total_enc + total_vat_enc
-            qr_code_str = base64.b64encode(str_to_encode).decode('UTF-8')
+            qr_code_str = base64.b64encode ( str_to_encode ).decode ( 'UTF-8' )
             return qr_code_str
 
-    
     # ---get financial and manager signiture for using vendor bills----#####
-    @api.depends('finance_signiture', 'manager_signiture')  # لازم تحط الفيلدات اللي هتتابعها
-    def _compute_user_signature(self):
+    @api.depends ( 'finance_signiture' , 'manager_signiture' )  # لازم تحط الفيلدات اللي هتتابعها
+    def _compute_user_signature(self) :
         User = self.env['res.users']
-        finance_user = User.browse(18)  # اليوزر اللي id = 18 finance
-        manager_user = User.browse(561)   # اليوزر اللي id = 561 manager
+        finance_user = User.browse ( 18 )  # اليوزر اللي id = 18 finance
+        manager_user = User.browse ( 561 )  # اليوزر اللي id = 561 manager
 
-        for rec in self:
+        for rec in self :
             # لو تفعيل التوقيع مفعل، نحط التوقيع، غير كده يبقى False
             rec.finance_assign = finance_user.sign_signature if rec.finance_signiture else False
             rec.manager_assign = manager_user.sign_signature if rec.manager_signiture else False
-            
+
     # def action_post(self):
     # ترحيل الفواتير فورًا مع تجاوز جميع تحقق E-Invoicing
     # self.with_context(disable_sa_edi_checks=True)._post(soft=False)
@@ -96,81 +101,75 @@ class AccountMove ( models.Model ) :
             if not sale_order :
                 continue
 
-            # ⭐ إعادة اختيار analytic_distribution قبل إنشاء الفاتورة
+            # ⭐ إعادة اختيار analytic_distribution
             if sale_order.analytic_account_id :
-                 sale_order._onchange_analytic_account_id() 
+                sale_order._onchange_analytic_account_id ()
 
-            # 1️⃣ سلّم أول سطر لم يُسلم بعد وسياسة الفوترة Delivered
-            unsent_line = sale_order.order_line.filtered (
-                lambda l : l.qty_delivered == 0 
-                #and l.product_id.invoice_policy == 'delivery'
-                and l.product_id.invoice_policy == 'delivery'
-                and l.qty_invoiced < l.product_uom_qty
+            # 1️⃣ سطر لم يتم "تسليمه منطقياً" بعد
+            pending_line = sale_order.order_line.filtered (
+                lambda l : l.relative_delivery == 0
+                           and l.relative_invoicing == 0
             )[:1]
-            if unsent_line :
-                unsent_line.qty_delivered = unsent_line.product_uom_qty
 
-            # 2️⃣ فلترة السطور الصالحة للفوترة فقط
-            lines_to_invoice = sale_order.order_line.filtered (
-                lambda l : l.qty_delivered > 0 and l.qty_invoiced < l.qty_delivered
-            )
-            if not lines_to_invoice :
+            if not pending_line :
                 continue
 
-            # 3️⃣ إنشاء فاتورة Delivered باستخدام Wizard الرسمي
+            # 2️⃣ إنشاء فاتورة (Delivered) بدون الاعتماد على qty_delivered
             wizard = self.env['sale.advance.payment.inv'].create ( {
                 'advance_payment_method' : 'delivered' ,
             } )
+
             action = wizard.with_context (
                 active_model='sale.order' ,
                 active_ids=sale_order.ids ,
                 skip_auto_invoice=True
             ).create_invoices ()
 
-            # 4️⃣ ضبط قيمة الفاتورة لتساوي قيد الدفع ÷ 1.15
+            # 3️⃣ جلب الفاتورة
             invoice = self.env['account.move'].browse ( action.get ( 'res_id' ) )
-            if invoice :
-                payment_amount = move.amount_total
-                new_total = payment_amount / 1.15
+            if not invoice :
+                continue
 
-                # توزيع القيمة الجديدة على كل سطر بحسب الكمية
-                total_quantity = sum ( invoice.invoice_line_ids.mapped ( 'quantity' ) )
-                for line in invoice.invoice_line_ids :
-                    line.price_unit = (line.quantity / total_quantity) * new_total
+            # 4️⃣ ضبط قيمة الفاتورة = قيد الدفع ÷ 1.15
+            payment_amount = move.amount_total
+            new_total = payment_amount / 1.15
 
-                # تطبيق التوزيع التحليلي من Sale Order Lines
-                for inv_line in invoice.invoice_line_ids :
-                    so_line = sale_order.order_line.filtered (
-                        lambda l : l.product_id == inv_line.product_id
-                    )[:1]
-                    if so_line :
-                        inv_line.analytic_distribution = so_line.analytic_distribution
+            total_quantity = sum ( invoice.invoice_line_ids.mapped ( 'quantity' ) ) or 1
+            for line in invoice.invoice_line_ids :
+                line.price_unit = (line.quantity / total_quantity) * new_total
 
-                # ترحيل الفاتورة
-                invoice.with_context ( skip_auto_invoice=True ).action_post ()
+            # 5️⃣ تطبيق analytic_distribution + تحديث relative fields
+            for inv_line in invoice.invoice_line_ids :
+                so_line = sale_order.order_line.filtered (
+                    lambda l : l.product_id == inv_line.product_id
+                )[:1]
+                if so_line :
+                    inv_line.analytic_distribution = so_line.analytic_distribution
 
-                # 5️⃣ Assign آخر Payment (Credit) للفاتورة
-                partner = invoice.partner_id
-                receivable_account = invoice.line_ids.filtered (
-                    lambda l : l.account_id.account_type == 'asset_receivable'
-                )
+                    # ⭐ تحديث الحقول المخصصة
+                    so_line.relative_delivery = 1
+                    so_line.relative_invoicing = 1
 
-                if receivable_account :
-                    invoice_line = receivable_account[:1]
+            # 6️⃣ ترحيل الفاتورة
+            invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
-                    # آخر Credit غير مسوى للعميل
-                    credit_line = self.env['account.move.line'].search ( [
-                        ('partner_id' , '=' , partner.id) ,
-                        ('account_id' , '=' , invoice_line.account_id.id) ,
-                        ('credit' , '>' , 0) ,
-                        ('reconciled' , '=' , False) ,
-                        ('move_id.state' , '=' , 'posted') ,
-                    ] , order='id desc' , limit=1 )
+            # 7️⃣ تسوية آخر Payment
+            receivable_line = invoice.line_ids.filtered (
+                lambda l : l.account_id.account_type == 'asset_receivable'
+            )[:1]
 
-                    if credit_line :
-                        (invoice_line + credit_line).reconcile ()
+            if receivable_line :
+                credit_line = self.env['account.move.line'].search ( [
+                    ('partner_id' , '=' , invoice.partner_id.id) ,
+                    ('account_id' , '=' , receivable_line.account_id.id) ,
+                    ('credit' , '>' , 0) ,
+                    ('reconciled' , '=' , False) ,
+                    ('move_id.state' , '=' , 'posted') ,
+                ] , order='id desc' , limit=1 )
 
-        #################################################################
+                if credit_line :
+                    (receivable_line + credit_line).reconcile ()
+        ###############################################################
 
         return res
 
@@ -263,7 +262,7 @@ class AccountPayment ( models.Model ) :
                 if rec.journal_id.id == 153 :
                     # rec.destination_account_id = self.env['account.account'].browse(1142)
                     # rec.destination_account_id = 1142
-                   # rec.partner_id = 417103
+                    # rec.partner_id = 417103
                     rec.destination_account_id = self.env['account.account'].browse ( 1142 )
             else :
                 rec.destination_account_id = False
