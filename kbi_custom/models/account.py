@@ -85,38 +85,34 @@ class AccountMove ( models.Model ) :
         if self.env.context.get ( 'skip_auto_invoice' ) :
             return super ().action_post ()
 
-        # 1️⃣ ترحيل القيد / الفاتورة مع تجاوز E-Invoicing
+        # 1️⃣ ترحيل قيد الدفع أولًا
         res = super ( AccountMove , self.with_context (
             disable_sa_edi_checks=True
         ) ).action_post ()
 
-        # 2️⃣ Wizard تلقائي إن وجد
-        autopost_bills_wizard = self._show_autopost_bills_wizard ()
-        if autopost_bills_wizard :
-            return autopost_bills_wizard
-
-        #################### AUTO INVOICE WITHOUT WIZARD ####################
+        #################### AUTO INVOICE FIRST LINE ONLY ####################
         for move in self :
             sale_order = move.sale_order_id
             if not sale_order :
                 continue
 
-            # سطور لم يتم فوترتها منطقيًا
+            # أول سطر مؤهل فقط
             lines_to_invoice = sale_order.order_line.filtered (
-                lambda l : l.relative_dalivery == 0
-                           and l.relative_invoicing == 0
-            )
+                lambda l : l.relative_dalivery == 0 and l.relative_invoicing == 0
+            )[:1]  # أول سطر فقط
 
             if not lines_to_invoice :
                 continue
 
             invoice_lines = []
 
+            # مبلغ الفاتورة = قيد الدفع ÷ 1.15 (افتراض ضريبة 15%)
             payment_amount = move.amount_total
-            new_total = payment_amount / 1.15  # بدون ضريبة
+            new_total = payment_amount / 1.15
 
             total_qty = sum ( lines_to_invoice.mapped ( 'product_uom_qty' ) ) or 1
 
+            # تجهيز سطر الفاتورة
             for so_line in lines_to_invoice :
                 price_unit = (so_line.product_uom_qty / total_qty) * new_total
 
@@ -129,19 +125,24 @@ class AccountMove ( models.Model ) :
                     'analytic_distribution' : so_line.analytic_distribution ,
                 }) )
 
+            # تاريخ الفاتورة = تاريخ قيد الدفع
+            invoice_date = move.date or fields.Date.context_today ( self )
+
+            # إنشاء الفاتورة
             invoice = self.env['account.move'].create ( {
                 'move_type' : 'out_invoice' ,
                 'partner_id' : sale_order.partner_id.id ,
                 'invoice_origin' : sale_order.name ,
                 'invoice_user_id' : sale_order.user_id.id ,
-                'invoice_date' : fields.Date.context_today ( self ) ,
+                'date' : invoice_date ,
+                'invoice_date' : invoice_date ,
                 'invoice_line_ids' : invoice_lines ,
             } )
 
             # ترحيل الفاتورة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
-            # تحديث الحقول المنطقية
+            # تحديث الحقول المنطقية في Sale Order Line
             lines_to_invoice.write ( {
                 'relative_dalivery' : 1 ,
                 'relative_invoicing' : 1 ,
@@ -163,11 +164,10 @@ class AccountMove ( models.Model ) :
 
                 if credit_line :
                     (receivable_line + credit_line).reconcile ()
-        ####################################################################
+        #######################################################################
 
         return res
 
-    
     @api.depends ( 'partner_id' )
     def compute_vendor_attachements(self) :
         for rec in self :
