@@ -104,6 +104,8 @@ class AccountMove ( models.Model ) :
             unsent_line = sale_order.order_line.filtered (
                 lambda l : l.qty_delivered == 0 
                 #and l.product_id.invoice_policy == 'delivery'
+                and l.product_id.invoice_policy == 'delivery'
+                and l.qty_invoiced < l.product_uom_qty
             )[:1]
             if unsent_line :
                 unsent_line.qty_delivered = unsent_line.product_uom_qty
