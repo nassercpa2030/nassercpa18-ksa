@@ -4,6 +4,7 @@ import base64
 import datetime
 import uuid
 from io import BytesIO
+from decimal import Decimal, ROUND_HALF_UP
 
 import qrcode
 
