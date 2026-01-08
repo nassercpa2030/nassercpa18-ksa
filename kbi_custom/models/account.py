@@ -107,7 +107,7 @@ class AccountMove ( models.Model ) :
 
             # 1️⃣ سطر لم يتم "تسليمه منطقياً" بعد
             pending_line = sale_order.order_line.filtered (
-                lambda l : l.relative_delivery == 0
+                lambda l : l.relative_dalivery == 0
                            and l.relative_invoicing == 0
             )[:1]
 
@@ -147,7 +147,7 @@ class AccountMove ( models.Model ) :
                     inv_line.analytic_distribution = so_line.analytic_distribution
 
                     # ⭐ تحديث الحقول المخصصة
-                    so_line.relative_delivery = 1
+                    so_line.relative_dalivery = 1
                     so_line.relative_invoicing = 1
 
             # 6️⃣ ترحيل الفاتورة
