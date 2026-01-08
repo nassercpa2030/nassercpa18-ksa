@@ -251,9 +251,12 @@ class SaleOrder ( models.Model ) :
            rec.tax1=rec.price1*0.15
            rec.tax2=rec.price2*0.15
            rec.tax3=rec.price3*0.15
-           rec.taxed_price1=round(rec.price1*1.15, 1)
-           rec.taxed_price2=round(rec.price2*1.15, 1)
-           rec.taxed_price3=round(rec.price3*1.15, 1)
+           #rec.taxed_price1=round(rec.price1*1.15, 1)
+           #rec.taxed_price2=round(rec.price2*1.15, 1)
+           #rec.taxed_price3=round(rec.price3*1.15, 1)
+           rec.taxed_price1 = float(Decimal(rec.price1 * 1.15).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP))
+           rec.taxed_price2 = float(Decimal(rec.price2 * 1.15).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP))
+           rec.taxed_price3 = float(Decimal(rec.price3 * 1.15).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP))
 
     #@api.depends('journal_entry_count')
     #def compute_journal_entry_count_finance(self) :
