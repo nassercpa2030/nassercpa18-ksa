@@ -4,7 +4,7 @@ import base64
 import datetime
 import uuid
 from io import BytesIO
-from decimal import Decimal, ROUND_HALF_UP
+
 
 import qrcode
 
@@ -176,9 +176,9 @@ class SaleOrder ( models.Model ) :
     mulit_year1 = fields.Integer ( string="Year1" , readonly=False )
     mulit_year2 = fields.Integer ( string="Year2" , readonly=False )
     mulit_year3 = fields.Integer ( string="Year3" , readonly=False )
-    taxed_price1=fields.Float(string="Taxed Price1",readonly=False,compute="compute_taxed_price",store=True)
-    taxed_price2=fields.Float(string="Taxed Price2",readonly=False,compute="compute_taxed_price",store=True)
-    taxed_price3=fields.Float(string="Taxed Price3",readonly=False,compute="compute_taxed_price",store=True)
+    taxed_price1=fields.Integer(string="Taxed Price1",readonly=False,compute="compute_taxed_price",store=True)
+    taxed_price2=fields.Integer(string="Taxed Price2",readonly=False,compute="compute_taxed_price",store=True)
+    taxed_price3=fields.Integer(string="Taxed Price3",readonly=False,compute="compute_taxed_price",store=True)
     ass_visible = fields.Boolean ( string="Visible" , compute='_compute_ass_visible' )
     partner_id = fields.Many2one ( string="Customer" , comodel_name="res.partner" , strore=True , required=False ,
                                    readonly=False )
@@ -252,12 +252,10 @@ class SaleOrder ( models.Model ) :
            rec.tax1=rec.price1*0.15
            rec.tax2=rec.price2*0.15
            rec.tax3=rec.price3*0.15
-           #rec.taxed_price1=round(rec.price1*1.15, 1)
-           #rec.taxed_price2=round(rec.price2*1.15, 1)
-           #rec.taxed_price3=round(rec.price3*1.15, 1)
-           rec.taxed_price1 = float(Decimal(rec.price1 * 1.15).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP))
-           rec.taxed_price2 = float(Decimal(rec.price2 * 1.15).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP))
-           rec.taxed_price3 = float(Decimal(rec.price3 * 1.15).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP))
+           rec.taxed_price1=round(rec.price1*1.15, 1)
+           rec.taxed_price2=round(rec.price2*1.15, 1)
+           rec.taxed_price3=round(rec.price3*1.15, 1)
+
 
     #@api.depends('journal_entry_count')
     #def compute_journal_entry_count_finance(self) :
