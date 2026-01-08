@@ -95,65 +95,59 @@ class AccountMove ( models.Model ) :
         if autopost_bills_wizard :
             return autopost_bills_wizard
 
-        #################### update deliver & invoice ####################
+        #################### AUTO INVOICE WITHOUT WIZARD ####################
         for move in self :
             sale_order = move.sale_order_id
             if not sale_order :
                 continue
 
-            # ⭐ إعادة اختيار analytic_distribution
-            if sale_order.analytic_account_id :
-                sale_order._onchange_analytic_account_id ()
-
-            # 1️⃣ سطر لم يتم "تسليمه منطقياً" بعد
-            pending_line = sale_order.order_line.filtered (
+            # سطور لم يتم فوترتها منطقيًا
+            lines_to_invoice = sale_order.order_line.filtered (
                 lambda l : l.relative_dalivery == 0
                            and l.relative_invoicing == 0
-            )[:1]
+            )
 
-            if not pending_line :
+            if not lines_to_invoice :
                 continue
 
-            # 2️⃣ إنشاء فاتورة (Delivered) بدون الاعتماد على qty_delivered
-            wizard = self.env['sale.advance.payment.inv'].create ( {
-                'advance_payment_method' : 'delivered' ,
+            invoice_lines = []
+
+            payment_amount = move.amount_total
+            new_total = payment_amount / 1.15  # بدون ضريبة
+
+            total_qty = sum ( lines_to_invoice.mapped ( 'product_uom_qty' ) ) or 1
+
+            for so_line in lines_to_invoice :
+                price_unit = (so_line.product_uom_qty / total_qty) * new_total
+
+                invoice_lines.append ( (0 , 0 , {
+                    'product_id' : so_line.product_id.id ,
+                    'name' : so_line.name ,
+                    'quantity' : so_line.product_uom_qty ,
+                    'price_unit' : price_unit ,
+                    'tax_ids' : [(6 , 0 , so_line.tax_id.ids)] ,
+                    'analytic_distribution' : so_line.analytic_distribution ,
+                }) )
+
+            invoice = self.env['account.move'].create ( {
+                'move_type' : 'out_invoice' ,
+                'partner_id' : sale_order.partner_id.id ,
+                'invoice_origin' : sale_order.name ,
+                'invoice_user_id' : sale_order.user_id.id ,
+                'invoice_date' : fields.Date.context_today ( self ) ,
+                'invoice_line_ids' : invoice_lines ,
             } )
 
-            action = wizard.with_context (
-                active_model='sale.order' ,
-                active_ids=sale_order.ids ,
-                skip_auto_invoice=True
-            ).create_invoices ()
-
-            # 3️⃣ جلب الفاتورة
-            invoice = self.env['account.move'].browse ( action.get ( 'res_id' ) )
-            if not invoice :
-                continue
-
-            # 4️⃣ ضبط قيمة الفاتورة = قيد الدفع ÷ 1.15
-            payment_amount = move.amount_total
-            new_total = payment_amount / 1.15
-
-            total_quantity = sum ( invoice.invoice_line_ids.mapped ( 'quantity' ) ) or 1
-            for line in invoice.invoice_line_ids :
-                line.price_unit = (line.quantity / total_quantity) * new_total
-
-            # 5️⃣ تطبيق analytic_distribution + تحديث relative fields
-            for inv_line in invoice.invoice_line_ids :
-                so_line = sale_order.order_line.filtered (
-                    lambda l : l.product_id == inv_line.product_id
-                )[:1]
-                if so_line :
-                    inv_line.analytic_distribution = so_line.analytic_distribution
-
-                    # ⭐ تحديث الحقول المخصصة
-                    so_line.relative_dalivery = 1
-                    so_line.relative_invoicing = 1
-
-            # 6️⃣ ترحيل الفاتورة
+            # ترحيل الفاتورة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
-            # 7️⃣ تسوية آخر Payment
+            # تحديث الحقول المنطقية
+            lines_to_invoice.write ( {
+                'relative_dalivery' : 1 ,
+                'relative_invoicing' : 1 ,
+            } )
+
+            # تسوية الفاتورة مع آخر Payment
             receivable_line = invoice.line_ids.filtered (
                 lambda l : l.account_id.account_type == 'asset_receivable'
             )[:1]
@@ -169,10 +163,11 @@ class AccountMove ( models.Model ) :
 
                 if credit_line :
                     (receivable_line + credit_line).reconcile ()
-        ###############################################################
+        ####################################################################
 
         return res
 
+    
     @api.depends ( 'partner_id' )
     def compute_vendor_attachements(self) :
         for rec in self :
