@@ -102,7 +102,8 @@ class AccountMove ( models.Model ) :
 
             # 1️⃣ سلّم أول سطر لم يُسلم بعد وسياسة الفوترة Delivered
             unsent_line = sale_order.order_line.filtered (
-                lambda l : l.qty_delivered == 0 and l.product_id.invoice_policy == 'delivery'
+                lambda l : l.qty_delivered == 0 
+                #and l.product_id.invoice_policy == 'delivery'
             )[:1]
             if unsent_line :
                 unsent_line.qty_delivered = unsent_line.product_uom_qty
