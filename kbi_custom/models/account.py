@@ -85,7 +85,7 @@ class AccountMove ( models.Model ) :
         if self.env.context.get ( 'skip_auto_invoice' ) :
             return super ().action_post ()
 
-        # 1️⃣ ترحيل قيد الدفع أولًا
+        # 1️⃣ ترحيل قيد الدفع أولًا مع تجاوز E-Invoicing
         res = super ( AccountMove , self.with_context (
             disable_sa_edi_checks=True
         ) ).action_post ()
@@ -116,6 +116,12 @@ class AccountMove ( models.Model ) :
             for so_line in lines_to_invoice :
                 price_unit = (so_line.product_uom_qty / total_qty) * new_total
 
+                # الحصول على حساب الإيرادات للمنتج
+                account = so_line.product_id.property_account_income_id or \
+                          so_line.product_id.categ_id.property_account_income_categ_id
+                if not account :
+                    raise ValidationError ( f"Product {so_line.product_id.name} has no income account!" )
+
                 invoice_lines.append ( (0 , 0 , {
                     'product_id' : so_line.product_id.id ,
                     'name' : so_line.name ,
@@ -123,6 +129,7 @@ class AccountMove ( models.Model ) :
                     'price_unit' : price_unit ,
                     'tax_ids' : [(6 , 0 , so_line.tax_id.ids)] ,
                     'analytic_distribution' : so_line.analytic_distribution ,
+                    'account_id' : account.id ,
                 }) )
 
             # تاريخ الفاتورة = تاريخ قيد الدفع
@@ -139,7 +146,7 @@ class AccountMove ( models.Model ) :
                 'invoice_line_ids' : invoice_lines ,
             } )
 
-            # ربط الفاتورة بالـ Sale Order (لتحديث invoice_count الافتراضي)
+            # ربط الفاتورة بالـ Sale Order
             sale_order.invoice_ids = [(4 , invoice.id)]
 
             # زيادة الحقل المخصص invoice_count_odoo16
@@ -155,24 +162,22 @@ class AccountMove ( models.Model ) :
                 'relative_invoicing' : 1 ,
             } )
 
-            # تسوية الفاتورة مع آخر Payment
-            receivable_line = invoice.line_ids.filtered (
+            # 4️⃣ تسوية الفاتورة مع أي رصيد دائن متاح
+            receivable_lines = invoice.line_ids.filtered (
                 lambda l : l.account_id.account_type == 'asset_receivable'
-            )[:1]
-
-            if receivable_line :
-                credit_line = self.env['account.move.line'].search ( [
+            )
+            for receivable_line in receivable_lines :
+                credit_lines = self.env['account.move.line'].search ( [
                     ('partner_id' , '=' , invoice.partner_id.id) ,
                     ('account_id' , '=' , receivable_line.account_id.id) ,
                     ('credit' , '>' , 0) ,
                     ('reconciled' , '=' , False) ,
                     ('move_id.state' , '=' , 'posted') ,
-                ] , order='id desc' , limit=1 )
+                ] )
+                if credit_lines :
+                    (receivable_line + credit_lines).reconcile ()
 
-                if credit_line :
-                    (receivable_line + credit_line).reconcile ()
         #######################################################################
-
         return res
 
     @api.depends ( 'partner_id' )
