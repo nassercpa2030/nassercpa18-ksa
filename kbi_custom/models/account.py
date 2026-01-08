@@ -98,14 +98,7 @@ class AccountMove ( models.Model ) :
 
             # ⭐ إعادة اختيار analytic_distribution قبل إنشاء الفاتورة
             if sale_order.analytic_account_id :
-                analytic_id = sale_order.analytic_account_id.id
-                for so_line in sale_order.order_line :
-                    # تجاهل Sections / Notes
-                    if so_line.display_type :
-                        continue
-                    so_line.analytic_distribution = {
-                        analytic_id : 100
-                    }
+                 sale_order._onchange_analytic_account_id() 
 
             # 1️⃣ سلّم أول سطر لم يُسلم بعد وسياسة الفوترة Delivered
             unsent_line = sale_order.order_line.filtered (
