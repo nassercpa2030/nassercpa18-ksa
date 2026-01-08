@@ -142,6 +142,10 @@ class AccountMove ( models.Model ) :
             # ربط الفاتورة بالـ Sale Order (لتحديث invoice_count الافتراضي)
             sale_order.invoice_ids = [(4 , invoice.id)]
 
+            # زيادة الحقل المخصص invoice_count_odoo16
+            if hasattr ( sale_order , 'invoice_count_odoo16' ) :
+                sale_order.invoice_count_odoo16 += 1
+
             # ترحيل الفاتورة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
