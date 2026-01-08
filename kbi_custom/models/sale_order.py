@@ -568,7 +568,7 @@ class SaleOrder ( models.Model ) :
                     'partner_id' : order.partner_id.id ,
                     'sale_order_id' : order.id ,
                     'user_id' : order.user_id.id ,
-                    'account_id':order.analytic_account_id,
+                    'account_id':order.analytic_account_id.id,
                     'contract_name' : order.project_name ,
                     'company_id' : order.company_id.id ,
                     'code' : order.auto_code ,
