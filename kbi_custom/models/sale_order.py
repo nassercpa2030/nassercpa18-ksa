@@ -1039,6 +1039,8 @@ class SaleOrderLine ( models.Model ) :
     budget_percentage = fields.Float ( string='Percentage(%)' , help='The Percentage from total Budget of SO' )
     order_budget = fields.Float ( related='order_id.project_budget' )
     working_days = fields.Integer ()
+    relative_dalivery = fields.Integer ()
+    relative_invoicing = fields.Integer ()
     product_id = fields.Many2one (
         comodel_name='product.product' ,
         string="Product" ,
