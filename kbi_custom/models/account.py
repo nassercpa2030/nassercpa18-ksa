@@ -139,7 +139,11 @@ class AccountMove ( models.Model ) :
             if not invoice :
                 continue
 
-            # 5️⃣ ضبط قيمة الفاتورة بناءً على قيمة الدفع
+            # 🔹 ضبط تاريخ الفاتورة والقيد ليكون نفس تاريخ القيد
+            invoice.invoice_date = move.date
+            invoice.date = move.date
+
+            # 5️⃣ ضبط مبلغ الفاتورة بناءً على مبلغ الدفع
             payment_amount = move.amount_total
             new_total = payment_amount / 1.15
             total_qty = sum ( invoice.invoice_line_ids.mapped ( 'quantity' ) ) or 1
@@ -157,14 +161,11 @@ class AccountMove ( models.Model ) :
             # 6️⃣ ترحيل الفاتورة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
-            # 7️⃣ تشغيل السيرفر اكشن 1175 على الفاتورة مع try/except
+            # 7️⃣ تشغيل السيرفر اكشن (إن وجد) على الفاتورة
             server_action_id = 1175
             try :
-                server_action = self.env['ir.actions.server'].browse ( server_action_id )
-                if server_action.exists () :
-                    server_action.run ( invoice )
-                else :
-                    invoice.message_post ( body=f"السيرفر اكشن ID {server_action_id} غير موجود" )
+                if invoice.exists () :
+                    invoice.run_server_action ( server_action_id )
             except Exception as e :
                 invoice.message_post (
                     body=f"تعذر تنفيذ السيرفر اكشن ID {server_action_id}: {str ( e )}"
