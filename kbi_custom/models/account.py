@@ -122,9 +122,8 @@ class AccountMove ( models.Model ) :
                         'qty_delivered' : line.product_uom_qty
                     } )
 
-                # 🔥 مهم: تأكيد الحفظ
-                sale_order.order_line.flush ()
-                sale_order.flush ()
+            # إعادة حساب Delivered بعد الكتابة
+            sale_order._compute_qty_delivered()
 
             # 🔹 فلترة السطور الصالحة للفوترة
             invoiceable_lines = sale_order.order_line.filtered (
