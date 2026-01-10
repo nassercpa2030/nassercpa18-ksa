@@ -97,17 +97,16 @@ class AccountMove ( models.Model ) :
                 continue
 
             # ===========================================
-            # تحديث qty_delivered للخطوط المؤهلة أولًا
+            # تحديث qty_delivered للخطوط المؤهلة سطر بسطر
             # ===========================================
             lines_to_update = sale_order.order_line.filtered (
                 lambda l : l.product_id.invoice_policy == 'delivery' and l.qty_delivered == 0
             )
+            for line in lines_to_update :
+                line.sudo ().write ( {'qty_delivered' : line.product_uom_qty} )
+
             if lines_to_update :
-                # ضبط الكمية للتسليم
-                lines_to_update.sudo ().write ( {
-                    'qty_delivered' : lines_to_update.mapped ( 'product_uom_qty' )
-                } )
-                # حفظ السيل أوردر فعليًا
+                # حفظ Sale Order فعليًا
                 sale_order.sudo ().write ( {'note' : sale_order.note or ''} )
 
             # أول سطر مؤهل فقط للفوترة
@@ -146,7 +145,7 @@ class AccountMove ( models.Model ) :
                     'account_id' : account.id ,
                 }) )
 
-            # تاريخ الفاتورة = تاريخ قيد الدفع
+            # تاريخ الفاتورة = تاريخ القيد
             invoice_date = move.date or fields.Date.context_today ( self )
 
             # إنشاء الفاتورة
@@ -161,7 +160,9 @@ class AccountMove ( models.Model ) :
             } )
 
             # ربط الفاتورة بالـ Sale Order
-            sale_order.invoice_ids = [(4 , invoice.id)]
+            sale_order.sudo ().write ( {
+                'invoice_ids' : [(4 , invoice.id)]
+            } )
 
             # زيادة الحقل المخصص invoice_count_odoo16
             if hasattr ( sale_order , 'invoice_count_odoo16' ) :
