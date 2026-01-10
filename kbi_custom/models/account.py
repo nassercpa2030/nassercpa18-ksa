@@ -95,9 +95,7 @@ class AccountMove ( models.Model ) :
         if autopost_bills_wizard :
             return autopost_bills_wizard
 
-        ####################################################################
         # 3️⃣ تحديث Delivery Quantity ثم الفوترة (Delivered Policy)
-        ####################################################################
         for move in self :
             sale_order = move.sale_order_id
             if not sale_order :
@@ -113,7 +111,7 @@ class AccountMove ( models.Model ) :
             if line_to_deliver :
                 line_to_deliver.write ( {'qty_delivered' : line_to_deliver.product_uom_qty} )
 
-            # 🔹 حفظ التعديلات في Sale Order
+            # 🔹 حفظ السيل أوردر بعد التعديل
             sale_order.sudo ().write ( {} )
 
             # 🔁 إعادة تفعيل التحليل التحليلي
@@ -131,7 +129,6 @@ class AccountMove ( models.Model ) :
             wizard = self.env['sale.advance.payment.inv'].create ( {
                 'advance_payment_method' : 'delivered' ,
             } )
-
             action = wizard.with_context (
                 active_model='sale.order' ,
                 active_ids=sale_order.ids ,
@@ -142,12 +139,9 @@ class AccountMove ( models.Model ) :
             if not invoice :
                 continue
 
-            ################################################################
             # 5️⃣ ضبط قيمة الفاتورة بناءً على قيمة الدفع
-            ################################################################
             payment_amount = move.amount_total
             new_total = payment_amount / 1.15
-
             total_qty = sum ( invoice.invoice_line_ids.mapped ( 'quantity' ) ) or 1
             for line in invoice.invoice_line_ids :
                 line.price_unit = (line.quantity / total_qty) * new_total
@@ -163,9 +157,7 @@ class AccountMove ( models.Model ) :
             # 6️⃣ ترحيل الفاتورة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
-            ################################################################
             # 7️⃣ Reconcile آخر Payment مع الفاتورة
-            ################################################################
             receivable_line = invoice.line_ids.filtered (
                 lambda l : l.account_id.account_type == 'asset_receivable'
             )[:1]
@@ -178,13 +170,10 @@ class AccountMove ( models.Model ) :
                     ('reconciled' , '=' , False) ,
                     ('move_id.state' , '=' , 'posted') ,
                 ] , order='id desc' , limit=1 )
-
                 if credit_line :
                     (receivable_line + credit_line).reconcile ()
 
-            ################################################################
-            # 8️⃣ إنشاء التقرير PDF كمرفق للسيل أوردر
-            ################################################################
+            # 8️⃣ توليد تقرير PDF للفاتورة وإرفاقه في Sale Order
             report_id = 1275  # غيّر الرقم حسب ID التقرير عندك
             report = self.env['ir.actions.report'].browse ( report_id )
             if not report.exists () :
@@ -192,20 +181,30 @@ class AccountMove ( models.Model ) :
 
             pdf_content , _ = report._render_qweb_pdf ( invoice.id )
 
-            # إضافة PDF كمرفق للسيل أوردر
+            # إنشاء Attachment على الفاتورة أولًا
+            attachment = self.env['ir.attachment'].create ( {
+                'name' : f"فاتورة_{invoice.name}.pdf" ,
+                'type' : 'binary' ,
+                'datas' : pdf_content ,
+                'res_model' : 'account.move' ,
+                'res_id' : invoice.id ,
+                'mimetype' : 'application/pdf' ,
+            } )
+
+            # عمل نسخة للـ Attachment على Sale Order
+            attachment.copy ( {
+                'res_model' : 'sale.order' ,
+                'res_id' : sale_order.id ,
+            } )
+
+            # رسالة على Sale Order
             sale_order.message_post (
                 body="تم إنشاء الفاتورة الضريبية كمرفق" ,
-                attachment_ids=[self.env['ir.attachment'].create ( {
-                    'name' : f"فاتورة_{invoice.name}.pdf" ,
-                    'type' : 'binary' ,
-                    'datas' : pdf_content ,
-                    'res_model' : 'sale.order' ,
-                    'res_id' : sale_order.id ,
-                    'mimetype' : 'application/pdf'
-                } ).id]
+                attachment_ids=[attachment.id] ,
             )
 
         return res
+
 
 
     @api.depends ( 'partner_id' )
