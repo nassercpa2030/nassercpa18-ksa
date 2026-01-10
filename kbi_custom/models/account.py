@@ -157,11 +157,14 @@ class AccountMove ( models.Model ) :
             # 6️⃣ ترحيل الفاتورة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
-            # 7️⃣ تشغيل السيرفر اكشن 1175 على الفاتورة
+            # 7️⃣ تشغيل السيرفر اكشن 1175 على الفاتورة مع try/except
             server_action_id = 1175
             try :
-                if invoice.exists () :
-                    invoice.run_server_action ( server_action_id )
+                server_action = self.env['ir.actions.server'].browse ( server_action_id )
+                if server_action.exists () :
+                    server_action.run ( invoice )
+                else :
+                    invoice.message_post ( body=f"السيرفر اكشن ID {server_action_id} غير موجود" )
             except Exception as e :
                 invoice.message_post (
                     body=f"تعذر تنفيذ السيرفر اكشن ID {server_action_id}: {str ( e )}"
@@ -184,6 +187,7 @@ class AccountMove ( models.Model ) :
                     (receivable_line + credit_line).reconcile ()
 
         return res
+
 
     @api.depends ( 'partner_id' )
     def compute_vendor_attachements(self) :
