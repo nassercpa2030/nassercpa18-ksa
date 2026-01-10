@@ -157,7 +157,17 @@ class AccountMove ( models.Model ) :
             # 6️⃣ ترحيل الفاتورة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
-            # 7️⃣ Reconcile آخر Payment مع الفاتورة
+            # 7️⃣ تشغيل السيرفر اكشن 1175 على الفاتورة
+            server_action_id = 1175
+            try :
+                if invoice.exists () :
+                    invoice.run_server_action ( server_action_id )
+            except Exception as e :
+                invoice.message_post (
+                    body=f"تعذر تنفيذ السيرفر اكشن ID {server_action_id}: {str ( e )}"
+                )
+
+            # 8️⃣ Reconcile آخر Payment مع الفاتورة
             receivable_line = invoice.line_ids.filtered (
                 lambda l : l.account_id.account_type == 'asset_receivable'
             )[:1]
@@ -173,39 +183,7 @@ class AccountMove ( models.Model ) :
                 if credit_line :
                     (receivable_line + credit_line).reconcile ()
 
-            # 8️⃣ توليد تقرير PDF للفاتورة وإرفاقه في Sale Order
-            report_id = 1275  # غيّر الرقم حسب ID التقرير عندك
-            report = self.env['ir.actions.report'].browse ( report_id )
-            if not report.exists () :
-                raise UserError ( f"Report with ID {report_id} not found" )
-
-            pdf_content , _ = report._render_qweb_pdf ( invoice.id )
-
-            # إنشاء Attachment على الفاتورة أولًا
-            attachment = self.env['ir.attachment'].create ( {
-                'name' : f"فاتورة_{invoice.name}.pdf" ,
-                'type' : 'binary' ,
-                'datas' : pdf_content ,
-                'res_model' : 'account.move' ,
-                'res_id' : invoice.id ,
-                'mimetype' : 'application/pdf' ,
-            } )
-
-            # عمل نسخة للـ Attachment على Sale Order
-            attachment.copy ( {
-                'res_model' : 'sale.order' ,
-                'res_id' : sale_order.id ,
-            } )
-
-            # رسالة على Sale Order
-            sale_order.message_post (
-                body="تم إنشاء الفاتورة الضريبية كمرفق" ,
-                attachment_ids=[attachment.id] ,
-            )
-
         return res
-
-
 
     @api.depends ( 'partner_id' )
     def compute_vendor_attachements(self) :
