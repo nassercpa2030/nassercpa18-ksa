@@ -81,27 +81,41 @@ class AccountMove ( models.Model ) :
     # return True
 
     def action_post(self) :
-        # منع التكرار (infinite loop)
+        # ===============================
+        # 0️⃣ منع التكرار (Infinite Loop)
+        # ===============================
         if self.env.context.get ( 'skip_auto_invoice' ) :
             return super ().action_post ()
 
-        # 1️⃣ ترحيل قيد الدفع / الفاتورة الأساسي أولًا
+        # ===============================
+        # 1️⃣ ترحيل القيد / الدفع الأساسي
+        # ===============================
         res = super ( AccountMove , self.with_context (
             disable_sa_edi_checks=True
         ) ).action_post ()
 
+        # ===============================
         # 2️⃣ Wizard تلقائي إن وجد
+        # ===============================
         autopost_bills_wizard = self._show_autopost_bills_wizard ()
         if autopost_bills_wizard :
             return autopost_bills_wizard
 
-        # 3️⃣ معالجة كل قيد دفع مرتبط بـ Sale Order
+        # ===============================
+        # 3️⃣ معالجة القيود المرتبطة بسيل أوردر
+        # ===============================
         for move in self :
+            # نشتغل فقط على قيود الدفع
+            if move.move_type not in ('out_receipt' , 'out_invoice') :
+                continue
+
             sale_order = move.sale_order_id
             if not sale_order :
                 continue
 
-            # 🔹 تحديث qty_delivered لأول سطر لم يتم توصيله
+            # --------------------------------
+            # 3.1 تحديث qty_delivered
+            # --------------------------------
             line_to_deliver = sale_order.order_line.filtered (
                 lambda l : l.product_id
                            and l.product_id.invoice_policy == 'delivery'
@@ -109,26 +123,33 @@ class AccountMove ( models.Model ) :
             )[:1]
 
             if line_to_deliver :
-                line_to_deliver.sudo ().write ( {'qty_delivered' : line_to_deliver.product_uom_qty} )
+                line_to_deliver.sudo ().write ( {
+                    'qty_delivered' : line_to_deliver.product_uom_qty
+                } )
 
-            # 🔹 حفظ Sale Order بعد التعديل
-            sale_order.sudo ().write ( {'note' : sale_order.note or ''} )  # مجرد حفظ record
+            # --------------------------------
+            # 3.2 حفظ السيل أوردر فعليًا
+            # --------------------------------
+            sale_order.sudo ().write ( {
+                'note' : sale_order.note or ''
+            } )
 
-            # 🔁 إعادة تفعيل التحليل التحليلي
-            if sale_order.analytic_account_id :
-                sale_order._onchange_analytic_account_id ()
-
-            # 🔹 فلترة السطور الصالحة للفوترة
+            # --------------------------------
+            # 3.3 التحقق من وجود سطور قابلة للفوترة
+            # --------------------------------
             invoiceable_lines = sale_order.order_line.filtered (
                 lambda l : l.qty_delivered > l.qty_invoiced
             )
             if not invoiceable_lines :
                 continue
 
-            # 4️⃣ إنشاء فاتورة Delivered باستخدام Wizard الرسمي
+            # --------------------------------
+            # 4️⃣ إنشاء الفاتورة (Delivered)
+            # --------------------------------
             wizard = self.env['sale.advance.payment.inv'].create ( {
                 'advance_payment_method' : 'delivered' ,
             } )
+
             action = wizard.with_context (
                 active_model='sale.order' ,
                 active_ids=sale_order.ids ,
@@ -139,13 +160,35 @@ class AccountMove ( models.Model ) :
             if not invoice :
                 continue
 
-            # 🔹 ضبط تاريخ الفاتورة ليكون نفس تاريخ القيد
-            invoice.write ( {'invoice_date' : move.date , 'date' : move.date} )
+            # --------------------------------
+            # 4.1 ضبط تاريخ الفاتورة
+            # --------------------------------
+            invoice.write ( {
+                'invoice_date' : move.date ,
+                'date' : move.date ,
+            } )
 
-            # 5️⃣ ترحيل الفاتورة
+            # ======================================================
+            # 5️⃣ إجبار الفاتورة = آخر قيد دفع (الحل الجوهري)
+            # ======================================================
+            payment_amount = move.amount_total
+
+            if invoice.amount_total and invoice.amount_total != payment_amount :
+                ratio = payment_amount / invoice.amount_total
+
+                for line in invoice.invoice_line_ids :
+                    line.write ( {
+                        'price_unit' : line.price_unit * ratio
+                    } )
+
+            # --------------------------------
+            # 6️⃣ ترحيل الفاتورة
+            # --------------------------------
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
-            # 6️⃣ تشغيل السيرفر اكشن (إن وجد)
+            # --------------------------------
+            # 7️⃣ تشغيل Server Action (اختياري)
+            # --------------------------------
             server_action_id = 1175
             try :
                 if invoice.exists () :
@@ -155,24 +198,22 @@ class AccountMove ( models.Model ) :
                     body=f"تعذر تنفيذ السيرفر اكشن ID {server_action_id}: {str ( e )}"
                 )
 
-            # 7️⃣ Reconcile آخر Payment مع الفاتورة
-            receivable_line = invoice.line_ids.filtered (
+            # --------------------------------
+            # 8️⃣ Reconcile كامل مع آخر دفع
+            # --------------------------------
+            inv_line = invoice.line_ids.filtered (
                 lambda l : l.account_id.account_type == 'asset_receivable'
-            )[:1]
+                           and not l.reconciled
+            )
+            pay_line = move.line_ids.filtered (
+                lambda l : l.account_id.account_type == 'asset_receivable'
+                           and not l.reconciled
+            )
 
-            if receivable_line :
-                credit_line = self.env['account.move.line'].search ( [
-                    ('partner_id' , '=' , invoice.partner_id.id) ,
-                    ('account_id' , '=' , receivable_line.account_id.id) ,
-                    ('credit' , '>' , 0) ,
-                    ('reconciled' , '=' , False) ,
-                    ('move_id.state' , '=' , 'posted') ,
-                ] , order='id desc' , limit=1 )
-                if credit_line :
-                    (receivable_line + credit_line).reconcile ()
+            if inv_line and pay_line :
+                (inv_line + pay_line).reconcile ()
 
         return res
-
     @api.depends ( 'partner_id' )
     def compute_vendor_attachements(self) :
         for rec in self :
