@@ -85,7 +85,7 @@ class AccountMove ( models.Model ) :
         if self.env.context.get ( 'skip_auto_invoice' ) :
             return super ().action_post ()
 
-        # 1️⃣ ترحيل قيد الدفع / الفاتورة
+        # 1️⃣ ترحيل قيد الدفع / الفاتورة الأساسي أولًا
         res = super ( AccountMove , self.with_context (
             disable_sa_edi_checks=True
         ) ).action_post ()
@@ -95,7 +95,7 @@ class AccountMove ( models.Model ) :
         if autopost_bills_wizard :
             return autopost_bills_wizard
 
-        # 3️⃣ تحديث Delivery Quantity ثم الفوترة (Delivered Policy)
+        # 3️⃣ معالجة كل قيد دفع مرتبط بـ Sale Order
         for move in self :
             sale_order = move.sale_order_id
             if not sale_order :
@@ -106,13 +106,13 @@ class AccountMove ( models.Model ) :
                 lambda l : l.product_id
                            and l.product_id.invoice_policy == 'delivery'
                            and l.qty_delivered == 0
-            )[:1]  # أول سطر فقط
+            )[:1]
 
             if line_to_deliver :
-                line_to_deliver.write ( {'qty_delivered' : line_to_deliver.product_uom_qty} )
+                line_to_deliver.sudo ().write ( {'qty_delivered' : line_to_deliver.product_uom_qty} )
 
-            # 🔹 حفظ السيل أوردر بعد التعديل
-            sale_order.sudo ().write ( {} )
+            # 🔹 حفظ Sale Order بعد التعديل
+            sale_order.sudo ().write ( {'note' : sale_order.note or ''} )  # مجرد حفظ record
 
             # 🔁 إعادة تفعيل التحليل التحليلي
             if sale_order.analytic_account_id :
@@ -139,29 +139,13 @@ class AccountMove ( models.Model ) :
             if not invoice :
                 continue
 
-            # 🔹 ضبط تاريخ الفاتورة والقيد ليكون نفس تاريخ القيد
-            invoice.invoice_date = move.date
-            invoice.date = move.date
+            # 🔹 ضبط تاريخ الفاتورة ليكون نفس تاريخ القيد
+            invoice.write ( {'invoice_date' : move.date , 'date' : move.date} )
 
-            # 5️⃣ ضبط مبلغ الفاتورة بناءً على مبلغ الدفع
-            payment_amount = move.amount_total
-            new_total = payment_amount / 1.15
-            total_qty = sum ( invoice.invoice_line_ids.mapped ( 'quantity' ) ) or 1
-            for line in invoice.invoice_line_ids :
-                line.price_unit = (line.quantity / total_qty) * new_total
-
-            # 🔹 تطبيق analytic_distribution من Sale Order Lines
-            for inv_line in invoice.invoice_line_ids :
-                so_line = sale_order.order_line.filtered (
-                    lambda l : l.product_id == inv_line.product_id
-                )[:1]
-                if so_line :
-                    inv_line.analytic_distribution = so_line.analytic_distribution
-
-            # 6️⃣ ترحيل الفاتورة
+            # 5️⃣ ترحيل الفاتورة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
-            # 7️⃣ تشغيل السيرفر اكشن (إن وجد) على الفاتورة
+            # 6️⃣ تشغيل السيرفر اكشن (إن وجد)
             server_action_id = 1175
             try :
                 if invoice.exists () :
@@ -171,7 +155,7 @@ class AccountMove ( models.Model ) :
                     body=f"تعذر تنفيذ السيرفر اكشن ID {server_action_id}: {str ( e )}"
                 )
 
-            # 8️⃣ Reconcile آخر Payment مع الفاتورة
+            # 7️⃣ Reconcile آخر Payment مع الفاتورة
             receivable_line = invoice.line_ids.filtered (
                 lambda l : l.account_id.account_type == 'asset_receivable'
             )[:1]
@@ -188,7 +172,6 @@ class AccountMove ( models.Model ) :
                     (receivable_line + credit_line).reconcile ()
 
         return res
-
 
     @api.depends ( 'partner_id' )
     def compute_vendor_attachements(self) :
