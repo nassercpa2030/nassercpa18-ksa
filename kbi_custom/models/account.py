@@ -96,14 +96,14 @@ class AccountMove ( models.Model ) :
             return autopost_bills_wizard
 
         ####################################################################
-        # 3️⃣ تحديث Delivery Quantity لأول سطر لم يتم توصيله فقط
+        # 3️⃣ تحديث Delivery Quantity ثم الفوترة (Delivered Policy)
         ####################################################################
         for move in self :
             sale_order = move.sale_order_id
             if not sale_order :
                 continue
 
-            # 🔹 تحديث أول سطر qty_delivered = 0 فقط
+            # 🔹 تحديث qty_delivered لأول سطر لم يتم توصيله
             line_to_deliver = sale_order.order_line.filtered (
                 lambda l : l.product_id
                            and l.product_id.invoice_policy == 'delivery'
@@ -112,8 +112,9 @@ class AccountMove ( models.Model ) :
 
             if line_to_deliver :
                 line_to_deliver.write ( {'qty_delivered' : line_to_deliver.product_uom_qty} )
-                # 🔹 حفظ التعديل في Sale Order
-                sale_order.sudo ().write ( {} )
+
+            # 🔹 حفظ التعديلات في Sale Order
+            sale_order.sudo ().write ( {} )
 
             # 🔁 إعادة تفعيل التحليل التحليلي
             if sale_order.analytic_account_id :
@@ -123,7 +124,6 @@ class AccountMove ( models.Model ) :
             invoiceable_lines = sale_order.order_line.filtered (
                 lambda l : l.qty_delivered > l.qty_invoiced
             )
-
             if not invoiceable_lines :
                 continue
 
@@ -178,31 +178,35 @@ class AccountMove ( models.Model ) :
                     ('reconciled' , '=' , False) ,
                     ('move_id.state' , '=' , 'posted') ,
                 ] , order='id desc' , limit=1 )
+
                 if credit_line :
                     (receivable_line + credit_line).reconcile ()
 
             ################################################################
-            # 8️⃣ إنشاء التقرير PDF كمرفق في Sale Order
+            # 8️⃣ إنشاء التقرير PDF كمرفق للسيل أوردر
             ################################################################
             report_id = 1275  # غيّر الرقم حسب ID التقرير عندك
             report = self.env['ir.actions.report'].browse ( report_id )
             if not report.exists () :
-                raise UserError ( "Report with ID %s not found" % report_id )
+                raise UserError ( f"Report with ID {report_id} not found" )
 
-            # ⚡ تمرير recordset وليس IDs
-            pdf_content , _ = report._render_qweb_pdf ( sale_order )
+            pdf_content , _ = report._render_qweb_pdf ( invoice.id )
 
-            attachment_vals = {
-                'name' : f"{sale_order.name}.pdf" ,
-                'type' : 'binary' ,
-                'datas' : base64.b64encode ( pdf_content ) ,
-                'res_model' : 'sale.order' ,
-                'res_id' : sale_order.id ,
-                'mimetype' : 'application/pdf' ,
-            }
-            self.env['ir.attachment'].create ( attachment_vals )
+            # إضافة PDF كمرفق للسيل أوردر
+            sale_order.message_post (
+                body="تم إنشاء الفاتورة الضريبية كمرفق" ,
+                attachment_ids=[self.env['ir.attachment'].create ( {
+                    'name' : f"فاتورة_{invoice.name}.pdf" ,
+                    'type' : 'binary' ,
+                    'datas' : pdf_content ,
+                    'res_model' : 'sale.order' ,
+                    'res_id' : sale_order.id ,
+                    'mimetype' : 'application/pdf'
+                } ).id]
+            )
 
         return res
+
 
     @api.depends ( 'partner_id' )
     def compute_vendor_attachements(self) :
