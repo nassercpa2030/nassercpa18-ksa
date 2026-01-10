@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from odoo import models , fields , api
 from odoo.exceptions import ValidationError
 import base64
@@ -80,7 +81,6 @@ class AccountMove ( models.Model ) :
     # return True
 
     def action_post(self) :
-        # منع التكرار (infinite loop)
         if self.env.context.get ( 'skip_auto_invoice' ) :
             return super ().action_post ()
 
@@ -94,40 +94,29 @@ class AccountMove ( models.Model ) :
         if autopost_bills_wizard :
             return autopost_bills_wizard
 
-        ####################################################################
-        # 3️⃣ تحديث Delivery Quantity ثم الفوترة (Delivered Policy)
-        ####################################################################
+        # 3️⃣ تحديث Delivery Quantity لأول سطر فقط ثم الفوترة
         for move in self :
             sale_order = move.sale_order_id
             if not sale_order :
                 continue
 
-            # 🔹 حفظ أي تغييرات على qty_delivered في Sale Order
-            sale_order.sudo ().write ( {} )  # حفظ التغييرات الحالية
+            # 🔹 اختيار أول سطر qty_delivered = 0 فقط
+            line_to_deliver = sale_order.order_line.filtered (
+                lambda l : l.product_id
+                           and l.product_id.invoice_policy == 'delivery'
+                           and l.qty_delivered == 0
+            )[:1]
 
-            # 🔁 إعادة تفعيل التحليل التحليلي
+            if line_to_deliver :
+                line_to_deliver.write ( {'qty_delivered' : line_to_deliver.product_uom_qty} )
+                sale_order.sudo ().write ( {} )  # حفظ التعديل في السيل أوردر
+
             if sale_order.analytic_account_id :
                 sale_order._onchange_analytic_account_id ()
 
-            # 🔹 تحديث qty_delivered (حفظ حقيقي)
-            lines_to_deliver = sale_order.order_line.filtered (
-                lambda l : l.product_id
-                           and l.product_id.invoice_policy == 'delivery'
-                           and l.qty_delivered < l.product_uom_qty
-                           and l.qty_invoiced < l.product_uom_qty
-            )
-
-            if lines_to_deliver :
-                for line in lines_to_deliver :
-                    line.write ( {
-                        'qty_delivered' : line.product_uom_qty
-                    } )
-
-            # 🔹 فلترة السطور الصالحة للفوترة
             invoiceable_lines = sale_order.order_line.filtered (
                 lambda l : l.qty_delivered > l.qty_invoiced
             )
-
             if not invoiceable_lines :
                 continue
 
@@ -146,17 +135,13 @@ class AccountMove ( models.Model ) :
             if not invoice :
                 continue
 
-            ################################################################
             # 5️⃣ ضبط قيمة الفاتورة بناءً على قيمة الدفع
-            ################################################################
             payment_amount = move.amount_total
             new_total = payment_amount / 1.15
-
             total_qty = sum ( invoice.invoice_line_ids.mapped ( 'quantity' ) ) or 1
             for line in invoice.invoice_line_ids :
                 line.price_unit = (line.quantity / total_qty) * new_total
 
-            # 🔹 تطبيق analytic_distribution من Sale Order Lines
             for inv_line in invoice.invoice_line_ids :
                 so_line = sale_order.order_line.filtered (
                     lambda l : l.product_id == inv_line.product_id
@@ -167,9 +152,7 @@ class AccountMove ( models.Model ) :
             # 6️⃣ ترحيل الفاتورة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
-            ################################################################
             # 7️⃣ Reconcile آخر Payment مع الفاتورة
-            ################################################################
             receivable_line = invoice.line_ids.filtered (
                 lambda l : l.account_id.account_type == 'asset_receivable'
             )[:1]
@@ -185,15 +168,22 @@ class AccountMove ( models.Model ) :
                 if credit_line :
                     (receivable_line + credit_line).reconcile ()
 
-            ################################################################
-            # 8️⃣ تشغيل التقرير تلقائيًا على الفاتورة
-            ################################################################
+            # 8️⃣ إنشاء التقرير PDF كمرفق في Sale Order
             report_id = 1275  # غيّر الرقم حسب ID التقرير عندك
             report = self.env['ir.actions.report'].browse ( report_id )
             if not report.exists () :
                 raise UserError ( "Report with ID %s not found" % report_id )
 
-            report_action = report.report_action ( invoice )
+            pdf_content , _ = report._render_qweb_pdf ( sale_order.ids )
+            attachment_vals = {
+                'name' : f"{sale_order.name}.pdf" ,
+                'type' : 'binary' ,
+                'datas' : base64.b64encode ( pdf_content ) ,
+                'res_model' : 'sale.order' ,
+                'res_id' : sale_order.id ,
+                'mimetype' : 'application/pdf' ,
+            }
+            self.env['ir.attachment'].create ( attachment_vals )
 
         return res
 
