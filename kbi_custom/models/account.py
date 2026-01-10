@@ -85,100 +85,112 @@ class AccountMove ( models.Model ) :
         if self.env.context.get ( 'skip_auto_invoice' ) :
             return super ().action_post ()
 
-        # 1️⃣ ترحيل قيد الدفع أولًا مع تجاوز E-Invoicing
+        # 1️⃣ ترحيل قيد الدفع / الفاتورة
         res = super ( AccountMove , self.with_context (
             disable_sa_edi_checks=True
         ) ).action_post ()
 
-        #################### AUTO INVOICE FIRST LINE ONLY ####################
+        # 2️⃣ Wizard تلقائي إن وجد
+        autopost_bills_wizard = self._show_autopost_bills_wizard ()
+        if autopost_bills_wizard :
+            return autopost_bills_wizard
+
+        ####################################################################
+        # 3️⃣ تحديث Delivery Quantity ثم الفوترة (Delivered Policy)
+        ####################################################################
         for move in self :
             sale_order = move.sale_order_id
             if not sale_order :
                 continue
 
-            # أول سطر مؤهل فقط
-            lines_to_invoice = sale_order.order_line.filtered (
-                lambda l : l.relative_dalivery == 0 and l.relative_invoicing == 0
-            )[:1]  # أول سطر فقط
+            # 🔁 إعادة تفعيل التحليل التحليلي
+            if sale_order.analytic_account_id :
+                sale_order._onchange_analytic_account_id ()
 
-            if not lines_to_invoice :
+            # 🔹 تحديث qty_delivered (حفظ حقيقي)
+            lines_to_deliver = sale_order.order_line.filtered (
+                lambda l :
+                l.product_id
+                and l.product_id.invoice_policy == 'delivery'
+                and l.qty_delivered < l.product_uom_qty
+                and l.qty_invoiced < l.product_uom_qty
+            )
+
+            if lines_to_deliver :
+                for line in lines_to_deliver :
+                    line.write ( {
+                        'qty_delivered' : line.product_uom_qty
+                    } )
+
+                # 🔥 مهم: تأكيد الحفظ
+                sale_order.order_line.flush ()
+                sale_order.flush ()
+
+            # 🔹 فلترة السطور الصالحة للفوترة
+            invoiceable_lines = sale_order.order_line.filtered (
+                lambda l : l.qty_delivered > l.qty_invoiced
+            )
+
+            if not invoiceable_lines :
                 continue
 
-            invoice_lines = []
+            # 4️⃣ إنشاء فاتورة Delivered باستخدام Wizard الرسمي
+            wizard = self.env['sale.advance.payment.inv'].create ( {
+                'advance_payment_method' : 'delivered' ,
+            } )
 
-            # مبلغ الفاتورة = قيد الدفع ÷ 1.15 (افتراض ضريبة 15%)
+            action = wizard.with_context (
+                active_model='sale.order' ,
+                active_ids=sale_order.ids ,
+                skip_auto_invoice=True
+            ).create_invoices ()
+
+            invoice = self.env['account.move'].browse ( action.get ( 'res_id' ) )
+            if not invoice :
+                continue
+
+            ################################################################
+            # 5️⃣ ضبط قيمة الفاتورة بناءً على قيمة الدفع
+            ################################################################
             payment_amount = move.amount_total
             new_total = payment_amount / 1.15
 
-            total_qty = sum ( lines_to_invoice.mapped ( 'product_uom_qty' ) ) or 1
+            total_qty = sum ( invoice.invoice_line_ids.mapped ( 'quantity' ) ) or 1
+            for line in invoice.invoice_line_ids :
+                line.price_unit = (line.quantity / total_qty) * new_total
 
-            # تجهيز سطر الفاتورة
-            for so_line in lines_to_invoice :
-                price_unit = (so_line.product_uom_qty / total_qty) * new_total
+            # 🔹 تطبيق analytic_distribution من Sale Order Lines
+            for inv_line in invoice.invoice_line_ids :
+                so_line = sale_order.order_line.filtered (
+                    lambda l : l.product_id == inv_line.product_id
+                )[:1]
+                if so_line :
+                    inv_line.analytic_distribution = so_line.analytic_distribution
 
-                # الحصول على حساب الإيرادات للمنتج
-                account = so_line.product_id.property_account_income_id or \
-                          so_line.product_id.categ_id.property_account_income_categ_id
-                if not account :
-                    raise ValidationError ( f"Product {so_line.product_id.name} has no income account!" )
-
-                invoice_lines.append ( (0 , 0 , {
-                    'product_id' : so_line.product_id.id ,
-                    'name' : so_line.name ,
-                    'quantity' : so_line.product_uom_qty ,
-                    'price_unit' : price_unit ,
-                    'tax_ids' : [(6 , 0 , so_line.tax_id.ids)] ,
-                    'analytic_distribution' : so_line.analytic_distribution ,
-                    'account_id' : account.id ,
-                }) )
-
-            # تاريخ الفاتورة = تاريخ قيد الدفع
-            invoice_date = move.date or fields.Date.context_today ( self )
-
-            # إنشاء الفاتورة
-            invoice = self.env['account.move'].create ( {
-                'move_type' : 'out_invoice' ,
-                'partner_id' : sale_order.partner_id.id ,
-                'invoice_origin' : sale_order.name ,
-                'invoice_user_id' : sale_order.user_id.id ,
-                'date' : invoice_date ,
-                'invoice_date' : invoice_date ,
-                'invoice_line_ids' : invoice_lines ,
-            } )
-
-            # ربط الفاتورة بالـ Sale Order
-            sale_order.invoice_ids = [(4 , invoice.id)]
-
-            # زيادة الحقل المخصص invoice_count_odoo16
-            if hasattr ( sale_order , 'invoice_count_odoo16' ) :
-                sale_order.invoice_count_odoo16 += 1
-
-            # ترحيل الفاتورة
+            # 6️⃣ ترحيل الفاتورة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
-            # تحديث الحقول المنطقية في Sale Order Line
-            lines_to_invoice.write ( {
-                'relative_dalivery' : 1 ,
-                'relative_invoicing' : 1 ,
-            } )
-
-            # 4️⃣ تسوية الفاتورة مع أي رصيد دائن متاح
-            receivable_lines = invoice.line_ids.filtered (
+            ################################################################
+            # 7️⃣ Reconcile آخر Payment مع الفاتورة
+            ################################################################
+            receivable_line = invoice.line_ids.filtered (
                 lambda l : l.account_id.account_type == 'asset_receivable'
-            )
-            for receivable_line in receivable_lines :
-                credit_lines = self.env['account.move.line'].search ( [
+            )[:1]
+
+            if receivable_line :
+                credit_line = self.env['account.move.line'].search ( [
                     ('partner_id' , '=' , invoice.partner_id.id) ,
                     ('account_id' , '=' , receivable_line.account_id.id) ,
                     ('credit' , '>' , 0) ,
                     ('reconciled' , '=' , False) ,
                     ('move_id.state' , '=' , 'posted') ,
-                ] )
-                if credit_lines :
-                    (receivable_line + credit_lines).reconcile ()
+                ] , order='id desc' , limit=1 )
 
-        #######################################################################
+                if credit_line :
+                    (receivable_line + credit_line).reconcile ()
+
         return res
+
 
     @api.depends ( 'partner_id' )
     def compute_vendor_attachements(self) :
