@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from odoo import models , fields , api
 from odoo.exceptions import ValidationError
 import base64
@@ -103,17 +102,19 @@ class AccountMove ( models.Model ) :
             if not sale_order :
                 continue
 
+            # 🔹 حفظ أي تغييرات على qty_delivered في Sale Order
+            sale_order.sudo ().write ( {} )  # حفظ التغييرات الحالية
+
             # 🔁 إعادة تفعيل التحليل التحليلي
             if sale_order.analytic_account_id :
                 sale_order._onchange_analytic_account_id ()
 
             # 🔹 تحديث qty_delivered (حفظ حقيقي)
             lines_to_deliver = sale_order.order_line.filtered (
-                lambda l :
-                l.product_id
-                and l.product_id.invoice_policy == 'delivery'
-                and l.qty_delivered < l.product_uom_qty
-                and l.qty_invoiced < l.product_uom_qty
+                lambda l : l.product_id
+                           and l.product_id.invoice_policy == 'delivery'
+                           and l.qty_delivered < l.product_uom_qty
+                           and l.qty_invoiced < l.product_uom_qty
             )
 
             if lines_to_deliver :
@@ -121,9 +122,6 @@ class AccountMove ( models.Model ) :
                     line.write ( {
                         'qty_delivered' : line.product_uom_qty
                     } )
-
-            # إعادة حساب Delivered بعد الكتابة
-            sale_order._compute_qty_delivered()
 
             # 🔹 فلترة السطور الصالحة للفوترة
             invoiceable_lines = sale_order.order_line.filtered (
@@ -184,12 +182,20 @@ class AccountMove ( models.Model ) :
                     ('reconciled' , '=' , False) ,
                     ('move_id.state' , '=' , 'posted') ,
                 ] , order='id desc' , limit=1 )
-
                 if credit_line :
                     (receivable_line + credit_line).reconcile ()
 
-        return res
+            ################################################################
+            # 8️⃣ تشغيل التقرير تلقائيًا على الفاتورة
+            ################################################################
+            report_id = 1275  # غيّر الرقم حسب ID التقرير عندك
+            report = self.env['ir.actions.report'].browse ( report_id )
+            if not report.exists () :
+                raise UserError ( "Report with ID %s not found" % report_id )
 
+            report_action = report.report_action ( invoice )
+
+        return res
 
     @api.depends ( 'partner_id' )
     def compute_vendor_attachements(self) :
