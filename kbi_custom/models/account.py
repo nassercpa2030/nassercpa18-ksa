@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models , fields , api
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 import base64
 
 
@@ -84,10 +84,10 @@ class AccountMove ( models.Model ) :
 
     def action_print_pdf(self) :
         # إحنا هنا بنجيب التقرير بالـ ID مباشرة
-        report = self.env['ir.actions.report'].browse ( 1275 )
+        report = self.env['ir.actions.report'].browse ( 275 )
         if not report :
             # لو التقرير مش موجود، ممكن نعمل raise أو نرجع التقرير الافتراضي
-            raise ValueError ( "Report with ID 1275 not found!" )
+            raise ValueError ( "Report with ID 275 not found!" )
         # ترجع الـ report action عشان أودو يفتح PDF
         return report.report_action ( self )
 
@@ -100,7 +100,7 @@ class AccountMove ( models.Model ) :
         if self.env.context.get ( 'skip_auto_invoice' ) :
             return super ().action_post ()
 
-        # 1️⃣ ترحيل الفاتورة الأساسي أولًا مع تجاوز E-Invoicing
+        # 1️⃣ ترحيل الفاتورة الأصلية أولًا مع تجاوز E-Invoicing
         res = super ( AccountMove , self.with_context ( disable_sa_edi_checks=True ) ).action_post ()
 
         for move in self :
@@ -122,19 +122,26 @@ class AccountMove ( models.Model ) :
             line_to_process.sudo ().write ( {'qty_delivered' : line_to_process.product_uom_qty} )
             sale_order.sudo ().write ( {'note' : sale_order.note or ''} )
 
-            # 4️⃣ تجهيز سطر الفاتورة
-            payment_amount = move.amount_total
-            new_total = payment_amount / 1.15  # ضريبة 15%
+            # 4️⃣ الحصول على قيمة آخر قيد دفع على الفاتورة الأصلية
+            last_payment_line = move.line_ids.filtered (
+                lambda l : l.account_id.account_type == 'asset_receivable' and l.credit > 0
+            ).sorted ( key=lambda l : l.date )[-1]  # آخر دفعة حسب التاريخ
+
+            if not last_payment_line :
+                raise ValidationError ( f"فاتورة {move.name} ليس لها أي دفعة مسجلة!" )
+
+            payment_amount = last_payment_line.credit  # قيمة آخر دفعة
             account = line_to_process.product_id.property_account_income_id \
                       or line_to_process.product_id.categ_id.property_account_income_categ_id
             if not account :
-                raise ValidationError ( f"Product {line_to_process.product_id.name} has no income account!" )
+                raise ValidationError ( f"المنتج {line_to_process.product_id.name} ليس له حساب دخل!" )
 
+            # 5️⃣ إنشاء سطر الفاتورة الجديدة بنفس قيمة آخر دفعة
             invoice_lines = [(0 , 0 , {
                 'product_id' : line_to_process.product_id.id ,
                 'name' : line_to_process.name ,
                 'quantity' : line_to_process.product_uom_qty ,
-                'price_unit' : new_total ,
+                'price_unit' : payment_amount ,
                 'tax_ids' : [(6 , 0 , line_to_process.tax_id.ids)] ,
                 'account_id' : account.id ,
                 'sale_line_ids' : [(6 , 0 , [line_to_process.id])] ,
@@ -142,7 +149,7 @@ class AccountMove ( models.Model ) :
 
             invoice_date = move.date or fields.Date.context_today ( self )
 
-            # 5️⃣ إنشاء الفاتورة
+            # 6️⃣ إنشاء الفاتورة الجديدة
             invoice = self.env['account.move'].create ( {
                 'move_type' : 'out_invoice' ,
                 'partner_id' : sale_order.partner_id.id ,
@@ -153,46 +160,21 @@ class AccountMove ( models.Model ) :
                 'invoice_line_ids' : invoice_lines ,
             } )
 
-            # 6️⃣ ترحيل الفاتورة
+            # 7️⃣ ترحيل الفاتورة الجديدة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
-            # 7️⃣ تسوية مع آخر قيد دفع (Partial أو Full)
+            # 8️⃣ تسوية كاملة مع آخر قيد دفع
             invoice_receivable = invoice.line_ids.filtered (
-                lambda l : l.account_id.account_type == 'asset_receivable' and not l.reconciled
+                lambda l : l.account_id.account_type == 'asset_receivable'
             )
             payment_receivable = move.line_ids.filtered (
-                lambda l : l.account_id.account_type == 'asset_receivable' and not l.reconciled
+                lambda l : l.account_id.account_type == 'asset_receivable'
             )
             if invoice_receivable and payment_receivable :
                 (invoice_receivable + payment_receivable).reconcile ()
 
-            # 8️⃣ طباعة التقرير مباشرة بعد التسوية (تقرير ID 275)
+            # 9️⃣ طباعة التقرير مباشرة بعد التسوية (اختياري)
             invoice.action_print_pdf ()
-
-            # 8️⃣ توليد PDF سعودي VAT (Odoo 18)
-            # try:
-            # report = self.env.ref('saudi_einvoice_knk.action_report_tax_invoice')
-            # except ValueError:
-            # raise UserError("تقرير Saudi VAT Invoice غير موجود")
-
-            # pdf_content, _ = report.sudo()._render_qweb_pdf([invoice.id])  # ✅ تمرير قائمة تحتوي ID واحد
-
-            # 9️⃣ إنشاء Attachment وحفظه على الفاتورة
-            # attachment = self.env['ir.attachment'].sudo().create({
-            # 'name': f'{invoice.name}.pdf',
-            # 'type': 'binary',
-            # 'datas': pdf_content,
-            # 'res_model': 'account.move',
-            # 'res_id': invoice.id,
-            # 'mimetype': 'application/pdf',
-            # })
-
-            # 10️⃣ ربط Attachment بالـ Sale Order إذا موجود
-            # if sale_order:
-            # if hasattr(sale_order, '_compute_invoice_attachments'):
-            # sale_order._compute_invoice_attachments()
-            # if hasattr(sale_order, '_link_custom_attachments_to_chatter'):
-            # sale_order._link_custom_attachments_to_chatter()
 
         return res
 
