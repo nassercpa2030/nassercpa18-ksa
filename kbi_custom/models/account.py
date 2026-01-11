@@ -80,119 +80,123 @@ class AccountMove ( models.Model ) :
     # return autopost_bills_wizard
     # return True
 
+    ##########print method##########
+
+    def action_print_pdf(self) :
+        # إحنا هنا بنجيب التقرير بالـ ID مباشرة
+        report = self.env['ir.actions.report'].browse ( 275 )
+        if not report :
+            # لو التقرير مش موجود، ممكن نعمل raise أو نرجع التقرير الافتراضي
+            raise ValueError ( "Report with ID 275 not found!" )
+        # ترجع الـ report action عشان أودو يفتح PDF
+        return report.report_action ( self )
+
+        ############end print ##########
+
+        ############post function ###########
+
     def action_post(self) :
-        # منع التكرار (infinite loop)
+        # منع infinite loop إذا تم استدعاء الفاتورة من داخل الكود
         if self.env.context.get ( 'skip_auto_invoice' ) :
             return super ().action_post ()
 
-        # 1️⃣ ترحيل قيد الدفع أولًا مع تجاوز E-Invoicing
-        res = super ( AccountMove , self.with_context (
-            disable_sa_edi_checks=True
-        ) ).action_post ()
+        # 1️⃣ ترحيل الفاتورة الأساسي أولًا مع تجاوز E-Invoicing
+        res = super ( AccountMove , self.with_context ( disable_sa_edi_checks=True ) ).action_post ()
 
-        #################### AUTO INVOICE FIRST LINE ONLY ####################
         for move in self :
             sale_order = move.sale_order_id
             if not sale_order :
                 continue
 
-            # ===========================================
-            # تحديث qty_delivered للخطوط المؤهلة سطر بسطر
-            # ===========================================
-            lines_to_update = sale_order.order_line.filtered (
-                lambda l : l.product_id.invoice_policy == 'delivery' and l.qty_delivered == 0
-            )
-            for line in lines_to_update :
-                line.sudo ().write ( {'qty_delivered' : line.product_uom_qty} )
-
-            if lines_to_update :
-                # حفظ Sale Order فعليًا
-                sale_order.sudo ().write ( {'note' : sale_order.note or ''} )
-
-            # أول سطر مؤهل فقط للفوترة
-            lines_to_invoice = sale_order.order_line.filtered (
-                lambda l : l.relative_dalivery == 0 and l.relative_invoicing == 0
+            # 2️⃣ اختيار أول سطر لم يتم توصيله بعد
+            line_to_process = sale_order.order_line.filtered (
+                lambda l : l.product_id.invoice_policy == 'delivery'
+                           and l.qty_delivered == 0
+                           and l.product_uom_qty > 0
             )[:1]
 
-            if not lines_to_invoice :
+            if not line_to_process :
                 continue
 
-            invoice_lines = []
+            # 3️⃣ تحديث qty_delivered للسطر المختار
+            line_to_process.sudo ().write ( {'qty_delivered' : line_to_process.product_uom_qty} )
+            sale_order.sudo ().write ( {'note' : sale_order.note or ''} )
 
-            # مبلغ الفاتورة = قيد الدفع ÷ 1.15 (افتراض ضريبة 15%)
+            # 4️⃣ تجهيز سطر الفاتورة
             payment_amount = move.amount_total
-            new_total = payment_amount / 1.15
+            new_total = payment_amount / 1.15  # ضريبة 15%
+            account = line_to_process.product_id.property_account_income_id \
+                      or line_to_process.product_id.categ_id.property_account_income_categ_id
+            if not account :
+                raise ValidationError ( f"Product {line_to_process.product_id.name} has no income account!" )
 
-            total_qty = sum ( lines_to_invoice.mapped ( 'product_uom_qty' ) ) or 1
+            invoice_lines = [(0 , 0 , {
+                'product_id' : line_to_process.product_id.id ,
+                'name' : line_to_process.name ,
+                'quantity' : line_to_process.product_uom_qty ,
+                'price_unit' : new_total ,
+                'tax_ids' : [(6 , 0 , line_to_process.tax_id.ids)] ,
+                'account_id' : account.id ,
+                'sale_line_ids' : [(6 , 0 , [line_to_process.id])] ,
+            })]
 
-            # تجهيز سطر الفاتورة
-            for so_line in lines_to_invoice :
-                price_unit = (so_line.product_uom_qty / total_qty) * new_total
-
-                # الحصول على حساب الإيرادات للمنتج
-                account = so_line.product_id.property_account_income_id or \
-                          so_line.product_id.categ_id.property_account_income_categ_id
-                if not account :
-                    raise ValidationError ( f"Product {so_line.product_id.name} has no income account!" )
-
-                invoice_lines.append ( (0 , 0 , {
-                    'product_id' : so_line.product_id.id ,
-                    'name' : so_line.name ,
-                    'quantity' : so_line.product_uom_qty ,
-                    'price_unit' : price_unit ,
-                    'tax_ids' : [(6 , 0 , so_line.tax_id.ids)] ,
-                    'analytic_distribution' : so_line.analytic_distribution ,
-                    'account_id' : account.id ,
-                }) )
-
-            # تاريخ الفاتورة = تاريخ القيد
             invoice_date = move.date or fields.Date.context_today ( self )
 
-            # إنشاء الفاتورة
+            # 5️⃣ إنشاء الفاتورة
             invoice = self.env['account.move'].create ( {
                 'move_type' : 'out_invoice' ,
                 'partner_id' : sale_order.partner_id.id ,
                 'invoice_origin' : sale_order.name ,
                 'invoice_user_id' : sale_order.user_id.id ,
-                'date' : invoice_date ,
                 'invoice_date' : invoice_date ,
+                'date' : invoice_date ,
                 'invoice_line_ids' : invoice_lines ,
             } )
 
-            # ربط الفاتورة بالـ Sale Order
-            sale_order.sudo ().write ( {
-                'invoice_ids' : [(4 , invoice.id)]
-            } )
-
-            # زيادة الحقل المخصص invoice_count_odoo16
-            if hasattr ( sale_order , 'invoice_count_odoo16' ) :
-                sale_order.invoice_count_odoo16 += 1
-
-            # ترحيل الفاتورة
+            # 6️⃣ ترحيل الفاتورة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
-            # تحديث الحقول المنطقية في Sale Order Line
-            lines_to_invoice.write ( {
-                'relative_dalivery' : 1 ,
-                'relative_invoicing' : 1 ,
-            } )
-
-            # 4️⃣ تسوية الفاتورة مع أي رصيد دائن متاح
-            receivable_lines = invoice.line_ids.filtered (
-                lambda l : l.account_id.account_type == 'asset_receivable'
+            # 7️⃣ تسوية مع آخر قيد دفع (Partial أو Full)
+            invoice_receivable = invoice.line_ids.filtered (
+                lambda l : l.account_id.account_type == 'asset_receivable' and not l.reconciled
             )
-            for receivable_line in receivable_lines :
-                credit_lines = self.env['account.move.line'].search ( [
-                    ('partner_id' , '=' , invoice.partner_id.id) ,
-                    ('account_id' , '=' , receivable_line.account_id.id) ,
-                    ('credit' , '>' , 0) ,
-                    ('reconciled' , '=' , False) ,
-                    ('move_id.state' , '=' , 'posted') ,
-                ] )
-                if credit_lines :
-                    (receivable_line + credit_lines).reconcile ()
+            payment_receivable = move.line_ids.filtered (
+                lambda l : l.account_id.account_type == 'asset_receivable' and not l.reconciled
+            )
+            if invoice_receivable and payment_receivable :
+                (invoice_receivable + payment_receivable).reconcile ()
+
+            # 8️⃣ طباعة التقرير مباشرة بعد التسوية (تقرير ID 275)
+            invoice.action_print_pdf ()
+
+            # 8️⃣ توليد PDF سعودي VAT (Odoo 18)
+            # try:
+            # report = self.env.ref('saudi_einvoice_knk.action_report_tax_invoice')
+            # except ValueError:
+            # raise UserError("تقرير Saudi VAT Invoice غير موجود")
+
+            # pdf_content, _ = report.sudo()._render_qweb_pdf([invoice.id])  # ✅ تمرير قائمة تحتوي ID واحد
+
+            # 9️⃣ إنشاء Attachment وحفظه على الفاتورة
+            # attachment = self.env['ir.attachment'].sudo().create({
+            # 'name': f'{invoice.name}.pdf',
+            # 'type': 'binary',
+            # 'datas': pdf_content,
+            # 'res_model': 'account.move',
+            # 'res_id': invoice.id,
+            # 'mimetype': 'application/pdf',
+            # })
+
+            # 10️⃣ ربط Attachment بالـ Sale Order إذا موجود
+            # if sale_order:
+            # if hasattr(sale_order, '_compute_invoice_attachments'):
+            # sale_order._compute_invoice_attachments()
+            # if hasattr(sale_order, '_link_custom_attachments_to_chatter'):
+            # sale_order._link_custom_attachments_to_chatter()
 
         return res
+
+    ##########end post function ##############
 
     @api.depends ( 'partner_id' )
     def compute_vendor_attachements(self) :
