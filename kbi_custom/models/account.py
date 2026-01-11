@@ -83,10 +83,10 @@ class AccountMove ( models.Model ) :
 
     def action_print_pdf(self) :
         # إحنا هنا بنجيب التقرير بالـ ID مباشرة
-        report = self.env['ir.actions.report'].browse ( 275 )
+        report = self.env['ir.actions.report'].browse ( 1275 )
         if not report :
             # لو التقرير مش موجود، ممكن نعمل raise أو نرجع التقرير الافتراضي
-            raise ValueError ( "Report with ID 275 not found!" )
+            raise ValueError ( "Report with ID 1275 not found!" )
         # ترجع الـ report action عشان أودو يفتح PDF
         return report.report_action ( self )
 
@@ -192,7 +192,11 @@ class AccountMove ( models.Model ) :
 
                 # 3️⃣ تنفيذ نفس زر Close Entry
                 wizard.close_entry ()
-
+                if sale_order.project_ids:
+                    project = sale_order.project_ids[0]  # مشروع واحد فقط
+                    if project.stage_id.id != 24:
+                       project.sudo().write({'stage_id': 24})
+        
             # 8️⃣ توليد PDF سعودي VAT (Odoo 18)
             # try:
             # report = self.env.ref('saudi_einvoice_knk.action_report_tax_invoice')
