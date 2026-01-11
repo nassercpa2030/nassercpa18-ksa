@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from odoo import models , fields , api
 from odoo.exceptions import ValidationError, UserError
 import base64
@@ -122,15 +121,26 @@ class AccountMove ( models.Model ) :
             line_to_process.sudo ().write ( {'qty_delivered' : line_to_process.product_uom_qty} )
             sale_order.sudo ().write ( {'note' : sale_order.note or ''} )
 
-            # 4️⃣ الحصول على قيمة آخر قيد دفع على الفاتورة الأصلية
-            last_payment_line = move.line_ids.filtered (
-                lambda l : l.account_id.account_type == 'asset_receivable' and l.credit > 0
-            ).sorted ( key=lambda l : l.date )[-1]  # آخر دفعة حسب التاريخ
+            # 4️⃣ الحصول على آخر دفعة منشورة على Sale Order
+            last_payment = self.env['account.payment'].search ( [
+                ('sale_order_id' , '=' , sale_order.id) ,
+                ('state' , '=' , 'posted')
+            ] , order='payment_date desc' , limit=1 )
+
+            if not last_payment :
+                continue  # لو مفيش دفعة، نكمل الفاتورة بدون تسوية
+
+            # جلب آخر قيد دفع
+            last_payment_line = last_payment.move_id.line_ids.filtered (
+                lambda l : l.account_id.internal_type == 'receivable' and l.credit > 0
+            ).sorted ( key=lambda l : l.date )[-1] if last_payment.move_id.line_ids else None
 
             if not last_payment_line :
-                raise ValidationError ( f"فاتورة {move.name} ليس لها أي دفعة مسجلة!" )
+                continue  # لو مفيش قيد، نتجاهل التسوية
 
-            payment_amount = last_payment_line.credit  # قيمة آخر دفعة
+            payment_amount = last_payment_line.credit
+
+            # حساب الدخل للمنتج
             account = line_to_process.product_id.property_account_income_id \
                       or line_to_process.product_id.categ_id.property_account_income_categ_id
             if not account :
@@ -164,12 +174,10 @@ class AccountMove ( models.Model ) :
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
             # 8️⃣ تسوية كاملة مع آخر قيد دفع
-            invoice_receivable = invoice.line_ids.filtered (
-                lambda l : l.account_id.account_type == 'asset_receivable'
-            )
-            payment_receivable = move.line_ids.filtered (
-                lambda l : l.account_id.account_type == 'asset_receivable'
-            )
+            invoice_receivable = invoice.line_ids.filtered ( lambda l : l.account_id.internal_type == 'receivable' )
+            payment_receivable = last_payment.move_id.line_ids.filtered (
+                lambda l : l.account_id.internal_type == 'receivable' )
+
             if invoice_receivable and payment_receivable :
                 (invoice_receivable + payment_receivable).reconcile ()
 
@@ -177,7 +185,6 @@ class AccountMove ( models.Model ) :
             invoice.action_print_pdf ()
 
         return res
-
     ##########end post function ##############
 
     @api.depends ( 'partner_id' )
