@@ -84,10 +84,10 @@ class AccountMove ( models.Model ) :
 
     def action_print_pdf(self) :
         # إحنا هنا بنجيب التقرير بالـ ID مباشرة
-        report = self.env['ir.actions.report'].browse ( 275 )
+        report = self.env['ir.actions.report'].browse ( 1275 )
         if not report :
             # لو التقرير مش موجود، ممكن نعمل raise أو نرجع التقرير الافتراضي
-            raise ValueError ( "Report with ID 275 not found!" )
+            raise ValueError ( "Report with ID 1275 not found!" )
         # ترجع الـ report action عشان أودو يفتح PDF
         return report.report_action ( self )
 
