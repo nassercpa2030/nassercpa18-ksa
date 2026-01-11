@@ -167,6 +167,31 @@ class AccountMove ( models.Model ) :
 
             # 8️⃣ طباعة التقرير مباشرة بعد التسوية (تقرير ID 275)
             invoice.action_print_pdf ()
+            
+            ### closing entry if theorder 100% paid  ###
+            # 🔟 التحقق هل ده آخر Sale Order Line
+            remaining_lines = sale_order.order_line.filtered (
+                lambda l : l.product_id.invoice_policy == 'delivery'
+                           and l.qty_delivered < l.product_uom_qty
+            )
+
+            if not remaining_lines :
+
+                # 1️⃣ استدعاء دالة الإقفال من Sale Order
+                if hasattr ( sale_order , 'action_close_journal_entries' ) :
+                    sale_order.action_close_journal_entries ()
+
+                # 2️⃣ إنشاء Wizard مع context الصحيح (زي الزرار)
+                wizard = self.env['close.entry.wizard'].with_context (
+                    active_id=sale_order.id ,
+                    active_model='sale.order'
+                ).create ( {
+                    'sale_order_id' : sale_order.id ,
+                    'journal_entry_date' : fields.Date.context_today ( self ) ,
+                } )
+
+                # 3️⃣ تنفيذ نفس زر Close Entry
+                wizard.close_entry ()
 
             # 8️⃣ توليد PDF سعودي VAT (Odoo 18)
             # try:
