@@ -125,7 +125,7 @@ class AccountMove ( models.Model ) :
             last_payment = self.env['account.payment'].search ( [
                 ('sale_order_id' , '=' , sale_order.id) ,
                 ('state' , '=' , 'posted')
-            ] , order='payment_date desc' , limit=1 )
+            ] , order='date desc' , limit=1 )
 
             if not last_payment :
                 continue  # لو مفيش دفعة، نكمل الفاتورة بدون تسوية
