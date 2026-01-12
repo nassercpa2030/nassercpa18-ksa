@@ -187,7 +187,8 @@ class AccountMove ( models.Model ) :
                     active_model='sale.order'
                 ).create ( {
                     'sale_order_id' : sale_order.id ,
-                    'journal_entry_date' : fields.Date.context_today ( self ) ,
+                    #'journal_entry_date' : fields.Date.context_today ( self ) ,
+                    'journal_entry_date' :invoice_date,
                 } )
 
                 # 3️⃣ تنفيذ نفس زر Close Entry
