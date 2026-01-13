@@ -514,7 +514,7 @@ class SaleOrder ( models.Model ) :
                 first_line = move_lines.sorted('date')[0]
                 rec.first_payment_code = first_line.move_id
                 rec.first_payment_code_date = first_line.date
-                 rec.first_payment_bank= first_line.journal_id.name
+                rec.first_payment_bank= first_line.journal_id.name
                 
                 #rec.first_payment_date = first_line.date
                 #rec.first_payment_amount = first_line.amount
