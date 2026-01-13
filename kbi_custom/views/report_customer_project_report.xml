@@ -5,21 +5,21 @@
     <!-- Report Action -->
     <!-- ============================= -->
     <record id="action_report_customer_bill_template" model="ir.actions.report">
-        <field name="name">فاتورة ضريبية</field>
-        <field name="model">account.move</field>
+        <field name="name">نموذج تتبع أمر البيع</field>
+        <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">kbi_custom.report_tax_invoice_document</field>
-        <!--field name="print_report_name">'فاتورة - %s' % (object.name) ' - %s' %(object.sale_order_id_finance.partner_id) - %s' %(object.sale_order_id_finance.name)</field-->
-        <field name="print_report_name"> f"فاتورة - {object.name or ''} - {object.sale_order_id_finance.partner_id.name or ''} - {object.sale_order_id_finance.name or ''}"</field>
+        <field name="report_name">kbi_custom.report_customer_project_report</field>
+        <!--field name="print_report_name">'فاتورة - %s' % (object.name) ' - %s' %(object.partner_id) - %s' %(object.sale_order_id_finance.name)</field-->
+        <field name="print_report_name"> f"أمر بيع - {object.name or ''} - {object.partner_id.name or ''} "</field>
         <field name="paperformat_id" ref="kbi_custom.paperformat_zero_margin"/>
-        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_model_id" ref="sale.order"/>
         <field name="binding_type">report</field>
     </record>
 
     <!-- ============================= -->
     <!-- QWEB REPORT -->
     <!-- ============================= -->
-    <template id="report_tax_invoice_document">
+    <template id="report_customer_project_report">
         <t t-foreach="docs" t-as="o">
             <t t-call="kbi_custom.external_layout_seti">
 
@@ -67,19 +67,19 @@
                 <!-- ================= Body الصفحة ================= -->
                 <div class="page" style="margin:0;padding:0 0 180px 0;">
 
-                    <!-- عنوان الفاتورة -->
+                    <!-- بيانات  السيل أوردر -->
                     <table>
                         <tr style="width=:100%">
                             <td colspan="8" style="text-align:center;font-weight:bold;padding:8px;width=:50%; direction: rtl; ">
-                               فاتورة ضريبية
+                               نموذج  تتبع  أمر البيع 
                             </td>
                              <td colspan="8" style="text-align:center;font-weight:bold;padding:8px;width=:50%; direction: ltr;">
-                                Tax Invoice 
+                                Sale Order History
                             </td>
                         </tr>
                     </table>
 
-                    <!-- بيانات الفاتورة -->
+                    <!-- بيانات السيل أوردر -->
                     <table style="margin-top:12px;">
                   <tr>
     <td width="100%">
@@ -88,7 +88,7 @@
             <tr>
                 <!-- عربي -->
                 <td width="33%" style="text-align:right;">
-                    <strong>رقم الفاتورة</strong>
+                    <strong>رقم أمر البيع</strong>
                 </td>
 
                 <!-- القيمة -->
@@ -98,51 +98,125 @@
 
                 <!-- إنجليزي -->
                 <td width="33%" style="text-align:left;">
-                    <strong>Invoice No</strong>
+                    <strong>Sale Order No</strong>
                 </td>
             </tr>
 
             <!-- Source -->
             <tr>
                 <td style="text-align:right;">
-                    <strong>المصدر</strong>
+                    <strong>العميل</strong>
                 </td>
 
                 <td style="text-align:center;">
-                    <span t-field="o.sale_order_id_finance.name"/>
+                    <span t-field="o.partner_id"/>
                 </td>
 
                 <td style="text-align:left;">
-                    <strong>Source</strong>
+                    <strong>Customer</strong>
                 </td>
             </tr>
-            <!-- Source Code -->
+            <!-- creation date -->
             <tr>
                 <td style="text-align:right;">
-                    <strong>كود المصدر</strong>
+                    <strong>تاريخ  الإنشاء </strong>
                 </td>
 
                 <td style="text-align:center;">
-                    <span t-field="o.sale_order_id_finance.auto_code"/>
+                    <span t-field="o.create_date"/>
                 </td>
 
                 <td style="text-align:left;">
-                    <strong>Source Code</strong>
+                    <strong>Creation Date</strong>
                 </td>
             </tr>
-                        <!-- Date -->
+                        <!-- created by -->
             <tr>
                 <td style="text-align:right;">
-                    <strong>التاريخ</strong>
+                    <strong>أنشئ بواسطة</strong>
                 </td>
 
                 <td style="text-align:center;">
-                    <span t-field="o.invoice_date"/>
+                    <span t-field="o.create_uid"/>
                 </td>
 
                 <td style="text-align:left;">
-                    <strong>Date</strong>
+                    <strong>Created By</strong>
                 </td>
+            </tr>
+                              <!-- order date -->
+            <tr>
+                <td style="text-align:right;">
+                    <strong>تاريخ  الطلب</strong>
+                </td>
+
+                <td style="text-align:center;">
+                    <span t-field="o.date_order"/>
+                </td>
+
+                <td style="text-align:left;">
+                    <strong>Order Date</strong>
+                </td>
+            </tr>
+              <!-- service -->
+            <tr>
+                <td style="text-align:right;">
+                    <strong>الخدمة المقدمة </strong>
+                </td>
+
+                <td style="text-align:center;">
+                    <span t-field="o.project_name"/>
+                </td>
+
+                <td style="text-align:left;">
+                    <strong>Service </strong>
+                </td>
+            </tr>
+            <!-- close entry journal -->
+            <tr>
+                <td style="text-align:right;">
+                    <strong>تاريخ قيد الإغلاق </strong>
+                </td>
+
+                <td style="text-align:center;">
+                    <span t-field="o.final_close_entry_date"/>
+                </td>
+
+                <td style="text-align:left;">
+                    <strong>Journal Entry Date </strong>
+                </td>
+                
+            </tr>
+               <!-- close entry journal date -->
+            <tr>
+                <td style="text-align:right;">
+                    <strong> قيد الإغلاق </strong>
+                </td>
+
+                <td style="text-align:center;">
+                    <span t-field="o.final_close_entry"/>
+                </td>
+
+                <td style="text-align:left;">
+                    <strong>Journal Entry 1 </strong>
+                </td>
+                
+            </tr>
+                      <!-- first payment date -->
+            <tr>
+                <td style="text-align:right;">
+                    <strong> تاريخ أول دفعة <br /> البنك </strong>
+                </td>
+
+                <td style="text-align:center;">
+                    <span t-field="o.final_close_entry"/><br/>
+                    <span t-field="o.final_close_entry"/>
+                </td>
+
+                <td style="text-align:left;">
+                    <strong>First Payment Date <br/ > Bank </strong>
+                </td>
+                
             </tr>
         </table>
     </td>
@@ -150,7 +224,9 @@
 
                     </table>
 
-                    <!-- جدول البنود -->
+                   
+
+                       <!-- جدول الفواتير -->
                     <table style="margin-top:15px;">
                         <thead>
                             <tr style="text-align:center;">
