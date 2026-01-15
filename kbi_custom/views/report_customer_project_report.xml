@@ -4,387 +4,183 @@
     <!-- ============================= -->
     <!-- Report Action -->
     <!-- ============================= -->
-    <record id="action_report_customer_bill_template" model="ir.actions.report">
+    <record id="action_report_customer_project_tracking" model="ir.actions.report">
         <field name="name">نموذج تتبع أمر البيع</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">kbi_custom.report_customer_project_report</field>
-        <!--field name="print_report_name">'فاتورة - %s' % (object.name) ' - %s' %(object.partner_id) - %s' %(object.sale_order_id_finance.name)</field-->
-        <field name="print_report_name"> f"أمر بيع - {object.name or ''} - {object.partner_id.name or ''} "</field>
+        <field name="report_name">kbi_custom.report_customer_project_tracking</field>
+        <field name="print_report_name">
+            'أمر بيع - %s' % (object.name or '')
+        </field>
         <field name="paperformat_id" ref="kbi_custom.paperformat_zero_margin"/>
         <field name="binding_model_id" ref="sale.order"/>
         <field name="binding_type">report</field>
     </record>
 
     <!-- ============================= -->
-    <!-- QWEB REPORT -->
+    <!-- QWEB TEMPLATE -->
     <!-- ============================= -->
-    <template id="report_customer_project_report">
+    <template id="report_customer_project_tracking">
         <t t-foreach="docs" t-as="o">
-            <t t-call="kbi_custom.external_layout_seti">
+            <t t-call="web.external_layout">
 
-                <!-- خط عربي وتكبير الخط -->
                 <style>
-                 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
-
                     body, table, td, th {
                         font-family: 'Tajawal', sans-serif;
                         font-size: 13px;
                     }
-
-                    th {
-                        font-weight: bold;
-                        font-size: 13.5px;
-                       /* background:#DCDCDC;*/
-                         background:#EAF3FF;
-
-                    }
-
                     table {
                         width: 100%;
                         border-collapse: collapse;
                     }
-
-                    td, th {
-                        padding:5px;
-                      /*  border:1px solid #ccc;*/
-                        border:1px solid #2F6FB2;
-                        text-align:right;
-                    }
-
-                    .thank-you {
-                        text-align:center;
-                        font-size:12px;
-                    }
-
-                    .thank-you .decor {
-                        color:#c71585;
-                        margin-top:5px;
-                        letter-spacing:2px;
+                    th, td {
+                        padding: 6px;
+                        text-align: right;
                     }
                 </style>
 
-                <!-- ================= Body الصفحة ================= -->
-                <div class="page" style="margin:0;padding:0 0 180px 0;">
+                <div class="page">
 
-                    <!-- بيانات  السيل أوردر -->
+                    <!-- ================= Header ================= -->
                     <table>
-                        <tr style="width=:100%">
-                            <td colspan="8" style="text-align:center;font-weight:bold;padding:8px;width=:50%; direction: rtl; ">
-                               نموذج  تتبع  أمر البيع 
-                            </td>
-                             <td colspan="8" style="text-align:center;font-weight:bold;padding:8px;width=:50%; direction: ltr;">
-                                Sale Order History
+                        <tr>
+                            <td colspan="2" style="text-align:center; font-size:16px; font-weight:bold;">
+                                نموذج تتبع أمر البيع
                             </td>
                         </tr>
                     </table>
 
-                    <!-- بيانات السيل أوردر -->
-                    <table style="margin-top:12px;">
-                  <tr>
-    <td width="100%">
-        <table width="100%" style="border-collapse:collapse;">
-            <!-- Invoice No -->
-            <tr>
-                <!-- عربي -->
-                <td width="33%" style="text-align:right;">
-                    <strong>رقم أمر البيع</strong>
-                </td>
-
-                <!-- القيمة -->
-                <td width="34%" style="text-align:center;">
-                    <span t-field="o.name"/>
-                </td>
-
-                <!-- إنجليزي -->
-                <td width="33%" style="text-align:left;">
-                    <strong>Sale Order No</strong>
-                </td>
-            </tr>
-
-            <!-- Source -->
-            <tr>
-                <td style="text-align:right;">
-                    <strong>العميل</strong>
-                </td>
-
-                <td style="text-align:center;">
-                    <span t-field="o.partner_id"/>
-                </td>
-
-                <td style="text-align:left;">
-                    <strong>Customer</strong>
-                </td>
-            </tr>
-            <!-- creation date -->
-            <tr>
-                <td style="text-align:right;">
-                    <strong>تاريخ  الإنشاء </strong>
-                </td>
-
-                <td style="text-align:center;">
-                    <span t-field="o.create_date"/>
-                </td>
-
-                <td style="text-align:left;">
-                    <strong>Creation Date</strong>
-                </td>
-            </tr>
-                        <!-- created by -->
-            <tr>
-                <td style="text-align:right;">
-                    <strong>أنشئ بواسطة</strong>
-                </td>
-
-                <td style="text-align:center;">
-                    <span t-field="o.create_uid"/>
-                </td>
-
-                <td style="text-align:left;">
-                    <strong>Created By</strong>
-                </td>
-            </tr>
-                              <!-- order date -->
-            <tr>
-                <td style="text-align:right;">
-                    <strong>تاريخ  الطلب</strong>
-                </td>
-
-                <td style="text-align:center;">
-                    <span t-field="o.date_order"/>
-                </td>
-
-                <td style="text-align:left;">
-                    <strong>Order Date</strong>
-                </td>
-            </tr>
-              <!-- service -->
-            <tr>
-                <td style="text-align:right;">
-                    <strong>الخدمة المقدمة </strong>
-                </td>
-
-                <td style="text-align:center;">
-                    <span t-field="o.project_name"/>
-                </td>
-
-                <td style="text-align:left;">
-                    <strong>Service </strong>
-                </td>
-            </tr>
-            <!-- close entry journal -->
-            <tr>
-                <td style="text-align:right;">
-                    <strong>تاريخ قيد الإغلاق </strong>
-                </td>
-
-                <td style="text-align:center;">
-                    <span t-field="o.final_close_entry_date"/>
-                </td>
-
-                <td style="text-align:left;">
-                    <strong>Journal Entry Date </strong>
-                </td>
-                
-            </tr>
-               <!-- close entry journal date -->
-            <tr>
-                <td style="text-align:right;">
-                    <strong> قيد الإغلاق </strong>
-                </td>
-
-                <td style="text-align:center;">
-                    <span t-field="o.final_close_entry"/>
-                </td>
-
-                <td style="text-align:left;">
-                    <strong>Journal Entry 1 </strong>
-                </td>
-                
-            </tr>
-                      <!-- first payment date -->
-            <tr>
-                <td style="text-align:right;">
-                    <strong> تاريخ أول دفعة <br /> البنك </strong>
-                </td>
-
-                <td style="text-align:center;">
-                    <span t-field="o.final_close_entry"/><br/>
-                    <span t-field="o.final_close_entry"/>
-                </td>
-
-                <td style="text-align:left;">
-                    <strong>First Payment Date <br/ > Bank </strong>
-                </td>
-                
-            </tr>
-        </table>
-    </td>
-</tr>
-
-                    </table>
-
-                   
-
-                       <!-- جدول الفواتير -->
+                    <!-- ================= Sale Order Info ================= -->
                     <table style="margin-top:15px;">
-                        <thead>
-                            <tr style="text-align:center;">
-                                <th style="width:11%;text-align:center;">الوصف <br/> 
-                                    Description</th>
-                                <th style="width:30%;text-align:center;">الخدمة المقدمة <br/> Service</th>
-                                <th style="width:8%;text-align:center;">الكمية <br/> Qty</th>
-                                <th style="width:12%;text-align:center;">سعر الوحدة <br/> Unit Price</th>
-                                <th style="width:10%;text-align:center;">الإجمالي <br/> Subtotal</th>
-                                <th style="width:9%;text-align:center;"> نسبة الضريبة <br/>VAT %</th>
-                                <th style="width:12%;text-align:center;">قيمة الضريبة <br/>VAT   </th>
-                                <th style="width:25%; font-weight:bold; text-align:center; "> الإجمالي الفرعي<br/>Total </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-set="tax_total" t-value="0"/>
-                            <tr t-foreach="o.invoice_line_ids" t-as="l">
-                                <t t-set="line_tax" t-value="sum(t.amount for t in l.tax_ids)"/>
-                                <t t-set="line_tax_amount" t-value="l.price_subtotal * line_tax / 100"/>
-                                <t t-set="tax_total" t-value="tax_total + line_tax_amount"/>
-
-                                <td style="text-align:center;"><span t-field="l.name"/></td>
-                                <td style="text-align:center;">
-                                    <t t-esc="l.sale_line_ids and l.sale_line_ids[0].order_id.project_name or ''"/>
-                                </td>
-                                <td style="text-align:center;"><span t-field="l.quantity"/></td>
-                                <td style="text-align:center;">
-                                    <span t-field="l.price_unit" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                                </td>
-                                <td style="text-align:center;">
-                                    <span t-field="l.price_subtotal" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                                </td>
-                                <td style="text-align:center;"><t t-esc="line_tax"/>%</td>
-                                <td style="text-align:center;">
-                                    <span t-esc="line_tax_amount" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                                </td>
-                                <td style="text-align:center;  font-weight:bold; ">
-                                    <span t-esc="l.price_subtotal + line_tax_amount" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                                </td>
-                            </tr>
-                        </tbody>
+                        <tr>
+                            <td><strong>رقم أمر البيع</strong></td>
+                            <td><span t-field="o.name"/></td>
+                            <td><strong>العميل</strong></td>
+                            <td><span t-field="o.partner_id"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>تاريخ الإنشاء</strong></td>
+                            <td><span t-field="o.create_date"/></td>
+                            <td><strong>أُنشئ بواسطة</strong></td>
+                            <td><span t-field="o.create_uid"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>تاريخ الطلب</strong></td>
+                            <td><span t-field="o.date_order"/></td>
+                            <td><strong>الخدمة</strong></td>
+                            <td><span t-esc="o.project_name or ''"/></td>
+                        </tr>
                     </table>
 
-                    <!-- الإجماليات -->
-                    <!--div style="margin-top:15px; text-align:right;">
-                        <table style="border:1px solid #ccc; border-collapse:collapse; min-width:200px; display:inline-block;">
+                    <!-- ================= Payments Tracking ================= -->
+                    <table style="margin-top:20px;">
+                        <tr>
+                            <td colspan="4" style="font-weight:bold;">الدفعات</td>
+                        </tr>
+                        <tr>
+                            <td><strong>تاريخ الدفعة الأولى</strong></td>
+                            <td><span t-esc="o.first_payment_date or ''"/></td>
+                            <td><strong>البنك المستلم</strong></td>
+                            <td><span t-esc="o.first_payment_bank or ''"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>تاريخ الدفعة الثانية</strong></td>
+                            <td><span t-esc="o.second_payment_date or ''"/></td>
+                            <td><strong>البنك المستلم</strong></td>
+                            <td><span t-esc="o.second_payment_bank or ''"/></td>
+                        </tr>
+                    </table>
+
+                    <!-- ================= Invoices ================= -->
+                    <table style="margin-top:20px;">
+                        <tr>
+                            <td colspan="4" style="font-weight:bold;">الفواتير المرتبطة</td>
+                        </tr>
+                        <t t-foreach="o.invoice_ids" t-as="inv">
                             <tr>
-                                <td>الإجمالي قبل الضريبة</td>
-                                <td style="text-align:right;">
-                                    <span t-field="o.amount_untaxed" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
+                                <td colspan="2">
+                                    رقم الفاتورة:
+                                    <strong><span t-esc="inv.name"/></strong>
                                 </td>
-                                 <td style="text-align:center;">Subtotal </td>
-                            </tr>
-                            <tr>
-                                <td> الضريبة</td>
-                                <td style="text-align:right;">
-                                    <span t-esc="tax_total" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                                     <td style="text-align:center;">VAT</td>
+                                <td colspan="2">
+                                    تاريخها:
+                                    <span t-field="inv.invoice_date"/>
                                 </td>
                             </tr>
-                            <tr style="font-weight:bold;">
-                                <td style="text-align:center;"> المجموع الكلي</td>
-                                <td style="text-align:right;">
-                                    <span t-field="o.amount_total" t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                                </td>
-                                 <td style="text-align:left;">Total Amount </td>
-                            </tr>
-                        </table>
-                     
-               
-                         <div style=" text-align:left;">
-                        <img t-if="o.get_qr_code()" 
-                             t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % o.get_qr_code()"
-                             style="border:1px solid #ccc;padding:4px;"/>
+                        </t>
+                    </table>
+
+                    <!-- ================= Approvals ================= -->
+                    <table style="width:100%; margin-top:35px; border-collapse:collapse;">
+                        <!-- Titles -->
+                        <tr>
+                            <td style="width:50%; text-align:center; font-weight:bold;">
+                                مدير الجودة
+                            </td>
+                            <td style="width:50%; text-align:center; font-weight:bold;">
+                                مدير المالية
+                            </td>
+                        </tr>
+
+                        <!-- Names -->
+                        <tr>
+                            <td style="text-align:center;">
+                                <span t-esc="o.quality_manager_id.name or ''"/>
+                            </td>
+                            <td style="text-align:center;">
+                                <span t-esc="o.finance_manager_id.name or ''"/>
+                            </td>
+                        </tr>
+
+                        <!-- Signatures -->
+                        <tr>
+                            <td style="text-align:center; padding-top:15px;">
+                                <t t-if="o.quality_manager_signature">
+                                    <img t-att-src="'data:image/png;base64,%s' % o.quality_manager_signature"
+                                         style="height:70px;"/>
+                                </t>
+                            </td>
+                            <td style="text-align:center; padding-top:15px;">
+                                <t t-if="o.finance_manager_signature">
+                                    <img t-att-src="'data:image/png;base64,%s' % o.finance_manager_signature"
+                                         style="height:70px;"/>
+                                </t>
+                            </td>
+                        </tr>
+
+                        <!-- Dates -->
+                        <tr>
+                            <td style="text-align:center; font-size:12px;">
+                                التاريخ:
+                                <span t-esc="o.quality_approve_date or ''"/>
+                            </td>
+                            <td style="text-align:center; font-size:12px;">
+                                التاريخ:
+                                <span t-esc="o.finance_approve_date or ''"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- ================= Closing Entry ================= -->
+                    <table style="margin-top:25px;">
+                        <tr>
+                            <td><strong>تاريخ قيد الإغلاق</strong></td>
+                            <td><span t-esc="o.final_close_entry_date or ''"/></td>
+                            <td><strong>رقم القيد</strong></td>
+                            <td><span t-esc="o.final_close_entry or ''"/></td>
+                        </tr>
+                    </table>
+
+                    <!-- ================= Official Stamp ================= -->
+                    <div style="margin-top:30px; text-align:center;">
+                        <t t-if="o.company_id.stamp_image">
+                            <img t-att-src="'data:image/png;base64,%s' % o.company_id.stamp_image"
+                                 style="height:90px;"/>
+                        </t>
+                        <div style="font-size:12px; margin-top:5px;">
+                            الختم الرسمي
+                        </div>
                     </div>
-                    </div-->
-                         <!--div style="margin-top:25px; text-align:left;"-->
-                    <table style="width:100%; border-collapse:collapse;height:105px;border: 1px solid transparent !important;
-    outline: none !important;">
-    <tr>
-        <!-- خلية جدول الإجماليات 60% -->
-        <td style="width:60%; vertical-align:top; text-align:right;border: 1px solid transparent !important;
-    outline: none !important;">
-            <table style="border:1px solid #ccc; border-collapse:collapse; width:100%;">
-                <tr>
-                    <td>الإجمالي قبل الضريبة</td>
-                    <td style="text-align:right;">
-                        <span t-field="o.amount_untaxed"
-                              t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                    </td>
-                    <td style="text-align:left;">Subtotal</td>
-                </tr>
-
-                <tr>
-                    <td >الضريبة</td>
-                    <td style="text-align:right;">
-                        <span t-esc="tax_total"
-                              t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                    </td>
-                    <td style="text-align:left;">VAT</td>
-                </tr>
-
-                <tr style="font-weight:bold; font-size:14px; text-align:center; background-color:#EAF3FF;">
-                    <td style="text-align:right;">المجموع الكلي</td>
-                    <td style="text-align:right;">
-                        <span t-field="o.amount_total"
-                              t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
-                    </td>
-                    <td style="text-align:left;">Total Amount</td>
-                </tr>
-            </table>
-        </td>
-
-        <!-- خلية QR Code 40% -->
-        <td style="width:40%; text-align:left; vertical-align:top;border: 1px solid transparent !important;
-    outline: none !important; padding:0px; padding-top:5px;">
-            <t t-if="o.get_qr_code()">
-                <img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=190&amp;height=90' % o.get_qr_code()"
-                     style="width:90px; height:90px; border:1px solid #ccc;padding:4px;" />
-            </t>
-        </td>
-    </tr>
-</table>
-
-                    <!-- مسافة بين QR وملاحظة ZATCA -->
-                    <div style="margin-top:30px;">
-                        <p style="font-size:11px;">
-                            فاتورة ضريبية صادرة وفق متطلبات هيئة الزكاة والضريبة والجمارك (ZATCA)
-                            <br/>
-                            Tax Invoice issued in accordance with ZATCA requirements
-                        </p>
-                    </div>
-
-                    <!-- سطر شكر ورد بعد كل شيء -->
-                    <div class="thank-you" style="margin-top:40px;">
-                        <strong>🌸🌸🌸 نشكركم علي التعامل معنا / Thank you for choosing our services 🌸🌸🌸</strong>
-                        <div class="decor">❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀</div>
-                    </div>
-
-                    <!-- ================= FOOTER ================= -->
-                    <!--div style="
-                        position: fixed;
-                        bottom: 0;
-                        left: 0;
-                        right: 0;
-                        text-align: center;
-                        font-size: 11px;
-                        padding-top: 8px;
-                        border-top: 2px dotted #666;
-                        background: #fff;
-                    ">
-                        <strong>
-                            <t t-esc="o.company_id.name"/>
-                            <t t-if="o.company_id.phone"> | Tel: <t t-esc="o.company_id.phone"/></t>
-                            <t t-if="o.company_id.email"> | Email: <t t-esc="o.company_id.email"/></t>
-                            <t t-if="o.company_id.website"> | <t t-esc="o.company_id.website"/></t>
-                        </strong>
-                    </div-->
 
                 </div>
             </t>
