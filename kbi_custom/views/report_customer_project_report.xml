@@ -80,7 +80,7 @@
                                     <t t-set="payment_count" t-value="len(payments)"/>
                                     <t t-if="payment_count &gt; 0">
                                         <t t-foreach="payments" t-as="pay" t-index="i">
-                                            <tr>
+                                            <!--tr>
                                                 <td><strong>الدفعة <t t-esc="(i or 0) + 1"/></td><br/>البنك/الخزنة</strong></td>
                                                 <td style="text-align:center;">
                                                    <strong> <span t-esc="pay.amount or 0"/> ريال<br/></strong>
@@ -88,7 +88,22 @@
                                                     <small>تاريخ الدفع: <strong><span t-esc="pay.date or '-'"/></strong></small>
                                                 </td>
                                                 <td style="text-align:left;"><strong>Payment <t t-esc="(i or 0) + 1"/><br/>Bank</strong></td>
-                                            </tr>
+                                            </tr-->
+                        <tr>
+    <td>
+        <strong>الدفعة <t t-esc="(i or 0) + 1"/></strong><br/>
+        <strong>البنك/الخزنة</strong>
+    </td>
+    <td style="text-align:center;">
+        <strong><span t-esc="pay.amount or 0"/> ريال</strong><br/>
+        <strong><span t-esc="pay.journal_id.name or '-'"/></strong><br/>
+        <small>تاريخ الدفع: <strong><span t-esc="pay.date or '-'"/></strong></small>
+    </td>
+    <td style="text-align:left;">
+        <strong>Payment <t t-esc="(i or 0) + 1"/><br/>Bank</strong>
+    </td>
+</tr>
+
                                         </t>
                                     </t>
                                     <t t-if="payment_count == 0">
