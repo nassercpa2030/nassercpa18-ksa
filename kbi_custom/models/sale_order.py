@@ -521,6 +521,7 @@ class SaleOrder ( models.Model ) :
             else:
                 rec.first_payment_code = False
                 rec.first_payment_code_date = False
+                rec.first_payment_bank = ''  # فارغ لو مفيش دفعة
 
             # تحديث الحقول الأخرى
             rec.paid_total = paid_total
