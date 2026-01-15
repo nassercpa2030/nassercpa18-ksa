@@ -13,7 +13,7 @@
             'أمر بيع - %s' % (object.name or '')
         </field>
         <field name="paperformat_id" ref="kbi_custom.paperformat_zero_margin"/>
-        <field name="binding_model_id" ref="sale.order"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
         <field name="binding_type">report</field>
     </record>
 
