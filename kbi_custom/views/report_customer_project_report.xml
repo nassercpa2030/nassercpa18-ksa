@@ -21,20 +21,76 @@
         <t t-foreach="docs" t-as="o">
             <t t-call="kbi_custom.external_layout_seti">
 
+                <!-- ======================= -->
+                <!-- Body CSS only -->
+                <!-- ======================= -->
                 <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
-                    body, table, td, th { font-family: 'Tajawal', sans-serif; font-size: 13px; }
-                    th { font-weight: bold; font-size: 13.5px; background:#EAF3FF; }
-                    table { width: 100%; border-collapse: collapse; }
-                    td, th { padding:5px; border:1px solid #2F6FB2; text-align:right; vertical-align:middle; }
-                    .thank-you { text-align:center; font-size:12px; color:#2F6FB2; }
-                    .decor { color:#c71585; margin-top:5px; letter-spacing:2px; }
-                    .header-title2 { font-size:18px; text-align:center; font-weight:bold; margin-bottom:10px;  padding-top:6px;}
-                    .signature-cell { width:45%; text-align:center; vertical-align:middle; }
-                    strong { display:block; text-align:center; }
+                    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+
+                    /* CSS يطبق فقط على محتوى التقرير */
+                    .report-body, 
+                    .report-body table, 
+                    .report-body td, 
+                    .report-body th { 
+                        font-family: 'Tajawal', sans-serif; 
+                        font-size: 13px; 
+                    }
+
+                    .report-body th { 
+                        font-weight: bold; 
+                        font-size: 13.5px; 
+                        background:#EAF3FF; 
+                    }
+
+                    .report-body table { 
+                        width: 100%; 
+                        border-collapse: collapse; 
+                    }
+
+                    .report-body td, .report-body th { 
+                        padding:5px; 
+                        border:1px solid #2F6FB2; 
+                        text-align:right; 
+                        vertical-align:middle; 
+                    }
+
+                    .report-body .thank-you { 
+                        text-align:center; 
+                        font-size:12px; 
+                        color:#2F6FB2; 
+                    }
+
+                    .report-body .decor { 
+                        color:#c71585; 
+                        margin-top:5px; 
+                        letter-spacing:2px; 
+                    }
+
+                    .report-body .header-title2 { 
+                        font-size:18px; 
+                        text-align:center; 
+                        font-weight:bold; 
+                        margin-bottom:10px;  
+                        padding-top:6px;
+                    }
+
+                    .report-body .signature-cell { 
+                        width:45%; 
+                        text-align:center; 
+                        vertical-align:middle; 
+                    }
+
+                    .report-body strong { 
+                        display:block; 
+                        text-align:center; 
+                    }
                 </style>
 
-                <div class="page" style="margin:0;padding:0 0 180px 0;">
+                <!-- ======================= -->
+                <!-- Body Content -->
+                <!-- ======================= -->
+                <div class="page report-body" style="margin:0;padding:0 0 180px 0;">
+
                     <!-- عنوان التقرير -->
                     <div class="header-title2">تقرير متابعة أمر البيع</div>
 
@@ -80,30 +136,25 @@
                                     <t t-set="payment_count" t-value="len(payments)"/>
                                     <t t-if="payment_count &gt; 0">
                                         <t t-foreach="payments" t-as="pay" t-index="i">
-                                            <!--tr>
-                                                <td><strong>الدفعة <t t-esc="(i or 0) + 1"/></td><br/>البنك/الخزنة</strong></td>
-                                                <td style="text-align:center;">
-                                                   <strong> <span t-esc="pay.amount or 0"/> ريال<br/></strong>
-                                                    <strong><span t-esc="pay.journal_id.name or '-'"/><br/></strong>
-                                                    <small>تاريخ الدفع: <strong><span t-esc="pay.date or '-'"/></strong></small>
+                                            <tr>
+                                                <td>
+                                                    <strong>الدفعة <t t-esc="(i or 0) + 1"/></strong><br/>
+                                                    <strong>البنك/الخزنة</strong>
                                                 </td>
-                                                <td style="text-align:left;"><strong>Payment <t t-esc="(i or 0) + 1"/><br/>Bank</strong></td>
-                                            </tr-->
-                        <tr>
-    <td>
-        <strong>الدفعة <t t-esc="(i or 0) + 1"/></strong><br/>
-        <strong>البنك/الخزنة</strong>
-    </td>
-    <td style="text-align:center;">
-        <strong><span t-esc="pay.amount or 0"/> ريال</strong><br/>
-        <strong><span t-esc="pay.journal_id.name or '-'"/></strong><br/>
-        <small>تاريخ الدفع: <strong><span t-esc="pay.date or '-'"/></strong></small>
-    </td>
-    <td style="text-align:left;">
-        <strong>Payment <t t-esc="(i or 0) + 1"/><br/>Bank</strong>
-    </td>
-</tr>
-
+                                                <td style="text-align:center;">
+                                                    <strong><span t-esc="pay.amount or 0"/> ريال</strong><br/>
+                                                    <strong><span t-esc="pay.journal_id.name or '-'"/></strong><br/>
+                                                    <small>
+                                                        تاريخ الدفع: <strong><span t-esc="pay.date or '-'"/></strong>
+                                                    </small>
+                                                </td>
+                                                <td style="text-align:left;">
+                                                    <strong>
+                                                        Payment <t t-esc="(i or 0) + 1"/><br/>
+                                                        Bank
+                                                    </strong>
+                                                </td>
+                                            </tr>
                                         </t>
                                     </t>
                                     <t t-if="payment_count == 0">
@@ -166,9 +217,10 @@
                                     </tr>
                                     <tr>
                                        <td style="text-align:center; padding:15px; height:30px; vertical-align:bottom;">..............................</td>
-                                      <td style="text-align:center; padding:5px; height:30px; vertical-align:bottom;">..............................</td>
-                                      <td style="text-align:center; padding:5px; height:30px; vertical-align:bottom;">..............................</td>
-                                       </tr>
+                                       <td style="text-align:center; padding:5px; height:30px; vertical-align:bottom;">..............................</td>
+                                       <td style="text-align:center; padding:5px; height:30px; vertical-align:bottom;">..............................</td>
+                                    </tr>
+
                                 </table>
                             </td>
                         </tr>
@@ -191,5 +243,3 @@
         </t>
     </template>
 </odoo>
-
-                
