@@ -68,7 +68,8 @@ class SaleOrder ( models.Model ) :
     x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="Contract_service" )
     report_template_id = fields.Many2one ( comodel_name='ir.actions.report' , string='Report Template' ,
                                            related="report_id.report_template_id" )
-    # account_year = fields.Integer ( string='Year' , required=True , default=lambda self : fields.Date.today ().year )
+    #printing_date = fields.Date ( string='printing date'  , default=lambda self : fields.Date.today () )
+    printing_date = fields.Date(string='Printing Date', default=fields.Date.today)
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreement' )
     payment_ids = fields.Many2many ( 'account.payment' , string='Payments' , compute='_compute_payment_ids' )
     payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
