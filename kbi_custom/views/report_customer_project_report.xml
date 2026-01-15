@@ -103,22 +103,22 @@
                                     </tr>
 
                                     <!-- أول دفعة -->
-                                    <tr t-set="first_payment" t-value="o.env['account.payment'].search([('sale_order_id','=',o.id)], order='payment_date asc', limit=1)"/>
+                                    <tr t-set="first_payment" t-value="o.env['account.payment'].search([('sale_order_id','=',o.id)], order='date asc', limit=1)"/>
                                     <tr>
                                         <td style="text-align:right;"><strong>تاريخ الدفعة الأولى</strong></td>
                                         <td style="text-align:center;">
-                                            <t t-if="first_payment"><span t-field="first_payment.payment_date"/> - <span t-field="first_payment.journal_id"/></t>
+                                            <t t-if="first_payment"><span t-field="first_payment.date"/> - <span t-field="first_payment.journal_id"/></t>
                                             <t t-else="">-</t>
                                         </td>
                                         <td style="text-align:left;"><strong>First Payment Date - Bank</strong></td>
                                     </tr>
 
                                     <!-- ثاني دفعة -->
-                                    <tr t-set="second_payment" t-value="o.env['account.payment'].search([('sale_order_id','=',o.id)], order='payment_date asc', offset=1, limit=1)"/>
+                                    <tr t-set="second_payment" t-value="o.env['account.payment'].search([('sale_order_id','=',o.id)], order='date asc', offset=1, limit=1)"/>
                                     <tr>
                                         <td style="text-align:right;"><strong>تاريخ الدفعة الثانية</strong></td>
                                         <td style="text-align:center;">
-                                            <t t-if="second_payment"><span t-field="second_payment.payment_date"/> - <span t-field="second_payment.journal_id"/></t>
+                                            <t t-if="second_payment"><span t-field="second_payment.date"/> - <span t-field="second_payment.journal_id"/></t>
                                             <t t-else="">-</t>
                                         </td>
                                         <td style="text-align:left;"><strong>Second Payment Date - Bank</strong></td>
