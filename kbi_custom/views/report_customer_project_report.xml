@@ -11,7 +11,7 @@
         <field name="report_name">kbi_custom.report_customer_project_tracking</field>
         <field name="print_report_name">f"أمر بيع - {object.name or ''} - {object.partner_id.name or ''}"</field>
         <field name="paperformat_id" ref="kbi_custom.paperformat_zero_margin"/>
-        <field name="binding_model_id" ref="sale.order"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
         <field name="binding_type">report</field>
     </record>
 
