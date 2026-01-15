@@ -141,13 +141,20 @@
                                                     <strong>الدفعة <t t-esc="(i or 0) + 1"/></strong><br/>
                                                     <strong>البنك/الخزنة</strong>
                                                 </td>
-                                                <td style="text-align:center;">
+                                                <!--td style="text-align:center;">
                                                     <strong><span t-esc="pay.amount or 0"/> ريال</strong><br/>
                                                     <strong><span t-esc="pay.journal_id.name or '-'"/></strong><br/>
                                                     <small>
                                                         تاريخ الدفع: <strong><span t-esc="pay.date or '-'"/></strong>
                                                     </small>
-                                                </td>
+                                                </td-->
+<td style="text-align:center;">
+    <div><strong><span t-esc="pay.amount or 0"/> ريال</strong></div>
+    <div><strong><span t-esc="pay.journal_id.name or '-'"/></strong></div>
+    <div><small>تاريخ الدفع: <span t-esc="pay.date or '-'"/></small></div>
+</td>
+
+                                                
                                                 <td style="text-align:left;">
                                                     <strong>
                                                         Payment <t t-esc="(i or 0) + 1"/><br/>
