@@ -46,48 +46,48 @@
                                     <!-- تاريخ الطباعة -->
                                     <tr>
                                         <td><strong>تاريخ الطباعة:</strong></td>
-                                        <td style="text-align:center;"><span t-field="o.printing_date"/></td>
+                                        <td style="text-align:center;"><span t-esc="o.printing_date or '-'"/></td>
                                         <td style="text-align:left;">Printing Date</td>
                                     </tr>
 
                                     <!-- بيانات العميل وأمر البيع -->
                                     <tr>
                                         <td><strong>رقم أمر البيع</strong></td>
-                                        <td style="text-align:center;"><span t-field="o.name"/></td>
+                                        <td style="text-align:center;"><span t-esc="o.name or '-'"/></td>
                                         <td style="text-align:left;"><strong>Sale Order No</strong></td>
                                     </tr>
 
                                     <tr>
                                         <td><strong>العميل</strong></td>
-                                        <td style="text-align:center;"><span t-field="o.partner_id"/></td>
+                                        <td style="text-align:center;"><span t-esc="o.partner_id.name or '-'"/></td>
                                         <td style="text-align:left;"><strong>Customer</strong></td>
                                     </tr>
 
                                     <tr>
                                         <td><strong>تاريخ الطلب</strong></td>
-                                        <td style="text-align:center;"><span t-field="o.date_order"/></td>
+                                        <td style="text-align:center;"><span t-esc="o.date_order or '-'"/></td>
                                         <td style="text-align:left;"><strong>Order Date</strong></td>
                                     </tr>
 
                                     <tr>
                                         <td><strong>الخدمة المقدمة </strong></td>
-                                        <td style="text-align:center;"><span t-field="o.project_name"/></td>
+                                        <td style="text-align:center;"><span t-esc="o.project_name or '-'"/></td>
                                         <td style="text-align:left;"><strong>Provided Service</strong></td>
                                     </tr>
 
                                     <!-- الدفعات -->
-                                    <t t-set="payments" t-value="o.env['account.payment'].search([('sale_order_id','=',o.id)], order='date asc')"/>
+                                    <t t-set="payments" t-value="o.env['account.payment'].search([('sale_order_id','=',o.id)], order='date asc') or []"/>
                                     <t t-set="payment_count" t-value="len(payments)"/>
                                     <t t-if="payment_count &gt; 0">
                                         <t t-foreach="payments" t-as="pay" t-index="i">
                                             <tr>
-                                                <td><strong>الدفعة <t t-esc="i+1"/></strong></td>
+                                                <td><strong>الدفعة <t t-esc="(i or 0) + 1"/></strong></td>
                                                 <td style="text-align:center;">
-                                                    <span t-esc="pay.amount"/> ريال<br/>
+                                                    <span t-esc="pay.amount or 0"/> ريال<br/>
                                                     <span t-esc="pay.journal_id.name or '-'"/><br/>
                                                     <small>تاريخ الدفع: <span t-esc="pay.payment_date or '-'"/></small>
                                                 </td>
-                                                <td style="text-align:left;"><strong>Payment <t t-esc="i+1"/><br/>Bank</strong></td>
+                                                <td style="text-align:left;"><strong>Payment <t t-esc="(i or 0) + 1"/><br/>Bank</strong></td>
                                             </tr>
                                         </t>
                                     </t>
@@ -100,14 +100,15 @@
                                     </t>
 
                                     <!-- الفواتير -->
-                                    <t t-set="invoice_count" t-value="len(o.invoice_ids)"/>
+                                    <t t-set="invoices" t-value="o.invoice_ids or []"/>
+                                    <t t-set="invoice_count" t-value="len(invoices)"/>
                                     <t t-if="invoice_count &gt; 0">
-                                        <tr t-foreach="o.invoice_ids" t-as="inv" t-index="i">
-                                            <td><strong>الفاتورة <t t-esc="i+1"/></strong></td>
+                                        <tr t-foreach="invoices" t-as="inv" t-index="i">
+                                            <td><strong>الفاتورة <t t-esc="(i or 0) + 1"/></strong></td>
                                             <td style="text-align:center;">
                                                 <span t-esc="inv.name or '-'"/> - <span t-esc="inv.date or '-'"/>
                                             </td>
-                                            <td style="text-align:left;"><strong>Invoice <t t-esc="i+1"/> - Date</strong></td>
+                                            <td style="text-align:left;"><strong>Invoice <t t-esc="(i or 0) + 1"/> - Date</strong></td>
                                         </tr>
                                     </t>
                                     <t t-if="invoice_count == 0">
@@ -135,7 +136,7 @@
                                         <td style="text-align:left;"><strong>SO Total After Tax</strong></td>
                                     </tr>
 
-                                    <!-- عدد الأوردر لاينز -->
+                                    <!-- عدد الدفعات -->
                                     <tr>
                                         <td><strong>عدد الدفعات:</strong></td>
                                         <td style="text-align:center;" t-esc="payment_count or 0"/>
@@ -143,26 +144,16 @@
                                     </tr>
 
                                     <!-- توقيعات -->
-                                    <!--tr>
+                                    <tr>
                                         <td style="text-align:center;"><strong> توقيع مدير الجودة</strong></td>
                                         <td style="text-align:center;"><strong> توقيع مدير المجموعة</strong></td>
                                         <td style="text-align:center;"><strong> توقيع مدير المالية</strong></td>
                                     </tr>
                                     <tr>
-                                        <td colspan="3" style="text-align:center; padding:10px;">
-                                            <div>..................................</div>
-                                        </td>
-                                    </tr-->
-                                         <tr>
-                                      <td style="text-align:center;"><strong> توقيع مدير الجودة</strong></td>
-                                        <td style="text-align:center;"><strong> توقيع مدير المجموعة</strong></td>
-                                        <td style="text-align:center;"><strong> توقيع مدير المالية</strong></td>
-                        </tr>
-                        <tr>
-                            <td  colspan="3" style="text-align:center; padding:10px;">..............................</td>
-                            <td  colspan="3" style="text-align:center; padding:10px;">..............................</td>
-                            <td  colspan="3" style="text-align:center; padding:10px;">..............................</td>
-                        </tr>
+                                        <td colspan="3" style="text-align:center; padding:10px;">..............................</td>
+                                        <td colspan="3" style="text-align:center; padding:10px;">..............................</td>
+                                        <td colspan="3" style="text-align:center; padding:10px;">..............................</td>
+                                    </tr>
 
                                 </table>
                             </td>
@@ -186,3 +177,5 @@
         </t>
     </template>
 </odoo>
+
+                
