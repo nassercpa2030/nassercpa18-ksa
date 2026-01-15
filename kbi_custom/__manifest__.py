@@ -41,6 +41,7 @@
         'views/paperformat.xml',
         'views/external_layout_seti.xml',
         'views/report_customer_invoice_report2.xml',
+        'views/report_customer_project_report.xml',
         
     ],
    }
