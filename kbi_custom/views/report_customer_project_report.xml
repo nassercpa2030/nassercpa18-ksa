@@ -22,7 +22,7 @@
             <t t-call="kbi_custom.external_layout_seti">
 
                 <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
+                   @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
                     body, table, td, th {
                         font-family: 'Tajawal', sans-serif;
                         font-size: 13px;
@@ -112,62 +112,79 @@
                                     <!-- ===================== الدفعات ===================== -->
                                     <t t-set="payments" t-value="o.env['account.payment'].search([('sale_order_id','=',o.id)], order='date asc')"/>
                                     <t t-set="payment_count" t-value="len(payments)"/>
-                                    <tr t-if="payment_count  &gt;= 1">
-                                        <td style="text-align:right;"><strong>الدفعة الأولى</strong></td>
-                                        <td style="text-align:center;">
-                                            <span t-esc="payments[0].amount or 0"/> ريال<br/>
-                                            <span t-esc="payments[0].journal_id.name or '-'"/>
-                                        </td>
-                                        <td style="text-align:left;"><strong>First Payment<br/>Bank</strong></td>
-                                    </tr>
-                                    <tr t-if="payment_count  &lt; 1">
-                                        <td style="text-align:right;"><strong>الدفعة الأولى</strong></td>
-                                        <td style="text-align:center;">لا يوجد دفعة أولى</td>
-                                        <td style="text-align:left;"><strong>First Payment<br/>Bank</strong></td>
-                                    </tr>
 
-                                    <tr t-if="payment_count  &gt;= 2">
-                                        <td style="text-align:right;"><strong>الدفعة الثانية</strong></td>
-                                        <td style="text-align:center;">
-                                            <span t-esc="payments[1].amount or 0"/> ريال<br/>
-                                            <span t-esc="payments[1].journal_id.name or '-'"/>
-                                        </td>
-                                        <td style="text-align:left;"><strong>Second Payment<br/>Bank</strong></td>
-                                    </tr>
-                                    <tr t-if="payment_count  &lt; 2">
-                                        <td style="text-align:right;"><strong>الدفعة الثانية</strong></td>
-                                        <td style="text-align:center;">لا يوجد دفعة ثانية</td>
-                                        <td style="text-align:left;"><strong>Second Payment<br/>Bank</strong></td>
-                                    </tr>
+                                    <t t-if="payment_count &gt;= 1">
+                                        <tr>
+                                            <td style="text-align:right;"><strong>الدفعة الأولى</strong></td>
+                                            <td style="text-align:center;">
+                                                <span t-esc="payments[0].amount or 0"/> ريال<br/>
+                                                <span t-esc="payments[0].journal_id.name or '-'"/>
+                                            </td>
+                                            <td style="text-align:left;"><strong>First Payment<br/>Bank</strong></td>
+                                        </tr>
+                                    </t>
+                                    <t t-if="payment_count &lt; 1">
+                                        <tr>
+                                            <td style="text-align:right;"><strong>الدفعة الأولى</strong></td>
+                                            <td style="text-align:center;">لا يوجد دفعة أولى</td>
+                                            <td style="text-align:left;"><strong>First Payment<br/>Bank</strong></td>
+                                        </tr>
+                                    </t>
 
-                                    <tr t-if="payment_count  &gt;= 3">
-                                        <td style="text-align:right;"><strong>الدفعة الثالثة</strong></td>
-                                        <td style="text-align:center;">
-                                            <span t-esc="payments[2].amount or 0"/> ريال<br/>
-                                            <span t-esc="payments[2].journal_id.name or '-'"/>
-                                        </td>
-                                        <td style="text-align:left;"><strong>Third Payment<br/>Bank</strong></td>
-                                    </tr>
-                                    <tr t-if="payment_count  &lt; 3">
-                                        <td style="text-align:right;"><strong>الدفعة الثالثة</strong></td>
-                                        <td style="text-align:center;">لا يوجد دفعة ثالثة</td>
-                                        <td style="text-align:left;"><strong>Third Payment<br/>Bank</strong></td>
-                                    </tr>
+                                    <t t-if="payment_count &gt;= 2">
+                                        <tr>
+                                            <td style="text-align:right;"><strong>الدفعة الثانية</strong></td>
+                                            <td style="text-align:center;">
+                                                <span t-esc="payments[1].amount or 0"/> ريال<br/>
+                                                <span t-esc="payments[1].journal_id.name or '-'"/>
+                                            </td>
+                                            <td style="text-align:left;"><strong>Second Payment<br/>Bank</strong></td>
+                                        </tr>
+                                    </t>
+                                    <t t-if="payment_count &lt; 2">
+                                        <tr>
+                                            <td style="text-align:right;"><strong>الدفعة الثانية</strong></td>
+                                            <td style="text-align:center;">لا يوجد دفعة ثانية</td>
+                                            <td style="text-align:left;"><strong>Second Payment<br/>Bank</strong></td>
+                                        </tr>
+                                    </t>
+
+                                    <t t-if="payment_count &gt;= 3">
+                                        <tr>
+                                            <td style="text-align:right;"><strong>الدفعة الثالثة</strong></td>
+                                            <td style="text-align:center;">
+                                                <span t-esc="payments[2].amount or 0"/> ريال<br/>
+                                                <span t-esc="payments[2].journal_id.name or '-'"/>
+                                            </td>
+                                            <td style="text-align:left;"><strong>Third Payment<br/>Bank</strong></td>
+                                        </tr>
+                                    </t>
+                                    <t t-if="payment_count &lt; 3">
+                                        <tr>
+                                            <td style="text-align:right;"><strong>الدفعة الثالثة</strong></td>
+                                            <td style="text-align:center;">لا يوجد دفعة ثالثة</td>
+                                            <td style="text-align:left;"><strong>Third Payment<br/>Bank</strong></td>
+                                        </tr>
+                                    </t>
 
                                     <!-- ===================== الفواتير ===================== -->
                                     <t t-set="invoice_count" t-value="len(o.invoice_ids)"/>
-                                    <tr t-foreach="o.invoice_ids" t-as="inv" t-index="i">
-                                        <td style="text-align:right;"><strong>الفاتورة <t t-esc="i+1 or 1"/></strong></td>
-                                        <td style="text-align:center;">
-                                            <span t-field="inv.name or 'لا توجد'"/> - <span t-field="inv.date or 'لا توجد'"/>
-                                        </td>
-                                        <td style="text-align:left;"><strong>Invoice <t t-esc="i+1 or 1"/> - Date</strong></td>
-                                    </tr>
-                                    <tr t-if="invoice_count == 0">
-                                        <td style="text-align:right;"><strong>الفاتورة الأولى</strong></td>
-                                        <td style="text-align:center;">لا توجد فاتورة</td>
-                                        <td style="text-align:left;"><strong>First Invoice - Date</strong></td>
-                                    </tr>
+                                    <t t-if="invoice_count &gt; 0">
+                                        <tr t-foreach="o.invoice_ids" t-as="inv" t-index="i">
+                                            <td style="text-align:right;"><strong>الفاتورة <t t-esc="(i or 0) + 1"/></strong></td>
+                                            <td style="text-align:center;">
+                                                <span t-esc="inv.name or 'لا توجد'"/> - <span t-esc="inv.date or 'لا توجد'"/>
+                                            </td>
+                                            <td style="text-align:left;"><strong>Invoice <t t-esc="(i or 0) + 1"/> - Date</strong></td>
+                                        </tr>
+                                    </t>
+                                    <t t-if="invoice_count == 0">
+                                        <tr>
+                                            <td style="text-align:right;"><strong>الفاتورة الأولى</strong></td>
+                                            <td style="text-align:center;">لا توجد فاتورة</td>
+                                            <td style="text-align:left;"><strong>First Invoice - Date</strong></td>
+                                        </tr>
+                                    </t>
 
                                     <!-- ===================== الإجمالي ===================== -->
                                     <tr>
@@ -205,7 +222,7 @@
                                     </tr>
 
                                     <tr>
-                                        <td style="text-align:center;" colspan="3"><strong>الختم الرسمي</strong></td>
+                                        <td style="text-align:center;" colspan="3"><strong>الختم </strong></td>
                                     </tr>
 
                                     <!-- ===================== تاريخ اليوم ===================== -->
@@ -222,7 +239,7 @@
 
                     <!-- شكر ودعم نهائي -->
                     <div class="thank-you" style="margin-top:40px; text-align:center; font-size:12px; line-height:1.4;">
-                        <strong>نشكر لكم ثقتكم باستخدام نظام أودوو 🌸</strong>
+                        <strong>🌸🌸🌸 نشكر لكم ثقتكم باستخدام نظام أودوو 🌸🌸🌸</strong>
                         <div class="decor" style="margin:5px 0;">❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀</div>
                         <p style="margin-top:5px; font-size:11px; font-style:italic;">
                             مقدم من إدارة الدعم الفني بشركة <strong>ناصر عوض أل كيرعان – محاسبون ومراجعون قانونيون</strong>، متمنين لكم دوام التميز والرقي.
@@ -234,3 +251,5 @@
         </t>
     </template>
 </odoo>
+
+                   
