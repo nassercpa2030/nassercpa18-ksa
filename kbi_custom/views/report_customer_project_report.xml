@@ -150,13 +150,13 @@
                                     </tr>
                                     <tr>
                                         
-                                        <td colspan="3" style="text-align:right;" padding:10px;">
+                                        <td colspan="3" style="text-align:right; padding:10px;">
                                             <div>..................................</div>
                                         </td>
-                                         <td colspan="3" style="text-align:center;" padding:10px;">
+                                         <td colspan="3" style="text-align:center; padding:10px;">
                                             <div>..................................</div>
                                         </td>
-                                         <td colspan="3" style="text-align:left;" padding:10px;">
+                                         <td colspan="3" style="text-align:left; padding:10px;">
                                             <div>..................................</div>
                                         </td>
                                     </tr>
