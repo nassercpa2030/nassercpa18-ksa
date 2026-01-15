@@ -25,39 +25,13 @@
             <t t-call="kbi_custom.external_layout_seti">
 
                 <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
-                    
-
-                    body, table, td, th {
-                        font-family: 'Tajawal', sans-serif;
-                        font-size: 13px;
-                        font-weight: bold;
-                    }
-
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                    }
-
-                    td, th {
-                        padding: 6px;
-                        border: 1px solid #2F6FB2;
-                        text-align: right;
-                        vertical-align: middle;
-                    }
-
-                    .header-title {
-                        font-size: 18px;
-                        text-align: center;
-                        margin-bottom: 12px;
-                    }
-
-                    .thank-you {
-                        text-align: center;
-                        font-size: 12px;
-                        margin-top: 40px;
-                        color: #2F6FB2;
-                    }
+                     @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
+                    body, table, td, th { font-family: 'Tajawal', sans-serif; font-size: 13px; }
+                    table { width:100%; border-collapse:collapse; }
+                    td, th { border:1px solid #2F6FB2; padding:6px; text-align:center; vertical-align:middle; }
+                    th { background:#EAF3FF; font-weight:bold; }
+                    .header-title { font-size:18px; font-weight:bold; text-align:center; margin-bottom:12px; }
+                    .thank-you { text-align:center; font-size:12px; color:#2F6FB2; }
                 </style>
 
                 <div class="page">
@@ -67,138 +41,129 @@
                     <table>
                         <tr>
                             <td><strong>تاريخ الطباعة</strong></td>
-                            <td style="text-align:center;">
-                                <span t-esc="o.printing_date or ''"/>
-                            </td>
-                            <td style="text-align:center;">Printing Date</td>
+                            <td><strong><span t-field="o.printing_date"/></strong></td>
+                            <td><strong>Printing Date</strong></td>
                         </tr>
 
                         <tr>
-                            <td>رقم أمر البيع</td>
-                            <td style="text-align:center;">
-                                <span t-esc="o.name or ''"/>
-                            </td>
-                            <td style="text-align:center;">Sale Order No</td>
+                            <td><strong>رقم أمر البيع</strong></td>
+                            <td><strong><span t-field="o.name"/></strong></td>
+                            <td><strong>Sale Order No</strong></td>
                         </tr>
 
                         <tr>
-                            <td>العميل</td>
-                            <td style="text-align:center;">
-                                <span t-esc="o.partner_id.name or ''"/>
-                            </td>
-                            <td style="text-align:center;">Customer</td>
+                            <td><strong>العميل</strong></td>
+                            <td><strong><span t-field="o.partner_id"/></strong></td>
+                            <td><strong>Customer</strong></td>
                         </tr>
 
                         <tr>
-                            <td>تاريخ الطلب</td>
-                            <td style="text-align:center;">
-                                <span t-esc="o.date_order or ''"/>
-                            </td>
-                            <td style="text-align:center;">Order Date</td>
+                            <td><strong>تاريخ الطلب</strong></td>
+                            <td><strong><span t-field="o.date_order"/></strong></td>
+                            <td><strong>Order Date</strong></td>
                         </tr>
 
                         <tr>
-                            <td>الخدمة المقدمة</td>
-                            <td style="text-align:center;">
-                                <span t-esc="o.project_name or ''"/>
-                            </td>
-                            <td style="text-align:center;">Provided Service</td>
+                            <td><strong>الخدمة المقدمة</strong></td>
+                            <td><strong><span t-field="o.project_name"/></strong></td>
+                            <td><strong>Provided Service</strong></td>
                         </tr>
 
-                        <!-- ===================== الدفعات ===================== -->
+                        <!-- ================= الدفعات ================= -->
                         <t t-set="payments"
                            t-value="o.env['account.payment'].search([
-                                ('partner_id','=',o.partner_id.id),
-                                ('state','=','posted')
-                           ], order='date asc') or []"/>
+                               ('sale_order_id','=',o.id),
+                               ('state','=','posted')
+                           ], order='date asc')"/>
 
-                        <t t-set="payment_count" t-value="len(payments)"/>
-                        <t t-set="idx" t-value="0"/>
+                        <t t-set="pay_idx" t-value="0"/>
 
-                        <t t-if="payment_count &gt; 0">
+                        <t t-if="payments">
                             <t t-foreach="payments" t-as="pay">
-                                <t t-set="idx" t-value="idx + 1"/>
-
+                                <t t-set="pay_idx" t-value="pay_idx + 1"/>
                                 <tr>
-                                    <td style="text-align:center;">
-                                        الدفعة <t t-esc="idx"/>
+                                    <td><strong>الدفعة <t t-esc="pay_idx"/></strong></td>
+                                    <td>
+                                        <strong>
+                                            <span t-esc="pay.amount"/> ريال<br/>
+                                            <span t-esc="pay.journal_id.name"/><br/>
+                                            تاريخ الدفع: <span t-esc="pay.date"/>
+                                        </strong>
                                     </td>
-
-                                    <td style="text-align:center;">
-                                        <span t-esc="pay.amount or 0"/> ريال<br/>
-                                        <span t-esc="pay.journal_id.name or '-'"/><br/>
-                                        تاريخ الدفع:
-                                        <span t-esc="pay.date or '-'"/>
-                                    </td>
-
-                                    <td style="text-align:center;">
-                                        Payment <t t-esc="idx"/><br/>Bank
-                                    </td>
+                                    <td><strong>Payment <t t-esc="pay_idx"/><br/>Bank</strong></td>
                                 </tr>
-
                             </t>
                         </t>
 
-                        <t t-if="payment_count == 0">
+                        <t t-if="not payments">
                             <tr>
-                                <td style="text-align:center;">الدفعات</td>
-                                <td style="text-align:center;">لا توجد دفعات</td>
-                                <td style="text-align:center;">Payments</td>
+                                <td><strong>الدفعات</strong></td>
+                                <td><strong>0</strong></td>
+                                <td><strong>Payments</strong></td>
                             </tr>
                         </t>
 
-                        <!-- ===================== الإجماليات ===================== -->
+                        <!-- ================= الفواتير ================= -->
+                        <t t-set="inv_idx" t-value="0"/>
+
+                        <t t-if="o.invoice_ids">
+                            <t t-foreach="o.invoice_ids" t-as="inv">
+                                <t t-set="inv_idx" t-value="inv_idx + 1"/>
+                                <tr>
+                                    <td><strong>الفاتورة <t t-esc="inv_idx"/></strong></td>
+                                    <td><strong><span t-esc="inv.name"/> - <span t-esc="inv.date"/></strong></td>
+                                    <td><strong>Invoice <t t-esc="inv_idx"/></strong></td>
+                                </tr>
+                            </t>
+                        </t>
+
+                        <t t-if="not o.invoice_ids">
+                            <tr>
+                                <td><strong>الفواتير</strong></td>
+                                <td><strong>0</strong></td>
+                                <td><strong>Invoices</strong></td>
+                            </tr>
+                        </t>
+
+                        <!-- ================= الإجماليات ================= -->
                         <tr>
-                            <td>إجمالي قبل الضريبة</td>
-                            <td style="text-align:center;">
-                                <span t-esc="o.amount_untaxed or 0"/> ريال
-                            </td>
-                            <td style="text-align:center;">Before Tax</td>
+                            <td><strong>الإجمالي قبل الضريبة</strong></td>
+                            <td><strong><span t-esc="o.amount_untaxed"/> ريال</strong></td>
+                            <td><strong>Before Tax</strong></td>
                         </tr>
 
                         <tr>
-                            <td>الضريبة</td>
-                            <td style="text-align:center;">
-                                <span t-esc="o.amount_tax or 0"/> ريال
-                            </td>
-                            <td style="text-align:center;">Tax</td>
+                            <td><strong>الضريبة</strong></td>
+                            <td><strong><span t-esc="o.amount_tax"/> ريال</strong></td>
+                            <td><strong>Tax</strong></td>
                         </tr>
 
                         <tr>
-                            <td>الإجمالي بعد الضريبة</td>
-                            <td style="text-align:center;">
-                                <span t-esc="o.amount_total or 0"/> ريال
-                            </td>
-                            <td style="text-align:center;">After Tax</td>
+                            <td><strong>الإجمالي بعد الضريبة</strong></td>
+                            <td><strong><span t-esc="o.amount_total"/> ريال</strong></td>
+                            <td><strong>Total</strong></td>
                         </tr>
 
+                        <!-- ================= التوقيعات ================= -->
                         <tr>
-                            <td>عدد الدفعات</td>
-                            <td style="text-align:center;">
-                                <span t-esc="payment_count"/>
-                            </td>
-                            <td style="text-align:center;">Number of Payments</td>
+                            <td><strong> توقيع مدير الجودة</strong></td>
+                            <td><strong> توقيع مدير المجموعة</strong></td>
+                            <td><strong> توقيع مدير المالية</strong></td>
                         </tr>
-
-                        <!-- ===================== التوقيعات ===================== -->
                         <tr>
-                            <td style="text-align:center;">توقيع مدير الجودة</td>
-                            <td style="text-align:center;">توقيع مدير المجموعة</td>
-                            <td style="text-align:center;">توقيع مدير المالية</td>
+                            <td>..............................</td>
+                            <td>..............................</td>
+                            <td>..............................</td>
                         </tr>
-
-                        <tr style="height:60px;">
-                            <td style="text-align:center;">..................................</td>
-                            <td style="text-align:center;">..................................</td>
-                            <td style="text-align:center;">..................................</td>
-                        </tr>
-
                     </table>
 
-                    <div class="thank-you">
-                        🌸🌸🌸 نشكر لكم ثقتكم باستخدام نظام أودوو 🌸🌸🌸
-                        <br/>
-                        مقدم من إدارة الدعم الفني
+                    <!-- الشكر -->
+                    <div class="thank-you" style="margin-top:40px;">
+                        <strong>🌸🌸🌸 نشكر لكم ثقتكم باستخدام نظام أودوو 🌸🌸🌸</strong>
+                        <p style="font-size:11px;">
+                            مقدم من إدارة الدعم الفني بشركة
+                            <strong>ناصر عوض أل كيرعان – محاسبون ومراجعون قانونيون</strong>
+                        </p>
                     </div>
 
                 </div>
@@ -207,5 +172,4 @@
     </template>
 
 </odoo>
-
-                   
+                 
