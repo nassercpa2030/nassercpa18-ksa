@@ -226,12 +226,16 @@
                                     </tr>
 
                                     <!-- ===================== تاريخ اليوم ===================== -->
-                                    <tr>
+                                    <!--tr>
                                         <td style="text-align:center;" colspan="3">
                                             <span t-esc="o.env['ir.qweb.field.date'].today()"/>
                                         </td>
+                                    </tr-->
+                                    <tr>
+                                      <td style="text-align:center;" colspan="3">
+                                      <span t-field="o.printing_date"/>
+                                      </td>
                                     </tr>
-
                                 </table>
                             </td>
                         </tr>
