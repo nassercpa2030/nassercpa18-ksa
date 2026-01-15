@@ -23,11 +23,17 @@
             <t t-call="kbi_custom.external_layout_seti">
 
                 <style>
-                       @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
+                   @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
 
                     body, table, td, th {
                         font-family: 'Tajawal', sans-serif;
                         font-size: 13px;
+                    }
+
+                    h1 {
+                        font-size: 18px;
+                        text-align:center;
+                        margin-bottom:15px;
                     }
 
                     th {
@@ -50,65 +56,57 @@
                     .thank-you {
                         text-align:center;
                         font-size:12px;
-                        line-height:1.6;
-                        background:#f9f9f9;
-                        padding:10px;
-                        border-radius:8px;
+                        color:#5a2f84;
                     }
 
                     .thank-you .decor {
-                        color:#d81b60;
+                        color:#c71585;
                         margin-top:5px;
-                        letter-spacing:3px;
-                        font-size:16px;
+                        letter-spacing:2px;
                     }
 
                 </style>
 
                 <div class="page" style="margin:0;padding:0 0 180px 0;">
 
+                    <!-- عنوان التقرير -->
+                    <h1>تقرير متابعة أمر البيع</h1>
+
                     <!-- بيانات السيل أوردر -->
                     <table style="margin-top:12px;">
                         <tr>
                             <td width="100%">
                                 <table width="100%" style="border-collapse:collapse;">
-
-                                    <!-- رقم أمر البيع -->
                                     <tr>
                                         <td width="33%" style="text-align:right;"><strong>رقم أمر البيع</strong></td>
                                         <td width="34%" style="text-align:center;"><span t-field="o.name"/></td>
                                         <td width="33%" style="text-align:left;"><strong>Sale Order No</strong></td>
                                     </tr>
 
-                                    <!-- العميل -->
                                     <tr>
                                         <td style="text-align:right;"><strong>العميل</strong></td>
                                         <td style="text-align:center;"><span t-field="o.partner_id"/></td>
                                         <td style="text-align:left;"><strong>Customer</strong></td>
                                     </tr>
 
-                                    <!-- تاريخ الإنشاء -->
                                     <tr>
                                         <td style="text-align:right;"><strong>تاريخ الإنشاء</strong></td>
                                         <td style="text-align:center;"><span t-field="o.create_date"/></td>
                                         <td style="text-align:left;"><strong>Created On</strong></td>
                                     </tr>
 
-                                    <!-- أنشئ بواسطة -->
                                     <tr>
                                         <td style="text-align:right;"><strong>أنشئ بواسطة</strong></td>
                                         <td style="text-align:center;"><span t-field="o.create_uid"/></td>
                                         <td style="text-align:left;"><strong>Created By</strong></td>
                                     </tr>
 
-                                    <!-- تاريخ الطلب -->
                                     <tr>
                                         <td style="text-align:right;"><strong>تاريخ الطلب</strong></td>
                                         <td style="text-align:center;"><span t-field="o.date_order"/></td>
                                         <td style="text-align:left;"><strong>Order Date</strong></td>
                                     </tr>
 
-                                    <!-- الخدمة -->
                                     <tr>
                                         <td style="text-align:right;"><strong>الخدمة</strong></td>
                                         <td style="text-align:center;"><span t-field="o.project_name"/></td>
@@ -119,99 +117,106 @@
                                     <tr t-set="payments" t-value="o.env['account.payment'].search([('sale_order_id','=',o.id)], order='date asc')"/>
                                     <tr t-set="payment_count" t-value="len(payments)"/>
 
-                                    <!-- أول دفعة -->
+                                    <!-- دفعة أولى -->
                                     <tr>
                                         <td style="text-align:right;"><strong>الدفعة الأولى</strong></td>
                                         <td style="text-align:center;">
                                             <t t-if="payment_count &gt;= 1">
-                                                <span t-field="payments[0].amount"/> <br/>
-                                                <span t-field="payments[0].journal_id"/>
+                                                <span t-esc="payments[0].amount"/> ريال<br/>
+                                                <span t-esc="payments[0].journal_id.name"/>
                                             </t>
-                                            <t t-else="">لا يوجد دفع أول</t>
+                                            <t t-else="">لا يوجد دفعة أولى</t>
                                         </td>
                                         <td style="text-align:left;"><strong>First Payment - Bank</strong></td>
                                     </tr>
 
-                                    <!-- ثاني دفعة -->
+                                    <!-- دفعة ثانية -->
                                     <tr>
                                         <td style="text-align:right;"><strong>الدفعة الثانية</strong></td>
                                         <td style="text-align:center;">
                                             <t t-if="payment_count &gt;= 2">
-                                                <span t-field="payments[1].amount"/> <br/>
-                                                <span t-field="payments[1].journal_id"/>
+                                                <span t-esc="payments[1].amount"/> ريال<br/>
+                                                <span t-esc="payments[1].journal_id.name"/>
                                             </t>
-                                            <t t-else="">لا يوجد دفع ثاني</t>
+                                            <t t-else="">لا يوجد دفعة ثانية</t>
                                         </td>
                                         <td style="text-align:left;"><strong>Second Payment - Bank</strong></td>
                                     </tr>
 
-                                    <!-- ثالث دفعة -->
+                                    <!-- دفعة ثالثة -->
                                     <tr>
                                         <td style="text-align:right;"><strong>الدفعة الثالثة</strong></td>
                                         <td style="text-align:center;">
                                             <t t-if="payment_count &gt;= 3">
-                                                <span t-field="payments[2].amount"/> <br/>
-                                                <span t-field="payments[2].journal_id"/>
+                                                <span t-esc="payments[2].amount"/> ريال<br/>
+                                                <span t-esc="payments[2].journal_id.name"/>
                                             </t>
-                                            <t t-else="">لا يوجد دفع ثالث</t>
+                                            <t t-else="">لا يوجد دفعة ثالثة</t>
                                         </td>
                                         <td style="text-align:left;"><strong>Third Payment - Bank</strong></td>
                                     </tr>
 
-                                    <!-- الفواتير المرتبطة -->
-                                    <tr t-set="invoices" t-value="o.invoice_ids"/>
-                                    <tr t-set="inv_count" t-value="len(invoices)"/>
-                                    <tr t-foreach="range(3)" t-as="i">
-                                        <td style="text-align:right;"><strong>فاتورة <t t-esc="['أولى','ثانية','ثالثة'][i]"/></strong></td>
+                                    <!-- الفواتير -->
+                                    <tr t-set="invoice_count" t-value="len(o.invoice_ids)"/>
+                                    <tr t-foreach="o.invoice_ids" t-as="inv" t-index="i">
+                                        <td style="text-align:right;"><strong>الفاتورة <t t-esc="i+1"/></strong></td>
                                         <td style="text-align:center;">
-                                            <t t-if="i &lt; inv_count">
-                                                <span t-field="invoices[i].name"/> <br/>
-                                                <span t-field="invoices[i].date"/>
-                                            </t>
-                                            <t t-else="">لا يوجد فاتورة <t t-esc="['أولى','ثانية','ثالثة'][i]"/></t>
+                                            <span t-field="inv.name"/> - <span t-field="inv.date"/>
                                         </td>
-                                        <td style="text-align:left;"><strong>Invoice <t t-esc="['First','Second','Third'][i]"/> - Date</strong></td>
+                                        <td style="text-align:left;"><strong>Invoice <t t-esc="i+1"/> - Date</strong></td>
+                                    </tr>
+                                    <tr t-if="invoice_count == 0">
+                                        <td style="text-align:right;"><strong>الفاتورة الأولى</strong></td>
+                                        <td style="text-align:center;">لا توجد فاتورة</td>
+                                        <td style="text-align:left;"><strong>First Invoice - Date</strong></td>
                                     </tr>
 
-                                    <!-- إجمالي السيل أوردر -->
+                                    <!-- إجمالي وأقساط -->
                                     <tr>
-                                        <td style="text-align:right;"><strong>الإجمالي قبل الضريبة</strong></td>
-                                        <td style="text-align:center;"><span t-field="o.amount_untaxed"/></td>
-                                        <td style="text-align:left;"><strong>Subtotal</strong></td>
+                                        <td style="text-align:right;"><strong>إجمالي أمر البيع قبل الضريبة</strong></td>
+                                        <td style="text-align:center;"><span t-esc="o.amount_untaxed"/> ريال</td>
+                                        <td style="text-align:left;"><strong>Total Before Tax</strong></td>
                                     </tr>
                                     <tr>
                                         <td style="text-align:right;"><strong>الضريبة</strong></td>
-                                        <td style="text-align:center;"><span t-field="o.amount_tax"/></td>
+                                        <td style="text-align:center;"><span t-esc="o.amount_tax"/> ريال</td>
                                         <td style="text-align:left;"><strong>Tax</strong></td>
                                     </tr>
                                     <tr>
-                                        <td style="text-align:right;"><strong>الإجمالي بعد الضريبة</strong></td>
-                                        <td style="text-align:center;"><span t-field="o.amount_total"/></td>
-                                        <td style="text-align:left;"><strong>Total</strong></td>
+                                        <td style="text-align:right;"><strong>إجمالي بعد الضريبة</strong></td>
+                                        <td style="text-align:center;"><span t-esc="o.amount_total"/> ريال</td>
+                                        <td style="text-align:left;"><strong>Total After Tax</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:right;"><strong>الباقي</strong></td>
+                                        <td style="text-align:center;"><span t-esc="o.amount_total - sum(p.amount for p in payments)"/> ريال</td>
+                                        <td style="text-align:left;"><strong>Remaining</strong></td>
                                     </tr>
 
-                                    <!-- التوقيعات -->
+                                    <!-- التوقيعات والختم -->
                                     <tr>
-                                        <td colspan="3" style="text-align:center; padding-top:20px;">
+                                        <td style="text-align:center;" colspan="3">
                                             <table style="width:100%; border:none; text-align:center;">
                                                 <tr>
-                                                    <td style="width:40%;">........................................</td>
-                                                    <td style="width:40%;">........................................</td>
+                                                    <td style="height:50px; font-size:18px;">....................................................</td>
+                                                    <td style="height:50px; font-size:18px;">....................................................</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>توقيع المدير</td>
-                                                    <td>توقيع مدير المجموعة</td>
+                                                    <td><strong>توقيع المدير</strong></td>
+                                                    <td><strong>توقيع مدير المجموعة</strong></td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="2" style="text-align:center;"><span t-esc="(Date.today()).strftime('%d/%m/%Y')"/></td>
+                                                    <td colspan="2" style="text-align:center; height:25px;">
+                                                        التاريخ: <t t-esc="fields.Date.today().strftime('%d/%m/%Y')"/>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2" style="text-align:center; height:60px; font-size:16px;">
+                                                        <strong>الختم الرسمي</strong>
+                                                    </td>
                                                 </tr>
                                             </table>
                                         </td>
-                                    </tr>
-
-                                    <!-- الختم الرسمي -->
-                                    <tr>
-                                        <td colspan="3" style="text-align:center; padding:15px 0; font-weight:bold;">الختم الرسمي</td>
                                     </tr>
 
                                 </table>
@@ -220,10 +225,10 @@
                     </table>
 
                     <!-- شكر ودعم نهائي -->
-                    <div class="thank-you">
-                        <strong style="color:#4a148c; font-size:13px;">نشكر لكم ثقتكم باستخدام نظام أودوو 🌸</strong>
-                        <div class="decor">❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀</div>
-                        <p style="margin-top:5px; font-size:11px; font-style:italic; color:#333;">
+                    <div class="thank-you" style="margin-top:40px; text-align:center; font-size:12px; line-height:1.4;">
+                        <strong>نشكر لكم ثقتكم باستخدام نظام أودوو 🌸</strong>
+                        <div class="decor" style="margin:5px 0;">❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀</div>
+                        <p style="margin-top:5px; font-size:11px; font-style:italic;">
                             مقدم من إدارة الدعم الفني بشركة <strong>ناصر عوض أل كيرعان – محاسبون ومراجعون قانونيون</strong>، متمنين لكم دوام التميز والرقي.
                         </p>
                     </div>
@@ -235,4 +240,5 @@
 
 </odoo>
 
-                   
+
+                      
