@@ -85,7 +85,7 @@
                                                 <td style="text-align:center;">
                                                     <span t-esc="pay.amount or 0"/> ريال<br/>
                                                     <span t-esc="pay.journal_id.name or '-'"/><br/>
-                                                    <small>تاريخ الدفع: <span t-esc="pay.payment_date or '-'"/></small>
+                                                    <small>تاريخ الدفع: <span t-esc="pay.date or '-'"/></small>
                                                 </td>
                                                 <td style="text-align:left;"><strong>Payment <t t-esc="(i or 0) + 1"/><br/>Bank</strong></td>
                                             </tr>
