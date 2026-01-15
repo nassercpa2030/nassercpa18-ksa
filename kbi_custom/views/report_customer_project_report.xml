@@ -22,7 +22,7 @@
             <t t-call="kbi_custom.external_layout_seti">
 
                 <style>
-                   @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
                     body, table, td, th {
                         font-family: 'Tajawal', sans-serif;
                         font-size: 13px;
@@ -68,11 +68,19 @@
                     <!-- عنوان التقرير -->
                     <div class="header-title">تقرير متابعة أمر البيع</div>
 
-                    <!-- بيانات السيل أوردر -->
                     <table style="margin-top:12px;">
                         <tr>
                             <td width="100%">
                                 <table width="100%" style="border-collapse:collapse;">
+
+                                    <!-- ===================== تاريخ الطباعة أول صف ===================== -->
+                                    <tr>
+                                        <td style="text-align:right;"><strong>تاريخ الطباعة:</strong></td>
+                                        <td style="text-align:center;"><span t-field="o.printing_date"/></td>
+                                        <td style="text-align:left;"></td>
+                                    </tr>
+
+                                    <!-- ===================== بيانات العميل وأمر البيع ===================== -->
                                     <tr>
                                         <td width="33%" style="text-align:right;"><strong>رقم أمر البيع</strong></td>
                                         <td width="34%" style="text-align:center;"><span t-field="o.name"/></td>
@@ -83,18 +91,6 @@
                                         <td style="text-align:right;"><strong>العميل</strong></td>
                                         <td style="text-align:center;"><span t-field="o.partner_id"/></td>
                                         <td style="text-align:left;"><strong>Customer</strong></td>
-                                    </tr>
-
-                                    <tr>
-                                        <td style="text-align:right;"><strong>تاريخ الإنشاء</strong></td>
-                                        <td style="text-align:center;"><span t-field="o.create_date"/></td>
-                                        <td style="text-align:left;"><strong>Created On</strong></td>
-                                    </tr>
-
-                                    <tr>
-                                        <td style="text-align:right;"><strong>أنشئ بواسطة</strong></td>
-                                        <td style="text-align:center;"><span t-field="o.create_uid"/></td>
-                                        <td style="text-align:left;"><strong>Created By</strong></td>
                                     </tr>
 
                                     <tr>
@@ -128,42 +124,6 @@
                                             <td style="text-align:right;"><strong>الدفعة الأولى</strong></td>
                                             <td style="text-align:center;">لا يوجد دفعة أولى</td>
                                             <td style="text-align:left;"><strong>First Payment<br/>Bank</strong></td>
-                                        </tr>
-                                    </t>
-
-                                    <t t-if="payment_count &gt;= 2">
-                                        <tr>
-                                            <td style="text-align:right;"><strong>الدفعة الثانية</strong></td>
-                                            <td style="text-align:center;">
-                                                <span t-esc="payments[1].amount or 0"/> ريال<br/>
-                                                <span t-esc="payments[1].journal_id.name or '-'"/>
-                                            </td>
-                                            <td style="text-align:left;"><strong>Second Payment<br/>Bank</strong></td>
-                                        </tr>
-                                    </t>
-                                    <t t-if="payment_count &lt; 2">
-                                        <tr>
-                                            <td style="text-align:right;"><strong>الدفعة الثانية</strong></td>
-                                            <td style="text-align:center;">لا يوجد دفعة ثانية</td>
-                                            <td style="text-align:left;"><strong>Second Payment<br/>Bank</strong></td>
-                                        </tr>
-                                    </t>
-
-                                    <t t-if="payment_count &gt;= 3">
-                                        <tr>
-                                            <td style="text-align:right;"><strong>الدفعة الثالثة</strong></td>
-                                            <td style="text-align:center;">
-                                                <span t-esc="payments[2].amount or 0"/> ريال<br/>
-                                                <span t-esc="payments[2].journal_id.name or '-'"/>
-                                            </td>
-                                            <td style="text-align:left;"><strong>Third Payment<br/>Bank</strong></td>
-                                        </tr>
-                                    </t>
-                                    <t t-if="payment_count &lt; 3">
-                                        <tr>
-                                            <td style="text-align:right;"><strong>الدفعة الثالثة</strong></td>
-                                            <td style="text-align:center;">لا يوجد دفعة ثالثة</td>
-                                            <td style="text-align:left;"><strong>Third Payment<br/>Bank</strong></td>
                                         </tr>
                                     </t>
 
@@ -205,37 +165,28 @@
                                         <td style="text-align:left;"><strong>SO Total After Tax</strong></td>
                                     </tr>
 
-                                    <!-- ===================== التوقيعات والختم ===================== -->
+                                    <!-- ===================== عدد الأوردر لاينز ===================== -->
                                     <tr>
-                                        <td style="text-align:center;" colspan="3">
-                                            <table style="width:100%; border:none; text-align:center;">
-                                                <tr>
-                                                    <td class="signature-cell">..................................</td>
-                                                    <td class="signature-cell">..................................</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>توقيع المدير</td>
-                                                    <td>توقيع مدير المجموعة</td>
-                                                </tr>
-                                            </table>
+                                        <td style="text-align:right;"><strong>عدد الدفعات:</strong></td>
+                                        <td style="text-align:center;"><span t-esc="len(o.order_line)"/></td>
+                                        <td></td>
+                                    </tr>
+
+                                    <!-- ===================== توقيعات ===================== -->
+                                    <tr>
+                                        <td colspan="3" style="text-align:center; vertical-align:top; height:80px;">
+                                            <div>..................................</div>
+                                            <div>توقيع المدير</div>
                                         </td>
                                     </tr>
 
                                     <tr>
-                                        <td style="text-align:center;" colspan="3"><strong>الختم </strong></td>
+                                        <td colspan="3" style="text-align:center; vertical-align:top; height:80px;">
+                                            <div>..................................</div>
+                                            <div>توقيع مدير المجموعة</div>
+                                        </td>
                                     </tr>
 
-                                    <!-- ===================== تاريخ اليوم ===================== -->
-                                    <!--tr>
-                                        <td style="text-align:center;" colspan="3">
-                                            <span t-esc="o.env['ir.qweb.field.date'].today()"/>
-                                        </td>
-                                    </tr-->
-                                    <tr>
-                                      <td style="text-align:center;" colspan="3">
-                                      <span t-field="o.printing_date"/>
-                                      </td>
-                                    </tr>
                                 </table>
                             </td>
                         </tr>
@@ -255,3 +206,5 @@
         </t>
     </template>
 </odoo>
+
+        
