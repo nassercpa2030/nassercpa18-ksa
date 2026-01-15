@@ -23,8 +23,7 @@
             <t t-call="kbi_custom.external_layout_seti">
 
                 <style>
-                 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
-
+                  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
                     body, table, td, th {
                         font-family: 'Tajawal', sans-serif;
                         font-size: 13px;
