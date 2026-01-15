@@ -120,7 +120,7 @@
                                         </td>
                                         <td style="text-align:left;"><strong>First Payment<br/>Bank</strong></td>
                                     </tr>
-                                    <tr t-if="payment_count < 1">
+                                    <tr t-if="payment_count < 1">>
                                         <td style="text-align:right;"><strong>الدفعة الأولى</strong></td>
                                         <td style="text-align:center;">لا يوجد دفعة أولى</td>
                                         <td style="text-align:left;"><strong>First Payment<br/>Bank</strong></td>
