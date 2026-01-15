@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
     <!-- ============================= -->
     <!-- Report Action -->
     <!-- ============================= -->
@@ -23,54 +22,51 @@
             <t t-call="kbi_custom.external_layout_seti">
 
                 <style>
-                   @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
-
+                    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
                     body, table, td, th {
                         font-family: 'Tajawal', sans-serif;
                         font-size: 13px;
                     }
-
-                    h1 {
-                        font-size: 18px;
-                        text-align:center;
-                        margin-bottom:15px;
-                    }
-
                     th {
                         font-weight: bold;
                         font-size: 13.5px;
                         background:#EAF3FF;
                     }
-
                     table {
                         width: 100%;
                         border-collapse: collapse;
                     }
-
                     td, th {
                         padding:5px;
                         border:1px solid #2F6FB2;
                         text-align:right;
                     }
-
                     .thank-you {
                         text-align:center;
                         font-size:12px;
-                        color:#5a2f84;
+                        color:#2F6FB2;
                     }
-
-                    .thank-you .decor {
+                    .decor {
                         color:#c71585;
                         margin-top:5px;
                         letter-spacing:2px;
                     }
-
+                    .header-title {
+                        font-size:18px;
+                        text-align:center;
+                        font-weight:bold;
+                        margin-bottom:10px;
+                    }
+                    .signature-cell {
+                        width:45%;
+                        text-align:center;
+                    }
                 </style>
 
                 <div class="page" style="margin:0;padding:0 0 180px 0;">
-
+                    
                     <!-- عنوان التقرير -->
-                    <h1>تقرير متابعة أمر البيع</h1>
+                    <div class="header-title">تقرير متابعة أمر البيع</div>
 
                     <!-- بيانات السيل أوردر -->
                     <table style="margin-top:12px;">
@@ -113,57 +109,59 @@
                                         <td style="text-align:left;"><strong>Service</strong></td>
                                     </tr>
 
-                                    <!-- الدفعات -->
-                                    <tr t-set="payments" t-value="o.env['account.payment'].search([('sale_order_id','=',o.id)], order='date asc')"/>
-                                    <tr t-set="payment_count" t-value="len(payments)"/>
-
-                                    <!-- دفعة أولى -->
-                                    <tr>
+                                    <!-- ===================== الدفعات ===================== -->
+                                    <t t-set="payments" t-value="o.env['account.payment'].search([('sale_order_id','=',o.id)], order='date asc')"/>
+                                    <t t-set="payment_count" t-value="len(payments)"/>
+                                    <tr t-if="payment_count >= 1">
                                         <td style="text-align:right;"><strong>الدفعة الأولى</strong></td>
                                         <td style="text-align:center;">
-                                            <t t-if="payment_count &gt;= 1">
-                                                <span t-esc="payments[0].amount"/> ريال<br/>
-                                                <span t-esc="payments[0].journal_id.name"/>
-                                            </t>
-                                            <t t-else="">لا يوجد دفعة أولى</t>
+                                            <span t-esc="payments[0].amount or 0"/> ريال<br/>
+                                            <span t-esc="payments[0].journal_id.name or '-'"/>
                                         </td>
-                                        <td style="text-align:left;"><strong>First Payment - Bank</strong></td>
+                                        <td style="text-align:left;"><strong>First Payment<br/>Bank</strong></td>
+                                    </tr>
+                                    <tr t-if="payment_count < 1">
+                                        <td style="text-align:right;"><strong>الدفعة الأولى</strong></td>
+                                        <td style="text-align:center;">لا يوجد دفعة أولى</td>
+                                        <td style="text-align:left;"><strong>First Payment<br/>Bank</strong></td>
                                     </tr>
 
-                                    <!-- دفعة ثانية -->
-                                    <tr>
+                                    <tr t-if="payment_count >= 2">
                                         <td style="text-align:right;"><strong>الدفعة الثانية</strong></td>
                                         <td style="text-align:center;">
-                                            <t t-if="payment_count &gt;= 2">
-                                                <span t-esc="payments[1].amount"/> ريال<br/>
-                                                <span t-esc="payments[1].journal_id.name"/>
-                                            </t>
-                                            <t t-else="">لا يوجد دفعة ثانية</t>
+                                            <span t-esc="payments[1].amount or 0"/> ريال<br/>
+                                            <span t-esc="payments[1].journal_id.name or '-'"/>
                                         </td>
-                                        <td style="text-align:left;"><strong>Second Payment - Bank</strong></td>
+                                        <td style="text-align:left;"><strong>Second Payment<br/>Bank</strong></td>
+                                    </tr>
+                                    <tr t-if="payment_count < 2">
+                                        <td style="text-align:right;"><strong>الدفعة الثانية</strong></td>
+                                        <td style="text-align:center;">لا يوجد دفعة ثانية</td>
+                                        <td style="text-align:left;"><strong>Second Payment<br/>Bank</strong></td>
                                     </tr>
 
-                                    <!-- دفعة ثالثة -->
-                                    <tr>
+                                    <tr t-if="payment_count >= 3">
                                         <td style="text-align:right;"><strong>الدفعة الثالثة</strong></td>
                                         <td style="text-align:center;">
-                                            <t t-if="payment_count &gt;= 3">
-                                                <span t-esc="payments[2].amount"/> ريال<br/>
-                                                <span t-esc="payments[2].journal_id.name"/>
-                                            </t>
-                                            <t t-else="">لا يوجد دفعة ثالثة</t>
+                                            <span t-esc="payments[2].amount or 0"/> ريال<br/>
+                                            <span t-esc="payments[2].journal_id.name or '-'"/>
                                         </td>
-                                        <td style="text-align:left;"><strong>Third Payment - Bank</strong></td>
+                                        <td style="text-align:left;"><strong>Third Payment<br/>Bank</strong></td>
+                                    </tr>
+                                    <tr t-if="payment_count < 3">
+                                        <td style="text-align:right;"><strong>الدفعة الثالثة</strong></td>
+                                        <td style="text-align:center;">لا يوجد دفعة ثالثة</td>
+                                        <td style="text-align:left;"><strong>Third Payment<br/>Bank</strong></td>
                                     </tr>
 
-                                    <!-- الفواتير -->
-                                    <tr t-set="invoice_count" t-value="len(o.invoice_ids)"/>
+                                    <!-- ===================== الفواتير ===================== -->
+                                    <t t-set="invoice_count" t-value="len(o.invoice_ids)"/>
                                     <tr t-foreach="o.invoice_ids" t-as="inv" t-index="i">
-                                        <td style="text-align:right;"><strong>الفاتورة <t t-esc="i+1"/></strong></td>
+                                        <td style="text-align:right;"><strong>الفاتورة <t t-esc="i+1 or 1"/></strong></td>
                                         <td style="text-align:center;">
-                                            <span t-field="inv.name"/> - <span t-field="inv.date"/>
+                                            <span t-field="inv.name or 'لا توجد'"/> - <span t-field="inv.date or 'لا توجد'"/>
                                         </td>
-                                        <td style="text-align:left;"><strong>Invoice <t t-esc="i+1"/> - Date</strong></td>
+                                        <td style="text-align:left;"><strong>Invoice <t t-esc="i+1 or 1"/> - Date</strong></td>
                                     </tr>
                                     <tr t-if="invoice_count == 0">
                                         <td style="text-align:right;"><strong>الفاتورة الأولى</strong></td>
@@ -171,51 +169,49 @@
                                         <td style="text-align:left;"><strong>First Invoice - Date</strong></td>
                                     </tr>
 
-                                    <!-- إجمالي وأقساط -->
+                                    <!-- ===================== الإجمالي ===================== -->
                                     <tr>
                                         <td style="text-align:right;"><strong>إجمالي أمر البيع قبل الضريبة</strong></td>
-                                        <td style="text-align:center;"><span t-esc="o.amount_untaxed"/> ريال</td>
-                                        <td style="text-align:left;"><strong>Total Before Tax</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="text-align:right;"><strong>الضريبة</strong></td>
-                                        <td style="text-align:center;"><span t-esc="o.amount_tax"/> ريال</td>
-                                        <td style="text-align:left;"><strong>Tax</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="text-align:right;"><strong>إجمالي بعد الضريبة</strong></td>
-                                        <td style="text-align:center;"><span t-esc="o.amount_total"/> ريال</td>
-                                        <td style="text-align:left;"><strong>Total After Tax</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="text-align:right;"><strong>الباقي</strong></td>
-                                        <td style="text-align:center;"><span t-esc="o.amount_total - sum(p.amount for p in payments)"/> ريال</td>
-                                        <td style="text-align:left;"><strong>Remaining</strong></td>
+                                        <td style="text-align:center;"><span t-esc="o.amount_untaxed or 0"/> ريال</td>
+                                        <td style="text-align:left;"><strong>SO Total Before Tax</strong></td>
                                     </tr>
 
-                                    <!-- التوقيعات والختم -->
+                                    <tr>
+                                        <td style="text-align:right;"><strong>الضريبة</strong></td>
+                                        <td style="text-align:center;"><span t-esc="o.amount_tax or 0"/> ريال</td>
+                                        <td style="text-align:left;"><strong>Tax</strong></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="text-align:right;"><strong>إجمالي أمر البيع بعد الضريبة</strong></td>
+                                        <td style="text-align:center;"><span t-esc="o.amount_total or 0"/> ريال</td>
+                                        <td style="text-align:left;"><strong>SO Total After Tax</strong></td>
+                                    </tr>
+
+                                    <!-- ===================== التوقيعات والختم ===================== -->
                                     <tr>
                                         <td style="text-align:center;" colspan="3">
                                             <table style="width:100%; border:none; text-align:center;">
                                                 <tr>
-                                                    <td style="height:50px; font-size:18px;">....................................................</td>
-                                                    <td style="height:50px; font-size:18px;">....................................................</td>
+                                                    <td class="signature-cell">..................................</td>
+                                                    <td class="signature-cell">..................................</td>
                                                 </tr>
                                                 <tr>
-                                                    <td><strong>توقيع المدير</strong></td>
-                                                    <td><strong>توقيع مدير المجموعة</strong></td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2" style="text-align:center; height:25px;">
-                                                        التاريخ: <t t-esc="fields.Date.today().strftime('%d/%m/%Y')"/>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2" style="text-align:center; height:60px; font-size:16px;">
-                                                        <strong>الختم الرسمي</strong>
-                                                    </td>
+                                                    <td>توقيع المدير</td>
+                                                    <td>توقيع مدير المجموعة</td>
                                                 </tr>
                                             </table>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="text-align:center;" colspan="3"><strong>الختم الرسمي</strong></td>
+                                    </tr>
+
+                                    <!-- ===================== تاريخ اليوم ===================== -->
+                                    <tr>
+                                        <td style="text-align:center;" colspan="3">
+                                            <span t-esc="fields.Date.context_today(o.env)"/>
                                         </td>
                                     </tr>
 
@@ -237,8 +233,4 @@
             </t>
         </t>
     </template>
-
 </odoo>
-
-
-                      
