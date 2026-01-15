@@ -226,18 +226,11 @@
                                     </tr>
 
                                     <!-- ===================== تاريخ اليوم ===================== -->
-                                    <t t-set="time" t-value="__import__('time')"/>
                                     <tr>
                                        <td style="text-align:center;" colspan="3">
-                                            <span t-esc="time.strftime('%Y-%m-%d')"/>
+                                            <span t-esc="o.env['ir.qweb.field.date'].context_today(o.env)"/>
                                        </td>
                                     </tr>
-
-                                    <!--tr>
-                                        <td style="text-align:center;" colspan="3">
-                                            <span t-esc="fields.Date.context_today(o.env)"/>
-                                        </td>
-                                    </tr-->
 
                                 </table>
                             </td>
@@ -258,5 +251,3 @@
         </t>
     </template>
 </odoo>
-
-                   
