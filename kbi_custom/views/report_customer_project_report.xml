@@ -144,12 +144,19 @@
 
                                     <!-- توقيعات -->
                                     <tr>
-                                        <td style="text-align:right;"><strong>✒️ توقيع مدير الجودة</strong></td>
-                                        <td style="text-align:center;">✒️ توقيع مدير المجموعة</td>
-                                        <td style="text-align:left;"><strong>✒️ توقيع مدير المالية</strong></td>
+                                        <td style="text-align:right;"><strong> توقيع مدير الجودة</strong></td>
+                                        <td style="text-align:center;"><strong> توقيع مدير المجموعة </strong></td>
+                                        <td style="text-align:left;"><strong> توقيع مدير المالية</strong></td>
                                     </tr>
                                     <tr>
-                                        <td colspan="3" style="text-align:center; padding:10px;">
+                                        
+                                        <td colspan="3" style="text-align:right;" padding:10px;">
+                                            <div>..................................</div>
+                                        </td>
+                                         <td colspan="3" style="text-align:center;" padding:10px;">
+                                            <div>..................................</div>
+                                        </td>
+                                         <td colspan="3" style="text-align:left;" padding:10px;">
                                             <div>..................................</div>
                                         </td>
                                     </tr>
