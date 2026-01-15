@@ -81,7 +81,7 @@
                                     <t t-if="payment_count &gt; 0">
                                         <t t-foreach="payments" t-as="pay" t-index="i">
                                             <tr>
-                                                <td><strong>الدفعة <t t-esc="(i or 0) + 1"/></td><br/>البنك/الخزنة</strong>
+                                                <td><strong>الدفعة <t t-esc="(i or 0) + 1"/></td><br/>البنك/الخزنة</strong></td>
                                                 <td style="text-align:center;">
                                                    <strong> <span t-esc="pay.amount or 0"/> ريال<br/></strong>
                                                     <strong><span t-esc="pay.journal_id.name or '-'"/><br/></strong>
