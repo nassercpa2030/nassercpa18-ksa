@@ -198,9 +198,10 @@
 
 <t t-if="payments">
     <t t-set="pay_index" t-value="0"/>
+    <t t-set="payment_count" t-value="len(payments)"/>
     
     <!-- تعريف قائمة ألوان -->
-    <t t-set="bg_colors" t-value="['#f8d7da', '#d1ecf1', '#d4edda', '#fff3cd', '#cce5ff', '#e2e3e5']"/>
+   <t t-set="bg_colors" t-value="['#cce5ff', '#99ccff', '#66b2ff', '#3399ff', '#99aab5', '#cccccc']"/>
 
     <t t-foreach="payments" t-as="pay">
         <t t-set="pay_index" t-value="pay_index + 1"/>
@@ -216,16 +217,32 @@
                 </strong>
             </td>
 
+            <!---نسبة الدفعة --->
             <td style="text-align:center;">
+    <div>
+        <strong>
+            <span t-esc="round((pay.amount / o.amount_total * 100) if o.amount_total else 0, 2)"/> %
+        </strong>
+    </div>
+    <div><strong><span t-esc="pay.journal_id.name or '-'"/></strong></div>
+    <div>
+        <small>
+            تاريخ الدفع: <span t-esc="pay.date or '-'"/>
+        </small>
+    </div>
+</td>
+
+
+            <!--td style="text-align:center;">
                 <div><strong><span t-esc="pay.amount or 0"/> ريال</strong></div>
                 <div><strong><span t-esc="pay.journal_id.name or '-'"/></strong></div>
                 <div>
                     <small>
                         تاريخ الدفع:
-                        <span t-esc="pay.date or '-'"/>
+                       <strong> <span t-esc="pay.date or '-'"/></strong>
                     </small>
                 </div>
-            </td>
+            </td-->
 
             <td style="text-align:left;">
                 <strong>
@@ -262,8 +279,8 @@
             </td>
 
             <td style="text-align:center;">
-                <span t-esc="inv.name or '-'"/> -
-                <span t-esc="inv.date or '-'"/>
+                <strong><span t-esc="inv.name or '-'"/> -
+                <span t-esc="inv.date or '-'"/></strong>
             </td>
 
             <td style="text-align:left;">
@@ -284,19 +301,19 @@
 
                                     <!-- الإجمالي -->
                                     <tr>
-                                        <td><strong>إجمالي أمر البيع قبل الضريبة</strong></td>
-                                        <td style="text-align:center;"><strong><span t-esc="o.amount_untaxed or 0"/> ريال</strong></td>
-                                        <td style="text-align:left;"><strong>SO Total Before Tax</strong></td>
+                                        <td><strong> نسبة دفع أمر البيع </strong></td>
+                                        <td style="text-align:center;"><strong><span t-esc="o. or 0"/> %</strong></td>
+                                        <td style="text-align:left;"><strong>Sales Order Payment Percentage</strong></td>
                                     </tr>
                                     <tr>
-                                        <td><strong>الضريبة</strong></td>
-                                        <td style="text-align:center;"><strong><span t-esc="o.amount_tax or 0"/> ريال</strong></td>
-                                        <td style="text-align:left;"><strong>Tax</strong></td>
+                                        <td><strong>مدير المجموعة </strong></td>
+                                        <td style="text-align:center;"><strong><span t-esc="o.user_id.name or 0"/> أ/</strong></td>
+                                        <td style="text-align:left;"><strong>Sale Order Manager</strong></td>
                                     </tr>
                                     <tr>
-                                        <td><strong>إجمالي أمر البيع بعد الضريبة</strong></td>
-                                        <td style="text-align:center;"><strong><span t-esc="o.amount_total or 0"/> ريال</strong></td>
-                                        <td style="text-align:left;"><strong>SO Total After Tax</strong></td>
+                                        <td><strong>تاريخ قيد الإيراد</strong></td>
+                                        <td style="text-align:center;"><strong><span t-esc="o.final_close_entry_date or 0"/> </strong></td>
+                                        <td style="text-align:left;"><strong>Close Entry Date</strong></td>
                                     </tr>
 
                                     <!-- عدد الدفعات -->
