@@ -305,7 +305,10 @@
                                     <!-- الإجمالي -->
                                     <tr>
                                         <td><strong> نسبة دفع أمر البيع </strong></td>
-                                        <td style="text-align:center;"><strong><span t-esc="o.paid_percent or 0"/> %</strong></td>
+                                        <td style="text-align:center;"><strong>
+                                            <!--span t-esc="o.paid_percent or 0"/--> 
+                                              <span t-esc="('%.2f' % (o.paid_percent or 0))"/> %
+                                        </strong></td>
                                         <td style="text-align:left;"><strong>Sales Order Payment Percentage</strong></td>
                                     </tr>
                                     <tr>
