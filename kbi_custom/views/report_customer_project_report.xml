@@ -201,7 +201,9 @@
     <t t-set="payment_count" t-value="len(payments)"/>
     
     <!-- تعريف قائمة ألوان -->
-   <t t-set="bg_colors" t-value="['#cce5ff', '#99ccff', '#66b2ff', '#3399ff', '#99aab5', '#cccccc']"/>
+   <!--t t-set="bg_colors" t-value="['#cce5ff', '#99ccff', '#66b2ff', '#3399ff', '#99aab5', '#cccccc']"/-->
+    <t t-set="bg_colors" t-value="['#e6f2ff', '#cce6ff', '#b3d9ff', '#99ccff', '#cce0e6', '#e6e6e6']"/>
+
 
     <t t-foreach="payments" t-as="pay">
         <t t-set="pay_index" t-value="pay_index + 1"/>
@@ -308,7 +310,7 @@
                                     </tr>
                                     <tr>
                                         <td><strong>مدير المجموعة </strong></td>
-                                        <td style="text-align:center;"><strong><span t-esc="o.user_id.name or 0"/> أ/</strong></td>
+                                        <td style="text-align:center;"><strong> أ/<span t-esc="o.user_id.name or 0"/></strong></td>
                                         <td style="text-align:left;"><strong>Sale Order Manager</strong></td>
                                     </tr>
                                     <tr>
