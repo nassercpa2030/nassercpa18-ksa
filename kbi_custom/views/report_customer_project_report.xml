@@ -102,7 +102,7 @@
                                     <!-- تاريخ الطباعة -->
                                     <tr>
                                         <td><strong>تاريخ الطباعة:</strong></td>
-                                        <td style="text-align:center;"><strong><span t-esc="o.printing_date or '-'"/></strong></td>
+                                        <td style="text-align:center;"><strong><span t-esc="o.printdate or '-'"/></strong></td>
                                         <td style="text-align:center;"><strong>Printing Date</strong></td>
                                     </tr>
 
