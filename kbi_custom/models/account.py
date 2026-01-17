@@ -25,12 +25,22 @@ class AccountMove ( models.Model ) :
     manager_assign = fields.Binary ( ' ملف توقيع مدير المجموعة ' , default=False , compute="_compute_user_signature" ,
                                      store=False , readonly=False )
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
+    ref_count = fields.Integer('عدد الرقم  المرجعي',compute="_compute_ref_count", store=True)
     analytic_acc_desc = fields.Char (
         string="Journal Analytic Description" ,
         compute='_compute_analytic_distribution' ,
         store=True ,
         readonly=False
     )
+
+    ### count refrence number ######
+    def _compute_ref_count(self):
+        for rec in self:
+            if rec.ref:
+               rec.ref_count = self.search_count([('ref', '=', rec.ref)])
+            else:
+               rec.ref_count = 0
+            
 
     def get_qr_code_knk(self) :
         def get_qr_encoding(tag , field) :
