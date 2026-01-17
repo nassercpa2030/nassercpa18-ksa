@@ -68,9 +68,9 @@ class SaleOrder ( models.Model ) :
     x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="Contract_service" )
     report_template_id = fields.Many2one ( comodel_name='ir.actions.report' , string='Report Template' ,
                                            related="report_id.report_template_id" )
-    #printing_date = fields.Date ( string='printing date'  , default=lambda self : fields.Date.today () )
+    printdate = fields.Date ( string='تاريخ  الطباعة'  , default=lambda self : fields.Date.today () )
     #printing_date = fields.Datetime(string='Printing Date', default=lambda self: fields.Datetime.context_timestamp(self, fields.Datetime.now()) )
-    printdate = fields.Datetime(string='تاريخ  الطباعة',  default=lambda self: datetime.now() )
+   #printdate = fields.Datetime(string='تاريخ  الطباعة',  default=lambda self: datetime.now() )
     
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreement' )
     payment_ids = fields.Many2many ( 'account.payment' , string='Payments' , compute='_compute_payment_ids' )
