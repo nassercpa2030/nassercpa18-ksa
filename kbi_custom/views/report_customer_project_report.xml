@@ -173,7 +173,7 @@
                                     </t>
 
                                     <!-- الفواتير -->
-                                    <t t-set="invoices" t-value="o.invoice_ids or []"/>
+                                    <!--t t-set="invoices" t-value="o.invoice_ids or []"/>
                                     <t t-set="invoice_count" t-value="len(invoices)"/>
                                     <t t-if="invoice_count &gt; 0">
                                         <tr t-foreach="invoices" t-as="inv" t-index="i">
@@ -190,7 +190,41 @@
                                             <td style="text-align:center;">0</td>
                                             <td style="text-align:left;"><strong>First Invoice - Date</strong></td>
                                         </tr>
-                                    </t>
+                                    </t-->
+                                    <!-- الفواتير -->
+<t t-set="invoices" t-value="o.invoice_ids or []"/>
+
+<t t-if="invoices">
+    <t t-set="inv_index" t-value="0"/>
+
+    <t t-foreach="invoices" t-as="inv">
+        <t t-set="inv_index" t-value="inv_index + 1"/>
+
+        <tr>
+            <td>
+                <strong>فاتورة <t t-esc="inv_index"/></strong>
+            </td>
+
+            <td style="text-align:center;">
+                <span t-esc="inv.name or '-'"/> -
+                <span t-esc="inv.date or '-'"/>
+            </td>
+
+            <td style="text-align:left;">
+                <strong>Invoice <t t-esc="inv_index"/> - Date</strong>
+            </td>
+        </tr>
+    </t>
+</t>
+
+<t t-if="not invoices">
+    <tr>
+        <td><strong>فاتورة 1</strong></td>
+        <td style="text-align:center;">-</td>
+        <td style="text-align:left;"><strong>Invoice 1 - Date</strong></td>
+    </tr>
+</t>
+
 
                                     <!-- الإجمالي -->
                                     <tr>
