@@ -140,6 +140,8 @@ class SaleOrder ( models.Model ) :
 
     journal_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string='عدد قيود الإغلاق' ,
                                            index=True , searchable=True )
+    finance_signiture = fields.Boolean ( 'توقيع المالية ' , default=False , readonly=False , index=True )
+    archive_signiture = fields.Boolean ( 'توقيع الأرشيف ' , default=False , readonly=False , index=True )
     close_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string=' قيود الإغلاق' , store=True )
     is_project_close_stage = fields.Boolean ( compute='_compute_is_project_close_stage' ,
                                               string='Is Project in Close Stage' )
