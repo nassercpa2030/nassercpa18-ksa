@@ -149,8 +149,8 @@ class AccountMove ( models.Model ) :
                 'invoice_user_id' : sale_order.user_id.id ,
                 'invoice_date' : invoice_date ,
                 'date' : invoice_date ,
-                'invoice_line_ids' : invoice_lines ,)
-            } 
+                'invoice_line_ids' : invoice_lines ,
+            }) 
                                                        
             # حفظ الفاتورة أولًا
             invoice.sudo().write({})
