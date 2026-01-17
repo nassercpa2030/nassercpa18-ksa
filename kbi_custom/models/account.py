@@ -150,8 +150,10 @@ class AccountMove ( models.Model ) :
                 'invoice_date' : invoice_date ,
                 'date' : invoice_date ,
                 'invoice_line_ids' : invoice_lines ,
-            } )
-
+            } 
+                                                       
+            # حفظ الفاتورة أولًا
+            invoice.sudo().write({})
             # 6️⃣ ترحيل الفاتورة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
