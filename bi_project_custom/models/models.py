@@ -235,15 +235,6 @@ class SaleOrder ( models.Model ) :
 
     # file_state_history = fields.Char(compute='_compute_project_files_state', string='File_state History')
     
-    ###### print 
-    def action_print_project_history(self) :
-        # إحنا هنا بنجيب التقرير بالـ ID مباشرة
-        report = self.env['ir.actions.report'].browse ( 1299)
-        if not report :
-            # لو التقرير مش موجود، ممكن نعمل raise أو نرجع التقرير الافتراضي
-            raise ValueError ( "Report with ID 1299 not found!" )
-        # ترجع الـ report action عشان أودو يفتح PDF
-        return report.report_action ( self )
 
 
     @api.depends ( 'project_ids.files_state' )
