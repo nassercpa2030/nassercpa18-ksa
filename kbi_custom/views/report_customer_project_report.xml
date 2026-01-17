@@ -103,7 +103,7 @@
                                     <tr>
                                         <td><strong>تاريخ الطباعة:</strong></td>
                                         <td style="text-align:center;"><strong><span t-esc="o.printing_date or '-'"/></strong></td>
-                                        <td style="text-align:left;">Printing Date</td>
+                                        <td style="text-align:center;"><strong>Printing Date</strong></td>
                                     </tr>
 
                                     <!-- بيانات العميل وأمر البيع -->
@@ -132,15 +132,16 @@
                                     </tr>
 
                                     <!-- الدفعات -->
-                                    <t t-set="payments" t-value="o.env['account.payment'].search([('sale_order_id','=',o.id)], order='date asc') or []"/>
+                                    <!--t t-set="payments" t-value="o.env['account.payment'].search([('sale_order_id','=',o.id)], order='date asc') or []"/>
                                     <t t-set="payment_count" t-value="len(payments)"/>
                                     <t t-if="payment_count &gt; 0">
                                         <t t-foreach="payments" t-as="pay" t-index="i">
                                             <tr>
                                                 <td>
-                                                    <strong>الدفعة <t t-esc="(i or 0) + 1"/></strong><br/>
-                                                    <strong>البنك/الخزنة</strong>
-                                                </td>
+                                                    <strong>الدفعة <t t-esc="(i or 0) + 1"/><br/>
+                                                    البنك/الخزنة
+                                                    </strong>
+                                                </td-->
                                                 <!--td style="text-align:center;">
                                                     <strong><span t-esc="pay.amount or 0"/> ريال</strong><br/>
                                                     <strong><span t-esc="pay.journal_id.name or '-'"/></strong><br/>
@@ -148,7 +149,7 @@
                                                         تاريخ الدفع: <strong><span t-esc="pay.date or '-'"/></strong>
                                                     </small>
                                                 </td-->
-<td style="text-align:center;">
+<!--td style="text-align:center;">
     <div><strong><span t-esc="pay.amount or 0"/> ريال</strong></div>
     <div><strong><span t-esc="pay.journal_id.name or '-'"/></strong></div>
     <div><small>تاريخ الدفع: <span t-esc="pay.date or '-'"/></small></div>
@@ -170,7 +171,7 @@
                                             <td style="text-align:center;">0</td>
                                             <td style="text-align:left;"><strong>Payments</strong></td>
                                         </tr>
-                                    </t>
+                                    </t-->
 
                                     <!-- الفواتير -->
                                     <!--t t-set="invoices" t-value="o.invoice_ids or []"/>
@@ -191,6 +192,61 @@
                                             <td style="text-align:left;"><strong>First Invoice - Date</strong></td>
                                         </tr>
                                     </t-->
+<!-- الدفعات -->
+<t t-set="payments"
+   t-value="o.env['account.payment'].search([('sale_order_id','=',o.id)], order='date asc') or []"/>
+
+<t t-if="payments">
+    <t t-set="pay_index" t-value="0"/>
+    
+    <!-- تعريف قائمة ألوان -->
+    <t t-set="bg_colors" t-value="['#f8d7da', '#d1ecf1', '#d4edda', '#fff3cd', '#cce5ff', '#e2e3e5']"/>
+
+    <t t-foreach="payments" t-as="pay">
+        <t t-set="pay_index" t-value="pay_index + 1"/>
+        
+        <!-- حساب اللون حسب index -->
+        <t t-set="color" t-value="bg_colors[(pay_index-1) % len(bg_colors)]"/>
+        
+        <tr t-att-style="'background-color: %s;' % color">
+            <td>
+                <strong>
+                    الدفعة <t t-esc="pay_index"/><br/>
+                    البنك/الخزنة
+                </strong>
+            </td>
+
+            <td style="text-align:center;">
+                <div><strong><span t-esc="pay.amount or 0"/> ريال</strong></div>
+                <div><strong><span t-esc="pay.journal_id.name or '-'"/></strong></div>
+                <div>
+                    <small>
+                        تاريخ الدفع:
+                        <span t-esc="pay.date or '-'"/>
+                    </small>
+                </div>
+            </td>
+
+            <td style="text-align:left;">
+                <strong>
+                    Payment <t t-esc="pay_index"/><br/>
+                    Bank
+                </strong>
+            </td>
+        </tr>
+    </t>
+</t>
+
+<t t-if="not payments">
+    <tr>
+        <td><strong>الدفعات</strong></td>
+        <td style="text-align:center;">0</td>
+        <td style="text-align:left;"><strong>Payments</strong></td>
+    </tr>
+</t>
+
+
+                                    
                                     <!-- الفواتير -->
 <t t-set="invoices" t-value="o.invoice_ids or []"/>
 
