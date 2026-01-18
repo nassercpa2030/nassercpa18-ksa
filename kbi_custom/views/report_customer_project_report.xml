@@ -86,8 +86,8 @@
                     }
                     .signature-images img {
                         display: block;
-                        height: 80px;
-                        max-width: 80%;
+                        height: 25px;
+                        max-width: 25%;
                         margin: 0 auto;
                         padding: 0;
                         border: 0;
@@ -358,8 +358,8 @@
                                        </td>
 
                                        <!--td style="text-align:center; padding:15px; height:30px; vertical-align:bottom;">..............................</td>
-                                       <td style="text-align:center; padding:5px; height:30px; vertical-align:bottom;">..................................</td>
-                                       <td style="text-align:center; padding:5px; height:30px; vertical-align:bottom;">..............................</td-->
+                                       <td style="text-align:center; padding:5px; height:25px; vertical-align:bottom;">..................................</td>
+                                       <td style="text-align:center; padding:5px; height:25px; vertical-align:bottom;">..............................</td-->
                                     </tr>
 
                                 </table>
