@@ -351,10 +351,10 @@
                                            ..............................
                                        </td>
                                         <td  class="signature-images" style="text-align:center; padding:10px; height:55px; vertical-align:bottom; ">
-                                           <img t-if="o.archive_assign" t-att-src="image_data_uri(o.archive_assign)"/>
+                                           <img t-if="o.archive_assign" t-att-src="image_data_uri(o.archive_assign)" style="max-height:80px; max-width:180px;"/>
                                        </td>
                                         <td  class="signature-images" style="text-align:center; padding:10px; height:55px; vertical-align:bottom; ">
-                                           <img t-if="o.finance_assign" t-att-src="image_data_uri(o.finance_assign)"/>
+                                           <img t-if="o.finance_assign" t-att-src="image_data_uri(o.finance_assign)" style="max-height:80px; max-width:180px;"/>
                                        </td>
 
                                        <!--td style="text-align:center; padding:15px; height:30px; vertical-align:bottom;">..............................</td>
