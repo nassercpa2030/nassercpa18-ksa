@@ -140,9 +140,9 @@ class SaleOrder ( models.Model ) :
 
     journal_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string='عدد قيود الإغلاق' ,
                                            index=True , searchable=True )
-    finance_signiture = fields.Boolean ( 'توقيع المالية ' , default=False , readonly=False , index=True )
-    archive_signiture = fields.Boolean ( 'توقيع الأرشيف ' , default=False , readonly=False , index=True )
-    manager_signiture = fields.Boolean ( 'توقيع مدير المجموعة ' , default=False , readonly=False , index=True )
+    finance_signiture = fields.Boolean ( ' توقيع المالية للختم ' , default=False , readonly=False , index=True )
+    archive_signiture = fields.Boolean ( 'توقيع الأرشيف للختم ' , default=False , readonly=False , index=True )
+    manager_signiture = fields.Boolean ( 'توقيع مدير المجموعة للختم ' , default=False , readonly=False , index=True )
     finance_assign = fields.Binary ( ' ملف توقيع المالية  ' , default=False , compute="_compute_finance_archive_signature" , store=False , readonly=False )
     archive_assign = fields.Binary ( ' ملف توقيع الأرشيف ' , default=False , compute="_compute_finance_archive_signature" , store=False , readonly=False )
     manager_assign = fields.Binary ( ' ملف توقيع مدير المجموعة ' , default=False , compute="_compute_finance_archive_signature" , store=False , readonly=False )
