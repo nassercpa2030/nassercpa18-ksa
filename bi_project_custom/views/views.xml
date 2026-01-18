@@ -138,6 +138,12 @@
                       style="color: white; font-weight: bold;"
                       confirm="Are you sure you want to set this order as 'Customer Not Signed'?"/>
           </xpath>
+         <xpath expr="//page[@string='قسم الأرشفة']//group[@class='oe_right']/field[@name='box_paper_archive']" position="after">
+            <field name="archive_signiture" widget="boolean_toggle" 
+                   modifiers="{'readonly': [('local_server_archive','=',False),
+                                           ('one_audit_archive','=',False),
+                                           ('papers_archive','=',False)]}"/>
+        </xpath>
       </field>
   </record>
 
