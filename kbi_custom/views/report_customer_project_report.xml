@@ -351,7 +351,7 @@
                                            ..............................
                                        </td>
                                         <td  class="signature-images" style="text-align:center; padding:15px; height:30px; vertical-align:bottom; ">
-                                           <img t-if="o.archive_assign" t-att-src="image_data_uri(o.finance_assign)"/>
+                                           <img t-if="o.archive_assign" t-att-src="image_data_uri(o.archive_assign)"/>
                                        </td>
                                         <td  class="signature-images" style="text-align:center; padding:15px; height:30px; vertical-align:bottom; ">
                                            <img t-if="o.finance_assign" t-att-src="image_data_uri(o.finance_assign)"/>
