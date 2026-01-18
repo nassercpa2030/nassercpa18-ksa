@@ -142,6 +142,10 @@ class SaleOrder ( models.Model ) :
                                            index=True , searchable=True )
     finance_signiture = fields.Boolean ( 'توقيع المالية ' , default=False , readonly=False , index=True )
     archive_signiture = fields.Boolean ( 'توقيع الأرشيف ' , default=False , readonly=False , index=True )
+    manager_signiture = fields.Boolean ( 'توقيع مدير المجموعة ' , default=False , readonly=False , index=True )
+    finance_assign = fields.Binary ( ' ملف توقيع المالية  ' , default=False , compute="_compute_finance_archive_signature" , store=False , readonly=False )
+    archive_assign = fields.Binary ( ' ملف توقيع الأرشيف ' , default=False , compute="_compute_finance_archive_signature" , store=False , readonly=False 
+    manager_assign = fields.Binary ( ' ملف توقيع مدير المجموعة ' , default=False , compute="_compute_finance_archive_signature" , store=False , readonly=False )
     close_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string=' قيود الإغلاق' , store=True )
     is_project_close_stage = fields.Boolean ( compute='_compute_is_project_close_stage' ,
                                               string='Is Project in Close Stage' )
@@ -238,6 +242,23 @@ class SaleOrder ( models.Model ) :
     # file_state_history = fields.Char(compute='_compute_project_files_state', string='File_state History')
     
 
+
+     # ---get financial and manager signiture for using vendor bills----#####
+    @api.depends ( 'finance_signiture' , 'archive_signiture' ,'manager_signiture')  # لازم تحط الفيلدات اللي هتتابعها
+    def _compute_finance_archive_signature(self) :
+        User = self.env['res.users']
+        finance_user = User.browse ( 18 )  # اليوزر اللي id = 18 finance
+        archive_user= User.browse (563)  # اليوزر اللي id = 563 archive
+        manager_user= User.search([('id', 'not in', [18, 563])], limit=1)
+        #browse ([!563,!18])  # اليوزر اللي id != 563,!=18 manager
+
+        for rec in self :
+            # لو تفعيل التوقيع مفعل، نحط التوقيع، غير كده يبقى False
+            rec.finance_assign = finance_user.sign_signature if rec.finance_signiture else False
+            rec.archive_assign = archive_user.sign_signature if rec.archive_signiture else False
+            rec.manager_assign = manager_user.sign_signature if rec.manager_signiture else False
+
+    
 
     @api.depends ( 'project_ids.files_state' )
     def _compute_project_files_state(self) :
