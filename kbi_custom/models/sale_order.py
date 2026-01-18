@@ -68,7 +68,7 @@ class SaleOrder ( models.Model ) :
     x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="Contract_service" )
     report_template_id = fields.Many2one ( comodel_name='ir.actions.report' , string='Report Template' ,
                                            related="report_id.report_template_id" )
-    printdate = fields.Date ( string='تاريخ  الطباعة'  , default=context_today )
+    printdate = fields.Date ( string='تاريخ  الطباعة'  , default=fields.Datetime.now )
     #printdate = fields.Date ( string='تاريخ  الطباعة'  , default=lambda self : fields.Date.today () )
     #printing_date = fields.Datetime(string='Printing Date', default=lambda self: fields.Datetime.context_timestamp(self, fields.Datetime.now()) )
    #printdate = fields.Datetime(string='تاريخ  الطباعة',  default=lambda self: datetime.now() )
