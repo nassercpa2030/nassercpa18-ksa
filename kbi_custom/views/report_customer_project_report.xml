@@ -109,11 +109,11 @@
                                 <table width="100%" style="border-collapse:collapse;">
 
                                     <!-- تاريخ الطباعة -->
-                                    <tr>
+                                    <!--tr>
                                         <td><strong>تاريخ الطباعة:</strong></td>
                                         <td style="text-align:center;"><strong><span t-esc="o.printdate or '-'"/></strong></td>
                                         <td style="text-align:center;"><strong>Printing Date</strong></td>
-                                    </tr>
+                                    </tr-->
 
                                     <!-- بيانات العميل وأمر البيع -->
                                     <tr>
@@ -346,14 +346,14 @@
                                         <td style="text-align:center;"><strong> توقيع مدير المالية</strong></td>
                                     </tr>
                                     <tr>
-                                       <td  class="signature-images" style="text-align:center; padding:15px; height:30px; vertical-align:bottom; ">
+                                       <td  class="signature-images" style="text-align:center; padding:10px; height:25px; vertical-align:bottom; ">
                                            <!--img t-if="o.manager_assign" t-att-src="image_data_uri(o.finance_assign)"/-->
                                            ..............................
                                        </td>
-                                        <td  class="signature-images" style="text-align:center; padding:15px; height:30px; vertical-align:bottom; ">
+                                        <td  class="signature-images" style="text-align:center; padding:10px; height:25px; vertical-align:bottom; ">
                                            <img t-if="o.archive_assign" t-att-src="image_data_uri(o.archive_assign)"/>
                                        </td>
-                                        <td  class="signature-images" style="text-align:center; padding:15px; height:30px; vertical-align:bottom; ">
+                                        <td  class="signature-images" style="text-align:center; padding:10px; height:25px; vertical-align:bottom; ">
                                            <img t-if="o.finance_assign" t-att-src="image_data_uri(o.finance_assign)"/>
                                        </td>
 
