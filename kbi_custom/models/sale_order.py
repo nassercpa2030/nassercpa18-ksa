@@ -225,7 +225,25 @@ class SaleOrder ( models.Model ) :
                 
             
             
+
+    def action_set_project_stage_20(self):
+        stage = self.env['project.project.stage'].browse(20)
+        if not stage.exists():
+            raise UserError('Project Stage with ID 20 not found.')
+
+        for order in self:
+            if not order.project_ids:
+                continue
+            order.project_ids.write({
+                'stage_id': stage.id
+            })
             
+        return {
+          'type': 'ir.actions.client',
+          'tag': 'reload',
+            }
+
+    
     @api.depends('amount_untaxed', 'ass_to_percentage')
     def _compute_ass_to(self):
         for rec in self:
@@ -752,7 +770,7 @@ class SaleOrder ( models.Model ) :
     # compute='_compute_first_payment_id' )
     # first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
     # first_payment_amount = fields.Monetary ( string='First Payment Amount' , related='first_payment_id.amount' )
-    project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
+    #project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
                                          related='project_ids.stage_id' , store=True , groups='base.group_user' )
     # close_type = fields.Char(comodel_name='project.project.close_type',string='Close_type', related='close_type', store=True)
     from_crm = fields.Boolean ( string='From CRM' )
