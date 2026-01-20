@@ -771,7 +771,7 @@ class SaleOrder ( models.Model ) :
     # first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
     # first_payment_amount = fields.Monetary ( string='First Payment Amount' , related='first_payment_id.amount' )
     #project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
-                                         related='project_ids.stage_id' , store=True , groups='base.group_user' )
+                                         #related='project_ids.stage_id' , store=True , groups='base.group_user' )
     # close_type = fields.Char(comodel_name='project.project.close_type',string='Close_type', related='close_type', store=True)
     from_crm = fields.Boolean ( string='From CRM' )
    
