@@ -224,10 +224,10 @@ class QualityStateLog ( models.Model ) :
     ] , string='القيمة الجديدة' )
     changed_by = fields.Many2one ( 'res.users' , string='تم التغيير بواسطة' )
     change_date = fields.Datetime ( string='تاريخ  التغيير' )
-    old_changed_by = fields.Many2one ( 'res.users' , string="Old Changed By" )
-    new_changed_by = fields.Many2one ( 'res.users' , string="New Changed By" )
-    old_change_date = fields.Datetime ( string="Old Change Date" )
-    new_change_date = fields.Datetime ( string="New Change Date" )
+    old_changed_by = fields.Many2one ( 'res.users' , string="التغيير القديم بواسطة" )
+    new_changed_by = fields.Many2one ( 'res.users' , string="التغيير الجديد بواسطة" )
+    old_change_date = fields.Datetime ( string="تاريخ التغيير القديم" )
+    new_change_date = fields.Datetime ( string="تاريخ التغيير الجديد" )
 
 
 class SaleOrder ( models.Model ) :
