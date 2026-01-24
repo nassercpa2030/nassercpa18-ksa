@@ -17,6 +17,7 @@ class SaleOrder ( models.Model ) :
 
     contract_date = fields.Date ( string='Contract Date' , readonly=False ,required=True )
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
+    order_lines_count = fields.Integer(string='Order Lines',compute='_compute_order_lines_count',store=True)
     convert_orders = fields.Boolean (
         string="تحويل الأوردرات لعقود" ,
         default=False ,
@@ -200,6 +201,14 @@ class SaleOrder ( models.Model ) :
     )
 
 
+    ##########Get order Lines##########
+
+    @api.depends('order_line')
+    def  _compute_order_lines_count(self) :
+        for rec in self :
+            rec.order_lines_count = len(rec.order_line) if rec.order_line else 0
+
+    
      ##########print method##########
 
     def action_print_project_history(self) :
