@@ -2,7 +2,7 @@ from odoo import models , fields , api , _
 from odoo.exceptions import ValidationError
 import logging
 
-_logger = logging.getLogger(__name__)
+_logger = logging.getLogger ( __name__ )
 
 
 class AccountMove ( models.Model ) :
@@ -31,10 +31,23 @@ class ProjectProject ( models.Model ) :
     contract_name = fields.Char ( string='Contract Name' )
     financial_period_date = fields.Date ( string='Financial Period Date' )
     stage_name = fields.Char ( string='Stage Name' , related='stage_id.name' , store=False )
-    sale_order_id = fields.Many2one ( commodel_name='sale.order' , string="Sales Order" , store=True ,
+    sale_order_id = fields.Many2one ( commodel_name='sale.order' , string="Sales Order" , store=True , readonly=False ,
                                       ondelete='set null' )
+    sale_order_contract_service = fields.Many2one ( 'product.product' , string="Contract Service" ,
+                                                    related="sale_order_id.x_studio_contract_service" , store=False ,
+                                                    readonly=True ,
+                                                    ondelete='set null' )
+
     manager_id = fields.Integer ( String="Manager_id" , related="user_id.id" , store=True , readonly=False ,
                                   ondelete='set null' )
+    quality_state = fields.Selection ( [('no_value' , ''),('to_quality' , 'التحويل للجودة') , ('review_again' , 'إعادة للمراجعة') ,
+                                        ('partner_signed' , 'توقيع الشريك') , ] , string='حالة الملف' , store=True ,
+                                       readonly=False , ondelete='set null' )
+    show_quality_state = fields.Boolean ( string='إظهار حالة الجودة' , compute='_compute_show_quality_state' ,
+                                          ondelete='set null' )
+    quality_state_history_ids = fields.One2many ( 'quality.state.log' , 'project_id' , string='Quality State History' ,
+                                                  readonly=True )
+
     # adding field close_type
     close_type = fields.Text ( string="Close Type" , default="قيد إغلاق مؤجل" , readonly=False )
     # إضافة حقل paid_percent محسوب بناءً على paid_percent في sale_order
@@ -69,40 +82,98 @@ class ProjectProject ( models.Model ) :
         ('last_notdone' , '( مستثني ) مكتمل-غيرمدفوع') ,
     ] , string='Files_State' , store=True , default='done' , readonly=False )
 
+    # =========================
+    # حساب show_quality_state
+    @api.depends ( 'sale_order_id.x_studio_contract_service' )
+    def _compute_show_quality_state(self) :
+        valid_ids = [206 , 212 , 214 , 218 , 219 , 223 , 224 , 228 , 231 , 233 , 234 , 256 , 689]
+        for rec in self :
+            contract = rec.sale_order_id.x_studio_contract_service
+            # rec.show_quality_state = contract and contract.id in valid_ids
+            rec.show_quality_state = bool ( contract and contract.id in valid_ids and rec.stage_id.id == 2 )
+
+    ### end of editing Quality state #######
+
+    @api.depends ( 'show_quality_state' )
+    def _compute_quality_state_visibility(self) :
+        for rec in self :
+            if not rec.show_quality_state :
+                # rec.quality_state_invisible = True
+                rec.quality_state = False  # يجعل الحقل فارغ لو غير ظاهر
+            else :
+                rec.quality_state = 'no_value'
+
+    ### changing stage_id using  editing Quality state #######
+
+    @api.onchange ('quality_state')
+    @api.depends ( 'quality_state' )
+    def _compute_quality_state_visibility(self) :
+        for rec in self :
+            if rec.quality_state == 'partner_signed' :
+                # rec.quality_state_invisible = True
+                rec.stage_id = 20 
+                rec.show_quality_state = False
+                
+            else :
+                rec.stage_id = 2
+                rec.show_quality_state = True
+
+    ###  write log of moving stages and Quality state #######
     def write(self , vals) :
+        # ===== تسجيل Quality State =====
+        if 'quality_state' in vals :
+            for project in self :
+                # ⛔ تجاهل لو مفيش تغيير فعلي
+                if project.quality_state == vals.get ( 'quality_state' ) :
+                    continue
+
+                # تخزين القيم القديمة قبل التغيير
+                old_changed_by = project.write_uid.id if project.write_uid else False
+                old_change_date = project.write_date if project.write_date else False
+
+                # إنشاء سجل التغيير
+                self.env['quality.state.log'].create ( {
+                    'project_id' : project.id ,
+                    'old_value' : project.quality_state ,
+                    'old_changed_by' : old_changed_by ,
+                    'old_change_date' : old_change_date ,
+                    'new_value' : vals.get ( 'quality_state' ) ,
+                    'new_changed_by' : self.env.user.id ,
+                    'new_change_date' : fields.Datetime.now () ,
+                } )
+
+        # ===== تسجيل Stage History =====
         if 'stage_id' in vals :
-            new_stage_id = vals.get ( 'stage_id' )
-            #  if int(new_stage_id) == 16:  # تحقق من المرحلة 16 (تغيير حسب الحاجة)
-            #     for project in self:
-            #        if project.paid_percent < 1.0 or project.files_state != 'done':
-            #           raise ValidationError(_("لا يمكن نقل المشروع إلى المرحلة قيد الإغلاق إلا إذا كانت نسبة الدفع 100%، وحالة الملفات مكتملة (done)."))
+            for project in self :
+                new_stage_id = vals.get ( 'stage_id' )
 
-            # التحقق من صلاحية الانتقال للمرحلة الجديدة
-            allowed_stage_ids = self.stage_id.rout_rule_ids.mapped ( 'allow_stage_id' ).ids
-            if vals['stage_id'] not in allowed_stage_ids :
-                raise ValidationError ( _ ( "Destination stage not in allowed interact with current stage." ) )
+                # التحقق من صلاحية الانتقال للمرحلة الجديدة
+                allowed_stage_ids = project.stage_id.rout_rule_ids.mapped ( 'allow_stage_id' ).ids
+                if new_stage_id not in allowed_stage_ids :
+                    raise ValidationError ( _ ( "Destination stage not allowed for this project." ) )
 
-            dest_stage = self.stage_id.rout_rule_ids.filtered (
-                lambda x : x.allow_stage_id.id == int ( vals['stage_id'] ) )
+                dest_stage = project.stage_id.rout_rule_ids.filtered (
+                    lambda x : x.allow_stage_id.id == int ( new_stage_id )
+                )
+                allowed_users = project.stage_id.allowed_users_ids.ids + dest_stage.mapped ( 'allowed_users_ids' ).ids
+                if self.env.uid not in allowed_users :
+                    raise ValidationError ( _ ( "You do not have the required permissions to move this project." ) )
 
-            allowed_users = self.stage_id.allowed_users_ids.ids + dest_stage.mapped ( 'allowed_users_ids' ).ids
-            if self.env.uid not in allowed_users :
-                raise ValidationError (
-                    _ ( "You do not have the required permissions to move the project to this stage." ) )
+                new_stage = self.env['project.project.stage'].browse ( new_stage_id )
 
-            new_stage = self.env['project.project.stage'].browse ( new_stage_id )
-            # إذا المرحلة هي "جاري العمل عليه" → امسح files_state
-            if new_stage.name == 'جاري العمل عليه' :
-                vals['files_state'] = False
+                # إذا المرحلة هي "جاري العمل عليه" → امسح files_state
+                if new_stage.name == 'جاري العمل عليه' :
+                    vals['files_state'] = False
 
-            # تسجيل تاريخ الانتقال بين المراحل
-            self.env['project.project.stage.history'].create ( {
-                'project_id' : self.id ,
-                'user_id' : self.env.uid ,
-                'source_stage_id' : self.stage_id.id ,
-                'dest_stage_id' : vals['stage_id']
-            } )
+                # تسجيل الانتقال بين المراحل لكل مشروع
+                self.env['project.project.stage.history'].create ( {
+                    'project_id' : project.id ,
+                    'user_id' : self.env.uid ,
+                    'source_stage_id' : project.stage_id.id ,
+                    'dest_stage_id' : new_stage_id
+                } )
 
+        # تنفيذ write الأصلي بعد تسجيل السجلات
         return super ( ProjectProject , self ).write ( vals )
 
 
@@ -135,6 +206,30 @@ class ProjectStagesRouteRule ( models.Model ) :
     allowed_users_ids = fields.Many2many ( comodel_name='res.users' , string='Allowed Users' )
 
 
+### quality log#########################################
+class QualityStateLog ( models.Model ) :
+    _name = 'quality.state.log'
+    _description = 'Quality State Change Log'
+
+    project_id = fields.Many2one ( 'project.project' , string='Project' , required=True )
+    old_value = fields.Selection ( [
+        ('to_quality' , 'التحويل للجودة') ,
+        ('review_again' , 'إعادة للمراجعة') ,
+        ('partner_signed' , 'توقيع الشريك') ,
+    ] , string='القيمة القديمة' )
+    new_value = fields.Selection ( [
+        ('to_quality' , 'التحويل للجودة') ,
+        ('review_again' , 'إعادة للمراجعة') ,
+        ('partner_signed' , 'توقيع الشريك') ,
+    ] , string='القيمة الجديدة' )
+    changed_by = fields.Many2one ( 'res.users' , string='تم التغيير بواسطة' )
+    change_date = fields.Datetime ( string='تاريخ  التغيير' )
+    old_changed_by = fields.Many2one ( 'res.users' , string="Old Changed By" )
+    new_changed_by = fields.Many2one ( 'res.users' , string="New Changed By" )
+    old_change_date = fields.Datetime ( string="Old Change Date" )
+    new_change_date = fields.Datetime ( string="New Change Date" )
+
+
 class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
@@ -143,9 +238,12 @@ class SaleOrder ( models.Model ) :
     finance_signiture = fields.Boolean ( ' توقيع المالية للختم ' , default=False , readonly=False , index=True )
     archive_signiture = fields.Boolean ( 'توقيع الأرشيف للختم ' , default=False , readonly=False , index=True )
     manager_signiture = fields.Boolean ( 'توقيع مدير المجموعة للختم ' , default=False , readonly=False , index=True )
-    finance_assign = fields.Binary ( ' ملف توقيع المالية  ' , default=False , compute="_compute_finance_archive_signature" , store=False , readonly=False )
-    archive_assign = fields.Binary ( ' ملف توقيع الأرشيف ' , default=False , compute="_compute_finance_archive_signature" , store=False , readonly=False )
-    manager_assign = fields.Binary ( ' ملف توقيع مدير المجموعة ' , default=False , compute="_compute_finance_archive_signature" , store=False , readonly=False )
+    finance_assign = fields.Binary ( ' ملف توقيع المالية  ' , default=False ,
+                                     compute="_compute_finance_archive_signature" , store=False , readonly=False )
+    archive_assign = fields.Binary ( ' ملف توقيع الأرشيف ' , default=False ,
+                                     compute="_compute_finance_archive_signature" , store=False , readonly=False )
+    manager_assign = fields.Binary ( ' ملف توقيع مدير المجموعة ' , default=False ,
+                                     compute="_compute_finance_archive_signature" , store=False , readonly=False )
     close_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string=' قيود الإغلاق' , store=True )
     is_project_close_stage = fields.Boolean ( compute='_compute_is_project_close_stage' ,
                                               string='Is Project in Close Stage' )
@@ -240,25 +338,21 @@ class SaleOrder ( models.Model ) :
     ] , string="Project Files State" , compute='_compute_project_files_state' , store=True , searchable=True )
 
     # file_state_history = fields.Char(compute='_compute_project_files_state', string='File_state History')
-    
 
-
-     # ---get financial and manager signiture for using vendor bills----#####
-    @api.depends ( 'finance_signiture' , 'archive_signiture' ,'manager_signiture')  # لازم تحط الفيلدات اللي هتتابعها
+    # ---get financial and manager signiture for using vendor bills----#####
+    @api.depends ( 'finance_signiture' , 'archive_signiture' , 'manager_signiture' )  # لازم تحط الفيلدات اللي هتتابعها
     def _compute_finance_archive_signature(self) :
         User = self.env['res.users']
         finance_user = User.browse ( 18 )  # اليوزر اللي id = 18 finance
-        archive_user= User.browse (563)  # اليوزر اللي id = 563 archive
-        manager_user= User.search([('id', 'not in', [18, 563])], limit=1)
-        #browse ([!563,!18])  # اليوزر اللي id != 563,!=18 manager
+        archive_user = User.browse ( 563 )  # اليوزر اللي id = 563 archive
+        manager_user = User.search ( [('id' , 'not in' , [18 , 563])] , limit=1 )
+        # browse ([!563,!18])  # اليوزر اللي id != 563,!=18 manager
 
         for rec in self :
             # لو تفعيل التوقيع مفعل، نحط التوقيع، غير كده يبقى False
             rec.finance_assign = finance_user.sign_signature if rec.finance_signiture else False
             rec.archive_assign = archive_user.sign_signature if rec.archive_signiture else False
             rec.manager_assign = manager_user.sign_signature if rec.manager_signiture else False
-
-    
 
     @api.depends ( 'project_ids.files_state' )
     def _compute_project_files_state(self) :
@@ -330,12 +424,12 @@ class SaleOrder ( models.Model ) :
                         'res_model' : 'sale.order' ,
                         'res_id' : rec.id
                     } )
-    #def _link_custom_attachments_to_chatter(self) :
-        #for rec in self :
-            #if rec.invoice_attachements_ids :
-                #for attachment in rec.invoice_attachements_ids :
-                    #attachment.write ( {'res_model' : 'sale.order' , 'res_id' : rec.id} )
 
+    # def _link_custom_attachments_to_chatter(self) :
+    # for rec in self :
+    # if rec.invoice_attachements_ids :
+    # for attachment in rec.invoice_attachements_ids :
+    # attachment.write ( {'res_model' : 'sale.order' , 'res_id' : rec.id} )
 
     def _is_admin(self) :
         return self.env.user.has_group ( 'base.group_system' )
@@ -433,7 +527,7 @@ class SaleOrder ( models.Model ) :
                 'message' : _ ( 'العقد تم عمله بإنتظار السداد' ) ,
                 'type' : 'success' ,  # success, warning, danger, info
                 'sticky' : False ,  # لو True الرسالة تظل حتى يغلقها المستخدم
-                'next': {'type': 'ir.actions.client', 'tag': 'reload'} 
+                'next' : {'type' : 'ir.actions.client' , 'tag' : 'reload'}
             }
         }
 
@@ -558,4 +652,3 @@ def action_open_close_entry_wizard_deffered(self) :
             'default_sale_order_id' : self.id ,
         }
     }
- 
