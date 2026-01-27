@@ -66,7 +66,7 @@ class HrPayslip(models.Model):
                 #)
 
         # عرض كل الرسائل مرة واحدة بعد التحديث
-        i#f messages:
+        #f messages:
             #self.env.user.notify_info(message="\n".join(messages), title=_("Payslip Updates"))
 
         return result
