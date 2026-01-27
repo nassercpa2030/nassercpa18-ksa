@@ -57,21 +57,25 @@ class HrPayslip ( models.Model ) :
                 'partner_id' : employee_partner.id ,
                 'analytic_distribution' : analytic_vals
             } )
+
             # عرض تنبيه warning على واجهة المستخدم
             message = (
-               f"Payslip {slip.number}: Partner set to '{employee_partner.name}' "
-               f"and Analytic Account set to '{analytic_account_id.name if analytic_account_id else 'None'}'."
+                f"Payslip {slip.number}: Partner set to '{employee_partner.name}' "
+                f"and Analytic Account set to '{analytic_account_id.name if analytic_account_id else 'None'}'."
             )
-           self.env.user.notify_warning(message, title="Payslip Update")
-
-           # _logger.info (
-               # "Partner and analytic account for payslip %s updated: partner=%s, analytic_account=%s" ,
-               # slip.number ,
+            self.env.user.notify_warning ( message , title="Payslip Update" )
+            #_logger.info (
+                #"Partner and analytic account for payslip %s updated: partner=%s, analytic_account=%s" ,
+                #slip.number ,
                 #employee_partner.name ,
                 #analytic_account_id.name if analytic_account_id else 'None'
             #)
 
         return result
+
+        
+
+        
 
 
 # ---------------- EMPLOYEE Contract -----------------
