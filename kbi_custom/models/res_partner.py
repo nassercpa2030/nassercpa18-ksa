@@ -60,14 +60,14 @@ class HrPayslip(models.Model):
                 })
 
                 # تجميع الرسائل
-                messages.append(
-                    f"Payslip {slip.number}: Partner set to '{employee_partner.name}' "
-                    f"and Analytic Account set to '{analytic_account_id.name if analytic_account_id else 'None'}'."
-                )
+                #messages.append(
+                    #f"Payslip {slip.number}: Partner set to '{employee_partner.name}' "
+                    #f"and Analytic Account set to '{analytic_account_id.name if analytic_account_id else 'None'}'."
+                #)
 
         # عرض كل الرسائل مرة واحدة بعد التحديث
-        if messages:
-            self.env.user.notify_info(message="\n".join(messages), title=_("Payslip Updates"))
+        i#f messages:
+            #self.env.user.notify_info(message="\n".join(messages), title=_("Payslip Updates"))
 
         return result
 
