@@ -48,6 +48,9 @@ class HrPayslip(models.Model):
             if not move:
                 continue
 
+            # جلب الحساب التحليلي من الموظف
+            analytic_account_id = getattr(employee, 'analytic_account_id', False)
+            
             move.partner_id = employee_partner.id
             if analytic_account_id:
                move.analytic_distribution = [(6, 0, [analytic_account_id.id])]
