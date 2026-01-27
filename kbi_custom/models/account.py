@@ -207,8 +207,8 @@ class AccountMove ( models.Model ) :
                 wizard.close_entry ()
                 if sale_order.project_ids:
                     project = sale_order.project_ids[0]  # مشروع واحد فقط
-                    if project.stage_id.id != 24:
-                       project.sudo().write({'stage_id': 24})
+                    #if project.stage_id.id != 24:
+                       #project.sudo().write({'stage_id': 24})
         
             # 8️⃣ توليد PDF سعودي VAT (Odoo 18)
             # try:
