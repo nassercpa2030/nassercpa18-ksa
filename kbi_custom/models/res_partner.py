@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from odoo import models , fields , api , _
-from odoo.exceptions import ValidationError
+import logging
+from odoo.exceptions import UserError
+
 import re
 
 
@@ -63,7 +65,7 @@ class HrPayslip ( models.Model ) :
                 f"Payslip {slip.number}: Partner set to '{employee_partner.name}' "
                 f"and Analytic Account set to '{analytic_account_id.name if analytic_account_id else 'None'}'."
             )
-            self.env.user.notify_warning ( message , title="Payslip Update" )
+            raise ValidationError(message)
             #_logger.info (
                 #"Partner and analytic account for payslip %s updated: partner=%s, analytic_account=%s" ,
                 #slip.number ,
