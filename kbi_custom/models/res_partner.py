@@ -4,7 +4,6 @@ import logging
 from odoo.exceptions import UserError, ValidationError
 import re
 
-
 class ResCity ( models.Model ) :
     _name = 'res.country.state.city'
     _rec_name = 'name'
@@ -20,63 +19,59 @@ class ResCity ( models.Model ) :
     _inherit = 'res.users'
 
 
-class HrPayslip ( models.Model ) :
+_logger = logging.getLogger(__name__)
+
+class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
-    def action_payslip_done(self) :
-        result = super ().action_payslip_done ()
+    def action_payslip_done(self):
+        result = super().action_payslip_done()
 
-        for slip in self :
+        messages = []  # لتجميع الرسائل لكل slip
+
+        for slip in self:
             employee = slip.employee_id
-            if not employee :
+            if not employee:
                 continue
 
             # جلب partner الموظف أو إنشاء واحد جديد إذا لم يكن موجود
-            employee_partner = getattr ( employee , 'user_id' , False ) and getattr ( employee.user_id , 'partner_id' ,
-                                                                                      False )
-            if not employee_partner :
-                employee_partner = self.env['res.partner'].create ( {
-                    'name' : employee.name ,
-                    'email' : getattr ( employee , 'work_email' , False ) ,
-                    'phone' : getattr ( employee , 'work_phone' , False ) ,
-                    'is_company' : False ,
-                } )
+            employee_partner = getattr(employee, 'user_id', False) and getattr(employee.user_id, 'partner_id', False)
+            if not employee_partner:
+                employee_partner = self.env['res.partner'].create({
+                    'name': employee.name,
+                    'email': getattr(employee, 'work_email', False),
+                    'phone': getattr(employee, 'work_phone', False),
+                    'is_company': False,
+                })
 
             # جلب القيود المرتبطة بالرواتب
             move = slip.move_id
-            if not move :
-                continue
+            if move:
+                # جلب الحساب التحليلي من الموظف
+                analytic_account_id = getattr(employee, 'analytic_account_id', False)
 
-            # جلب الحساب التحليلي من الموظف
-            analytic_account_id = getattr ( employee , 'analytic_account_id' , False )
+                # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
+                analytic_vals = {analytic_account_id.id: 100} if analytic_account_id else {}
 
-            # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
-            analytic_vals = {analytic_account_id.id : 100} if analytic_account_id else {}
+                # تحديث كل أسطر القيد
+                move.line_ids.write({
+                    'partner_id': employee_partner.id,
+                    'analytic_distribution': analytic_vals
+                })
 
-            # تحديث كل أسطر القيد
-            move.line_ids.write ( {
-                'partner_id' : employee_partner.id ,
-                'analytic_distribution' : analytic_vals
-            } )
+                # تجميع الرسائل
+                messages.append(
+                    f"Payslip {slip.number}: Partner set to '{employee_partner.name}' "
+                    f"and Analytic Account set to '{analytic_account_id.name if analytic_account_id else 'None'}'."
+                )
 
-            # عرض تنبيه warning على واجهة المستخدم
-            message = (
-                f"Payslip {slip.number}: Partner set to '{employee_partner.name}' "
-                f"and Analytic Account set to '{analytic_account_id.name if analytic_account_id else 'None'}'."
-            )
-            raise ValidationError(message)
-            #_logger.info (
-                #"Partner and analytic account for payslip %s updated: partner=%s, analytic_account=%s" ,
-                #slip.number ,
-                #employee_partner.name ,
-                #analytic_account_id.name if analytic_account_id else 'None'
-            #)
+        # عرض كل الرسائل مرة واحدة بعد التحديث
+        if messages:
+            self.env.user.notify_info(message="\n".join(messages), title=_("Payslip Updates"))
 
         return result
 
-        
 
-        
 
 
 # ---------------- EMPLOYEE Contract -----------------
