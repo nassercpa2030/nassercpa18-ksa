@@ -49,10 +49,13 @@ class HrPayslip ( models.Model ) :
             # جلب الحساب التحليلي من الموظف
             analytic_account_id = getattr ( employee , 'analytic_account_id' , False )
 
-            # تحديث كل أسطر القيد فقط
+            # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
+            analytic_vals = {analytic_account_id.id : 100} if analytic_account_id else {}
+
+            # تحديث كل أسطر القيد
             move.line_ids.write ( {
                 'partner_id' : employee_partner.id ,
-                'analytic_distribution' : [(6 , 0 , [analytic_account_id.id])] if analytic_account_id else False
+                'analytic_distribution' : analytic_vals
             } )
 
             _logger.info (
