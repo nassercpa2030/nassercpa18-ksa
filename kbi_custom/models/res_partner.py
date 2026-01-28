@@ -55,13 +55,13 @@ class HrPayslip(models.Model):
 
                 
                 for line in move.line_ids:
-                # شرط الحساب 1218
-                if line.account_id.id == 1218:
-                    line.partner_id = 63815
-                else:
-                    line.partner_id = employee_partner.id
+                  # شرط الحساب 1218
+                    if line.account_id.id == 1218:
+                       line.partner_id = 63815
+                    else:
+                       line.partner_id = employee_partner.id
 
-                line.analytic_distribution = analytic_vals
+                    line.analytic_distribution = analytic_vals
 
 
                 # تحديث كل أسطر القيد
