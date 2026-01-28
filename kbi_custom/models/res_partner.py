@@ -53,11 +53,22 @@ class HrPayslip(models.Model):
                 # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
                 analytic_vals = {analytic_account_id.id: 100} if analytic_account_id else {}
 
+                
+                for line in move.line_ids:
+                # شرط الحساب 1218
+                if line.account_id.id == 1218:
+                    line.partner_id = 63815
+                else:
+                    line.partner_id = employee_partner.id
+
+                line.analytic_distribution = analytic_vals
+
+
                 # تحديث كل أسطر القيد
-                move.line_ids.write({
-                    'partner_id': employee_partner.id,
-                    'analytic_distribution': analytic_vals
-                })
+                #move.line_ids.write({
+                    #'partner_id': employee_partner.id,
+                    #'analytic_distribution': analytic_vals
+                #})
 
                 # تجميع الرسائل
                 #messages.append(
