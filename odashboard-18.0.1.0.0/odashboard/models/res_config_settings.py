@@ -39,9 +39,26 @@ class ResConfigSettings(models.TransientModel):
         readonly=True
     )
 
+    @api.model
+    def get_values(self):
+        """Load real license values from parameters"""
+        res = super(ResConfigSettings, self).get_values()
+        config = self.env['ir.config_parameter'].sudo()
+
+        res.update({
+            'odashboard_uuid': config.get_param('odashboard.uuid', ''),
+            'odashboard_key': config.get_param('odashboard.key', ''),
+            'odashboard_plan': config.get_param('odashboard.plan', ''),
+            'odashboard_key_synchronized': config.get_param('odashboard.key_synchronized', 'False') == 'True',
+            'odashboard_is_free_trial': config.get_param('odashboard.is_free_trial', 'False') == 'True',
+            'odashboard_free_trial_end_date': config.get_param('odashboard.free_trial_end_date', ''),
+        })
+        return res
+
     def get_my_key(self):
         """Call post_init_hook to create internal 10-year license"""
         post_init_hook(self.env)
+        # لا نحتاج refresh بعد التعديل لأنه يتم قراءة القيم من get_values
         return {
             'type': 'ir.actions.client',
             'tag': 'reload',
@@ -50,7 +67,6 @@ class ResConfigSettings(models.TransientModel):
     def _clear_odashboard_data(self):
         """Clear all odashboard-related configuration data"""
         config_params = self.env['ir.config_parameter'].sudo()
-
         config_params.set_param('odashboard.key_synchronized', False)
         config_params.set_param('odashboard.key', '')
         config_params.set_param('odashboard.plan', '')
