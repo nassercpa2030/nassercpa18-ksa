@@ -17,6 +17,17 @@ class ResCity ( models.Model ) :
 
 class ResCity ( models.Model ) :
     _inherit = 'res.users'
+    
+     analytic_account_ids = fields.Many2many(
+        'account.analytic.account',
+        'account_analytic_account_res_users_rel',  # relation table
+        'res_users_id',                            # column 1
+        'account_analytic_account_id',             # column 2
+        string='الحسابات التحليلية',
+        readonly=False,
+       
+
+    )
 
 
 _logger = logging.getLogger(__name__)
