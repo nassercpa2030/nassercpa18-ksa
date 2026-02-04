@@ -173,7 +173,7 @@ class ResPartner ( models.Model ) :
                                             placeholder="Enter Analytic Account for employee" )
 
     nationality = fields.Char ( "Nationality" )
-    real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False  )
+    real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False,store=True  )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
     nationality = fields.Char ( "Nationality" )
     manager_team = fields.Many2one ( comodel_name="res.users" , string='Manager' ,
