@@ -3379,6 +3379,7 @@ class DashboardChart(models.Model):
         }
 
 
+
 class ItemViewAction(models.Model):
     _name = "item.view.action"
     _description = "Item View Action"
@@ -3441,6 +3442,17 @@ class ChartMultiplier(models.Model):
                         "The multiplier must be 1 or greater. Please enter a valid value to proceed."
                     )
                 )
+
+    def action_view_single_chart(self) :
+        self.ensure_one ()  # للتأكد إنه record واحد فقط
+        return {
+            'name' : self.name ,
+            'type' : 'ir.actions.act_window' ,
+            'res_model' : 'dashboard.chart' ,
+            'view_mode' : 'form' ,
+            'res_id' : self.id ,
+            'target' : 'new' ,  # تفتح popup
+        }
 
     @api.onchange("multiplier")
     def _onchange_multiplier(self):
