@@ -527,6 +527,16 @@ class DashboardChart(models.Model):
             name=name, args=args, operator=operator, limit=limit
         )
 
+    def action_view_single_chart(self) :
+        return {
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'Chart View' ,
+            'res_model' : 'dashboard.chart' ,  # عدّل حسب موديل chart عندك
+            'view_mode' : 'form' ,
+            'res_id' : self.id ,
+            'target' : 'new' ,
+        }
+
     @api.model
     def search_fetch(self, domain, field_names, offset=0, limit=None, order=None):
         domain = list(domain or [])
@@ -3443,16 +3453,6 @@ class ChartMultiplier(models.Model):
                     )
                 )
 
-    def action_view_single_chart(self) :
-        self.ensure_one ()  # للتأكد إنه record واحد فقط
-        return {
-            'name' : self.name ,
-            'type' : 'ir.actions.act_window' ,
-            'res_model' : 'dashboard.chart' ,
-            'view_mode' : 'form' ,
-            'res_id' : self.id ,
-            'target' : 'new' ,  # تفتح popup
-        }
 
     @api.onchange("multiplier")
     def _onchange_multiplier(self):
