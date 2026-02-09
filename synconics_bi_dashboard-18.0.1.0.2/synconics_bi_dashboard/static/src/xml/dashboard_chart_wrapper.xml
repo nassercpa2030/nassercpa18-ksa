@@ -18,7 +18,8 @@
                           </ul>
                         </div>
                         <button class="btn" t-if="!props.dashboard_user" title="Edit Chart" t-on-click="(ev) => onEditChart(ev, state.chartId)"><i class="fa fa-pencil" /></button>
-                        <button class="btn btn-outline-success"  title="تفاصيل" t-on-click="(ev) => onEditChart(ev, state.chartId)"><i class="fa fa-eye" /></button>
+                        <!--button class="btn btn-outline-success"  title="تفاصيل" t-on-click="(ev) => onEditChart(ev, state.chartId)"><i class="fa fa-eye" /></button-->
+                        <button class="btn btn-outline-success"  title="تفاصيل"  t-on-click="(ev) => onViewDomain(ev, state.chartId)"><i class="fa fa-eye" /></button>
 
                     </div>
                 </div>
