@@ -7,7 +7,7 @@ from odoo.osv import expression
 class Users(models.Model):
     _inherit = "res.users"
     
-     analytic_account_ids = fields.Many2many(
+    analytic_account_ids = fields.Many2many(
         'account.analytic.account',
         'account_analytic_account_res_users_rel',  # relation table
         'res_users_id',                            # column 1
