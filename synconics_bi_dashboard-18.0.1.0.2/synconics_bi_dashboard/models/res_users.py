@@ -6,6 +6,14 @@ from odoo.osv import expression
 
 class Users(models.Model):
     _inherit = "res.users"
+    
+     analytic_account_ids = fields.Many2many(
+        'account.analytic.account',
+        'account_analytic_account_res_users_rel',  # relation table
+        'res_users_id',                            # column 1
+        'account_analytic_account_id',             # column 2
+        string='الحسابات التحليلية',
+        readonly=False  )
 
     @api.depends("groups_id")
     def _compute_model_access(self):
