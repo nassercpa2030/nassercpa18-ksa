@@ -91,6 +91,31 @@ export class DashboardChartWrapper extends Component {
       }
     };
 
+
+    this.onViewDomain = async (ev, chartId) => {
+    ev.preventDefault();
+    const res = await this.orm.searchRead(
+        "dashboard.chart",
+        [["id", "=", parseInt(chartId)]],
+        ["domain", "model_id"]
+    );
+
+    if (!res.length) return;
+
+    const domain = res[0].domain || [];
+    const model = res[0].model_id?.[0]; // technical id (id) أو [1] هو human name
+
+    // استخدم technical name
+    this.action.doAction({
+        type: "ir.actions.act_window",
+        name: this.state.name,
+        res_model: "sale.order",  // 👈 هنا صح
+        views: [[false, "list"], [false, "form"]],
+        domain: domain,
+        target: "current",});};
+    
+    
+
     this.onDownloadCSV = (ev) => {
       return this.orm
         .call("dashboard.chart", "export_csv", [
