@@ -243,7 +243,7 @@ class Recruiter ( models.Model ) :
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
                                       placeholder="Enter Analytic Plan" )
-   related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' ,store=True,
+    related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' ,store=True,
                                       help="this field get partner from contact" ,
                                       placeholder="Enter Related Contact" )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
