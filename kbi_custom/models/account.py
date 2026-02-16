@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models , fields , api
-from odoo.exceptions import ValidationError, UserError
+from odoo.exceptions import ValidationError , UserError
 import base64
 
 
@@ -25,7 +25,7 @@ class AccountMove ( models.Model ) :
     manager_assign = fields.Binary ( ' ملف توقيع مدير المجموعة ' , default=False , compute="_compute_user_signature" ,
                                      store=False , readonly=False )
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
-    ref_count = fields.Integer('عدد الرقم  المرجعي',compute="_compute_ref_count", store=True)
+    ref_count = fields.Integer ( 'عدد الرقم  المرجعي' , compute="_compute_ref_count" , store=True )
     analytic_acc_desc = fields.Char (
         string="Journal Analytic Description" ,
         compute='_compute_analytic_distribution' ,
@@ -34,13 +34,12 @@ class AccountMove ( models.Model ) :
     )
 
     ### count refrence number ######
-    def _compute_ref_count(self):
-        for rec in self:
-            if rec.ref:
-               rec.ref_count = self.search_count([('ref', '=', rec.ref)])
-            else:
-               rec.ref_count = 0
-            
+    def _compute_ref_count(self) :
+        for rec in self :
+            if rec.ref :
+                rec.ref_count = self.search_count ( [('ref' , '=' , rec.ref)] )
+            else :
+                rec.ref_count = 0
 
     def get_qr_code_knk(self) :
         def get_qr_encoding(tag , field) :
@@ -160,10 +159,10 @@ class AccountMove ( models.Model ) :
                 'invoice_date' : invoice_date ,
                 'date' : invoice_date ,
                 'invoice_line_ids' : invoice_lines ,
-            }) 
-                                                       
+            } )
+
             # حفظ الفاتورة أولًا
-            invoice.sudo().write({})
+            invoice.sudo ().write ( {} )
             # 6️⃣ ترحيل الفاتورة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
@@ -179,7 +178,7 @@ class AccountMove ( models.Model ) :
 
             # 8️⃣ طباعة التقرير مباشرة بعد التسوية (تقرير ID 275)
             invoice.action_print_pdf ()
-            
+
             ### closing entry if theorder 100% paid  ###
             # 🔟 التحقق هل ده آخر Sale Order Line
             remaining_lines = sale_order.order_line.filtered (
@@ -199,17 +198,17 @@ class AccountMove ( models.Model ) :
                     active_model='sale.order'
                 ).create ( {
                     'sale_order_id' : sale_order.id ,
-                    #'journal_entry_date' : fields.Date.context_today ( self ) ,
-                    'journal_entry_date' :invoice_date,
+                    # 'journal_entry_date' : fields.Date.context_today ( self ) ,
+                    'journal_entry_date' : invoice_date ,
                 } )
 
                 # 3️⃣ تنفيذ نفس زر Close Entry
                 wizard.close_entry ()
-                if sale_order.project_ids:
+                if sale_order.project_ids :
                     project = sale_order.project_ids[0]  # مشروع واحد فقط
-                    #if project.stage_id.id != 24:
-                       #project.sudo().write({'stage_id': 24})
-        
+                    # if project.stage_id.id != 24:
+                    # project.sudo().write({'stage_id': 24})
+
             # 8️⃣ توليد PDF سعودي VAT (Odoo 18)
             # try:
             # report = self.env.ref('saudi_einvoice_knk.action_report_tax_invoice')
@@ -276,13 +275,501 @@ class AccountMoveLine ( models.Model ) :
     x_studio_analytic_account_test = fields.Char (
         string="analytic_Test" ,
         related='sale_order_id.analytic_account_id.display_name' ,
-        store=True)
-    older_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , related='sale_order_id.old_sale_orders' , stored=True )
+        store=True )
+    older_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , related='sale_order_id.old_sale_orders' ,
+                                         stored=True )
+    analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='الحساب التحليلي' ,
+                                            ondelete='set null' , store=True )
     sale_order_id = fields.Many2one ( 'sale.order' , string='Sale Order' , domain="[('partner_id','=',partner_id)]" )
     is_broker_move = fields.Boolean ( 'Is Broker Move' )
     analytic_acc_desc_line = fields.Char ( string="Analytic Description" , store=True , readonly=False )
     analytic_account_name = fields.Char ( string="Analytic Account" , compute="compute_analytic_account_name" ,
                                           store=True )
+    # توزيع الحسابات  التحليلة 9##   
+    finance923_perc_101 = fields.Float ( string="=نسبة توزيع المالية علي 101" , compute="_compute_perc" ,
+                                         readonly=False );
+    finance923_perc_104 = fields.Float ( string="=نسبة توزيع المالية علي 104" , compute="_compute_perc" ,
+                                         readonly=False );
+    finance923_perc_110 = fields.Float ( string="=نسبة توزيع المالية علي 110" , compute="_compute_perc" ,
+                                         readonly=False );
+    finance923_perc_111 = fields.Float ( string="=نسبة توزيع المالية علي 111" , compute="_compute_perc" ,
+                                         readonly=False );
+    finance923_perc_200 = fields.Float ( string="=نسبة توزيع المالية علي 200" , compute="_compute_perc" ,
+                                         readonly=False );
+    finance923_perc_103 = fields.Float ( string="=نسبة توزيع المالية علي 103" , compute="_compute_perc" ,
+                                         readonly=False );
+    # =========================== الدعم التشغيلي ===========================
+    oper_supp902_perc_101 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 101" , compute="_compute_perc" ,
+                                           readonly=False )
+    oper_supp902_perc_104 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 104" , compute="_compute_perc" ,
+                                           readonly=False )
+    oper_supp902_perc_110 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 110" , compute="_compute_perc" ,
+                                           readonly=False )
+    oper_supp902_perc_111 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 111" , compute="_compute_perc" ,
+                                           readonly=False )
+    oper_supp902_perc_200 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 200" , compute="_compute_perc" ,
+                                           readonly=False )
+    oper_supp902_perc_103 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 103" , compute="_compute_perc" ,
+                                           readonly=False )
+    # ===== الجودة =====
+    quality901_perc_101 = fields.Float ( string="نسبة توزيع الجودة على 101" , compute="_compute_perc" , readonly=False )
+    quality901_perc_104 = fields.Float ( string="نسبة توزيع الجودة على 104" , compute="_compute_perc" , readonly=False )
+    quality901_perc_110 = fields.Float ( string="نسبة توزيع الجودة على 110" , compute="_compute_perc" , readonly=False )
+    quality901_perc_111 = fields.Float ( string="نسبة توزيع الجودة على 111" , compute="_compute_perc" , readonly=False )
+    quality901_perc_200 = fields.Float ( string="نسبة توزيع الجودة على 200" , compute="_compute_perc" , readonly=False )
+    quality901_perc_103 = fields.Float ( string="نسبة توزيع الجودة على 103" , compute="_compute_perc" , readonly=False )
+
+    # ===== المستلزمات المكتبية =====
+    office_supp_perc_101 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 101" ,
+                                          compute="_compute_perc" , readonly=False )
+    office_supp_perc_104 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 104" ,
+                                          compute="_compute_perc" , readonly=False )
+    office_supp_perc_110 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 110" ,
+                                          compute="_compute_perc" , readonly=False )
+    office_supp_perc_111 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 111" ,
+                                          compute="_compute_perc" , readonly=False )
+    office_supp_perc_200 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 200" ,
+                                          compute="_compute_perc" , readonly=False )
+    office_supp_perc_103 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 103" ,
+                                          compute="_compute_perc" , readonly=False )
+
+    # ===== الشئون الإدارية =====
+    manage_921_perc_101 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 101" , compute="_compute_perc" ,
+                                         readonly=False )
+    manage_921_perc_104 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 104" , compute="_compute_perc" ,
+                                         readonly=False )
+    manage_921_perc_110 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 110" , compute="_compute_perc" ,
+                                         readonly=False )
+    manage_921_perc_111 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 111" , compute="_compute_perc" ,
+                                         readonly=False )
+    manage_921_perc_200 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 200" , compute="_compute_perc" ,
+                                         readonly=False )
+    manage_921_perc_103 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 103" , compute="_compute_perc" ,
+                                         readonly=False )
+
+    # ===== إدارة التقنية =====
+    it_922_perc_101 = fields.Float ( string="نسبة توزيع التقنية علي 101" , compute="_compute_perc" ,
+                                     readonly=False )
+    it_922_perc_104 = fields.Float ( string="نسبة توزيع التقنية علي 104" , compute="_compute_perc" ,
+                                     readonly=False )
+    it_922_perc_110 = fields.Float ( string="نسبة توزيع التقنية علي 110" , compute="_compute_perc" ,
+                                     readonly=False )
+    it_922_perc_111 = fields.Float ( string="نسبة توزيع التقنية علي 111" , compute="_compute_perc" ,
+                                     readonly=False )
+    it_922_perc_200 = fields.Float ( string="نسبة توزيع التقنية علي 200" , compute="_compute_perc" ,
+                                     readonly=False )
+    it_922_perc_103 = fields.Float ( string="نسبة توزيع التقنية علي 103" , compute="_compute_perc" ,
+                                     readonly=False )
+    # ===== المباني والمنشئات =====
+    build_facil950_perc_101 = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 101" ,
+                                             compute="_compute_perc" ,
+                                             readonly=False )
+    build_facil950_perc_104 = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 104" ,
+                                             compute="_compute_perc" ,
+                                             readonly=False )
+    build_facil950_perc_110 = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 110" ,
+                                             compute="_compute_perc" ,
+                                             readonly=False )
+    build_facil950_perc_111 = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 111" ,
+                                             compute="_compute_perc" ,
+                                             readonly=False )
+    build_facil950_perc_200 = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 200" ,
+                                             compute="_compute_perc" ,
+                                             readonly=False )
+    build_facil950_perc_103 = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 103" ,
+                                             compute="_compute_perc" ,
+                                             readonly=False )
+    # ===== القهوة والضيافة =====
+    coff_clean_ryd_perc_101 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 101" ,
+                                             compute="_compute_perc" ,
+                                             readonly=False )
+    coff_clean_ryd_perc_104 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 104" ,
+                                             compute="_compute_perc" ,
+                                             readonly=False )
+    coff_clean_ryd_perc_110 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 110" ,
+                                             compute="_compute_perc" ,
+                                             readonly=False )
+    coff_clean_ryd_perc_111 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 111" ,
+                                             compute="_compute_perc" ,
+                                             readonly=False )
+    coff_clean_ryd_perc_200 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 200" ,
+                                             compute="_compute_perc" ,
+                                             readonly=False )
+    coff_clean_ryd_perc_103 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 103" ,
+                                             compute="_compute_perc" ,
+                                             readonly=False )
+    # ===== التوطين العام =====
+    pub_loc903_perc_101 = fields.Float ( string="نسبة توزيع التوطين العام علي 101" , compute="_compute_perc" ,
+                                         readonly=False )
+    pub_loc903_perc_104 = fields.Float ( string="نسبة توزيع التوطين العام علي 104" , compute="_compute_perc" ,
+                                         readonly=False )
+    pub_loc903_perc_110 = fields.Float ( string="نسبة توزيع التوطين العام علي 110" , compute="_compute_perc" ,
+                                         readonly=False )
+    pub_loc903_perc_111 = fields.Float ( string="نسبة توزيع التوطين العام علي 111" , compute="_compute_perc" ,
+                                         readonly=False )
+    pub_loc903_perc_200 = fields.Float ( string="نسبة توزيع التوطين العام علي 200" , compute="_compute_perc" ,
+                                         readonly=False )
+    pub_loc903_perc_103 = fields.Float ( string="نسبة توزيع التوطين العام علي 103" , compute="_compute_perc" ,
+                                         readonly=False )
+
+    # @api.depends()
+    def _compute_perc(self) :
+        for rec in self :
+            #### المالية
+            rec.finance923_perc_101 = self.env.user.finance923_perc_101
+            rec.finance923_perc_104 = self.env.user.finance923_perc_104
+            rec.finance923_perc_110 = self.env.user.finance923_perc_110
+            rec.finance923_perc_111 = self.env.user.finance923_perc_111
+            rec.finance923_perc_200 = self.env.user.finance923_perc_200
+            rec.finance923_perc_103 = self.env.user.finance923_perc_103
+            ######### الدعم  التشغيلي
+            rec.oper_supp902_perc_101 = self.env.user.oper_supp902_perc_101
+            rec.oper_supp902_perc_104 = self.env.user.oper_supp902_perc_104
+            rec.oper_supp902_perc_110 = self.env.user.oper_supp902_perc_110
+            rec.oper_supp902_perc_111 = self.env.user.oper_supp902_perc_111
+            rec.oper_supp902_perc_200 = self.env.user.oper_supp902_perc_200
+            rec.oper_supp902_perc_103 = self.env.user.oper_supp902_perc_103
+            #### الجودة
+            rec.quality901_perc_101 = self.env.user.quality901_perc_101
+            rec.quality901_perc_104 = self.env.user.quality901_perc_104
+            rec.quality901_perc_110 = self.env.user.quality901_perc_110
+            rec.quality901_perc_111 = self.env.user.quality901_perc_111
+            rec.quality901_perc_200 = self.env.user.quality901_perc_200
+            rec.quality901_perc_103 = self.env.user.quality901_perc_103
+            #### المستلزمات المكتبية
+            rec.office_supp_perc_101 = self.env.user.office_supp_perc_101
+            rec.office_supp_perc_104 = self.env.user.office_supp_perc_104
+            rec.office_supp_perc_110 = self.env.user.office_supp_perc_110
+            rec.office_supp_perc_111 = self.env.user.office_supp_perc_111
+            rec.office_supp_perc_200 = self.env.user.office_supp_perc_200
+            rec.office_supp_perc_103 = self.env.user.office_supp_perc_103
+            #### الشئون الإدارية
+            rec.manage_921_perc_101 = self.env.user.manage_921_perc_101
+            rec.manage_921_perc_104 = self.env.user.manage_921_perc_104
+            rec.manage_921_perc_110 = self.env.user.manage_921_perc_110
+            rec.manage_921_perc_111 = self.env.user.manage_921_perc_111
+            rec.manage_921_perc_200 = self.env.user.manage_921_perc_200
+            rec.manage_921_perc_103 = self.env.user.manage_921_perc_103
+            #### التقنية
+            rec.it_922_perc_101 = self.env.user.it_922_perc_101
+            rec.it_922_perc_104 = self.env.user.it_922_perc_104
+            rec.it_922_perc_110 = self.env.user.it_922_perc_110
+            rec.it_922_perc_111 = self.env.user.it_922_perc_111
+            rec.it_922_perc_200 = self.env.user.it_922_perc_200
+            rec.it_922_perc_103 = self.env.user.it_922_perc_103
+            #### المباني والمرافق
+            rec.build_facil950_perc_101 = self.env.user.build_facil950_perc_101
+            rec.build_facil950_perc_104 = self.env.user.build_facil950_perc_104
+            rec.build_facil950_perc_110 = self.env.user.build_facil950_perc_110
+            rec.build_facil950_perc_111 = self.env.user.build_facil950_perc_111
+            rec.build_facil950_perc_200 = self.env.user.build_facil950_perc_200
+            rec.build_facil950_perc_103 = self.env.user.build_facil950_perc_103
+            #### القهوة والضيافة
+            rec.coff_clean_ryd_perc_101 = self.env.user.coff_clean_ryd_perc_101
+            rec.coff_clean_ryd_perc_104 = self.env.user.coff_clean_ryd_perc_104
+            rec.coff_clean_ryd_perc_110 = self.env.user.coff_clean_ryd_perc_110
+            rec.coff_clean_ryd_perc_111 = self.env.user.coff_clean_ryd_perc_111
+            rec.coff_clean_ryd_perc_200 = self.env.user.coff_clean_ryd_perc_200
+            rec.coff_clean_ryd_perc_103 = self.env.user.coff_clean_ryd_perc_103
+            #### التوطين العام
+            rec.pub_loc903_perc_101 = self.env.user.pub_loc903_perc_101
+            rec.pub_loc903_perc_104 = self.env.user.pub_loc903_perc_104
+            rec.pub_loc903_perc_110 = self.env.user.pub_loc903_perc_110
+            rec.pub_loc903_perc_111 = self.env.user.pub_loc903_perc_111
+            rec.pub_loc903_perc_200 = self.env.user.pub_loc903_perc_200
+            rec.pub_loc903_perc_103 = self.env.user.pub_loc903_perc_103
+
+    @api.onchange ( 'partner_id' , 'analytic_account_id' , 'account_id' )
+    def _get_office_supp_perc(self) :
+        for rec in self :
+
+            distribution_vals_1 = {
+                8820 : rec.office_supp_perc_101 ,
+                8843 : rec.office_supp_perc_104 ,
+                8849 : rec.office_supp_perc_110 ,
+                8865 : rec.office_supp_perc_111 ,
+                8858 : rec.office_supp_perc_200 ,
+                8834 : rec.office_supp_perc_103 ,
+                8804 : 100.0 ,
+
+            }
+            distribution_vals0 = {
+                8820 : rec.office_supp_perc_101 ,
+                8843 : rec.office_supp_perc_104 ,
+                8849 : rec.office_supp_perc_110 ,
+                8865 : rec.office_supp_perc_111 ,
+                8858 : rec.office_supp_perc_200 ,
+                8834 : rec.office_supp_perc_103 ,
+                8805 : 100.0 ,
+
+            }
+            distribution_vals = {
+                8820 : rec.office_supp_perc_101 ,
+                8843 : rec.office_supp_perc_104 ,
+                8849 : rec.office_supp_perc_110 ,
+                8865 : rec.office_supp_perc_111 ,
+                8858 : rec.office_supp_perc_200 ,
+                8834 : rec.office_supp_perc_103 ,
+                8806 : 100.0 ,
+            }
+
+            distribution_vals1 = {
+                8820 : rec.finance923_perc_101 ,
+                8843 : rec.finance923_perc_104 ,
+                8849 : rec.finance923_perc_110 ,
+                8865 : rec.finance923_perc_111 ,
+                8858 : rec.finance923_perc_200 ,
+                8834 : rec.finance923_perc_103 ,
+                8791 : 100.0 ,
+            }
+            distribution_vals2 = {
+                8820 : rec.oper_supp902_perc_101 ,
+                8843 : rec.oper_supp902_perc_104 ,
+                8849 : rec.oper_supp902_perc_110 ,
+                8865 : rec.oper_supp902_perc_111 ,
+                8858 : rec.oper_supp902_perc_200 ,
+                8834 : rec.oper_supp902_perc_103 ,
+                8796 : 100.0 ,
+
+            }
+            distribution_vals3 = {
+                8820 : rec.oper_supp902_perc_101 ,
+                8843 : rec.oper_supp902_perc_104 ,
+                8849 : rec.oper_supp902_perc_110 ,
+                8865 : rec.oper_supp902_perc_111 ,
+                8858 : rec.oper_supp902_perc_200 ,
+                8834 : rec.oper_supp902_perc_103 ,
+                8795 : 100.0 ,
+
+            }
+            distribution_vals4 = {
+                8820 : rec.oper_supp902_perc_101 ,
+                8843 : rec.oper_supp902_perc_104 ,
+                8849 : rec.oper_supp902_perc_110 ,
+                8865 : rec.oper_supp902_perc_111 ,
+                8858 : rec.oper_supp902_perc_200 ,
+                8834 : rec.oper_supp902_perc_103 ,
+                8797 : 100.0 ,
+            }
+            distribution_vals_quality = {
+                8820 : rec.quality901_perc_101 ,
+                8843 : rec.quality901_perc_104 ,
+                8849 : rec.quality901_perc_110 ,
+                8865 : rec.quality901_perc_111 ,
+                8858 : rec.quality901_perc_200 ,
+                8834 : rec.quality901_perc_103 ,
+                8790 : 100.0 ,
+            }
+            distribution_vals_build_facil950 = {
+                8820 : rec.build_facil950_perc_101 ,
+                8843 : rec.build_facil950_perc_104 ,
+                8849 : rec.build_facil950_perc_110 ,
+                8865 : rec.build_facil950_perc_111 ,
+                8858 : rec.build_facil950_perc_200 ,
+                8834 : rec.build_facil950_perc_103 ,
+                8803 : 100.0 ,
+            }
+            distribution_vals_manage_921 = {
+                8820 : rec.manage_921_perc_101 ,
+                8843 : rec.manage_921_perc_104 ,
+                8849 : rec.manage_921_perc_110 ,
+                8865 : rec.manage_921_perc_111 ,
+                8858 : rec.manage_921_perc_200 ,
+                8834 : rec.manage_921_perc_103 ,
+                8799 : 100.0 ,
+            }
+            distribution_vals_it = {
+                8820 : rec.it_922_perc_101 ,
+                8843 : rec.it_922_perc_104 ,
+                8849 : rec.it_922_perc_110 ,
+                8865 : rec.it_922_perc_111 ,
+                8858 : rec.it_922_perc_200 ,
+                8834 : rec.it_922_perc_103 ,
+                8789 : 100.0 ,
+            }
+            distribution_vals_coff_ryd = {
+                8820 : rec.coff_clean_ryd_perc_101 ,
+                8843 : rec.coff_clean_ryd_perc_104 ,
+                8849 : rec.coff_clean_ryd_perc_110 ,
+                8865 : rec.coff_clean_ryd_perc_111 ,
+                8858 : rec.coff_clean_ryd_perc_200 ,
+                8834 : rec.coff_clean_ryd_perc_103 ,
+                8800 : 100.0 ,
+            }
+            distribution_vals_clean_ryd = {
+                8820 : rec.coff_clean_ryd_perc_101 ,
+                8843 : rec.coff_clean_ryd_perc_104 ,
+                8849 : rec.coff_clean_ryd_perc_110 ,
+                8865 : rec.coff_clean_ryd_perc_111 ,
+                8858 : rec.coff_clean_ryd_perc_200 ,
+                8834 : rec.coff_clean_ryd_perc_103 ,
+                8801 : 100.0 ,
+            }
+            distribution_vals_pub_loc903 = {
+                8820 : rec.pub_loc903_perc_101 ,
+                8843 : rec.pub_loc903_perc_104 ,
+                8849 : rec.pub_loc903_perc_110 ,
+                8865 : rec.pub_loc903_perc_111 ,
+                8858 : rec.pub_loc903_perc_200 ,
+                8834 : rec.pub_loc903_perc_103 ,
+                87892 : 100.0 ,
+            }
+            ####أحبار
+            if rec.analytic_account_id and rec.analytic_account_id.id == 8804 and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals_1
+                # rec.analytic_distribution[8804] = 100.0
+
+
+            ####مطبوعات  رسمية
+            elif rec.analytic_account_id and rec.analytic_account_id.id == 8805 and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals0
+                # rec.analytic_distribution[8805] = 100.0
+            ####مكتبية أخري
+
+            elif rec.analytic_account_id and rec.analytic_account_id.id == 8806 and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals
+                # rec.analytic_distribution[8806] = 100.0
+
+            ####ورق تصوير
+            elif rec.analytic_account_id and rec.analytic_account_id.id == 8807 and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals
+                # rec.analytic_distribution[8807] = 100.0
+
+            # الحالة الأولى
+            elif (
+                    rec.partner_id
+                    and rec.partner_id.id == 79981
+                    and rec.account_id
+                    and rec.account_id.code
+                    and rec.account_id.code.startswith ( '410' )
+            ) :
+                rec.analytic_distribution = distribution_vals1
+                rec.analytic_account_id = 8791  # تعيين مش مقارنة
+
+            # الحالة الثانية
+            elif rec.analytic_account_id and rec.analytic_account_id.id == 8791 and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals1
+
+            # الحالات الخاصة بالشركاء
+            elif rec.partner_id and rec.partner_id.id == 60597 and rec.account_id and rec.account_id.code and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals2
+                # rec.analytic_distribution[8796] = 100.0
+                rec.analytic_account_id = 8796
+
+
+            elif rec.partner_id and rec.partner_id.id == 395817 and rec.account_id and rec.account_id.code and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals3
+                # rec.analytic_distribution[8795] = 100.0
+                rec.analytic_account_id = 8795
+
+            elif rec.partner_id and rec.partner_id.id == 79968 and rec.account_id and rec.account_id.code and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals4
+                # rec.analytic_distribution[8797] = 100.0
+                rec.analytic_account_id = 8797
+
+            # الحالة الثانية حسب analytic_account_id
+            elif rec.analytic_account_id and rec.analytic_account_id.id == 8796 and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals2
+                # rec.analytic_distribution[8796] = 100.0
+
+            elif rec.analytic_account_id and rec.analytic_account_id.id == 8795 and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals3
+                # rec.analytic_distribution[8795] = 100.0
+
+            elif rec.analytic_account_id and rec.analytic_account_id.id == 8797 and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals4
+                # rec.analytic_distribution[8797] = 100.0
+            ############# الجودة
+            elif rec.analytic_account_id and rec.analytic_account_id.id == 8790 and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals_quality
+
+                ############# المباني والمرافق
+            elif rec.analytic_account_id and rec.analytic_account_id.id == 8803 and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals_build_facil950
+
+
+            ##### الشئون  الإدارية     #######
+            elif (
+                    rec.partner_id
+                    and rec.partner_id.id == 417103
+                    and rec.account_id
+                    and rec.account_id.code
+                    and rec.account_id.code.startswith ( '410' )
+            ) :
+                rec.analytic_distribution = distribution_vals_manage_921
+                rec.analytic_account_id = 8799  # تعيين مش مقارنة
+
+            elif rec.analytic_account_id and rec.analytic_account_id.id == 8799 and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals_manage_921
+
+            ##### التقنية     #######
+            elif (
+                    rec.partner_id
+                    and rec.partner_id.id == 60740
+                    and rec.account_id
+                    and rec.account_id.code
+                    and rec.account_id.code.startswith ( '410' )
+            ) :
+                rec.analytic_distribution = distribution_vals_it
+                rec.analytic_account_id = 8789
+
+            elif rec.analytic_account_id and rec.analytic_account_id.id == 8789 and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals_it
+
+            ##### القهوة والضيافة
+            elif rec.analytic_account_id and rec.analytic_account_id.id == 8800 and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals_coff_ryd
+
+            ##### النضافة الرياض    #######
+            elif (
+                    rec.partner_id
+                    and rec.partner_id.id == 80006
+                    and rec.account_id
+                    and rec.account_id.code
+                    and rec.account_id.code.startswith ( '410' )
+            ) :
+                rec.analytic_distribution = distribution_vals_clean_ryd
+                rec.analytic_account_id = 8801
+
+            elif rec.analytic_account_id and rec.analytic_account_id.id == 8801 and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals_clean_ryd
+
+            ##### التوطين  العام    #######
+            elif (
+                    rec.partner_id
+                    and rec.partner_id.id in [80006 , 80008 , 79988 , 79985 , 80010]
+                    and rec.account_id
+                    and rec.account_id.code
+                    and rec.account_id.code.startswith ( '410' )
+            ) :
+                rec.analytic_distribution = distribution_vals_pub_loc903
+                rec.analytic_account_id = 8792
+
+            elif rec.analytic_account_id and rec.analytic_account_id.id == 8792 and rec.account_id.code.startswith (
+                    '410' ) :
+                rec.analytic_distribution = distribution_vals_pub_loc903
+
+            else :
+                rec.analytic_distribution = False
+
+    ##############نهاية التوزيع  لحسابات  ال9
 
     @api.depends ( 'analytic_distribution' )
     def compute_analytic_account_name(self) :
