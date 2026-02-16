@@ -612,7 +612,7 @@ class AccountMoveLine ( models.Model ) :
                 8865 : rec.pub_loc903_perc_111 ,
                 8858 : rec.pub_loc903_perc_200 ,
                 8834 : rec.pub_loc903_perc_103 ,
-                87892 : 100.0 ,
+                8792 : 100.0 ,
             }
             ####أحبار
             if rec.analytic_account_id and rec.analytic_account_id.id == 8804 and rec.account_id.code.startswith (
