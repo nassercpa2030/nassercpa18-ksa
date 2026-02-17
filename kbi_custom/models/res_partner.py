@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from odoo import models , fields , api , _
 import logging
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import UserError , ValidationError
 import re
+
 
 class ResCity ( models.Model ) :
     _name = 'res.country.state.city'
@@ -17,210 +18,390 @@ class ResCity ( models.Model ) :
 
 class ResCity ( models.Model ) :
     _inherit = 'res.users'
-    
-    analytic_account_ids = fields.Many2many(
-        'account.analytic.account',
-        'account_analytic_account_res_users_rel',  # relation table
-        'res_users_id',                            # column 1
-        'account_analytic_account_id',             # column 2
-        string='الحسابات التحليلية',
-        readonly=False  )
-        # ===== المالية =====
-    finance923_perc_101 = fields.Float(string="نسبة توزيع المالية علي 101", store=True, readonly=False)
-    finance923_perc_104 = fields.Float(string="نسبة توزيع المالية علي 104", store=True, readonly=False)
-    finance923_perc_110 = fields.Float(string="نسبة توزيع المالية علي 110", store=True, readonly=False)
-    finance923_perc_111 = fields.Float(string="نسبة توزيع المالية علي 111", store=True, readonly=False)
-    finance923_perc_200 = fields.Float(string="نسبة توزيع المالية علي 200", store=True, readonly=False)
-    finance923_perc_103 = fields.Float(string="نسبة توزيع المالية علي 103", store=True, readonly=False)
+
+    analytic_account_ids = fields.Many2many (
+        'account.analytic.account' ,
+        'account_analytic_account_res_users_rel' ,  # relation table
+        'res_users_id' ,  # column 1
+        'account_analytic_account_id' ,  # column 2
+        string='الحسابات التحليلية' ,
+        readonly=False )
+    # ===== المالية =====
+    finance923_perc_101 = fields.Float ( string="نسبة توزيع المالية علي 101" , store=True , readonly=False )
+    finance923_perc_104 = fields.Float ( string="نسبة توزيع المالية علي 104" , store=True , readonly=False )
+    finance923_perc_110 = fields.Float ( string="نسبة توزيع المالية علي 110" , store=True , readonly=False )
+    finance923_perc_111 = fields.Float ( string="نسبة توزيع المالية علي 111" , store=True , readonly=False )
+    finance923_perc_200 = fields.Float ( string="نسبة توزيع المالية علي 200" , store=True , readonly=False )
+    finance923_perc_103 = fields.Float ( string="نسبة توزيع المالية علي 103" , store=True , readonly=False )
 
     # ===== الجودة =====
-    quality901_perc_101 = fields.Float(string="نسبة توزيع الجودة علي 101", store=True, readonly=False)
-    quality901_perc_104 = fields.Float(string="نسبة توزيع الجودة علي 104", store=True, readonly=False)
-    quality901_perc_110 = fields.Float(string="نسبة توزيع الجودة علي 110", store=True, readonly=False)
-    quality901_perc_111 = fields.Float(string="نسبة توزيع الجودة علي 111", store=True, readonly=False)
-    quality901_perc_200 = fields.Float(string="نسبة توزيع الجودة علي 200", store=True, readonly=False)
-    quality901_perc_103 = fields.Float(string="نسبة توزيع الجودة علي 103", store=True, readonly=False)
+    quality901_perc_101 = fields.Float ( string="نسبة توزيع الجودة علي 101" , store=True , readonly=False )
+    quality901_perc_104 = fields.Float ( string="نسبة توزيع الجودة علي 104" , store=True , readonly=False )
+    quality901_perc_110 = fields.Float ( string="نسبة توزيع الجودة علي 110" , store=True , readonly=False )
+    quality901_perc_111 = fields.Float ( string="نسبة توزيع الجودة علي 111" , store=True , readonly=False )
+    quality901_perc_200 = fields.Float ( string="نسبة توزيع الجودة علي 200" , store=True , readonly=False )
+    quality901_perc_103 = fields.Float ( string="نسبة توزيع الجودة علي 103" , store=True , readonly=False )
 
     # ===== الدعم التشغيلي =====
-    oper_supp902_perc_101 = fields.Float(string="نسبة توزيع الدعم التشغيلي علي 101", store=True, readonly=False)
-    oper_supp902_perc_104 = fields.Float(string="نسبة توزيع الدعم التشغيلي علي 104", store=True, readonly=False)
-    oper_supp902_perc_110 = fields.Float(string="نسبة توزيع الدعم التشغيلي علي 110", store=True, readonly=False)
-    oper_supp902_perc_111 = fields.Float(string="نسبة توزيع الدعم التشغيلي علي 111", store=True, readonly=False)
-    oper_supp902_perc_200 = fields.Float(string="نسبة توزيع الدعم التشغيلي علي 200", store=True, readonly=False)
-    oper_supp902_perc_103 = fields.Float(string="نسبة توزيع الدعم التشغيلي علي 103", store=True, readonly=False)
+    oper_supp902_perc_101 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 101" , store=True , readonly=False )
+    oper_supp902_perc_104 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 104" , store=True , readonly=False )
+    oper_supp902_perc_110 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 110" , store=True , readonly=False )
+    oper_supp902_perc_111 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 111" , store=True , readonly=False )
+    oper_supp902_perc_200 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 200" , store=True , readonly=False )
+    oper_supp902_perc_103 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 103" , store=True , readonly=False )
 
     # ===== التسويق عام =====
-    sale_gen911_perc_101 = fields.Float(string="نسبة توزيع التسويق عام علي 101", store=True, readonly=False)
-    sale_gen911_perc_104 = fields.Float(string="نسبة توزيع التسويق عام علي 104", store=True, readonly=False)
-    sale_gen911_perc_110 = fields.Float(string="نسبة توزيع التسويق عام علي 110", store=True, readonly=False)
-    sale_gen911_perc_111 = fields.Float(string="نسبة توزيع التسويق عام علي 111", store=True, readonly=False)
-    sale_gen911_perc_200 = fields.Float(string="نسبة توزيع التسويق عام علي 200", store=True, readonly=False)
-    sale_gen911_perc_103 = fields.Float(string="نسبة توزيع التسويق عام علي 103", store=True, readonly=False)
+    sale_gen911_perc_101 = fields.Float ( string="نسبة توزيع التسويق عام علي 101" , store=True , readonly=False )
+    sale_gen911_perc_104 = fields.Float ( string="نسبة توزيع التسويق عام علي 104" , store=True , readonly=False )
+    sale_gen911_perc_110 = fields.Float ( string="نسبة توزيع التسويق عام علي 110" , store=True , readonly=False )
+    sale_gen911_perc_111 = fields.Float ( string="نسبة توزيع التسويق عام علي 111" , store=True , readonly=False )
+    sale_gen911_perc_200 = fields.Float ( string="نسبة توزيع التسويق عام علي 200" , store=True , readonly=False )
+    sale_gen911_perc_103 = fields.Float ( string="نسبة توزيع التسويق عام علي 103" , store=True , readonly=False )
 
     # ===== المستلزمات المكتبية =====
-    office_supp_perc_101 = fields.Float(string="نسبة توزيع المستلزمات المكتبية علي 101", store=True, readonly=False)
-    office_supp_perc_104 = fields.Float(string="نسبة توزيع المستلزمات المكتبية علي 104", store=True, readonly=False)
-    office_supp_perc_110 = fields.Float(string="نسبة توزيع المستلزمات المكتبية علي 110", store=True, readonly=False)
-    office_supp_perc_111 = fields.Float(string="نسبة توزيع المستلزمات المكتبية علي 111", store=True, readonly=False)
-    office_supp_perc_200 = fields.Float(string="نسبة توزيع المستلزمات المكتبية علي 200", store=True, readonly=False)
-    office_supp_perc_103 = fields.Float(string="نسبة توزيع المستلزمات المكتبية علي 103", store=True, readonly=False)
+    office_supp_perc_101 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 101" , store=True ,
+                                          readonly=False )
+    office_supp_perc_104 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 104" , store=True ,
+                                          readonly=False )
+    office_supp_perc_110 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 110" , store=True ,
+                                          readonly=False )
+    office_supp_perc_111 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 111" , store=True ,
+                                          readonly=False )
+    office_supp_perc_200 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 200" , store=True ,
+                                          readonly=False )
+    office_supp_perc_103 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 103" , store=True ,
+                                          readonly=False )
 
     # ===== الشئون الإدارية =====
-    manage_921_perc_101 = fields.Float(string="نسبة توزيع الشئون الإدارية علي 101", store=True, readonly=False)
-    manage_921_perc_104 = fields.Float(string="نسبة توزيع الشئون الإدارية علي 104", store=True, readonly=False)
-    manage_921_perc_110 = fields.Float(string="نسبة توزيع الشئون الإدارية علي 110", store=True, readonly=False)
-    manage_921_perc_111 = fields.Float(string="نسبة توزيع الشئون الإدارية علي 111", store=True, readonly=False)
-    manage_921_perc_200 = fields.Float(string="نسبة توزيع الشئون الإدارية علي 200", store=True, readonly=False)
-    manage_921_perc_103 = fields.Float(string="نسبة توزيع الشئون الإدارية علي 103", store=True, readonly=False)
+    manage_921_perc_101 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 101" , store=True , readonly=False )
+    manage_921_perc_104 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 104" , store=True , readonly=False )
+    manage_921_perc_110 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 110" , store=True , readonly=False )
+    manage_921_perc_111 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 111" , store=True , readonly=False )
+    manage_921_perc_200 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 200" , store=True , readonly=False )
+    manage_921_perc_103 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 103" , store=True , readonly=False )
 
     # ===== الدعم التقني =====
-    it_922_perc_101 = fields.Float(string="نسبة توزيع الدعم التقني علي 101", store=True, readonly=False)
-    it_922_perc_104 = fields.Float(string="نسبة توزيع الدعم التقني علي 104", store=True, readonly=False)
-    it_922_perc_110 = fields.Float(string="نسبة توزيع الدعم التقني علي 110", store=True, readonly=False)
-    it_922_perc_111 = fields.Float(string="نسبة توزيع الدعم التقني علي 111", store=True, readonly=False)
-    it_922_perc_200 = fields.Float(string="نسبة توزيع الدعم التقني علي 200", store=True, readonly=False)
-    it_922_perc_103 = fields.Float(string="نسبة توزيع الدعم التقني علي 103", store=True, readonly=False)
+    it_922_perc_101 = fields.Float ( string="نسبة توزيع الدعم التقني علي 101" , store=True , readonly=False )
+    it_922_perc_104 = fields.Float ( string="نسبة توزيع الدعم التقني علي 104" , store=True , readonly=False )
+    it_922_perc_110 = fields.Float ( string="نسبة توزيع الدعم التقني علي 110" , store=True , readonly=False )
+    it_922_perc_111 = fields.Float ( string="نسبة توزيع الدعم التقني علي 111" , store=True , readonly=False )
+    it_922_perc_200 = fields.Float ( string="نسبة توزيع الدعم التقني علي 200" , store=True , readonly=False )
+    it_922_perc_103 = fields.Float ( string="نسبة توزيع الدعم التقني علي 103" , store=True , readonly=False )
 
     # ===== المباني والمرافق =====
-    build_facil950_perc_101 = fields.Float(string="نسبة توزيع المباني والمرافق علي 101", store=True, readonly=False)
-    build_facil950_perc_104 = fields.Float(string="نسبة توزيع المباني والمرافق علي 104", store=True, readonly=False)
-    build_facil950_perc_110 = fields.Float(string="نسبة توزيع المباني والمرافق علي 110", store=True, readonly=False)
-    build_facil950_perc_111 = fields.Float(string="نسبة توزيع المباني والمرافق علي 111", store=True, readonly=False)
-    build_facil950_perc_200 = fields.Float(string="نسبة توزيع المباني والمرافق علي 200", store=True, readonly=False)
-    build_facil950_perc_103 = fields.Float(string="نسبة توزيع المباني والمرافق علي 103", store=True, readonly=False)
+    build_facil950_perc_101 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 101" , store=True ,
+                                             readonly=False )
+    build_facil950_perc_104 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 104" , store=True ,
+                                             readonly=False )
+    build_facil950_perc_110 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 110" , store=True ,
+                                             readonly=False )
+    build_facil950_perc_111 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 111" , store=True ,
+                                             readonly=False )
+    build_facil950_perc_200 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 200" , store=True ,
+                                             readonly=False )
+    build_facil950_perc_103 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 103" , store=True ,
+                                             readonly=False )
 
     # ===== القهوة والضيافة والنضافة (الرياض) =====
-    coff_clean_ryd_perc_101 = fields.Float(string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 101", store=True, readonly=False)
-    coff_clean_ryd_perc_104 = fields.Float(string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 104", store=True, readonly=False)
-    coff_clean_ryd_perc_110 = fields.Float(string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 110", store=True, readonly=False)
-    coff_clean_ryd_perc_111 = fields.Float(string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 111", store=True, readonly=False)
-    coff_clean_ryd_perc_200 = fields.Float(string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 200", store=True, readonly=False)
-    coff_clean_ryd_perc_103 = fields.Float(string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 103", store=True, readonly=False)
+    coff_clean_ryd_perc_101 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 101" ,
+                                             store=True , readonly=False )
+    coff_clean_ryd_perc_104 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 104" ,
+                                             store=True , readonly=False )
+    coff_clean_ryd_perc_110 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 110" ,
+                                             store=True , readonly=False )
+    coff_clean_ryd_perc_111 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 111" ,
+                                             store=True , readonly=False )
+    coff_clean_ryd_perc_200 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 200" ,
+                                             store=True , readonly=False )
+    coff_clean_ryd_perc_103 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 103" ,
+                                             store=True , readonly=False )
 
     # ===== التوطين العام =====
-    pub_loc903_perc_101 = fields.Float(string="نسبة توزيع التوطين العام علي 101", store=True, readonly=False)
-    pub_loc903_perc_104 = fields.Float(string="نسبة توزيع التوطين العام علي 104", store=True, readonly=False)
-    pub_loc903_perc_110 = fields.Float(string="نسبة توزيع التوطين العام علي 110", store=True, readonly=False)
-    pub_loc903_perc_111 = fields.Float(string="نسبة توزيع التوطين العام علي 111", store=True, readonly=False)
-    pub_loc903_perc_200 = fields.Float(string="نسبة توزيع التوطين العام علي 200", store=True, readonly=False)
-    pub_loc903_perc_103 = fields.Float(string="نسبة توزيع التوطين العام علي 103", store=True, readonly=False)
+    pub_loc903_perc_101 = fields.Float ( string="نسبة توزيع التوطين العام علي 101" , store=True , readonly=False )
+    pub_loc903_perc_104 = fields.Float ( string="نسبة توزيع التوطين العام علي 104" , store=True , readonly=False )
+    pub_loc903_perc_110 = fields.Float ( string="نسبة توزيع التوطين العام علي 110" , store=True , readonly=False )
+    pub_loc903_perc_111 = fields.Float ( string="نسبة توزيع التوطين العام علي 111" , store=True , readonly=False )
+    pub_loc903_perc_200 = fields.Float ( string="نسبة توزيع التوطين العام علي 200" , store=True , readonly=False )
+    pub_loc903_perc_103 = fields.Float ( string="نسبة توزيع التوطين العام علي 103" , store=True , readonly=False )
 
     # 🔥 Constrain واحد فقط لكل المجموعات
-    @api.constrains(
-        'finance923_perc_101', 'finance923_perc_104', 'finance923_perc_110',
-        'finance923_perc_111', 'finance923_perc_200', 'finance923_perc_103',
-        'quality901_perc_101', 'quality901_perc_104', 'quality901_perc_110',
-        'quality901_perc_111', 'quality901_perc_200', 'quality901_perc_103',
-        'oper_supp902_perc_101', 'oper_supp902_perc_104', 'oper_supp902_perc_110',
-        'oper_supp902_perc_111', 'oper_supp902_perc_200', 'oper_supp902_perc_103',
-        'sale_gen911_perc_101', 'sale_gen911_perc_104', 'sale_gen911_perc_110',
-        'sale_gen911_perc_111', 'sale_gen911_perc_200', 'sale_gen911_perc_103',
-        'office_supp_perc_101', 'office_supp_perc_104', 'office_supp_perc_110',
-        'office_supp_perc_111', 'office_supp_perc_200', 'office_supp_perc_103',
-        'manage_921_perc_101', 'manage_921_perc_104', 'manage_921_perc_110',
-        'manage_921_perc_111', 'manage_921_perc_200', 'manage_921_perc_103',
-        'it_922_perc_101', 'it_922_perc_104', 'it_922_perc_110',
-        'it_922_perc_111', 'it_922_perc_200', 'it_922_perc_103',
-        'build_facil950_perc_101', 'build_facil950_perc_104', 'build_facil950_perc_110',
-        'build_facil950_perc_111', 'build_facil950_perc_200', 'build_facil950_perc_103',
-        'coff_clean_ryd_perc_101', 'coff_clean_ryd_perc_104', 'coff_clean_ryd_perc_110',
-        'coff_clean_ryd_perc_111', 'coff_clean_ryd_perc_200', 'coff_clean_ryd_perc_103',
-        'pub_loc903_perc_101', 'pub_loc903_perc_104', 'pub_loc903_perc_110',
-        'pub_loc903_perc_111', 'pub_loc903_perc_200', 'pub_loc903_perc_103'
+    @api.constrains (
+        'finance923_perc_101' , 'finance923_perc_104' , 'finance923_perc_110' ,
+        'finance923_perc_111' , 'finance923_perc_200' , 'finance923_perc_103' ,
+        'quality901_perc_101' , 'quality901_perc_104' , 'quality901_perc_110' ,
+        'quality901_perc_111' , 'quality901_perc_200' , 'quality901_perc_103' ,
+        'oper_supp902_perc_101' , 'oper_supp902_perc_104' , 'oper_supp902_perc_110' ,
+        'oper_supp902_perc_111' , 'oper_supp902_perc_200' , 'oper_supp902_perc_103' ,
+        'sale_gen911_perc_101' , 'sale_gen911_perc_104' , 'sale_gen911_perc_110' ,
+        'sale_gen911_perc_111' , 'sale_gen911_perc_200' , 'sale_gen911_perc_103' ,
+        'office_supp_perc_101' , 'office_supp_perc_104' , 'office_supp_perc_110' ,
+        'office_supp_perc_111' , 'office_supp_perc_200' , 'office_supp_perc_103' ,
+        'manage_921_perc_101' , 'manage_921_perc_104' , 'manage_921_perc_110' ,
+        'manage_921_perc_111' , 'manage_921_perc_200' , 'manage_921_perc_103' ,
+        'it_922_perc_101' , 'it_922_perc_104' , 'it_922_perc_110' ,
+        'it_922_perc_111' , 'it_922_perc_200' , 'it_922_perc_103' ,
+        'build_facil950_perc_101' , 'build_facil950_perc_104' , 'build_facil950_perc_110' ,
+        'build_facil950_perc_111' , 'build_facil950_perc_200' , 'build_facil950_perc_103' ,
+        'coff_clean_ryd_perc_101' , 'coff_clean_ryd_perc_104' , 'coff_clean_ryd_perc_110' ,
+        'coff_clean_ryd_perc_111' , 'coff_clean_ryd_perc_200' , 'coff_clean_ryd_perc_103' ,
+        'pub_loc903_perc_101' , 'pub_loc903_perc_104' , 'pub_loc903_perc_110' ,
+        'pub_loc903_perc_111' , 'pub_loc903_perc_200' , 'pub_loc903_perc_103'
     )
-    def _check_all_percentages(self):
+    def _check_all_percentages(self) :
         groups = {
-            "المالية": "finance923",
-            "الجودة": "quality901",
-            "الدعم التشغيلي": "oper_supp902",
-            "التسويق عام": "sale_gen911",
-            "المستلزمات المكتبية": "office_supp",
-            "الشئون الإدارية": "manage_921",
-            "الدعم التقني": "it_922",
-            "المباني والمرافق": "build_facil950",
-            "القهوة والضيافة والنضافة (الرياض)": "coff_clean_ryd",
-            "التوطين العام": "pub_loc903",
+            "المالية" : "finance923" ,
+            "الجودة" : "quality901" ,
+            "الدعم التشغيلي" : "oper_supp902" ,
+            "التسويق عام" : "sale_gen911" ,
+            "المستلزمات المكتبية" : "office_supp" ,
+            "الشئون الإدارية" : "manage_921" ,
+            "الدعم التقني" : "it_922" ,
+            "المباني والمرافق" : "build_facil950" ,
+            "القهوة والضيافة والنضافة (الرياض)" : "coff_clean_ryd" ,
+            "التوطين العام" : "pub_loc903" ,
         }
 
-        codes = ['101', '104', '110', '111', '200', '103']
+        codes = ['101' , '104' , '110' , '111' , '200' , '103']
 
-        for rec in self:
-            for label, prefix in groups.items():
-                total = sum(getattr(rec, f"{prefix}_perc_{code}") or 0.0 for code in codes)
-                total = round(total, 2)
-                if total not in (0.0, 100.0):
+        for rec in self :
+            for label , prefix in groups.items () :
+                total = sum ( getattr ( rec , f"{prefix}_perc_{code}" ) or 0.0 for code in codes )
+                total = round ( total , 2 )
+                if total not in (0.0 , 100.0) :
                     diff = total - 100
-                    diff_msg = _("أكبر من 100 بنسبة %.2f%%") % diff if diff > 0 else _("أقل من 100 بنسبة %.2f%%") % (-diff)
-                    raise ValidationError(_(
+                    diff_msg = _ ( "أكبر من 100 بنسبة %.2f%%" ) % diff if diff > 0 else _ (
+                        "أقل من 100 بنسبة %.2f%%" ) % (-diff)
+                    raise ValidationError ( _ (
                         "خطأ في توزيع %s (%s)\n"
                         "الإجمالي الحالي: %.2f%%\n"
                         "(المسموح فقط: 0%% أو 100%%)"
-                    ) % (label, diff_msg, total))
+                    ) % (label , diff_msg , total) )
 
 
-_logger = logging.getLogger(__name__)
+_logger = logging.getLogger ( __name__ )
 
-class HrPayslip(models.Model):
+
+class HrPayslip ( models.Model ) :
     _inherit = 'hr.payslip'
 
-    def action_payslip_done(self):
-        result = super().action_payslip_done()
+    def action_payslip_done(self) :
+        result = super ().action_payslip_done ()
 
         messages = []  # لتجميع الرسائل لكل slip
 
-        for slip in self:
+        for slip in self :
             employee = slip.employee_id
-            if not employee:
+            if not employee :
                 continue
 
             # جلب partner الموظف أو إنشاء واحد جديد إذا لم يكن موجود
-            employee_partner = getattr(employee, 'user_id', False) and getattr(employee.user_id, 'partner_id', False)
-            if not employee_partner:
-                employee_partner = self.env['res.partner'].create({
-                    'name': employee.name,
-                    'email': getattr(employee, 'work_email', False),
-                    'phone': getattr(employee, 'work_phone', False),
-                    'is_company': False,
-                })
+            employee_partner = getattr ( employee , 'user_id' , False ) and getattr ( employee.user_id , 'partner_id' ,
+                                                                                      False )
+            if not employee_partner :
+                employee_partner = self.env['res.partner'].create ( {
+                    'name' : employee.name ,
+                    'email' : getattr ( employee , 'work_email' , False ) ,
+                    'phone' : getattr ( employee , 'work_phone' , False ) ,
+                    'is_company' : False ,
+                } )
 
             # جلب القيود المرتبطة بالرواتب
             move = slip.move_id
-            if move:
+            if move :
                 # جلب الحساب التحليلي من الموظف
-                analytic_account_id = getattr(employee, 'analytic_account_id', False)
+                analytic_account_id = getattr ( employee , 'analytic_account_id' , False )
 
                 # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
-                analytic_vals = {analytic_account_id.id: 100} if analytic_account_id else {}
+                analytic_vals = {analytic_account_id.id : 100} if analytic_account_id else {}
 
-                
-                for line in move.line_ids:
-                  # شرط الحساب 1218
-                    if line.account_id.id == 1329:
-                       line.partner_id = 63815
+
+                for line in move.line_ids :
+                    line.analytic_account_id = analytic_account_id
+                    ### finance department ###
+                    distribution_vals_finance = {
+                        8820 : line.env.user.finance923_perc_101,
+                        8843 : line.env.user.finance923_perc_104 ,
+                        8849 : line.env.user.finance923_perc_110 ,
+                        8865 : line.env.user.finance923_perc_111 ,
+                        8858 : line.env.user.finance923_perc_200 ,
+                        8834 : line.env.user.finance923_perc_103 ,
+                        8791 : 100.0 ,
+                    }
+                    ### uploading ###
+                    distribution_vals_upload = {
+                        8820 : line.env.user.oper_supp902_perc_101 ,
+                        8843 : line.env.user.oper_supp902_perc_104 ,
+                        8849 : line.env.user.oper_supp902_perc_110 ,
+                        8865 : line.env.user.oper_supp902_perc_111 ,
+                        8858 : line.env.user.oper_supp902_perc_200 ,
+                        8834 : line.env.user.oper_supp902_perc_103 ,
+                        8796 : 100.0 ,
+
+                    }
+                    ### Archive ###
+                    distribution_vals3_archive = {
+                        8820 : line.env.user.oper_supp902_perc_101 ,
+                        8843 : line.env.user.oper_supp902_perc_104 ,
+                        8849 : line.env.user.oper_supp902_perc_110 ,
+                        8865 : line.env.user.oper_supp902_perc_111 ,
+                        8858 : line.env.user.oper_supp902_perc_200 ,
+                        8834 : line.env.user.oper_supp902_perc_103 ,
+                        8795 : 100.0 ,
+
+                    }
+                    ### Sercratry_manageral ###
+                    distribution_vals4_secretary = {
+                        8820 : line.env.user.oper_supp902_perc_101 ,
+                        8843 : line.env.user.oper_supp902_perc_104 ,
+                        8849 : line.env.user.oper_supp902_perc_110 ,
+                        8865 : line.env.user.oper_supp902_perc_111 ,
+                        8858 : line.env.user.oper_supp902_perc_200 ,
+                        8834 : line.env.user.oper_supp902_perc_103 ,
+                        8797 : 100.0 ,
+                    }
+                    ### Quality ###
+                    distribution_vals_quality = {
+                        8820 : line.env.user.quality901_perc_101 ,
+                        8843 : line.env.user.quality901_perc_104 ,
+                        8849 : line.env.user.quality901_perc_110 ,
+                        8865 : line.env.user.quality901_perc_111 ,
+                        8858 : line.env.user.quality901_perc_200 ,
+                        8834 : line.env.user.quality901_perc_103 ,
+                        8790 : 100.0 ,
+                    }
+                    ### manageral921 ###
+                    distribution_vals_manage_921 = {
+                        8820 : line.env.user.manage_921_perc_101 ,
+                        8843 : line.env.user.manage_921_perc_104 ,
+                        8849 : line.env.user.manage_921_perc_110 ,
+                        8865 : line.env.user.manage_921_perc_111 ,
+                        8858 : line.env.user.manage_921_perc_200 ,
+                        8834 : line.env.user.manage_921_perc_103 ,
+                        8799 : 100.0 ,
+                    }
+                    ### technology922 ###
+                    distribution_vals_it = {
+                        8820 : line.env.user.it_922_perc_101 ,
+                        8843 : line.env.user.it_922_perc_104 ,
+                        8849 : line.env.user.it_922_perc_110 ,
+                        8865 : line.env.user.it_922_perc_111 ,
+                        8858 : line.env.user.it_922_perc_200 ,
+                        8834 : line.env.user.it_922_perc_103 ,
+                        8789 : 100.0 ,
+                    }
+                    ### Cleaning ###
+                    distribution_vals_clean_ryd = {
+                        8820 : line.env.user.coff_clean_ryd_perc_101 ,
+                        8843 : line.env.user.coff_clean_ryd_perc_104 ,
+                        8849 : line.env.user.coff_clean_ryd_perc_110 ,
+                        8865 : line.env.user.coff_clean_ryd_perc_111 ,
+                        8858 : line.env.user.coff_clean_ryd_perc_200 ,
+                        8834 : line.env.user.coff_clean_ryd_perc_103 ,
+                        8801 : 100.0 ,
+                    }
+                    ### pub_loc903 ###
+                    distribution_vals_pub_loc903 = {
+                        8820 : line.env.user.pub_loc903_perc_101 ,
+                        8843 : line.env.user.pub_loc903_perc_104 ,
+                        8849 : line.env.user.pub_loc903_perc_110 ,
+                        8865 : line.env.user.pub_loc903_perc_111 ,
+                        8858 : line.env.user.pub_loc903_perc_200 ,
+                        8834 : line.env.user.pub_loc903_perc_103 ,
+                        8792 : 100.0 ,
+                    }
+                    # شرط الحساب 1218
+                    if line.account_id.id == 1329 :
+                        line.partner_id = 63815
+
+                    else :
+                         line.partner_id = employee_partner.id
+
+                    ####### distribution analytic accounts #######
+                        ## finance##
+                    if (
+                            line.analytic_account_id
+                            and line.analytic_account_id.id == 8791
+                            and line.account_id
+                            and line.account_id.code.startswith ( '410' )
+                    ) :
+                        line.analytic_distribution = distribution_vals_finance
+
+                        ## uploading##
+                    elif (
+                            line.analytic_account_id
+                            and line.analytic_account_id.id == 8796
+                            and line.account_id
+                            and line.account_id.code.startswith ( '410' )
+                    ) :
+                        line.analytic_distribution = distribution_vals_upload
+
+                        ### Archive ###
+                    elif (
+                            line.analytic_account_id
+                            and line.analytic_account_id.id == 8795
+                            and line.account_id
+                            and line.account_id.code.startswith ( '410' )
+                    ) :
+                        line.analytic_distribution = distribution_vals3_archive
+
+                        ### Sercratry_manageral ###
+                    elif (
+                            line.analytic_account_id
+                            and line.analytic_account_id.id == 8797
+                            and line.account_id
+                            and line.account_id.code.startswith ( '410' )
+                    ) :
+                        line.analytic_distribution = distribution_vals4_secretary
+
+                        ### Quality ###
+                    elif (
+                            line.analytic_account_id
+                            and line.analytic_account_id.id == 8790
+                            and line.account_id
+                            and line.account_id.code.startswith ( '410' )
+                    ) :
+                        line.analytic_distribution = distribution_vals_quality
+
+                        ### manageral921 ###
+                    elif (
+                            line.analytic_account_id
+                            and line.analytic_account_id.id == 8799
+                            and line.account_id
+                            and line.account_id.code.startswith ( '410' )
+                    ) :
+                        line.analytic_distribution = distribution_vals_manage_921
+
+                        ### technology922 ###
+                    elif (
+                            line.analytic_account_id
+                            and line.analytic_account_id.id == 8789
+                            and line.account_id
+                            and line.account_id.code.startswith ( '410' )
+                    ) :
+                        line.analytic_distribution = distribution_vals_it
+
+                        ### Cleaning ###
+                    elif (
+                            line.analytic_account_id
+                            and line.analytic_account_id.id == 8801
+                            and line.account_id
+                            and line.account_id.code.startswith ( '410' )
+                    ) :
+                        line.analytic_distribution = distribution_vals_clean_ryd
+
+                        ### pub_loc903 ###
+                    elif (
+                            line.analytic_account_id
+                            and line.analytic_account_id.id == 8792
+                            and line.account_id
+                            and line.account_id.code.startswith ( '410' )
+                    ) :
+                        line.analytic_distribution = distribution_vals_pub_loc903
+
                     else:
-                       line.partner_id = employee_partner.id
-
-                    line.analytic_distribution = analytic_vals
-
-
-                # تحديث كل أسطر القيد
-                #move.line_ids.write({
-                    #'partner_id': employee_partner.id,
-                    #'analytic_distribution': analytic_vals
-                #})
-
-                # تجميع الرسائل
-                #messages.append(
-                    #f"Payslip {slip.number}: Partner set to '{employee_partner.name}' "
-                    #f"and Analytic Account set to '{analytic_account_id.name if analytic_account_id else 'None'}'."
-                #)
-
-        # عرض كل الرسائل مرة واحدة بعد التحديث
-        #f messages:
-            #self.env.user.notify_info(message="\n".join(messages), title=_("Payslip Updates"))
+                       line.analytic_distribution = analytic_vals
 
         return result
-
 
 
 
@@ -243,9 +424,9 @@ class Recruiter ( models.Model ) :
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
                                       placeholder="Enter Analytic Plan" )
-    related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' ,store=True,
-                                      help="this field get partner from contact" ,
-                                      placeholder="Enter Related Contact" )
+    related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
+                                           help="this field get partner from contact" ,
+                                           placeholder="Enter Related Contact" )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
                                             domain="[('plan_id', '=', analytic_plan)]" , readonly=False , store=True )
     wage = fields.Float ( 'الأساسي' , help="Same field as Wage for employee contract" , compute="get_employee_wage" ,
@@ -307,7 +488,7 @@ class ResPartner ( models.Model ) :
                                             placeholder="Enter Analytic Account for employee" )
 
     nationality = fields.Char ( "Nationality" )
-    real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False,store=True  )
+    real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
     nationality = fields.Char ( "Nationality" )
     manager_team = fields.Many2one ( comodel_name="res.users" , string='Manager' ,
