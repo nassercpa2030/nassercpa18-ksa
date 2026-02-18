@@ -513,6 +513,12 @@ class ResPartner ( models.Model ) :
     attachment_ids = fields.Many2many ( 'ir.attachment' , string='Attachments' , compute='_compute_attachments' ,
                                         store=False )
     fax_number = fields.Char ( string='FAX' , readonly=False , required=False )
+    all_sale_order_count = fields.Integer(string='Sale Order Count')
+
+    @api.onchange('sale_order_count')
+    def _onchange_sale_order_count(self):
+        for rec in self:
+            rec.all_sale_order_count = rec.sale_order_count
 
     def _compute_attachments(self) :
         for rec in self :
