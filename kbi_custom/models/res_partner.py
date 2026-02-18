@@ -519,7 +519,15 @@ class ResPartner ( models.Model ) :
     def _onchange_sale_order_count(self):
         for rec in self:
             rec.all_sale_order_count = rec.sale_order_count
-
+            
+    def action_copy_sale_order_count(self):
+        """
+        دالة يتم استدعائها عند الضغط على الزر
+        لنسخ قيمة sale_order_count لكل سجل مختار
+        """
+        for rec in self:  # self = السجلات المختارة
+            rec.all_sale_order_count = rec.sale_order_count
+            
     def _compute_attachments(self) :
         for rec in self :
             rec.attachment_ids = self.env['ir.attachment'].search ( [
