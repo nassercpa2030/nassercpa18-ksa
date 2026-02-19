@@ -27,18 +27,18 @@ class ResCity ( models.Model ) :
         string='الحسابات التحليلية' ,
         readonly=False )
     # ===== المالية =====
-    #finance923_perc_101 = fields.Float ( string="نسبة توزيع المالية علي 101" , store=True , readonly=False )
-    #finance923_perc_104 = fields.Float ( string="نسبة توزيع المالية علي 104" , store=True , readonly=False )
-    #finance923_perc_110 = fields.Float ( string="نسبة توزيع المالية علي 110" , store=True , readonly=False )
-    #finance923_perc_111 = fields.Float ( string="نسبة توزيع المالية علي 111" , store=True , readonly=False )
-    #finance923_perc_200 = fields.Float ( string="نسبة توزيع المالية علي 200" , store=True , readonly=False )
-    #finance923_perc_103 = fields.Float ( string="نسبة توزيع المالية علي 103" , store=True , readonly=False )
+    finance923_perc_101 = fields.Float ( string="نسبة توزيع المالية علي 101" , store=True , readonly=False )
+    finance923_perc_104 = fields.Float ( string="نسبة توزيع المالية علي 104" , store=True , readonly=False )
+    finance923_perc_110 = fields.Float ( string="نسبة توزيع المالية علي 110" , store=True , readonly=False )
+    finance923_perc_111 = fields.Float ( string="نسبة توزيع المالية علي 111" , store=True , readonly=False )
+    finance923_perc_200 = fields.Float ( string="نسبة توزيع المالية علي 200" , store=True , readonly=False )
+    finance923_perc_103 = fields.Float ( string="نسبة توزيع المالية علي 103" , store=True , readonly=False )
 
     # ===== الجودة =====
-    #quality901_perc_101 = fields.Float ( string="نسبة توزيع الجودة علي 101" , store=True , readonly=False )
-    #quality901_perc_104 = fields.Float ( string="نسبة توزيع الجودة علي 104" , store=True , readonly=False )
-    #quality901_perc_110 = fields.Float ( string="نسبة توزيع الجودة علي 110" , store=True , readonly=False )
-    """
+    quality901_perc_101 = fields.Float ( string="نسبة توزيع الجودة علي 101" , store=True , readonly=False )
+    quality901_perc_104 = fields.Float ( string="نسبة توزيع الجودة علي 104" , store=True , readonly=False )
+    quality901_perc_110 = fields.Float ( string="نسبة توزيع الجودة علي 110" , store=True , readonly=False )
+
     quality901_perc_111 = fields.Float ( string="نسبة توزيع الجودة علي 111" , store=True , readonly=False )
     quality901_perc_200 = fields.Float ( string="نسبة توزيع الجودة علي 200" , store=True , readonly=False )
     quality901_perc_103 = fields.Float ( string="نسبة توزيع الجودة علي 103" , store=True , readonly=False )
@@ -50,8 +50,8 @@ class ResCity ( models.Model ) :
     oper_supp902_perc_111 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 111" , store=True , readonly=False )
     oper_supp902_perc_200 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 200" , store=True , readonly=False )
     oper_supp902_perc_103 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 103" , store=True , readonly=False )
-    """
-    """
+    
+    
     # ===== التسويق عام =====
     sale_gen911_perc_101 = fields.Float ( string="نسبة توزيع التسويق عام علي 101" , store=True , readonly=False )
     sale_gen911_perc_104 = fields.Float ( string="نسبة توزيع التسويق عام علي 104" , store=True , readonly=False )
@@ -178,7 +178,7 @@ class ResCity ( models.Model ) :
                         "الإجمالي الحالي: %.2f%%\n"
                         "(المسموح فقط: 0%% أو 100%%)"
                     ) % (label , diff_msg , total) )
-    """        
+           
 
 
 _logger = logging.getLogger ( __name__ )
