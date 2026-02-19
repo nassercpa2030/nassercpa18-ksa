@@ -520,7 +520,7 @@ class AccountMoveLine ( models.Model ) :
                 #8865 : rec.finance923_perc_111 ,
                 #8858 : rec.finance923_perc_200 ,
                 #8834 : rec.finance923_perc_103 ,
-                #8791 : 100.0 ,
+                8791 : 100.0 ,
             }
             distribution_vals2 = {
                 #8820 : rec.oper_supp902_perc_101 ,
@@ -529,7 +529,7 @@ class AccountMoveLine ( models.Model ) :
                 #8865 : rec.oper_supp902_perc_111 ,
                 #8858 : rec.oper_supp902_perc_200 ,
                 #8834 : rec.oper_supp902_perc_103 ,
-                #8796 : 100.0 ,
+                8796 : 100.0 ,
 
             }
             distribution_vals3 = {
