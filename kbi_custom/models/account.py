@@ -867,6 +867,21 @@ class HrExpenseSheet ( models.Model ) :
     # store=True ,
     # readonly=False )
 
+class AnalyticDistributuion ( models.Model ) :
+    _inherit = 'account.analytic.line'
+    finance_101_distribution_amount=fields.Float(string="نسبة توزيع  101 للمالية",compute="_compute_dist_percentage" , readonly=False )
+    
+    @api.depends('amount', 'x_plan98_id')
+    def _compute_dist_percentage(self) :
+        for rec in self :
+            perc = rec.env.user.finance923_perc_101 or 0.0
+            
+            if rec.x_plan98_id and rec.x_plan98_id.id == 8791 and rec.amount and perc:
+               rec.finance_101_distribution_amount = rec.amount * (perc / 100) 
+            else:
+                rec.finance_101_distribution_amount = 0.0
+
+
 
 class AccountPaymentSale ( models.Model ) :
     _name = 'account.payment.sale'
