@@ -874,14 +874,14 @@ class AnalyticDistributuion ( models.Model ) :
         related='company_id.currency_id',
         store=True,
         readonly=True)
-    finance_101_distribution_amount=fields.Monetary(string="نسبة توزيع  101 للمالية",currency_field='currency_id',compute="_compute_dist_percentage" , readonly=False,store=True )
+    finance_101_distribution_amount=fields.Monetary(string="نسبة توزيع  101 للمالية",currency_field='currency_id',compute="_compute_dist_percentage" , readonly=False )
     
-    @api.depends('amount', 'x_plan98_id')
+    @api.depends('amount')
     def _compute_dist_percentage(self) :
         for rec in self :
             perc = rec.env.user.finance923_perc_101 or 0.0
             
-            if rec.x_plan98_id and rec.x_plan98_id.id == 8791 and rec.amount and perc:
+            if rec.x_plan98_id and rec.x_plan98_id.id == 8791 and rec.amount :
                rec.finance_101_distribution_amount = rec.amount * (perc / 100) 
             else:
                 rec.finance_101_distribution_amount = 0.0
