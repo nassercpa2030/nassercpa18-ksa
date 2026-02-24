@@ -874,7 +874,7 @@ class AnalyticDistributuion ( models.Model ) :
         related='company_id.currency_id',
         store=True,
         readonly=True)
-    finance_101_distribution_amount=fields.Monetary(string="نسبة توزيع  101 للمالية",currency_field='currency_id',compute="_compute_dist_percentage" , readonly=False )
+    finance_101_distribution_amount=fields.Monetary(string="نسبة توزيع  101 للمالية",currency_field='currency_id',compute="_compute_dist_percentage" , readonly=False,store=True )
     
     @api.depends('amount', 'x_plan98_id')
     def _compute_dist_percentage(self) :
