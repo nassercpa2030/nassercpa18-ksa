@@ -869,7 +869,12 @@ class HrExpenseSheet ( models.Model ) :
 
 class AnalyticDistributuion ( models.Model ) :
     _inherit = 'account.analytic.line'
-    finance_101_distribution_amount=fields.Float(string="نسبة توزيع  101 للمالية",compute="_compute_dist_percentage" , readonly=False )
+    currency_id = fields.Many2one(
+        'res.currency',
+        related='company_id.currency_id',
+        store=True,
+        readonly=True)
+    finance_101_distribution_amount=fields.Monetary(string="نسبة توزيع  101 للمالية",currency_field='currency_id',compute="_compute_dist_percentage" , readonly=False )
     
     @api.depends('amount', 'x_plan98_id')
     def _compute_dist_percentage(self) :
