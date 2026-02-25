@@ -900,6 +900,19 @@ class AnalyticDistributuion ( models.Model ) :
                                            readonly=False )
     oper_supp902_103_distribution_amount = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 103" , compute="_compute_dist_percentage" ,
                                            readonly=False )
+      # =========================== التسويق عام ===========================
+    sale_gen911_101_distribution_amount = fields.Float ( string="نسبة توزيع التسويق عام علي 101" , compute="_compute_dist_percentage",
+                                           readonly=False )
+    sale_gen911_104_distribution_amount = fields.Float ( string="نسبة توزيع التسويق عام علي 104"  , compute="_compute_dist_percentage" ,
+                                           readonly=False )
+    sale_gen911_110_distribution_amount = fields.Float ( string="نسبة توزيع التسويق عام علي 110"  , compute="_compute_dist_percentage",
+                                           readonly=False )
+    sale_gen911_111_distribution_amount = fields.Float ( string="نسبة توزيع التسويق عام علي 111"  , compute="_compute_dist_percentage" ,
+                                           readonly=False )
+    sale_gen911_200_distribution_amount = fields.Float ( string="نسبة توزيع التسويق عام علي 200"  , compute="_compute_dist_percentage" ,
+                                           readonly=False )
+    sale_gen911_103_distribution_amount = fields.Float ( string="نسبة توزيع التسويق عام علي 103"  , compute="_compute_dist_percentage" ,
+                                           readonly=False )
     # ===== الجودة =====
     quality901_perc_101_distribution_amount = fields.Float ( string="نسبة توزيع الجودة على 101" , compute="_compute_dist_percentage" , readonly=False )
     quality901_perc_104_distribution_amount = fields.Float ( string="نسبة توزيع الجودة على 104" , compute="_compute_dist_percentage" , readonly=False )
@@ -1005,13 +1018,226 @@ class AnalyticDistributuion ( models.Model ) :
     @api.depends('amount','x_plan98_id')
     def _compute_dist_percentage(self) :
         for rec in self :
-            perc = rec.env.user.finance923_perc_101 or 0.0
+            #### المالية
+            finance_perc101 = rec.env.user.finance923_perc_101 or 0.0
+            finance_perc104 = self.env.user.finance923_perc_104 or 0.0
+            finance_perc110 = self.env.user.finance923_perc_110 or 0.0
+            finance_perc111 = self.env.user.finance923_perc_111 or 0.0
+            finance_perc200 = self.env.user.finance923_perc_200 or 0.0
+            finance_perc103 = self.env.user.finance923_perc_103 or 0.0
+            ######### الدعم  التشغيلي
+            oper_supp902_perc_101 = self.env.user.oper_supp902_perc_101 or 0.0
+            oper_supp902_perc_104 = self.env.user.oper_supp902_perc_104 or 0.0
+            oper_supp902_perc_110 = self.env.user.oper_supp902_perc_110 or 0.0
+            oper_supp902_perc_111 = self.env.user.oper_supp902_perc_111 or 0.0
+            oper_supp902_perc_200 = self.env.user.oper_supp902_perc_200 or 0.0
+            oper_supp902_perc_103 = self.env.user.oper_supp902_perc_103 or 0.0
+            ######### التسويق عام
+            sale_gen911_perc_101 = self.env.user.sale_gen911_perc_101 or 0.0
+            sale_gen911_perc_104 = self.env.user.sale_gen911_perc_104 or 0.0
+            sale_gen911_perc_110 = self.env.user.sale_gen911_perc_110 or 0.0
+            sale_gen911_perc_111 = self.env.user.sale_gen911_perc_111 or 0.0
+            sale_gen911_perc_200 = self.env.user.sale_gen911_perc_200 or 0.0
+            sale_gen911_perc_103 = self.env.user.sale_gen911_perc_103 or 0.0
             
-            if rec.x_plan98_id and rec.x_plan98_id.id == 8791 and rec.amount :
-               rec.finance_101_distribution_amount = rec.amount * (perc / 100) 
-               rec. finance_101_distribution_show= rec.finance_101_distribution_amount
+            #### الجودة
+            quality901_perc_101 = self.env.user.quality901_perc_101 or 0.0
+            quality901_perc_104 = self.env.user.quality901_perc_104 or 0.0
+            quality901_perc_110 = self.env.user.quality901_perc_110 or 0.0
+            quality901_perc_111 = self.env.user.quality901_perc_111 or 0.0
+            quality901_perc_200 = self.env.user.quality901_perc_200 or 0.0
+            quality901_perc_103 = self.env.user.quality901_perc_103 or 0.0
+            #### المستلزمات المكتبية
+            office_supp_perc_101 = self.env.user.office_supp_perc_101 or 0.0
+            office_supp_perc_104 = self.env.user.office_supp_perc_104 or 0.0
+            office_supp_perc_110 = self.env.user.office_supp_perc_110 or 0.0
+            office_supp_perc_111 = self.env.user.office_supp_perc_111 or 0.0
+            office_supp_perc_200 = self.env.user.office_supp_perc_200 or 0.0
+            office_supp_perc_103 = self.env.user.office_supp_perc_103 or 0.0
+            #### الشئون الإدارية
+            manage_921_perc_101 = self.env.user.manage_921_perc_101 or 0.0
+            manage_921_perc_104 = self.env.user.manage_921_perc_104 or 0.0
+            manage_921_perc_110 = self.env.user.manage_921_perc_110 or 0.0
+            manage_921_perc_111 = self.env.user.manage_921_perc_111 or 0.0
+            manage_921_perc_200 = self.env.user.manage_921_perc_200 or 0.0
+            manage_921_perc_103 = self.env.user.manage_921_perc_103 or 0.0
+            #### التقنية
+            it_922_perc_101 = self.env.user.it_922_perc_101 or 0.0
+            it_922_perc_104 = self.env.user.it_922_perc_104 or 0.0
+            it_922_perc_110 = self.env.user.it_922_perc_110 or 0.0
+            it_922_perc_111 = self.env.user.it_922_perc_111 or 0.0
+            it_922_perc_200 = self.env.user.it_922_perc_200 or 0.0
+            it_922_perc_103 = self.env.user.it_922_perc_103 or 0.0
+            #### المباني والمرافق
+            build_facil950_perc_101 = self.env.user.build_facil950_perc_101 or 0.0
+            build_facil950_perc_104 = self.env.user.build_facil950_perc_104 or 0.0
+            build_facil950_perc_110 = self.env.user.build_facil950_perc_110 or 0.0
+            build_facil950_perc_111 = self.env.user.build_facil950_perc_111 or 0.0
+            build_facil950_perc_200 = self.env.user.build_facil950_perc_200 or 0.0
+            build_facil950_perc_103 = self.env.user.build_facil950_perc_103 or 0.0
+            #### القهوة والضيافة
+            coff_clean_ryd_perc_101 = self.env.user.coff_clean_ryd_perc_101 or 0.0
+            coff_clean_ryd_perc_104 = self.env.user.coff_clean_ryd_perc_104 or 0.0
+            coff_clean_ryd_perc_110 = self.env.user.coff_clean_ryd_perc_110 or 0.0
+            coff_clean_ryd_perc_111 = self.env.user.coff_clean_ryd_perc_111 or 0.0
+            coff_clean_ryd_perc_200 = self.env.user.coff_clean_ryd_perc_200 or 0.0
+            coff_clean_ryd_perc_103 = self.env.user.coff_clean_ryd_perc_103 or 0.0
+            #### التوطين العام
+            pub_loc903_perc_101 = self.env.user.pub_loc903_perc_101 or 0.0
+            pub_loc903_perc_104 = self.env.user.pub_loc903_perc_104 or 0.0
+            pub_loc903_perc_110 = self.env.user.pub_loc903_perc_110 or 0.0
+            pub_loc903_perc_111 = self.env.user.pub_loc903_perc_111 or 0.0
+            pub_loc903_perc_200 = self.env.user.pub_loc903_perc_200 or 0.0
+            pub_loc903_perc_103 = self.env.user.pub_loc903_perc_103 or 0.0
+            # finance
+            if rec.x_plan98_id  and rec.amount : 
+               rec.finance_101_distribution_amount = rec.amount * (finance_perc101 / 100) 
+               rec.finance_104_distribution_amount = rec.amount * (finance_perc104 / 100) 
+               rec.finance_110_distribution_amount = rec.amount * (finance_perc110 / 100)
+               rec.finance_111_distribution_amount = rec.amount * (finance_perc111 / 100)
+               rec.finance_200_distribution_amount = rec.amount * (finance_perc200 / 100)
+               rec.finance_103_distribution_amount = rec.amount * (finance_perc103 / 100) 
+            # quality    
+            elif rec.x_plan91_id  and rec.amount : 
+                 rec.quality901_perc_101_distribution_amount = rec.amount * (quality901_perc_101 / 100) 
+                 rec.quality901_perc_104_distribution_amount = rec.amount * (quality901_perc_104 / 100) 
+                 rec.quality901_perc_110_distribution_amount = rec.amount * (quality901_perc_110 / 100)
+                 rec.quality901_perc_111_distribution_amount = rec.amount * (quality901_perc_111 / 100)
+                 rec.quality901_perc_200_distribution_amount = rec.amount * (quality901_perc_200 / 100)
+                 rec.quality901_perc_103_distribution_amount = rec.amount * (quality901_perc_103 / 100)
+                 
+            #  الدعم التشغيلي  
+            elif rec.x_plan92_id  and rec.amount :  
+                rec.oper_supp902_101_distribution_amount =rec.amount * (oper_supp902_perc_101 / 100)
+                rec.oper_supp902_104_distribution_amount =rec.amount * (oper_supp902_perc_104 / 100)
+                rec.oper_supp902_110_distribution_amount =rec.amount * (oper_supp902_perc_110 / 100)
+                rec.oper_supp902_111_distribution_amount =rec.amount * (oper_supp902_perc_111 / 100)
+                rec.oper_supp902_200_distribution_amount =rec.amount * (oper_supp902_perc_200 / 100)
+                rec.oper_supp902_103_distribution_amount =rec.amount * (oper_supp902_perc_103 / 100)
+                  
+            # التسويق عام    
+            elif rec.x_plan95_id  and rec.amount :   
+                 rec.sale_gen911_101_distribution_amount =rec.amount * (sale_gen911_perc_101 / 100)
+                 rec.sale_gen911_104_distribution_amount =rec.amount * (sale_gen911_perc_104 / 100)
+                 rec.sale_gen911_110_distribution_amount =rec.amount * (sale_gen911_perc_110 / 100)
+                 rec.sale_gen911_111_distribution_amount =rec.amount * (sale_gen911_perc_111 / 100)
+                 rec.sale_gen911_200_distribution_amount =rec.amount * (sale_gen911_perc_200 / 100)
+                 rec.sale_gen911_103_distribution_amount =rec.amount * (sale_gen911_perc_103 / 100)
+                
+                 
+                   
+            #المستلزمات المكتبية    
+            elif rec.x_plan100_id  and rec.amount :
+               rec.office_supp_perc_101_distribution_amount = rec.amount * (office_supp_perc_101 / 100)
+               rec.office_supp_perc_104_distribution_amount = rec.amount * (office_supp_perc_104 / 100)
+               rec.office_supp_perc_110_distribution_amount = rec.amount * (office_supp_perc_110 / 100)
+               rec.office_supp_perc_111_distribution_amount = rec.amount * (office_supp_perc_111 / 100)
+               rec.office_supp_perc_200_distribution_amount = rec.amount * (office_supp_perc_200 / 100)
+               rec.office_supp_perc_103_distribution_amount = rec.amount * (office_supp_perc_103 / 100) 
+                  
+            #الشئون  الإدارية    
+            elif rec.x_plan97_id  and rec.amount :
+               rec.manage_921_perc_101_distribution_amount = rec.amount * (manage_921_perc_101 / 100)
+               rec.manage_921_perc_104_distribution_amount = rec.amount * (manage_921_perc_104 / 100)
+               rec.manage_921_perc_110_distribution_amount = rec.amount * (manage_921_perc_110 / 100)
+               rec.manage_921_perc_111_distribution_amount = rec.amount * (manage_921_perc_111 / 100)
+               rec.manage_921_perc_200_distribution_amount = rec.amount * (manage_921_perc_200 / 100)
+               rec.manage_921_perc_103_distribution_amount = rec.amount * (manage_921_perc_103 / 100)
+               
+                   
+            # IT   
+            elif rec.x_plan99_id  and rec.amount : 
+               rec.it_922_perc_101_distribution_amount = rec.amount * (it_922_perc_101 / 100)
+               rec.it_922_perc_104_distribution_amount = rec.amount * (it_922_perc_104 / 100)
+               rec.it_922_perc_110_distribution_amount = rec.amount * (it_922_perc_110 / 100)
+               rec.it_922_perc_111_distribution_amount = rec.amount * (it_922_perc_111 / 100)
+               rec.it_922_perc_200_distribution_amount = rec.amount * (it_922_perc_200 / 100)
+               rec.it_922_perc_103_distribution_amount = rec.amount * (it_922_perc_103 / 100) 
+                   
+            # المباني والمرافق   
+            elif rec.x_plan101_id  and rec.amount :  
+               rec.build_facil950_perc_101_distribution_amount = rec.amount * (build_facil950_perc_101 / 100)
+               rec.build_facil950_perc_104_distribution_amount = rec.amount * (build_facil950_perc_104 / 100)
+               rec.build_facil950_perc_110_distribution_amount = rec.amount * (build_facil950_perc_110 / 100)
+               rec.build_facil950_perc_111_distribution_amount = rec.amount * (build_facil950_perc_111 / 100)
+               rec.build_facil950_perc_200_distribution_amount = rec.amount * (build_facil950_perc_200 / 100) 
+               rec.build_facil950_perc_103_distribution_amount = rec.amount * (build_facil950_perc_103 / 100) 
+                     
+            # القهوة والضيافة  
+            elif rec.x_plan104_id  and rec.amount :
+               rec.coff_clean_ryd_perc_101_distribution_amount = rec.amount * (coff_clean_ryd_perc_101 / 100)
+               rec.coff_clean_ryd_perc_104_distribution_amount = rec.amount * (coff_clean_ryd_perc_104 / 100)
+               rec.coff_clean_ryd_perc_110_distribution_amount = rec.amount * (coff_clean_ryd_perc_110 / 100)
+               rec.coff_clean_ryd_perc_111_distribution_amount = rec.amount * (coff_clean_ryd_perc_111 / 100)
+               rec.coff_clean_ryd_perc_200_distribution_amount = rec.amount * (coff_clean_ryd_perc_200 / 100) 
+               rec.coff_clean_ryd_perc_103_distribution_amount = rec.amount * (coff_clean_ryd_perc_103 / 100)  
+                 
+            # التوطين  العام   
+            elif rec.x_plan93_id  and rec.amount :
+               rec.pub_loc903_perc_101_distribution_amount = rec.amount * (pub_loc903_perc_101 / 100)
+               rec.pub_loc903_perc_104_distribution_amount = rec.amount * (pub_loc903_perc_104 / 100)
+               rec.pub_loc903_perc_110_distribution_amount = rec.amount * (pub_loc903_perc_110 / 100)
+               rec.pub_loc903_perc_111_distribution_amount = rec.amount * (pub_loc903_perc_111 / 100)
+               rec.pub_loc903_perc_200_distribution_amount = rec.amount * (pub_loc903_perc_200 / 100)
+               rec.pub_loc903_perc_103_distribution_amount = rec.amount * (pub_loc903_perc_103 / 100)
+                
+                                                                          
             else:
                 rec.finance_101_distribution_amount = 0.0
+                rec.finance_104_distribution_amount = 0.0
+                rec.finance_110_distribution_amount = 0.0
+                rec.finance_111_distribution_amount = 0.0
+                rec.finance_200_distribution_amount = 0.0
+                rec.finance_103_distribution_amount = 0.0
+                rec.quality901_perc_101_distribution_amount = 0.0 
+                rec.quality901_perc_104_distribution_amount = 0.0 
+                rec.quality901_perc_110_distribution_amount = 0.0
+                rec.quality901_perc_111_distribution_amount = 0.0
+                rec.quality901_perc_200_distribution_amount = 0.0
+                rec.quality901_perc_103_distribution_amount = 0.0
+                rec.oper_supp902_101_distribution_amount =0.0
+                rec.oper_supp902_104_distribution_amount =0.0
+                rec.oper_supp902_110_distribution_amount =0.0
+                rec.oper_supp902_111_distribution_amount =0.0
+                rec.oper_supp902_200_distribution_amount =0.0
+                rec.oper_supp902_103_distribution_amount =0.0
+                rec.office_supp_perc_101_distribution_amount = 0.0
+                rec.office_supp_perc_104_distribution_amount = 0.0
+                rec.office_supp_perc_110_distribution_amount = 0.0
+                rec.office_supp_perc_111_distribution_amount = 0.0
+                rec.office_supp_perc_200_distribution_amount = 0.0
+                rec.office_supp_perc_103_distribution_amount = 0.0 
+                rec.manage_921_perc_101_distribution_amount = 0.0
+                rec.manage_921_perc_104_distribution_amount = 0.0
+                rec.manage_921_perc_110_distribution_amount = 0.0
+                rec.manage_921_perc_111_distribution_amount = 0.0
+                rec.manage_921_perc_200_distribution_amount = 0.0
+                rec.manage_921_perc_103_distribution_amount = 0.0
+                rec.it_922_perc_101_distribution_amount = 0.0
+                rec.it_922_perc_104_distribution_amount = 0.0
+                rec.it_922_perc_110_distribution_amount = 0.0
+                rec.it_922_perc_111_distribution_amount = 0.0
+                rec.it_922_perc_200_distribution_amount = 0.0
+                rec.it_922_perc_103_distribution_amount = 0.0 
+                rec.build_facil950_perc_101_distribution_amount = 0.0
+                rec.build_facil950_perc_104_distribution_amount = 0.0
+                rec.build_facil950_perc_110_distribution_amount = 0.0
+                rec.build_facil950_perc_111_distribution_amount = 0.0
+                rec.build_facil950_perc_200_distribution_amount = 0.0
+                rec.build_facil950_perc_103_distribution_amount = 0.0
+                rec.coff_clean_ryd_perc_101_distribution_amount = 0.0
+                rec.coff_clean_ryd_perc_104_distribution_amount = 0.0
+                rec.coff_clean_ryd_perc_110_distribution_amount = 0.0
+                rec.coff_clean_ryd_perc_111_distribution_amount = 0.0
+                rec.coff_clean_ryd_perc_200_distribution_amount = 0.0
+                rec.coff_clean_ryd_perc_103_distribution_amount = 0.0
+                rec.pub_loc903_perc_101_distribution_amount = 0.0
+                rec.pub_loc903_perc_104_distribution_amount = 0.0
+                rec.pub_loc903_perc_110_distribution_amount = 0.0
+                rec.pub_loc903_perc_111_distribution_amount = 0.0
+                rec.pub_loc903_perc_200_distribution_amount = 0.0
+                rec.pub_loc903_perc_103_distribution_amount = 0.0
+
 
 
 
