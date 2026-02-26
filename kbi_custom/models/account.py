@@ -964,105 +964,105 @@ class AnalyticDistributuion ( models.Model ) :
     # ===== الشئون الإدارية =====
     manage_921_perc_101_distribution_amount = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 101" ,
                                                              compute="_compute_dist_percentage" ,
-                                                             readonly=False  )
+                                                              readonly=False , store=True  )
     manage_921_perc_104_distribution_amount = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 104" ,
                                                              compute="_compute_dist_percentage" ,
-                                                             readonly=False  )
+                                                              readonly=False , store=True  )
     manage_921_perc_110_distribution_amount = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 110" ,
                                                              compute="_compute_dist_percentage" ,
-                                                             readonly=False  )
+                                                              readonly=False , store=True  )
     manage_921_perc_111_distribution_amount = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 111" ,
                                                              compute="_compute_dist_percentage" ,
-                                                             readonly=False  )
+                                                              readonly=False , store=True  )
     manage_921_perc_200_distribution_amount = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 200" ,
                                                              compute="_compute_dist_percentage" ,
-                                                             readonly=False  )
+                                                              readonly=False , store=True  )
     manage_921_perc_103_distribution_amount = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 103" ,
                                                              compute="_compute_dist_percentage" ,
-                                                             readonly=False  )
+                                                              readonly=False , store=True  )
 
     # ===== إدارة التقنية =====
     it_922_perc_101_distribution_amount = fields.Float ( string="نسبة توزيع التقنية علي 101" ,
                                                          compute="_compute_dist_percentage" ,
-                                                         readonly=False  )
+                                                          readonly=False , store=True  )
     it_922_perc_104_distribution_amount = fields.Float ( string="نسبة توزيع التقنية علي 104" ,
                                                          compute="_compute_dist_percentage" ,
-                                                         readonly=False  )
+                                                          readonly=False , store=True  )
     it_922_perc_110_distribution_amount = fields.Float ( string="نسبة توزيع التقنية علي 110" ,
                                                          compute="_compute_dist_percentage" ,
-                                                         readonly=False  )
+                                                          readonly=False , store=True  )
     it_922_perc_111_distribution_amount = fields.Float ( string="نسبة توزيع التقنية علي 111" ,
                                                          compute="_compute_dist_percentage" ,
-                                                         readonly=False  )
+                                                          readonly=False , store=True  )
     it_922_perc_200_distribution_amount = fields.Float ( string="نسبة توزيع التقنية علي 200" ,
                                                          compute="_compute_dist_percentage" ,
-                                                         readonly=False  )
+                                                          readonly=False , store=True  )
     it_922_perc_103_distribution_amount = fields.Float ( string="نسبة توزيع التقنية علي 103" ,
                                                          compute="_compute_dist_percentage" ,
-                                                         readonly=False  )
+                                                          readonly=False , store=True  )
     # ===== المباني والمنشئات =====
     build_facil950_perc_101_distribution_amount = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 101" ,
                                                                  compute="_compute_dist_percentage" ,
-                                                                 readonly=False  )
+                                                                  readonly=False , store=True  )
     build_facil950_perc_104_distribution_amount = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 104" ,
                                                                  compute="_compute_dist_percentage" ,
-                                                                 readonly=False  )
+                                                                  readonly=False , store=True  )
     build_facil950_perc_110_distribution_amount = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 110" ,
                                                                  compute="_compute_dist_percentage" ,
-                                                                 readonly=False  )
+                                                                  readonly=False , store=True  )
     build_facil950_perc_111_distribution_amount = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 111" ,
                                                                  compute="_compute_dist_percentage" ,
-                                                                 readonly=False  )
+                                                                  readonly=False , store=True  )
     build_facil950_perc_200_distribution_amount = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 200" ,
                                                                  compute="_compute_dist_percentage" ,
-                                                                 readonly=False  )
+                                                                  readonly=False , store=True  )
     build_facil950_perc_103_distribution_amount = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 103" ,
                                                                  compute="_compute_dist_percentage" ,
-                                                                 readonly=False  )
+                                                                  readonly=False , store=True  )
     # ===== القهوة والضيافة =====
     coff_clean_ryd_perc_101_distribution_amount = fields.Float (
         string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 101" ,
         compute="_compute_dist_percentage" ,
-        readonly=False  )
+         readonly=False , store=True  )
     coff_clean_ryd_perc_104_distribution_amount = fields.Float (
         string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 104" ,
         compute="_compute_dist_percentage" ,
-        readonly=False  )
+         readonly=False , store=True  )
     coff_clean_ryd_perc_110_distribution_amount = fields.Float (
         string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 110" ,
         compute="_compute_dist_percentage" ,
-        readonly=False  )
+         readonly=False , store=True  )
     coff_clean_ryd_perc_111_distribution_amount = fields.Float (
         string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 111" ,
         compute="_compute_dist_percentage" ,
-        readonly=False  )
+         readonly=False , store=True  )
     coff_clean_ryd_perc_200_distribution_amount = fields.Float (
         string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 200" ,
         compute="_compute_dist_percentage" ,
-        readonly=False  )
+         readonly=False , store=True  )
     coff_clean_ryd_perc_103_distribution_amount = fields.Float (
         string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 103" ,
         compute="_compute_dist_percentage" ,
-        readonly=False  )
+         readonly=False , store=True  )
     # ===== التوطين العام =====
     pub_loc903_perc_101_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 101" ,
                                                              compute="_compute_dist_percentage" ,
-                                                             readonly=False  )
+                                                              readonly=False , store=True  )
     pub_loc903_perc_104_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 104" ,
                                                              compute="_compute_dist_percentage" ,
-                                                             readonly=False  )
+                                                              readonly=False , store=True  )
     pub_loc903_perc_110_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 110" ,
                                                              compute="_compute_dist_percentage" ,
-                                                             readonly=False  )
+                                                              readonly=False , store=True  )
     pub_loc903_perc_111_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 111" ,
                                                              compute="_compute_dist_percentage" ,
-                                                             readonly=False  )
+                                                              readonly=False , store=True  )
     pub_loc903_perc_200_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 200" ,
                                                              compute="_compute_dist_percentage" ,
-                                                             readonly=False  )
+                                                              readonly=False , store=True  )
     pub_loc903_perc_103_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 103" ,
                                                              compute="_compute_dist_percentage" ,
-                                                             readonly=False  )
+                                                              readonly=False , store=True  )
     # user_id = fields.Many2one('res.users',default=lambda self: self.env['res.users'].browse(18), string="User")
     user_id = fields.Many2one ( 'res.users' , string="User" , default=lambda self : self.env.user )
 
