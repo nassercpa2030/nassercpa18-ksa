@@ -1015,7 +1015,7 @@ class AnalyticDistributuion ( models.Model ) :
                                          readonly=False )
 
     
-    @api.depends('amount','x_plan98_id')
+    @api.depends('amount','x_plan98_id','x_plan91_id','x_plan92_id','x_plan95_id','x_plan100_id','x_plan97_id','x_plan99_id','x_plan101_id','x_plan104_id','x_plan93_id')
     def _compute_dist_percentage(self) :
         for rec in self :
             #### المالية
