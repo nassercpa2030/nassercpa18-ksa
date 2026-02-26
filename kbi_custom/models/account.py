@@ -879,43 +879,43 @@ class AnalyticDistributuion ( models.Model ) :
     # توزيع الحسابات  التحليلة finance##
     finance_101_distribution_amount = fields.Monetary ( string="101 نسبة توزيع المالية علي " ,
                                                         currency_field='currency_id' ,
-                                                        compute="_compute_dist_percentage" , readonly=False ,
+                                                        compute="_compute_dist_percentage" , readonly=False , store=True
                                                          )
 
-    finance_104_distribution_amount = fields.Float ( string="نسبة توزيع المالية علي 104" ,
+    finance_104_distribution_amount = fields.Float ( string="نسبة توزيع الم
                                                      compute="_compute_dist_percentage" ,
-                                                     readonly=False ,  );
+                                                      readonly=False , store=True ,  );
     finance_110_distribution_amount = fields.Float ( string="نسبة توزيع المالية علي 110" ,
                                                      compute="_compute_dist_percentage" ,
-                                                     readonly=False  );
+                                                      readonly=False , store=True  );
     finance_111_distribution_amount = fields.Float ( string="نسبة توزيع المالية علي 111" ,
                                                      compute="_compute_dist_percentage" ,
-                                                     readonly=False  );
+                                                      readonly=False , store=True  );
     finance_200_distribution_amount = fields.Float ( string="نسبة توزيع المالية علي 200" ,
                                                      compute="_compute_dist_percentage" ,
-                                                     readonly=False  );
+                                                      readonly=False , store=True  );
     finance_103_distribution_amount = fields.Float ( string="نسبة توزيع المالية علي 103" ,
                                                      compute="_compute_dist_percentage" ,
-                                                     readonly=False  );
+                                                      readonly=False , store=True  );
     # =========================== الدعم التشغيلي ===========================
     oper_supp902_101_distribution_amount = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 101" ,
                                                           compute="_compute_dist_percentage" ,
-                                                          readonly=False  )
+                                                           readonly=False , store=True  )
     oper_supp902_104_distribution_amount = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 104" ,
                                                           compute="_compute_dist_percentage" ,
-                                                          readonly=False  )
+                                                           readonly=False , store=True  )
     oper_supp902_110_distribution_amount = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 110" ,
                                                           compute="_compute_dist_percentage" ,
-                                                          readonly=False  )
+                                                           readonly=False , store=True  )
     oper_supp902_111_distribution_amount = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 111" ,
                                                           compute="_compute_dist_percentage" ,
-                                                          readonly=False  )
+                                                           readonly=False , store=True  )
     oper_supp902_200_distribution_amount = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 200" ,
                                                           compute="_compute_dist_percentage" ,
-                                                          readonly=False  )
+                                                           readonly=False , store=True  )
     oper_supp902_103_distribution_amount = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 103" ,
                                                           compute="_compute_dist_percentage" ,
-                                                          readonly=False  )
+                                                           readonly=False , store=True  )
     # =========================== التسويق عام ===========================
     sale_gen911_101_distribution_amount = fields.Float ( string="نسبة توزيع التسويق عام علي 101" ,
                                                          compute="_compute_dist_percentage" ,
