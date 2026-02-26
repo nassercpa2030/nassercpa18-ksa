@@ -1011,7 +1011,7 @@ class AnalyticDistributuion ( models.Model ) :
                                          readonly=False )
     pub_loc903_perc_200_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 200" ,compute="_compute_dist_percentage" ,
                                          readonly=False )
-    pub_loc903_perc_200_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 200" ,compute="_compute_dist_percentage" ,
+    pub_loc903_perc_103_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 103" ,compute="_compute_dist_percentage" ,
                                          readonly=False )
 
     
