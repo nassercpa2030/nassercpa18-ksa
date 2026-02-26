@@ -1013,25 +1013,27 @@ class AnalyticDistributuion ( models.Model ) :
                                          readonly=False )
     pub_loc903_perc_103_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 103" ,compute="_compute_dist_percentage" ,
                                          readonly=False )
+    user_id = fields.Many2one('res.users',default=lambda self: self.env.user)
 
     
     @api.depends('amount','x_plan98_id','x_plan91_id','x_plan92_id','x_plan95_id','x_plan100_id','x_plan97_id','x_plan99_id','x_plan101_id','x_plan104_id','x_plan93_id')
     def _compute_dist_percentage(self) :
         for rec in self :
+           
             #### المالية
-            finance_perc101 = rec.env.user.finance923_perc_101 or 0.0
-            finance_perc104 = self.env.user.finance923_perc_104 or 0.0
-            finance_perc110 = self.env.user.finance923_perc_110 or 0.0
-            finance_perc111 = self.env.user.finance923_perc_111 or 0.0
-            finance_perc200 = self.env.user.finance923_perc_200 or 0.0
-            finance_perc103 = self.env.user.finance923_perc_103 or 0.0
+            finance_perc101 = rec.user_id.finance923_perc_101 or 0.0
+            finance_perc104 = rec.user_id.finance923_perc_104 or 0.00
+            finance_perc110 = rec.user_id.finance923_perc_110 or 0.0
+            finance_perc111 = rec.user_id.finance923_perc_111 or 0.0
+            finance_perc200 = rec.user_id.finance923_perc_200 or 0.0
+            finance_perc103 = rec.user_id.finance923_perc_103 or 0.0
             ######### الدعم  التشغيلي
-            oper_supp902_perc_101 = self.env.user.oper_supp902_perc_101 or 0.0
-            oper_supp902_perc_104 = self.env.user.oper_supp902_perc_104 or 0.0
-            oper_supp902_perc_110 = self.env.user.oper_supp902_perc_110 or 0.0
-            oper_supp902_perc_111 = self.env.user.oper_supp902_perc_111 or 0.0
-            oper_supp902_perc_200 = self.env.user.oper_supp902_perc_200 or 0.0
-            oper_supp902_perc_103 = self.env.user.oper_supp902_perc_103 or 0.0
+            oper_supp902_perc_101 = rec.user_id.oper_supp902_perc_101 or 0.0
+            oper_supp902_perc_104 = rec.user_id.oper_supp902_perc_104 or 0.0
+            oper_supp902_perc_110 = rec.user_id.oper_supp902_perc_110 or 0.0
+            oper_supp902_perc_111 = rec.user_id.oper_supp902_perc_111 or 0.0
+            oper_supp902_perc_200 = rec.user_id.oper_supp902_perc_200 or 0.0
+            oper_supp902_perc_103 = rec.user_id.oper_supp902_perc_103 or 0.0
             ######### التسويق عام
             sale_gen911_perc_101 = self.env.user.sale_gen911_perc_101 or 0.0
             sale_gen911_perc_104 = self.env.user.sale_gen911_perc_104 or 0.0
