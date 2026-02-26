@@ -1080,7 +1080,8 @@ class AnalyticDistributuion ( models.Model ) :
     # user_id = fields.Many2one('res.users',default=lambda self: self.env['res.users'].browse(18), string="User")
     user_id = fields.Many2one ( 'res.users' , string="User" , default=lambda self : self.env.user )
 
-    @api.depends ( 'amount' )
+    #@api.depends ( 'amount' )
+    @api.depends('amount', 'user_id', 'x_plan98_id', 'x_plan91_id', 'x_plan92_id', 'x_plan95_id', 'x_plan100_id', 'x_plan97_id', 'x_plan99_id', 'x_plan101_id', 'x_plan104_id', 'x_plan93_id')
     def _compute_dist_percentage(self) :
         for rec in self :
             amt = rec.amount or 0.0
