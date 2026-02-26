@@ -34,7 +34,7 @@ class AccountMove ( models.Model ) :
     )
 
     ### count refrence number ######
-    def _compute_ref_count(self) :
+    def _compute_ref_count(rec) :
         for rec in self :
             if rec.ref :
                 rec.ref_count = self.search_count ( [('ref' , '=' , rec.ref)] )
@@ -1035,62 +1035,62 @@ class AnalyticDistributuion ( models.Model ) :
             oper_supp902_perc_200 = rec.user_id.oper_supp902_perc_200 or 0.0
             oper_supp902_perc_103 = rec.user_id.oper_supp902_perc_103 or 0.0
             ######### التسويق عام
-            sale_gen911_perc_101 = self.user_id.sale_gen911_perc_101 or 0.0
-            sale_gen911_perc_104 = self.user_id.sale_gen911_perc_104 or 0.0
-            sale_gen911_perc_110 = self.user_id.sale_gen911_perc_110 or 0.0
-            sale_gen911_perc_111 = self.user_id.sale_gen911_perc_111 or 0.0
-            sale_gen911_perc_200 = self.user_id.sale_gen911_perc_200 or 0.0
-            sale_gen911_perc_103 = self.user_id.sale_gen911_perc_103 or 0.0
+            sale_gen911_perc_101 = rec.user_id.sale_gen911_perc_101 or 0.0
+            sale_gen911_perc_104 = rec.user_id.sale_gen911_perc_104 or 0.0
+            sale_gen911_perc_110 = rec.user_id.sale_gen911_perc_110 or 0.0
+            sale_gen911_perc_111 = rec.user_id.sale_gen911_perc_111 or 0.0
+            sale_gen911_perc_200 = rec.user_id.sale_gen911_perc_200 or 0.0
+            sale_gen911_perc_103 = rec.user_id.sale_gen911_perc_103 or 0.0
             
             #### الجودة
-            quality901_perc_101 = self.user_id.quality901_perc_101 or 0.0
-            quality901_perc_104 = self.user_id.quality901_perc_104 or 0.0
-            quality901_perc_110 = self.user_id.quality901_perc_110 or 0.0
-            quality901_perc_111 = self.user_id.quality901_perc_111 or 0.0
-            quality901_perc_200 = self.user_id.quality901_perc_200 or 0.0
-            quality901_perc_103 = self.user_id.quality901_perc_103 or 0.0
+            quality901_perc_101 = rec.user_id.quality901_perc_101 or 0.0
+            quality901_perc_104 = rec.user_id.quality901_perc_104 or 0.0
+            quality901_perc_110 = rec.user_id.quality901_perc_110 or 0.0
+            quality901_perc_111 = rec.user_id.quality901_perc_111 or 0.0
+            quality901_perc_200 = rec.user_id.quality901_perc_200 or 0.0
+            quality901_perc_103 = rec.user_id.quality901_perc_103 or 0.0
             #### المستلزمات المكتبية
-            office_supp_perc_101 = self.user_id.office_supp_perc_101 or 0.0
-            office_supp_perc_104 = self.user_id.office_supp_perc_104 or 0.0
-            office_supp_perc_110 = self.user_id.office_supp_perc_110 or 0.0
-            office_supp_perc_111 = self.user_id.office_supp_perc_111 or 0.0
-            office_supp_perc_200 = self.user_id.office_supp_perc_200 or 0.0
-            office_supp_perc_103 = self.user_id.office_supp_perc_103 or 0.0
+            office_supp_perc_101 = rec.user_id.office_supp_perc_101 or 0.0
+            office_supp_perc_104 = rec.user_id.office_supp_perc_104 or 0.0
+            office_supp_perc_110 = rec.user_id.office_supp_perc_110 or 0.0
+            office_supp_perc_111 = rec.user_id.office_supp_perc_111 or 0.0
+            office_supp_perc_200 = rec.user_id.office_supp_perc_200 or 0.0
+            office_supp_perc_103 = rec.user_id.office_supp_perc_103 or 0.0
             #### الشئون الإدارية
-            manage_921_perc_101 = self.user_id.manage_921_perc_101 or 0.0
-            manage_921_perc_104 = self.user_id.manage_921_perc_104 or 0.0
-            manage_921_perc_110 = self.user_id.manage_921_perc_110 or 0.0
-            manage_921_perc_111 = self.user_id.manage_921_perc_111 or 0.0
-            manage_921_perc_200 = self.user_id.manage_921_perc_200 or 0.0
-            manage_921_perc_103 = self.user_id.manage_921_perc_103 or 0.0
+            manage_921_perc_101 = rec.user_id.manage_921_perc_101 or 0.0
+            manage_921_perc_104 = rec.user_id.manage_921_perc_104 or 0.0
+            manage_921_perc_110 = rec.user_id.manage_921_perc_110 or 0.0
+            manage_921_perc_111 = rec.user_id.manage_921_perc_111 or 0.0
+            manage_921_perc_200 = rec.user_id.manage_921_perc_200 or 0.0
+            manage_921_perc_103 = rec.user_id.manage_921_perc_103 or 0.0
             #### التقنية
-            it_922_perc_101 = self.user_id.it_922_perc_101 or 0.0
-            it_922_perc_104 = self.user_id.it_922_perc_104 or 0.0
-            it_922_perc_110 = self.user_id.it_922_perc_110 or 0.0
-            it_922_perc_111 = self.user_id.it_922_perc_111 or 0.0
-            it_922_perc_200 = self.user_id.it_922_perc_200 or 0.0
-            it_922_perc_103 = self.user_id.it_922_perc_103 or 0.0
+            it_922_perc_101 = rec.user_id.it_922_perc_101 or 0.0
+            it_922_perc_104 = rec.user_id.it_922_perc_104 or 0.0
+            it_922_perc_110 = rec.user_id.it_922_perc_110 or 0.0
+            it_922_perc_111 = rec.user_id.it_922_perc_111 or 0.0
+            it_922_perc_200 = rec.user_id.it_922_perc_200 or 0.0
+            it_922_perc_103 = rec.user_id.it_922_perc_103 or 0.0
             #### المباني والمرافق
-            build_facil950_perc_101 = self.user_id.build_facil950_perc_101 or 0.0
-            build_facil950_perc_104 = self.user_id.build_facil950_perc_104 or 0.0
-            build_facil950_perc_110 = self.user_id.build_facil950_perc_110 or 0.0
-            build_facil950_perc_111 = self.user_id.build_facil950_perc_111 or 0.0
-            build_facil950_perc_200 = self.user_id.build_facil950_perc_200 or 0.0
-            build_facil950_perc_103 = self.user_id.build_facil950_perc_103 or 0.0
+            build_facil950_perc_101 = rec.user_id.build_facil950_perc_101 or 0.0
+            build_facil950_perc_104 = rec.user_id.build_facil950_perc_104 or 0.0
+            build_facil950_perc_110 = rec.user_id.build_facil950_perc_110 or 0.0
+            build_facil950_perc_111 = rec.user_id.build_facil950_perc_111 or 0.0
+            build_facil950_perc_200 = rec.user_id.build_facil950_perc_200 or 0.0
+            build_facil950_perc_103 = rec.user_id.build_facil950_perc_103 or 0.0
             #### القهوة والضيافة
-            coff_clean_ryd_perc_101 = self.user_id.coff_clean_ryd_perc_101 or 0.0
-            coff_clean_ryd_perc_104 = self.user_id.coff_clean_ryd_perc_104 or 0.0
-            coff_clean_ryd_perc_110 = self.user_id.coff_clean_ryd_perc_110 or 0.0
-            coff_clean_ryd_perc_111 = self.user_id.coff_clean_ryd_perc_111 or 0.0
-            coff_clean_ryd_perc_200 = self.user_id.coff_clean_ryd_perc_200 or 0.0
-            coff_clean_ryd_perc_103 = self.user_id.coff_clean_ryd_perc_103 or 0.0
+            coff_clean_ryd_perc_101 = rec.user_id.coff_clean_ryd_perc_101 or 0.0
+            coff_clean_ryd_perc_104 = rec.user_id.coff_clean_ryd_perc_104 or 0.0
+            coff_clean_ryd_perc_110 = rec.user_id.coff_clean_ryd_perc_110 or 0.0
+            coff_clean_ryd_perc_111 = rec.user_id.coff_clean_ryd_perc_111 or 0.0
+            coff_clean_ryd_perc_200 = rec.user_id.coff_clean_ryd_perc_200 or 0.0
+            coff_clean_ryd_perc_103 = rec.user_id.coff_clean_ryd_perc_103 or 0.0
             #### التوطين العام
-            pub_loc903_perc_101 = self.user_id.pub_loc903_perc_101 or 0.0
-            pub_loc903_perc_104 = self.user_id.pub_loc903_perc_104 or 0.0
-            pub_loc903_perc_110 = self.user_id.pub_loc903_perc_110 or 0.0
-            pub_loc903_perc_111 = self.user_id.pub_loc903_perc_111 or 0.0
-            pub_loc903_perc_200 = self.user_id.pub_loc903_perc_200 or 0.0
-            pub_loc903_perc_103 = self.user_id.pub_loc903_perc_103 or 0.0
+            pub_loc903_perc_101 = rec.user_id.pub_loc903_perc_101 or 0.0
+            pub_loc903_perc_104 = rec.user_id.pub_loc903_perc_104 or 0.0
+            pub_loc903_perc_110 = rec.user_id.pub_loc903_perc_110 or 0.0
+            pub_loc903_perc_111 = rec.user_id.pub_loc903_perc_111 or 0.0
+            pub_loc903_perc_200 = rec.user_id.pub_loc903_perc_200 or 0.0
+            pub_loc903_perc_103 = rec.user_id.pub_loc903_perc_103 or 0.0
             # finance
             if rec.x_plan98_id  and rec.amount : 
                rec.finance_101_distribution_amount = rec.amount * (finance_perc101 / 100) 
