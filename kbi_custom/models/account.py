@@ -1013,8 +1013,8 @@ class AnalyticDistributuion ( models.Model ) :
                                          readonly=False ,store=True )
     pub_loc903_perc_103_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 103" ,compute="_compute_dist_percentage" ,
                                          readonly=False ,store=True )
-    user_id = fields.Many2one('res.users',default=lambda self: self.env['res.users'].browse(18), string="User")
-
+    #user_id = fields.Many2one('res.users',default=lambda self: self.env['res.users'].browse(18), string="User")
+    user_id=fields.Many2one('res.users',string="User",default=lambda self: self.env.user)
     
     @api.depends('amount','x_plan98_id','x_plan91_id','x_plan92_id','x_plan95_id','x_plan100_id','x_plan97_id','x_plan99_id','x_plan101_id','x_plan104_id','x_plan93_id')
     def _compute_dist_percentage(self) :
