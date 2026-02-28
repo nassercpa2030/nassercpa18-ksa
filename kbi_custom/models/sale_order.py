@@ -19,7 +19,7 @@ class SaleOrder ( models.Model ) :
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
     old_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , stored=True )
     order_lines_count = fields.Integer(string='Order Lines',compute='_compute_order_lines_count',store=True)
-    customer_phone_number = fields.Char(string='تيلفون العميل',related='partner_id.mobile' ,required=True,store=True )
+    customer_phone_number = fields.Char(string='تيلفون العميل',related='partner_id.mobile' ,store=True )
     convert_orders = fields.Boolean (
         string="تحويل الأوردرات لعقود" ,
         default=False ,
@@ -222,7 +222,23 @@ class SaleOrder ( models.Model ) :
         # ترجع الـ report action عشان أودو يفتح PDF
         return report.report_action ( self )
 
-    
+    @api.constrains ( 'customer_phone_numer' )
+    def _check_numbers(self) :
+        allowed_user_ids = [2 , 394 , 18]
+        admin_group = self.env.ref ( 'base.group_system' )  # مجموعة الـ Admin
+
+        for rec in self :
+            # إذا المستخدم الحالي Admin → تخطى التحقق
+            if self.env.user in admin_group.users :
+                continue
+
+            # إذا المستخدم الحالي غير مسموح له
+          
+                # ===== phone_customer_contact =====
+            else  :
+                if not rec.customer_phone_number :
+                    raise ValidationError ( ".  برجاء إدخال رقم  التيلفون للعميل " )
+                
     def calc_close_date(self):
         for rec in self:
             move = self.env['account.move'].search([('sale_order_id_finance', '=', rec.id),('journal_id', '=', 165),('state', '=', 'posted'), ('date', '!=', False) ], limit=1)
