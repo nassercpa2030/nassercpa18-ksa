@@ -19,6 +19,7 @@ class SaleOrder ( models.Model ) :
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
     old_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , stored=True )
     order_lines_count = fields.Integer(string='Order Lines',compute='_compute_order_lines_count',store=True)
+    customer_phone_number = fields.Integer(string='تيلفون العميل',related='partner_id.mobile' ,required=True )
     convert_orders = fields.Boolean (
         string="تحويل الأوردرات لعقود" ,
         default=False ,
