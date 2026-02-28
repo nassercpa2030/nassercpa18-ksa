@@ -217,27 +217,32 @@ class SaleOrder ( models.Model ) :
         admin_group = self.env.ref(self.admin_group_ref)
         return self.env.user in admin_group.users or self.env.user.id in self.allowed_user_ids
 
-    # منع الحفظ لأي تعديل
+    # 1️⃣ Onchange شامل لأي تعديل في الفورم
+    @api.onchange('partner_id', 'order_line', 'pricelist_id', 'date_order', 'state')
+    def _check_customer_phone_onchange(self):
+        if self._is_allowed_user():
+            return
+        for rec in self:
+            if not rec.partner_id.mobile:
+                return {
+                    'warning': {
+                        'title': _("رقم العميل فارغ"),
+                        'message': _("برجاء إدخال رقم التيلفون للعميل")
+                    }
+                }
+
+    # 2️⃣ منع الحفظ نهائيًا لأي تعديل
     def write(self, vals):
-        if not self._is_allowed_user():
-            for rec in self:
-                if not rec.partner_id.mobile:
-                    raise ValidationError("برجاء إدخال رقم التيلفون للعميل")
+        for rec in self:
+            if not self._is_allowed_user() and not rec.partner_id.mobile:
+                raise ValidationError(_("برجاء إدخال رقم التيلفون للعميل"))
         return super(SaleOrder, self).write(vals)
-    @api.model
-    def create(self, vals):
-        partner = self.env['res.partner'].browse(vals.get('partner_id'))
-        if not self._is_allowed_user():
-            if not partner.mobile:
-                raise ValidationError("برجاء إدخال رقم التيلفون للعميل")
-        return super(SaleOrder, self).create(vals)    
 
     @api.model
     def create(self, vals):
         partner = self.env['res.partner'].browse(vals.get('partner_id'))
-        if not self._is_allowed_user():
-            if not partner.mobile:
-                raise ValidationError("برجاء إدخال رقم التيلفون للعميل")
+        if not self._is_allowed_user() and not partner.mobile:
+            raise ValidationError(_("برجاء إدخال رقم التيلفون للعميل"))
         return super(SaleOrder, self).create(vals)
 
     
