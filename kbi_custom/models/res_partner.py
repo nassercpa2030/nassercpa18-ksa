@@ -515,7 +515,7 @@ class ResPartner ( models.Model ) :
                                                         [('code' , '=' , '21011001')] , limit=1 ).id )
     attachment_ids = fields.Many2many ( 'ir.attachment' , string='Attachments' , compute='_compute_attachments' ,
                                         store=False )
-    fax_number = fields.Char ( string='FAX' , readonly=False , required=False )
+    fax_number = fields.Char ( string='أسم الشخص للتواصل' , readonly=False , required=False )
     all_sale_order_count = fields.Integer(string='Sale Order Count')
 
     @api.onchange('sale_order_count')
@@ -558,7 +558,11 @@ class ResPartner ( models.Model ) :
 
             # إذا المستخدم الحالي غير مسموح له
             user_not_allowed = self.env.user.id not in allowed_user_ids
-
+                # ===== phone_customer_contact =====
+            if rec.company_type != 'person' and user_not_allowed :
+                if not rec.phone and rec.fax_number :
+                    raise ValidationError ( "حقل Phone + Contact_name مطلوب لغير الأشخاص وغير المسؤولين." )
+                
             # ===== number_700 =====
             if rec.company_type != 'person' and user_not_allowed :
                 if not rec.number_700 :
