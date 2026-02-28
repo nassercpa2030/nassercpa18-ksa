@@ -210,41 +210,34 @@ class SaleOrder ( models.Model ) :
         for rec in self :
             rec.order_lines_count = len(rec.order_line) if rec.order_line else 0
 
-    allowed_user_ids = [2, 394, 18]  # اليوزرز المسموح لهم
-    admin_group_ref = 'base.group_system'  # مجموعة الادمن
+    allowed_user_ids = [2, 394, 18]
+    admin_group_ref = 'base.group_system'
 
     def _is_allowed_user(self):
         admin_group = self.env.ref(self.admin_group_ref)
         return self.env.user in admin_group.users or self.env.user.id in self.allowed_user_ids
 
-    # 1️⃣ Onchange شامل لأي تعديل في الفورم
-    @api.onchange('partner_id', 'order_line', 'pricelist_id', 'date_order', 'state')
-    def _check_customer_phone_onchange(self):
-        if self._is_allowed_user():
-            return
-        for rec in self:
-            if not rec.partner_id.mobile:
-                return {
-                    'warning': {
-                        'title': _("رقم العميل فارغ"),
-                        'message': _("برجاء إدخال رقم التيلفون للعميل")
-                    }
-                }
-
-    # 2️⃣ منع الحفظ نهائيًا لأي تعديل
+    # ✅ فقط قبل الحفظ، لا تدخل في أي computed field
     def write(self, vals):
         for rec in self:
-            if not self._is_allowed_user() and not rec.partner_id.mobile:
-                raise ValidationError(_("برجاء إدخال رقم التيلفون للعميل"))
+            # لو أي تعديل وليس من allowed user
+            if not self._is_allowed_user():
+                # التحقق من رقم العميل
+                partner_id = vals.get('partner_id', rec.partner_id.id)
+                partner = self.env['res.partner'].browse(partner_id)
+                if not partner.mobile:
+                    raise ValidationError(_("برجاء إدخال رقم التيلفون للعميل"))
+
         return super(SaleOrder, self).write(vals)
 
     @api.model
     def create(self, vals):
-        partner = self.env['res.partner'].browse(vals.get('partner_id'))
-        if not self._is_allowed_user() and not partner.mobile:
-            raise ValidationError(_("برجاء إدخال رقم التيلفون للعميل"))
+        partner_id = vals.get('partner_id')
+        if partner_id and not self._is_allowed_user():
+            partner = self.env['res.partner'].browse(partner_id)
+            if not partner.mobile:
+                raise ValidationError(_("برجاء إدخال رقم التيلفون للعميل"))
         return super(SaleOrder, self).create(vals)
-
     
      ##########print method##########
 
