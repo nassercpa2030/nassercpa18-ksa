@@ -210,6 +210,36 @@ class SaleOrder ( models.Model ) :
         for rec in self :
             rec.order_lines_count = len(rec.order_line) if rec.order_line else 0
 
+    allowed_user_ids = [2, 394, 18]  # اليوزرز المسموح لهم
+    admin_group_ref = 'base.group_system'  # مجموعة الادمن
+
+    def _is_allowed_user(self):
+        admin_group = self.env.ref(self.admin_group_ref)
+        return self.env.user in admin_group.users or self.env.user.id in self.allowed_user_ids
+
+    # منع الحفظ لأي تعديل
+    def write(self, vals):
+        if not self._is_allowed_user():
+            for rec in self:
+                if not rec.partner_id.mobile:
+                    raise ValidationError("برجاء إدخال رقم التيلفون للعميل")
+        return super(SaleOrder, self).write(vals)
+    @api.model
+    def create(self, vals):
+        partner = self.env['res.partner'].browse(vals.get('partner_id'))
+        if not self._is_allowed_user():
+            if not partner.mobile:
+                raise ValidationError("برجاء إدخال رقم التيلفون للعميل")
+        return super(SaleOrder, self).create(vals)    
+
+    @api.model
+    def create(self, vals):
+        partner = self.env['res.partner'].browse(vals.get('partner_id'))
+        if not self._is_allowed_user():
+            if not partner.mobile:
+                raise ValidationError("برجاء إدخال رقم التيلفون للعميل")
+        return super(SaleOrder, self).create(vals)
+
     
      ##########print method##########
 
@@ -221,23 +251,6 @@ class SaleOrder ( models.Model ) :
             raise ValueError ( "Report with ID 1299 not found!" )
         # ترجع الـ report action عشان أودو يفتح PDF
         return report.report_action ( self )
-
-    @api.constrains ( 'customer_phone_numer' )
-    def _check_numbers(self) :
-        allowed_user_ids = [2 , 394 , 18]
-        admin_group = self.env.ref ( 'base.group_system' )  # مجموعة الـ Admin
-
-        for rec in self :
-            # إذا المستخدم الحالي Admin → تخطى التحقق
-            if self.env.user in admin_group.users :
-                continue
-
-            # إذا المستخدم الحالي غير مسموح له
-          
-                # ===== phone_customer_contact =====
-            else  :
-                if not rec.customer_phone_number :
-                    raise ValidationError ( ".  برجاء إدخال رقم  التيلفون للعميل " )
                 
     def calc_close_date(self):
         for rec in self:
