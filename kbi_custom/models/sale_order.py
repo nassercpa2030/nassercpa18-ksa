@@ -210,34 +210,23 @@ class SaleOrder ( models.Model ) :
         for rec in self :
             rec.order_lines_count = len(rec.order_line) if rec.order_line else 0
 
-    allowed_user_ids = [2, 394, 18]
-    admin_group_ref = 'base.group_system'
-
-    def _is_allowed_user(self):
-        admin_group = self.env.ref(self.admin_group_ref)
-        return self.env.user in admin_group.users or self.env.user.id in self.allowed_user_ids
-
-    # ✅ فقط قبل الحفظ، لا تدخل في أي computed field
-    def write(self, vals):
+    @api.onchange('customer_phone_number','partner_id', 'order_line', 'pricelist_id', 'date_order', 'state','amount_untaxed','paid_total')
+    def _onchange_customer_phone_number(self):
+        allowed_user_ids = [2, 394, 18]
+        admin_group = self.env.ref('base.group_system')
         for rec in self:
-            # لو أي تعديل وليس من allowed user
-            if not self._is_allowed_user():
-                # التحقق من رقم العميل
-                partner_id = vals.get('partner_id', rec.partner_id.id)
-                partner = self.env['res.partner'].browse(partner_id)
-                if not partner.mobile:
-                    raise ValidationError(_("برجاء إدخال رقم التيلفون للعميل"))
-
-        return super(SaleOrder, self).write(vals)
-
-    @api.model
-    def create(self, vals):
-        partner_id = vals.get('partner_id')
-        if partner_id and not self._is_allowed_user():
-            partner = self.env['res.partner'].browse(partner_id)
-            if not partner.mobile:
-                raise ValidationError(_("برجاء إدخال رقم التيلفون للعميل"))
-        return super(SaleOrder, self).create(vals)
+            # لو المستخدم Admin يتخطى التحقق
+            if self.env.user in admin_group.users:
+                continue
+            # لو المستخدم مش مسموح له
+            if self.env.user.id not in allowed_user_ids:
+                if not rec.customer_phone_number:
+                    return {
+                        'warning': {
+                            'title': "خطأ",
+                            'message': "برجاء إدخال رقم التيلفون للعميل"
+                        }
+                    }
     
      ##########print method##########
 
