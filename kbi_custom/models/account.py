@@ -657,7 +657,7 @@ class AccountMoveLine ( models.Model ) :
                 rec.analytic_distribution = distribution_vals1
 
             elif rec.analytic_account_id and rec.account_id.code.startswith('410'):
-                 rec.analytic_distribution_ids = [(0, 0, {'analytic_account_id': rec.analytic_account_id.id,'amount': 100.0,})]
+                 rec.analytic_distribution = [(0, 0, {'analytic_account_id': rec.analytic_account_id.id,'amount': 100.0,})]
 
             # الحالات الخاصة بالشركاء
             elif rec.partner_id and rec.partner_id.id == 60597 and rec.account_id and rec.account_id.code and rec.account_id.code.startswith (
