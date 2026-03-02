@@ -494,10 +494,6 @@ class AccountMoveLine ( models.Model ) :
                 8804 : 100.0 ,
 
             }
-            distribution_vals_analytic = {
-                analytic_account_id.id : 100.0,
-
-            }
             distribution_vals0 = {
                 # 8820 : rec.office_supp_perc_101 ,
                 # 8843 : rec.office_supp_perc_104 ,
@@ -660,10 +656,8 @@ class AccountMoveLine ( models.Model ) :
                     '410' ) :
                 rec.analytic_distribution = distribution_vals1
 
-             # الحالة الثانية
-            elif rec.analytic_account_id and rec.account_id.code.startswith (
-                    '410' ) :
-                 rec.analytic_distribution = distribution_vals_analytic
+            elif rec.analytic_account_id and rec.account_id.code.startswith('410'):
+                 rec.analytic_distribution_ids = [(0, 0, {'analytic_account_id': rec.analytic_account_id.id,'amount': 100.0,})]
 
             # الحالات الخاصة بالشركاء
             elif rec.partner_id and rec.partner_id.id == 60597 and rec.account_id and rec.account_id.code and rec.account_id.code.startswith (
