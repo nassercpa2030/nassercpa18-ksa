@@ -1089,13 +1089,15 @@ class SaleOrder ( models.Model ) :
 
     def action_create_new_payment2(self) :
         # self.ensure_one()
-        allowed_user_ids = [2 , 394 , 18]
-        admin_group = self.env.ref ( 'base.group_system' )
+        #allowed_user_ids = [2 , 394 , 18]
+        allowed_user_ids = [2 , 394 ]
+        #admin_group = self.env.ref ( 'base.group_system' )
         # لو مش Admin
-        if self.env.user not in admin_group.users :
-            if self.env.user.id not in allowed_user_ids :
-                if not self.customer_phone_number :
-                    raise UserError ( "برجاء إدخال رقم التيلفون للعميل" )
+        #if self.env.user not in admin_group.users :
+        if self.env.user.id not in allowed_user_ids :
+           if not self.customer_phone_number :
+              raise UserError ( "برجاء إدخال رقم التيلفون للعميل" )
+               
         return {
             'name' : 'Create New Payment' ,
             'type' : 'ir.actions.act_window' ,
