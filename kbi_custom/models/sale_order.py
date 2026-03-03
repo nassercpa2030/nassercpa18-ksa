@@ -1096,7 +1096,11 @@ class SaleOrder ( models.Model ) :
         #if self.env.user not in admin_group.users :
         if self.env.user.id not in allowed_user_ids :
            if not self.customer_phone_number :
-              raise UserError ( "برجاء إدخال رقم التيلفون للعميل" )
+              return {
+                        'warning' : {
+                            'title' : "خطأ" ,
+                            'message' : "برجاء إدخال رقم التيلفون للعميل"
+                        }
                
         return {
             'name' : 'Create New Payment' ,
