@@ -211,7 +211,7 @@ class SaleOrder ( models.Model ) :
             rec.order_lines_count = len(rec.order_line) if rec.order_line else 0
 
     #@api.onchange('customer_phone_number','partner_id', 'order_line', 'pricelist_id', 'date_order', 'state','amount_untaxed','paid_total','broker_amount','project_name','multi_years','multi_service','x_studio_contract_service','project_count','contarct_date','audit_date','customer_english_name')
-    @api.onchange('payment_count','payment_count2','invoice_count','paid_percent')
+    @api.onchange('customer_phone_number','payment_count','payment_count2','invoice_count','paid_percent')
     def _onchange_customer_phone_number(self):
         allowed_user_ids = [2, 394, 18]
         admin_group = self.env.ref('base.group_system')
