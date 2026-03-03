@@ -9,6 +9,7 @@ import qrcode
 
 from odoo import models , fields , api , _
 from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError 
 
 
 # from odoo.tools.populate import compute
@@ -1096,12 +1097,7 @@ class SaleOrder ( models.Model ) :
         #if self.env.user not in admin_group.users :
         if self.env.user.id not in allowed_user_ids :
            if not self.customer_phone_number :
-              return {
-                        'warning' : {
-                            'title' : "خطأ" ,
-                            'message' : "برجاء إدخال رقم التيلفون للعميل"
-                        }
-              }
+              raise UserError("برجاء إدخال رقم التيلفون للعميل")  # يمنع التنفيذ فورًا
 
         
         return {
