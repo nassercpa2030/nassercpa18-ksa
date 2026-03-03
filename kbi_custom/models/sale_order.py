@@ -1101,7 +1101,9 @@ class SaleOrder ( models.Model ) :
                             'title' : "خطأ" ,
                             'message' : "برجاء إدخال رقم التيلفون للعميل"
                         }
-               
+              }
+
+        
         return {
             'name' : 'Create New Payment' ,
             'type' : 'ir.actions.act_window' ,
