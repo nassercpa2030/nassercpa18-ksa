@@ -117,7 +117,7 @@
                                 <th style="padding: 16px; text-align: center;">أسم العميل</th-->
                                 <!--th style="padding: 8px; text-align: center;">أمر البيع</th-->
                                 <!--th style="padding: 12px; text-align: center;">إسم المشروع</th>
-                                <!--th style="padding: 8px; text-align: center;">قيمة العقد</th>
+                                <th style="padding: 8px; text-align: center;">قيمة العقد</th>
                                 <th style="padding: 5px; text-align: center;">نسبة العمولة</th-->
                                 <!--th style="padding: 8px; text-align: center;">قيمة فاتورة المسوق</th-->
                                 <!--th style="padding: 5px; text-align: center;">المبلغ المستحق</th>
