@@ -49,10 +49,10 @@
                     <table class="table table-bordered" style="width: 100%; direction: rtl; font-size: 10px;">
                         <thead style="background-color: #f0f0f0;">
                             <tr>
-                                <th style="padding: 8px; text-align: center;">رقم الفاتورة</th>
-                                <th style="padding: 8px; text-align: center;">أسم العميل</th>
+                                <th style="padding: 12px; text-align: center;">رقم الفاتورة</th>
+                                <th style="padding: 14px; text-align: center;">أسم العميل</th>
                                 <!--th style="padding: 8px; text-align: center;">أمر البيع</th-->
-                                <th style="padding: 8px; text-align: center;">إسم المشروع</th>
+                                <th style="padding: 12px; text-align: center;">إسم المشروع</th>
                                 <th style="padding: 8px; text-align: center;">قيمة العقد</th>
                                 <th style="padding: 8px; text-align: center;">نسبة العمولة</th>
                                 <!--th style="padding: 8px; text-align: center;">قيمة فاتورة المسوق</th-->
@@ -67,10 +67,10 @@
                             <!-- المرور على جميع الفواتير -->
                             <t t-foreach="docs" t-as="bill">
                                 <tr>
-                                    <td style="padding: 8px;"><span t-field="bill.name"/></td>
-                                    <td style="padding: 8px;"><span t-field="bill.sale_order_id_finance.partner_id.name" /></td>
+                                    <td style="padding: 12px;"><span t-field="bill.name"/></td>
+                                    <td style="padding: 14px;"><span t-field="bill.sale_order_id_finance.partner_id.name" /></td>
                                     <!--td style="padding: 8px;"><span t-field="bill.sale_order_id_finance.name" t-if="bill.sale_order_id_finance"/></td-->
-                                    <td style="padding: 7px; text-align: center;"><span t-field="bill.sale_order_id_finance.project_name" t-if="bill.sale_order_id_finance"/></td>
+                                    <td style="padding: 12px; text-align: center;"><span t-field="bill.sale_order_id_finance.project_name" t-if="bill.sale_order_id_finance"/></td>
                                     <td style="padding: 10px; text-align: center;"><span t-field="bill.sale_order_id_finance.amount_untaxed" t-if="bill.sale_order_id_finance"/></td>
                                     <td style="padding: 7px; text-align: center;"><span t-field="bill.sale_order_id_finance.broker_percentage_" t-if="bill.sale_order_id_finance"/>
                                     <b>%</b>
