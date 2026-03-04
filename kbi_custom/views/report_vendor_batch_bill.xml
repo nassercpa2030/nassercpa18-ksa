@@ -143,7 +143,7 @@
                                         <span t-field="bill.amount_total" t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/>
                                     </td-->
                                       <!--td style="padding: 5px; text-align: left;">
-                                        <span t-field="bill.amount_residual_signed" t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/-->
+                                        <span t-field="bill.amount_residual_signed" t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/>
                                     </td-->
                                     
                                     <!-- تحديث المجموع -->
