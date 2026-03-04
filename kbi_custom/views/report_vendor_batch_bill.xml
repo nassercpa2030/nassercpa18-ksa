@@ -46,124 +46,58 @@
                     <hr/>
 
                     <!-- الجدول الذي سيحتوي على البيانات -->
-                     <table class="table table-bordered" style="width: 100%; direction: rtl; font-size: 10px;">
-    <thead style="background-color: #f0f0f0;">
-        <tr>
-            <th style="padding: 12px; text-align: center;">رقم الفاتورة</th>
-            <th style="padding: 16px; text-align: center;">أسم العميل</th>
-            <th style="padding: 12px; text-align: center;">إسم المشروع</th>
-            <th style="padding: 8px; text-align: center;">قيمة العقد</th>
-            <th style="padding: 5px; text-align: center;">نسبة العمولة</th>
-            <th style="padding: 5px; text-align: center;">المبلغ المستحق</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- تهيئة متغير المجموع -->
-        <t t-set="total_sum" t-value="0.0"/> 
-        <t t-set="amount_residual_sig" t-value="0.0"/> 
-
-        <!-- المرور على جميع الفواتير -->
-        <t t-foreach="docs" t-as="bill">
-            <tr>
-                <td style="padding: 12px; white-space: nowrap; text-align: center;">
-                    <span t-field="bill.name"/>
-                </td>
-                <td style="padding: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;">
-                    <span t-field="bill.sale_order_id_finance.partner_id.name"/>
-                </td>
-                <td style="padding: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;">
-                    <span t-field="bill.sale_order_id_finance.project_name" t-if="bill.sale_order_id_finance"/>
-                </td>
-                <td style="padding: 10px; text-align: center; white-space: nowrap;">
-                    <span t-field="bill.sale_order_id_finance.amount_untaxed" t-if="bill.sale_order_id_finance"/>
-                </td>
-                <td style="padding: 5px; text-align: center; white-space: nowrap;">
-                    <span t-field="bill.sale_order_id_finance.broker_percentage_" t-if="bill.sale_order_id_finance"/>
-                    <b>%</b>
-                </td>
-                <td style="padding: 5px; text-align: left; white-space: nowrap;">
-                    <span t-field="bill.amount_residual_signed" t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/>
-                </td>
-
-                <!-- تحديث المجموع -->
-                <t t-set="total_sum" t-value="total_sum + (bill.amount_total or 0.0)"  />
-                <t t-set="amount_residual_sig" t-value="amount_residual_sig + (bill.amount_residual_signed or 0.0)"  />
-            </tr>
-        </t>
-        
-        <!-- صف المجموع النهائي -->
-        <tr style="font-weight:bold; border-top: 2px solid black;">
-            <td colspan="5" style="text-align:right; padding:8px;" decoration_success="1">إجمالي المبلغ المستحق:</td>   
-            <td style="padding:8px; text-align:left;">
-                <span t-esc="'{:,.2f}'.format(amount_residual_sig or 0.0)"  />
-                <b>SR</b>
-            </td>
-        </tr>
-
-        <tr style="font-weight:bold; border-top: 2px solid black;">
-            <td colspan="5" style="text-align:right; padding:8px;" decoration_danger="1">إجمالي المبالغ:</td>
-            <td style="padding:8px; text-align:left;">
-                <span t-esc="'{:,.2f}'.format(total_sum or 0.0)"  />
-                <b>SR</b>
-            </td>
-        </tr>
-         
-    </tbody>
-</table>
-                    <!--table class="table table-bordered" style="width: 100%; direction: rtl; font-size: 10px;">
+                    <table class="table table-bordered" style="width: 100%; direction: rtl; font-size: 10px;">
                         <thead style="background-color: #f0f0f0;">
                             <tr>
-                                <th style="padding: 12px; text-align: center;">رقم الفاتورة</th>
-                                <th style="padding: 16px; text-align: center;">أسم العميل</th-->
-                                <!--th style="padding: 8px; text-align: center;">أمر البيع</th-->
-                                <!--th style="padding: 12px; text-align: center;">إسم المشروع</th>
+                                <th style="padding: 8px; text-align: center;">رقم الفاتورة</th>
+                                <th style="padding: 8px; text-align: center;">أسم العميل</th>
+                                <th style="padding: 8px; text-align: center;">أمر البيع</th>
+                                <th style="padding: 8px; text-align: center;">إسم المشروع</th>
                                 <th style="padding: 8px; text-align: center;">قيمة العقد</th>
-                                <th style="padding: 5px; text-align: center;">نسبة العمولة</th-->
-                                <!--th style="padding: 8px; text-align: center;">قيمة فاتورة المسوق</th-->
-                                <!--th style="padding: 5px; text-align: center;">المبلغ المستحق</th>
+                                <th style="padding: 8px; text-align: center;">نسبة العمولة</th>
+                                <th style="padding: 8px; text-align: center;">قيمة فاتورة المسوق</th>
+                                <th style="padding: 8px; text-align: center;">المبلغ المستحق</th>
                             </tr>
                         </thead>
-                        <tbody-->
+                        <tbody>
                             <!-- تهيئة متغير المجموع -->
-                            <!--t t-set="total_sum" t-value="0.0"/> 
-                            <t t-set="amount_residual_sig" t-value="0.0"/--> 
+                            <t t-set="total_sum" t-value="0.0"/> 
+                            <t t-set="amount_residual_sig" t-value="0.0"/> 
 
                             <!-- المرور على جميع الفواتير -->
-                            <!--t t-foreach="docs" t-as="bill">
+                            <t t-foreach="docs" t-as="bill">
                                 <tr>
-                                    <td style="padding: 12px;"><span t-field="bill.name"/></td>
-                                    <td style="padding: 16px;"><span t-field="bill.sale_order_id_finance.partner_id.name" /></td-->
-                                    <!--td style="padding: 8px;"><span t-field="bill.sale_order_id_finance.name" t-if="bill.sale_order_id_finance"/></td-->
-                                    <!--td style="padding: 12px; text-align: center;"><span t-field="bill.sale_order_id_finance.project_name" t-if="bill.sale_order_id_finance"/></td>
+                                    <td style="padding: 8px;"><span t-field="bill.name"/></td>
+                                    <td style="padding: 8px;"><span t-field="bill.sale_order_id_finance.partner_id.name" /></td>
+                                    <td style="padding: 8px;"><span t-field="bill.sale_order_id_finance.name" t-if="bill.sale_order_id_finance"/></td>
+                                    <td style="padding: 7px; text-align: center;"><span t-field="bill.sale_order_id_finance.project_name" t-if="bill.sale_order_id_finance"/></td>
                                     <td style="padding: 10px; text-align: center;"><span t-field="bill.sale_order_id_finance.amount_untaxed" t-if="bill.sale_order_id_finance"/></td>
-                                    <td style="padding: 5px; text-align: center;"><span t-field="bill.sale_order_id_finance.broker_percentage_" t-if="bill.sale_order_id_finance"/>
+                                    <td style="padding: 7px; text-align: center;"><span t-field="bill.sale_order_id_finance.broker_percentage_" t-if="bill.sale_order_id_finance"/>
                                     <b>%</b>
-                                    </td-->
-                                    <!--td style="padding: 8px; text-align: left;">
+                                    </td>
+                                    <td style="padding: 8px; text-align: left;">
                                         <span t-field="bill.amount_total" t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/>
-                                    </td-->
-                                      <!--td style="padding: 5px; text-align: left;">
+                                    </td>
+                                      <td style="padding: 8px; text-align: left;">
                                         <span t-field="bill.amount_residual_signed" t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/>
-                                    </td-->
+                                    </td>
                                     
                                     <!-- تحديث المجموع -->
-                                    <!--t t-set="total_sum" t-value="total_sum + (bill.amount_total or 0.0)"  />
+                                    <t t-set="total_sum" t-value="total_sum + (bill.amount_total or 0.0)"  />
                                     <t t-set="amount_residual_sig" t-value="amount_residual_sig + (bill.amount_residual_signed or 0.0)"  />
                                 </tr>
                             </t>
                             
-                              <tr style="font-weight:bold; border-top: 2px solid black;"-->
-                                <!--td colspan="7" style="text-align:right; padding:8px;" decoration_success="1">  إجمالي المبلغ المستحق:</td-->
-                                <!--td colspan="5" style="text-align:right; padding:8px;" decoration_success="1">  إجمالي المبلغ المستحق:</td>   
+                              <tr style="font-weight:bold; border-top: 2px solid black;">
+                                <td colspan="7" style="text-align:right; padding:8px;" decoration_success="1">  إجمالي المبلغ المستحق:</td>
                                 <td style="padding:8px; text-align:left;">
                                     <span t-esc="'{:,.2f}'.format(amount_residual_sig or 0.0)"  />
                                      <b>SR</b>
                                 </td>
-                            </tr-->
+                            </tr>
                             <!-- صف المجموع النهائي -->
-                            <!--tr style="font-weight:bold; border-top: 2px solid black;"-->
-                                <!--td colspan="6" style="text-align:right; padding:8px;" decoration_danger="1">إجمالي المبالغ:</td-->
-                                 <!--td colspan="5" style="text-align:right; padding:8px;" decoration_danger="1">إجمالي المبالغ:</td>
+                            <tr style="font-weight:bold; border-top: 2px solid black;">
+                                <td colspan="6" style="text-align:right; padding:8px;" decoration_danger="1">إجمالي المبالغ:</td>
                                 <td style="padding:8px; text-align:left;">
                                     <span t-esc="'{:,.2f}'.format(total_sum or 0.0)"  />
                                     <b>SR</b>
@@ -171,7 +105,7 @@
                             </tr>
                              
                         </tbody>
-                    </table-->
+                    </table>
                     <hr/>
 
                     <!-- توقيع الإعداد والمراجعة والإعتماد -->
@@ -238,7 +172,7 @@
 
                 </div>
                       <table  class="signature-table" style="padding:10px;  direction: rtl; text-align: right;">
-                           <tr> <td class="signature-texts "><label style="text-decoration: underline; font-weight:bold;">:توقيع بإستلام المبلغ </label></td><td class="signature-texts "></td><td class="signature-texts "></td></tr>
+                           <tr> <td class="signature-texts "><label style="text-decoration: underline; font-weight:bold;"> توقيع بإستلام المبلغ: </label></td><td class="signature-texts ">ــــــــــــــــــــــــــــــــــــــــ</td><td class="signature-texts "></td></tr>
                      </table> 
             </t>
         </t>
