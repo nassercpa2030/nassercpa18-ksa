@@ -1078,10 +1078,12 @@ class AnalyticDistributuion ( models.Model ) :
         for rec in self :
             amt = rec.amount or 0.0
             user = rec.user_id or self.env.user
+            hide_101 = user.id == 8  # لو current_user_id = 8 نخفي 101
 
             # ==================== المالية ====================
             if rec.x_plan98_id and amt :
-                rec.finance_101_distribution_amount = amt * (user.finance923_perc_101 or 0.0) / 100
+                rec.finance_101_distribution_amount = 0.0 if not hide_101 else (amt * (user.finance923_perc_101 or 0.0) / 100)
+                #rec.finance_101_distribution_amount = amt * (user.finance923_perc_101 or 0.0) / 100
                 rec.finance_104_distribution_amount = amt * (user.finance923_perc_104 or 0.0) / 100
                 rec.finance_110_distribution_amount = amt * (user.finance923_perc_110 or 0.0) / 100
                 rec.finance_111_distribution_amount = amt * (user.finance923_perc_111 or 0.0) / 100
@@ -1097,7 +1099,8 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== الجودة ====================
             if rec.x_plan91_id and amt :
-                rec.quality901_perc_101_distribution_amount = amt * (user.quality901_perc_101 or 0.0) / 100
+                rec.quality901_perc_101_distribution_amount = 0.0 if not hide_101 else (amt * (user.quality901_perc_101 or 0.0) / 100)
+                #rec.quality901_perc_101_distribution_amount = amt * (user.quality901_perc_101 or 0.0) / 100
                 rec.quality901_perc_104_distribution_amount = amt * (user.quality901_perc_104 or 0.0) / 100
                 rec.quality901_perc_110_distribution_amount = amt * (user.quality901_perc_110 or 0.0) / 100
                 rec.quality901_perc_111_distribution_amount = amt * (user.quality901_perc_111 or 0.0) / 100
@@ -1113,7 +1116,8 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== الدعم التشغيلي ====================
             if rec.x_plan92_id and amt :
-                rec.oper_supp902_101_distribution_amount = amt * (user.oper_supp902_perc_101 or 0.0) / 100
+                rec.oper_supp902_101_distribution_amount = 0.0 if not hide_101 else (amt * (user.oper_supp902_perc_101 or 0.0) / 100)
+                #rec.oper_supp902_101_distribution_amount = amt * (user.oper_supp902_perc_101 or 0.0) / 100
                 rec.oper_supp902_104_distribution_amount = amt * (user.oper_supp902_perc_104 or 0.0) / 100
                 rec.oper_supp902_110_distribution_amount = amt * (user.oper_supp902_perc_110 or 0.0) / 100
                 rec.oper_supp902_111_distribution_amount = amt * (user.oper_supp902_perc_111 or 0.0) / 100
@@ -1129,7 +1133,8 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== التسويق العام ====================
             if rec.x_plan95_id and amt :
-                rec.sale_gen911_101_distribution_amount = amt * (user.sale_gen911_perc_101 or 0.0) / 100
+                rec.sale_gen911_101_distribution_amount = 0.0 if not hide_101 else (amt * (user.sale_gen911_perc_101 or 0.0) / 100)
+                #rec.sale_gen911_101_distribution_amount = amt * (user.sale_gen911_perc_101 or 0.0) / 100
                 rec.sale_gen911_104_distribution_amount = amt * (user.sale_gen911_perc_104 or 0.0) / 100
                 rec.sale_gen911_110_distribution_amount = amt * (user.sale_gen911_perc_110 or 0.0) / 100
                 rec.sale_gen911_111_distribution_amount = amt * (user.sale_gen911_perc_111 or 0.0) / 100
@@ -1145,7 +1150,8 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== المستلزمات المكتبية ====================
             if rec.x_plan100_id and amt :
-                rec.office_supp_perc_101_distribution_amount = amt * (user.office_supp_perc_101 or 0.0) / 100
+                rec.office_supp_perc_101_distribution_amount = 0.0 if not hide_101 else (amt * (user.office_supp_perc_101 or 0.0) / 100)
+                #rec.office_supp_perc_101_distribution_amount = amt * (user.office_supp_perc_101 or 0.0) / 100
                 rec.office_supp_perc_104_distribution_amount = amt * (user.office_supp_perc_104 or 0.0) / 100
                 rec.office_supp_perc_110_distribution_amount = amt * (user.office_supp_perc_110 or 0.0) / 100
                 rec.office_supp_perc_111_distribution_amount = amt * (user.office_supp_perc_111 or 0.0) / 100
