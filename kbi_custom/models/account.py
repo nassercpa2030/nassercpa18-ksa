@@ -1167,7 +1167,7 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== الشئون الإدارية ====================
             if rec.x_plan97_id and amt :
-                rec.manage_921_perc_101_distribution_amount =  = 0.0 if self.env.user.id != 8 else ( amt * (user.manage_921_perc_101 or 0.0) / 100)
+                rec.manage_921_perc_101_distribution_amount = 0.0 if self.env.user.id != 8 else ( amt * (user.manage_921_perc_101 or 0.0) / 100)
                 rec.manage_921_perc_104_distribution_amount = amt * (user.manage_921_perc_104 or 0.0) / 100
                 rec.manage_921_perc_110_distribution_amount = amt * (user.manage_921_perc_110 or 0.0) / 100
                 rec.manage_921_perc_111_distribution_amount = amt * (user.manage_921_perc_111 or 0.0) / 100
@@ -1183,7 +1183,7 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== التقنية ====================
             if rec.x_plan99_id and amt :
-                rec.it_922_perc_101_distribution_amount = = 0.0 if self.env.user.id != 8 else (amt * (user.it_922_perc_101 or 0.0) / 100)
+                rec.it_922_perc_101_distribution_amount = 0.0 if self.env.user.id != 8 else (amt * (user.it_922_perc_101 or 0.0) / 100)
                 rec.it_922_perc_104_distribution_amount = amt * (user.it_922_perc_104 or 0.0) / 100
                 rec.it_922_perc_110_distribution_amount = amt * (user.it_922_perc_110 or 0.0) / 100
                 rec.it_922_perc_111_distribution_amount = amt * (user.it_922_perc_111 or 0.0) / 100
@@ -1199,7 +1199,7 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== المباني والمرافق ====================
             if rec.x_plan101_id and amt :
-                rec.build_facil950_perc_101_distribution_amount =  = 0.0 if self.env.user.id != 8 else (amt * (user.build_facil950_perc_101 or 0.0) / 100)
+                rec.build_facil950_perc_101_distribution_amount = 0.0 if self.env.user.id != 8 else (amt * (user.build_facil950_perc_101 or 0.0) / 100)
                 rec.build_facil950_perc_104_distribution_amount = amt * (user.build_facil950_perc_104 or 0.0) / 100
                 rec.build_facil950_perc_110_distribution_amount = amt * (user.build_facil950_perc_110 or 0.0) / 100
                 rec.build_facil950_perc_111_distribution_amount = amt * (user.build_facil950_perc_111 or 0.0) / 100
@@ -1215,7 +1215,7 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== القهوة والضيافة ====================
             if rec.x_plan104_id and amt :
-                rec.coff_clean_ryd_perc_101_distribution_amount =  = 0.0 if self.env.user.id != 8 else (amt * (user.coff_clean_ryd_perc_101 or 0.0) / 100)
+                rec.coff_clean_ryd_perc_101_distribution_amount = 0.0 if self.env.user.id != 8 else (amt * (user.coff_clean_ryd_perc_101 or 0.0) / 100)
                 rec.coff_clean_ryd_perc_104_distribution_amount = amt * (user.coff_clean_ryd_perc_104 or 0.0) / 100
                 rec.coff_clean_ryd_perc_110_distribution_amount = amt * (user.coff_clean_ryd_perc_110 or 0.0) / 100
                 rec.coff_clean_ryd_perc_111_distribution_amount = amt * (user.coff_clean_ryd_perc_111 or 0.0) / 100
@@ -1231,7 +1231,7 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== التوطين العام ====================
             if rec.x_plan93_id and amt :
-                rec.pub_loc903_perc_101_distribution_amount =  = 0.0 if self.env.user.id != 8 else (amt * (user.pub_loc903_perc_101 or 0.0) / 100)
+                rec.pub_loc903_perc_101_distribution_amount = 0.0 if self.env.user.id != 8 else (amt * (user.pub_loc903_perc_101 or 0.0) / 100)
                 rec.pub_loc903_perc_104_distribution_amount = amt * (user.pub_loc903_perc_104 or 0.0) / 100
                 rec.pub_loc903_perc_110_distribution_amount = amt * (user.pub_loc903_perc_110 or 0.0) / 100
                 rec.pub_loc903_perc_111_distribution_amount = amt * (user.pub_loc903_perc_111 or 0.0) / 100
