@@ -517,6 +517,9 @@ class SaleOrder ( models.Model ) :
         for order in self :
             order.state = 'to approve'
             order._auto_code ()  # استدعاء الدالة لكل سجل
+             # لو فيه فرصة مرتبطة، نغير stage_idالي نعاقد  غير مدفوع
+            if order.opportunity_id:
+               order.opportunity_id.stage_id = 3  # حدد Stage ID اللي تحب
             res.append ( order )
 
         return {
