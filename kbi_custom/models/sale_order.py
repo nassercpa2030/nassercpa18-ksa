@@ -479,6 +479,20 @@ class SaleOrder ( models.Model ) :
     def create(self , vals_list) :
         res = super ().create ( vals_list )
         res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
+        # with offer price  stage إنشاء فرصة CRM لو مش موجودة
+        if not res.opportunity_id :
+            stage = self.env['crm.stage'].search ( [] , limit=1 )
+            lead = self.env['crm.lead'].create ( {
+                'name' :  f'{res.project_name} {res.partner_id.name}' if res.project_name else res.name,
+                'partner_id' : res.partner_id.id ,
+                'type' : 'opportunity' ,
+                'user_id' : res.user_id.id ,
+                'email_from' : res.partner_id.email ,
+                'phone' : res.partner_id.phone ,
+                'stage_id' : 5,
+            } )
+
+            res.opportunity_id = lead.id
         return res
 
     def compute_sign_qrcode(self) :
