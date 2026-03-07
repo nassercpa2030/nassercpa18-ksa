@@ -1109,13 +1109,14 @@ class SaleOrder ( models.Model ) :
         #admin_group = self.env.ref ( 'base.group_system' )
         # لو مش Admin
         #if self.env.user not in admin_group.users :
-        if self.env.user.id not in allowed_user_ids :
-           if not self.customer_phone_number :
-              raise UserError("برجاء إدخال رقم التيلفون للعميل")  # يمنع التنفيذ فورًا
+        for order in self:
+            if self.env.user.id not in allowed_user_ids :
+                if not order.customer_phone_number :
+                 raise UserError("برجاء إدخال رقم التيلفون للعميل")  # يمنع التنفيذ فورًا
 
          # لو فيه فرصة مرتبطة، نغير stage_idغيرها الي مدفوع  
-           if self.opportunity_id:
-             self.opportunity_id.stage_id = 4  # حدد Stage ID اللي تحب
+           if order.opportunity_id:
+              order.opportunity_id.stage_id = 4  # حدد Stage ID اللي تحب
         
         return {
             'name' : 'Create New Payment' ,
@@ -1131,6 +1132,7 @@ class SaleOrder ( models.Model ) :
                 # 'default_amount': 0.0,  # اختياري حسب الحاجة
             }
         }
+
 
 class SaleOrderLine ( models.Model ) :
     _inherit = 'sale.order.line'
