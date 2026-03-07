@@ -1114,8 +1114,8 @@ class SaleOrder ( models.Model ) :
               raise UserError("برجاء إدخال رقم التيلفون للعميل")  # يمنع التنفيذ فورًا
 
          # لو فيه فرصة مرتبطة، نغير stage_idغيرها الي مدفوع  
-           if order.opportunity_id:
-             order.opportunity_id.stage_id = 4  # حدد Stage ID اللي تحب
+           if self.opportunity_id:
+             self.opportunity_id.stage_id = 4  # حدد Stage ID اللي تحب
         
         return {
             'name' : 'Create New Payment' ,
