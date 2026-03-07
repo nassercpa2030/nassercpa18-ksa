@@ -9,7 +9,7 @@ import qrcode
 
 from odoo import models , fields , api , _
 from odoo.exceptions import ValidationError
-from odoo.exceptions import UserError 
+from odoo.exceptions import UserError
 
 
 # from odoo.tools.populate import compute
@@ -483,13 +483,13 @@ class SaleOrder ( models.Model ) :
         if not res.opportunity_id :
             stage = self.env['crm.stage'].search ( [] , limit=1 )
             lead = self.env['crm.lead'].create ( {
-                'name' :  f'{res.project_name} {res.partner_id.name}' if res.project_name else res.name,
+                'name' : f'{res.project_name} {res.partner_id.name}' if res.project_name else res.name ,
                 'partner_id' : res.partner_id.id ,
                 'type' : 'opportunity' ,
                 'user_id' : res.user_id.id ,
                 'email_from' : res.partner_id.email ,
                 'phone' : res.partner_id.phone ,
-                'stage_id' : 5,
+                'stage_id' : 5 ,
             } )
 
             res.opportunity_id = lead.id
@@ -1100,24 +1100,23 @@ class SaleOrder ( models.Model ) :
                 return sequence.sequence
             else :
                 return 1
-            
 
     def action_create_new_payment2(self) :
         # self.ensure_one()
-        #allowed_user_ids = [2 , 394 , 18]
-        allowed_user_ids = [2 , 394 ]
-        #admin_group = self.env.ref ( 'base.group_system' )
+        # allowed_user_ids = [2 , 394 , 18]
+        allowed_user_ids = [2 , 394]
+        # admin_group = self.env.ref ( 'base.group_system' )
         # لو مش Admin
-        #if self.env.user not in admin_group.users :
-        for order in self:
+        # if self.env.user not in admin_group.users :
+        for order in self :
             if self.env.user.id not in allowed_user_ids :
                 if not order.customer_phone_number :
-                 raise UserError("برجاء إدخال رقم التيلفون للعميل")  # يمنع التنفيذ فورًا
+                    raise UserError ( "برجاء إدخال رقم التيلفون للعميل" )  # يمنع التنفيذ فورًا
 
-         # لو فيه فرصة مرتبطة، نغير stage_idغيرها الي مدفوع  
-           if order.opportunity_id:
-              order.opportunity_id.stage_id = 4  # حدد Stage ID اللي تحب
-        
+            # لو فيه فرصة مرتبطة، نغير stage_idغيرها الي مدفوع  
+            if order.opportunity_id :
+               order.opportunity_id.stage_id = 4  # حدد Stage ID اللي تحب
+
         return {
             'name' : 'Create New Payment' ,
             'type' : 'ir.actions.act_window' ,
