@@ -18,7 +18,8 @@ class SaleOrder ( models.Model ) :
     
     planning_first_sale_line_id = fields.Many2one('sale.order.line', string='First Sale Line Planning', readonly=True   )
     planning_initial_date = fields.Date(string="Initial Planning Date",readonly=True  )
-    planning_hours_to_plan = fields.Float(string="Hours to Plan",readonly=True, )
+    planning_hours_to_plan = fields.Float(string="Hours to Plan",readonly=True )
+    planning_hours_planned = fields.Float(string="Hours Planned",readonly=True )
     contract_date = fields.Date ( string='Contract Date' , readonly=False , required=True )
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
     old_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , stored=True )
