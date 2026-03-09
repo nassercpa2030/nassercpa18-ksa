@@ -15,7 +15,8 @@ from odoo.exceptions import UserError
 # from odoo.tools.populate import compute
 class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
-
+    
+    planning_first_sale_line_id = fields.Many2one('sale.order.line', string='First Sale Line Planning', readonly=True   )
     contract_date = fields.Date ( string='Contract Date' , readonly=False , required=True )
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
     old_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , stored=True )
