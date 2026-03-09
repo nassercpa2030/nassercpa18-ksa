@@ -116,9 +116,9 @@
      background-color:#EAF3FF;
      border-top:2px solid #2F6FB2;
      padding:5px 10px;
-     font-weight:bold;">
+     font-weight:bold; overflow:hidden; border:none;">
 
-    <table style="width:100%; border-collapse:collapse; border:none; overflow:hidden;">
+    <table style="width:100%; border-collapse:collapse; border:none;">
         <tr style="border:none;">
             <td style="border:none; padding:5px;">
 
@@ -131,7 +131,7 @@
 
                     <!-- الرسالة -->
                     <span style="float:left;">
-                        ....برجاء المراجعة قبل التوقيع وشكراً 
+                        برجاء المراجعة قبل التوقيع وشكراً ....
                     </span>
 
                 </div>
@@ -141,7 +141,6 @@
     </table>
 
 </div>
-
             </div>
         </t>
     </template>
