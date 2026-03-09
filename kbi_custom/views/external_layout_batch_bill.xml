@@ -96,7 +96,7 @@
             <td style="text-align:left;">
                 <t t-if="o.partner_id.image_1920">
                     <img t-att-src="'data:image/png;base64,%s' % (o.partner_id.image_1920.decode() if isinstance(o.partner_id.image_1920, bytes) else o.partner_id.image_1920)"
-                         style="max-width:290px; max-height:200px; border:2px solid #000;"/>
+                         style="max-width:250px; max-height:200px; border:2px solid #000;"/>
                 </t>
             </td>
         </tr>
@@ -118,7 +118,7 @@
      padding:5px 10px;
      font-weight:bold;">
 
-    <table style="width:100%; border-collapse:collapse; border:none;">
+    <table style="width:100%; border-collapse:collapse; border:none; overflow:hidden;">
         <tr style="border:none;">
             <td style="border:none; padding:5px;">
 
@@ -131,7 +131,7 @@
 
                     <!-- الرسالة -->
                     <span style="float:left;">
-                        برجاء المراجعة قبل التوقيع وشكراً ....
+                        ....برجاء المراجعة قبل التوقيع وشكراً 
                     </span>
 
                 </div>
