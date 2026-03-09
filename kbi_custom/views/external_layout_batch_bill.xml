@@ -96,7 +96,7 @@
             <td style="text-align:left;">
                 <t t-if="o.partner_id.image_1920">
                     <img t-att-src="'data:image/png;base64,%s' % (o.partner_id.image_1920.decode() if isinstance(o.partner_id.image_1920, bytes) else o.partner_id.image_1920)"
-                         style="max-width:350px; max-height:200px; border:2px solid #000;"/>
+                         style="max-width:290px; max-height:200px; border:2px solid #000;"/>
                 </t>
             </td>
         </tr>
@@ -129,8 +129,8 @@
 
               <td colspan="2" style="padding:5px;">
         <div style="display:flex; justify-content:space-between; width:100%;">
-            <span>صفحة <span class="page"/> من <span class="topage"/></span>
-            <span>.... برجاء المراجعة قبل التوقيع وشكراً</span>
+            <span>(صفحة <span class="page"/> من )<span class="topage"/></span>
+            <span>برجاء المراجعة قبل التوقيع وشكراً .... </span>
         </div>
     </td>
         </tr>
