@@ -125,23 +125,14 @@
 
     <table class="footer_blue" style="width:100%; border-collapse:collapse; text-align:center;">
         <tr>
-            <td style="width:10%;"></td>
-            <td style="width:20%;">
-                <t t-if="company.phone">
-                    <!-- رقم الهاتف لو موجود -->
-                </t>
-            </td>
-            <td style="width:40%;">
-                <t t-if="company.email">
-                    <span>.... برجاء المراجعة قبل التوقيع وشكراً </span>
-                </t>
-            </td>
-            <td style="width:10%;">
-                <t t-if="company.website">
-                    <!-- موقع الشركة -->
-                </t>
-            </td>
-            <td style="width:20%;">صفحة <span class="page"/> من <span class="topage"/></td>
+
+
+              <td colspan="2" style="padding:5px;">
+        <div style="display:flex; justify-content:space-between; width:100%;">
+            <span>صفحة <span class="page"/> من <span class="topage"/></span>
+            <span>.... برجاء المراجعة قبل التوقيع وشكراً</span>
+        </div>
+    </td>
         </tr>
     </table>
 </div>
