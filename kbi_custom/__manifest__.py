@@ -40,6 +40,7 @@
         'views/motalba_all.xml',
         'views/paperformat.xml',
         'views/external_layout_seti.xml',
+        'views/external_layout_batch_bill.xml',
         'views/report_customer_invoice_report2.xml',
         'views/report_customer_project_report.xml',
         
