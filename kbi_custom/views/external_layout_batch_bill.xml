@@ -111,30 +111,35 @@
 
 <!-- Footer -->
 <!-- Footer -->
-<div class="footer" style="font-family: Verdana, Geneva, sans-serif; font-size: 10px; 
-    background-color: #EAF3FF; border-top:2px solid #2F6FB2; padding:5px 0; font-weight:bold;">
-    
-    <style>
-    /* منع ظهور حدود الجدول عند الطباعة */
-    @media print {
-        .footer_blue, .footer_blue td, .footer_blue th {
-            border: none !important;
-        }
-    }
-    </style>
+<div class="footer" style="font-family: Verdana, Geneva, sans-serif;
+     font-size:10px;
+     background-color:#EAF3FF;
+     border-top:2px solid #2F6FB2;
+     padding:5px 10px;
+     font-weight:bold;">
 
-    <table class="footer_blue" style="width:100%; border-collapse:collapse; text-align:center;">
-        <tr>
+    <table style="width:100%; border-collapse:collapse; border:none;">
+        <tr style="border:none;">
+            <td style="border:none; padding:5px;">
 
+                <div style="width:100%; overflow:hidden;">
 
-              <td colspan="2" style="padding:5px;">
-        <div style="display:flex; justify-content:space-between; width:100%;">
-            <span>(صفحة <span class="page"/> من )<span class="topage"/></span>
-            <span>برجاء المراجعة قبل التوقيع وشكراً .... </span>
-        </div>
-    </td>
+                    <!-- رقم الصفحة -->
+                    <span style="float:right;">
+                        صفحة <span class="page"/> من <span class="topage"/>
+                    </span>
+
+                    <!-- الرسالة -->
+                    <span style="float:left;">
+                        برجاء المراجعة قبل التوقيع وشكراً ....
+                    </span>
+
+                </div>
+
+            </td>
         </tr>
     </table>
+
 </div>
 
             </div>
