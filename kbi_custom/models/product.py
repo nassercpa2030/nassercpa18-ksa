@@ -19,6 +19,12 @@ class ProductTemplate(models.Model):
     product_analytic_ids = fields.One2many(comodel_name='product.analytic.account', inverse_name='product_tmpl_id', string='Products')
     public_name = fields.Char(string="Product Description", readonly=False , store=True)
     super_report_user_ids = fields.Many2many(comodel_name='res.users', string='Super Report Users')
+    planning_enabled = fields.Boolean( string="Planning Enabled",default=False )
+    planning_role_id = fields.Many2one(
+        'res.users',  # أو أي موديل مناسب
+        string="Planning Role",
+        help="Temporary field to prevent OWL error"
+    )
     
     
     #@api.depends("name")
