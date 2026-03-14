@@ -174,23 +174,24 @@ class CrmLead ( models.Model ) :
             if rec.sale_person :
                 rec.sale_team = rec.sale_person.department_id
 
-    def action_call_zoom(self) :
-        for lead in self :
-            phone_number = lead.phone or (lead.partner_id.phone if lead.partner_id else False)
-            if phone_number :
-                url = f"tel:{phone_number}"
-                return {
-                    'type' : 'ir.actions.act_url' ,
-                    'url' : url ,
-                    'target' : 'new' ,  # يفتح على جهاز المستخدم
+    def action_call_mobile(self):
+        self.ensure_one()
+        phone_number = self.phone or (self.partner_id.phone if self.partner_id else False)
+        if not phone_number:
+            return {
+                'warning': {
+                    'title': _("تنبيه"),
+                    'message': _("لا يوجد رقم هاتف لهذا العميل!"),
                 }
-            else :
-                return {
-                    'warning' : {
-                        'title' : _ ( "تنبيه" ) ,
-                        'message' : _ ( "لا يوجد رقم هاتف لهذا العميل!" ) ,
-                    }
-                }
+            }
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'call_mobile_js',
+            'params': {
+                'phone_number': phone_number,
+            }
+        }
 
     @api.constrains ( 'number_700' )
     def _check700_number(self) :
