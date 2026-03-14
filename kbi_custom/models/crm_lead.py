@@ -153,6 +153,20 @@ class CrmLead(models.Model):
         for rec in self :
             if rec.sale_person :
                 rec.sale_team = rec.sale_person.department_id
+
+    def action_call_zoom(self):
+        for lead in self:
+            phone_number = lead.phone or lead.partner_id.phone
+            if phone_number:
+                url = f"zoommtg://zoom.us/start?phoneNumber={phone_number}"
+                webbrowser.open(url)
+            else:
+                return {
+                    'warning': {
+                        'title': "تنبيه",
+                        'message': "لا يوجد رقم هاتف لهذا العميل!"
+                    }
+                } 
                 
     @api.constrains ( 'number_700' )
     def _check700_number(self) :
