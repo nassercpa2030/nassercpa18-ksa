@@ -903,7 +903,7 @@ class SaleOrder ( models.Model ) :
         }
 
 
-class SaleOrder ( models.Model ) :
+class SaleOrder2 ( models.Model ) :
     _inherit = 'sale.order'
 
     # contract_date = fields.Date(string='Contract Date')
