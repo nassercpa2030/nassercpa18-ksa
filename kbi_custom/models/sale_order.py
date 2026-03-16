@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 import ast
-import base64
+import base64, binascii, gzip, json, uuid
 import datetime
-import uuid
 from io import BytesIO
-
+import openpyxl
 import qrcode
 
 from odoo import models , fields , api , _
