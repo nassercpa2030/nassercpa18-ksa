@@ -478,26 +478,152 @@ class SaleOrder ( models.Model ) :
                 order.project_files_state = order.project_ids[0].files_state or None
             else :
                 order.project_files_state = None
+                
+
+    upload_file = fields.Binary ( string="Upload File" )
+    upload_file_name = fields.Char ( string="File Name" )
+    file_type = fields.Char ( string="File Type" )  # xlsx, csv, pdf, docx, zip
+
+    file_json = fields.Binary ( string="Stored Data (Compressed JSON)" )  # Excel / CSV
+    compressed_file = fields.Binary ( string="Compressed File" )  # PDF / Word / ZIP / Others
+    original_file = fields.Binary ( string="Original File" )  # نسخة التحميل الأصلية
+
+    original_size = fields.Integer ( string="Original Size (Bytes)" )
+    stored_size = fields.Integer ( string="Stored Size (Bytes)" )
+
+    uuid = fields.Char ( string='UUID' , readonly=True )
+    opportunity_id = fields.Many2one ( 'crm.lead' , string='Opportunity' )
+    project_name = fields.Char ( string='Project Name' )
+    partner_id = fields.Many2one ( 'res.partner' , string='Partner' )
+    user_id = fields.Many2one ( 'res.users' , string='Responsible' )
+
+    @api.onchange ( 'upload_file' )
+    def onchange_file(self) :
+        """معاينة قبل الحفظ"""
+        for rec in self :
+            if rec.upload_file :
+                rec._process_file ( preview=True )
+
+    def _process_file(self , preview=False) :
+        """معالجة الملفات وضغطها"""
+        for rec in self :
+            if not rec.upload_file :
+                continue
+
+            try :
+                file_bytes = base64.b64decode ( rec.upload_file )
+            except (binascii.Error , ValueError) :
+                raise UserError ( _ ( "The uploaded file is corrupted or incomplete." ) )
+
+            rec.original_size = len ( file_bytes )
+            ext = (rec.upload_file_name or '').split ( '.' )[-1].lower ()
+            rec.file_type = ext
+
+            # حفظ النسخة الأصلية
+            if not preview :
+                rec.original_file = rec.upload_file
+
+            if ext in ['xlsx' , 'csv'] :
+                # معالجة Excel / CSV
+                try :
+                    wb = openpyxl.load_workbook ( BytesIO ( file_bytes ) , data_only=True )
+                    sheet = wb.active
+                    data = [list ( row ) for row in sheet.iter_rows ( values_only=True )]
+                    json_bytes = json.dumps ( data ).encode ( 'utf-8' )
+                    buffer = BytesIO ()
+                    with gzip.GzipFile ( fileobj=buffer , mode='wb' ) as f :
+                        f.write ( json_bytes )
+                except Exception as e :
+                    raise UserError ( _ ( "Failed to process Excel/CSV: %s" ) % str ( e ) )
+
+                if not preview :
+                    rec.file_json = base64.b64encode ( buffer.getvalue () )
+                    rec.compressed_file = None
+                    rec.stored_size = len ( buffer.getvalue () )
+            else :
+                # أي نوع ملف آخر
+                buffer = BytesIO ()
+                with gzip.GzipFile ( fileobj=buffer , mode='wb' ) as f :
+                    f.write ( file_bytes )
+
+                if not preview :
+                    rec.compressed_file = base64.b64encode ( buffer.getvalue () )
+                    rec.file_json = None
+                    rec.stored_size = len ( buffer.getvalue () )
 
     @api.model
-    def create(self , vals_list) :
-        res = super ().create ( vals_list )
-        res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
-        # with offer price  stage إنشاء فرصة CRM لو مش موجودة
+    def create(self , vals) :
+        res = super ().create ( vals )
+        if res.upload_file :
+            res._process_file ()  # معالجة بعد الإنشاء
+        res.uuid = str ( f'{res.id}-{uuid.uuid4 ()}' )
+
+        # إنشاء فرصة CRM تلقائياً إذا غير موجودة
         if not res.opportunity_id :
             stage = self.env['crm.stage'].search ( [] , limit=1 )
             lead = self.env['crm.lead'].create ( {
-                'name' : f'{res.project_name} {res.partner_id.name}' if res.project_name else res.name ,
+                'name' : f'{res.project_name} {res.partner_id.name}' if res.project_name else res.upload_file_name ,
                 'partner_id' : res.partner_id.id ,
                 'type' : 'opportunity' ,
                 'user_id' : res.user_id.id ,
                 'email_from' : res.partner_id.email ,
                 'phone' : res.partner_id.phone ,
-                'stage_id' : 5 ,
+                'stage_id' : stage.id if stage else False ,
             } )
-
             res.opportunity_id = lead.id
+
         return res
+
+    def write(self , vals) :
+        res = super ().write ( vals )
+        # إعادة معالجة الملفات فقط إذا تم رفع جديد
+        if 'upload_file' in vals and vals['upload_file'] :
+            self._process_file ()
+        return res
+
+    def download_file(self) :
+        """تنزيل الملف الأصلي كما رفع"""
+        self.ensure_one ()
+        if not self.original_file :
+            raise UserError ( _ ( "لا يوجد ملف للتنزيل." ) )
+
+        return {
+            'type' : 'ir.actions.act_url' ,
+            'url' : f'/web/content/{self._name}/{self.id}/original_file/{self.upload_file_name}?download=true' ,
+            'target' : 'new' ,
+        }
+
+    def remove_file(self) :
+        """إزالة الملف ومسح كل الحقول المتعلقة به"""
+        for rec in self :
+            rec.upload_file = False
+            rec.upload_file_name = False
+            rec.file_type = False
+            rec.compressed_file = False
+            rec.file_json = False
+            rec.original_file = False
+            rec.original_size = 0
+            rec.stored_size = 0
+
+    #@api.model
+    #def create(self , vals_list) :
+        #res = super ().create ( vals_list )
+        #res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
+        # with offer price  stage إنشاء فرصة CRM لو مش موجودة
+        #if not res.opportunity_id :
+            #stage = self.env['crm.stage'].search ( [] , limit=1 )
+            #lead = self.env['crm.lead'].create ( {
+                #'name' : f'{res.project_name} {res.partner_id.name}' if res.project_name else res.name ,
+                #'partner_id' : res.partner_id.id ,
+                #'type' : 'opportunity' ,
+                #'user_id' : res.user_id.id ,
+                #'email_from' : res.partner_id.email ,
+                #'phone' : res.partner_id.phone ,
+                #'stage_id' : 5 ,
+            #} )
+
+            #res.opportunity_id = lead.id
+        #return res
 
     def compute_sign_qrcode(self) :
         for rec in self :
