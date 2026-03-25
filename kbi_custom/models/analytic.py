@@ -18,7 +18,16 @@ class AnalyticBroker(models.Model):
     value_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], string='Value Type', required=True)
     value = fields.Float(string='Value', required=True)
     condition = fields.Char(string='Condition')
+    
+class ApprovalRequest(models.Model):
+    _inherit = 'approval.request'
 
+    request_owner_employee_id = fields.Many2one(
+        'hr.employee',
+        string='صاحب الطلب ',
+        required=True
+        
+    )
 
 
 
