@@ -25,8 +25,12 @@ class ApprovalRequest(models.Model):
     request_owner_employee_id = fields.Many2one(
         'hr.employee',
         string='صاحب الطلب ',
-        required=True
-        
+        required=True)
+    
+    request_owner_id = fields.Many2one(
+        'res.users',
+        string="المدير",
+        required=False,   # 👈 أهم سطر
     )
 
 
