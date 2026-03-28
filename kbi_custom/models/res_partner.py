@@ -431,6 +431,7 @@ class Recruiter ( models.Model ) :
                                            help="this field get partner from contact" ,
                                            placeholder="Enter Related Contact" )
     request_employee_manager= fields.Many2one('res.users',string='المدير ',required=True)
+    contract_state = fields.Selection( related='contract_id.state', string='حالة العقد',store=True )
     
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
                                             domain="[('plan_id', '=', analytic_plan)]" , readonly=False , store=True )
