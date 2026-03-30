@@ -521,6 +521,28 @@ class ResPartner ( models.Model ) :
     fax_number = fields.Char ( string='أسم الشخص للتواصل' , readonly=False , required=False )
     all_sale_order_count = fields.Integer(string='Sale Order Count')
 
+    @api.onchange('name')
+    def _onchange_name_lock(self):
+        for rec in self:
+            # لو الاسم موجود واتغير والمستخدم مش سوبر أدمن
+            if rec.name and rec._origin.name != rec.name and not self.env.user.has_group('base.group_system'):
+                # ارجع الاسم القديم
+                rec.name = rec._origin.name
+                # رسالة تحذيرية
+                return {
+                    'warning': {
+                        'title': "تغيير غير مسموح",
+                        'message': "لا يجوز تغيير اسم العميل، الصلاحية موجودة مع أ/ ناصر عوض"
+                    }
+                }
+
+    def write(self, vals):
+        if 'name' in vals:
+            for rec in self:
+                if rec.name and rec.name != vals['name'] and not self.env.user.has_group('base.group_system'):
+                    raise UserError("لا يجوز تغيير اسم العميل، الصلاحية موجودة مع أ/ ناصر عوض")
+        return super().write(vals)
+        
     @api.onchange('sale_order_count')
     def _onchange_sale_order_count(self):
         for rec in self:
