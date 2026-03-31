@@ -525,7 +525,7 @@ class ResPartner ( models.Model ) :
     def _onchange_name_lock(self):
         for rec in self:
             # لو الاسم موجود واتغير والمستخدم مش سوبر أدمن
-            if rec.name and rec._origin.name != rec.name :
+            if rec.id and rec.name and rec._origin.name != rec.name :
                if not rec.env.user.has_group('base.group_system'):
                    # ارجع الاسم القديم
                    rec.name = rec._origin.name
