@@ -525,17 +525,19 @@ class ResPartner ( models.Model ) :
     def _onchange_name_lock(self):
         for rec in self:
             # لو الاسم موجود واتغير والمستخدم مش سوبر أدمن
-            if rec.name and rec._origin.name != rec.name and not self.env.user.has_group('base.group_system'):
-                # ارجع الاسم القديم
-                rec.name = rec._origin.name
-                # رسالة تحذيرية
-                return {
+            if rec.name and rec._origin.name != rec.name :
+               if not rec.env.user.has_group('base.group_system'):
+                   # ارجع الاسم القديم
+                   rec.name = rec._origin.name
+                    # رسالة تحذيرية
+                   return {
                     'warning': {
                         'title': "تغيير غير مسموح",
-                        'message': "لا يجوز تغيير اسم العميل، الصلاحية موجودة مع أ/ ناصر عوض"
-                    }
-                }
+                        'message': "لا يجوز تغيير اسم العميل، الصلاحية موجودة مع أ/ ناصر عوض" } }
 
+               #else:
+                  #continue
+                    
     def write(self, vals):
         if 'name' in vals:
             for rec in self:
