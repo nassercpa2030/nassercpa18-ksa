@@ -52,5 +52,24 @@
                 </xpath>
             </field>
         </record>
+
+        <record model="ir.ui.view" id="kbi_custom.view_hr_employee_date_form_contract">
+            <field name="name">hr.employee.form.contract.custom</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='contract_state']" position="after">
+                    <!-- Badge widget بلون أزرق -->
+                    <field name="start_working_date" widget="badge" options="{'color':'#1f77b4'}"
+                           placeholder="تاريخ مباشرة العمل"/>
+                </xpath>
+   
+                <!--xpath expr="//field[@name='city']" position="before">
+                    <field name="state_id"  />
+                    <field name="city_id" placeholder="City" class="o_address_city"
+                           modifiers="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+                </xpath-->
+            </field>
+        </record>
     </data>
 </odoo>
