@@ -74,7 +74,7 @@
                     <field name="passport_expiry_date" placeholder="تاريخ انتهاء الجواز" />
                     <field name="residency_visa_number"
                            options="{'color':'dark'}"
-                           style="background-color:#90EE90; color:white;padding:2px 6px;border-radius:4px;"
+                           style="background-color:#90EE90; color:dark;padding:2px 6px;border-radius:4px;"
                            placeholder="رقم الهوية /رقم الإقامة"
                            string="رقم الهوية /رقم الإقامة" />
                     <field name="border_number" placeholder="رقم الحدود" />
