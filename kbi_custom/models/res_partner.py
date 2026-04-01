@@ -50,8 +50,7 @@ class ResCity ( models.Model ) :
     oper_supp902_perc_111 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 111" , store=True , readonly=False )
     oper_supp902_perc_200 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 200" , store=True , readonly=False )
     oper_supp902_perc_103 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 103" , store=True , readonly=False )
-    
-    
+
     # ===== التسويق عام =====
     sale_gen911_perc_101 = fields.Float ( string="نسبة توزيع التسويق عام علي 101" , store=True , readonly=False )
     sale_gen911_perc_104 = fields.Float ( string="نسبة توزيع التسويق عام علي 104" , store=True , readonly=False )
@@ -178,7 +177,6 @@ class ResCity ( models.Model ) :
                         "الإجمالي الحالي: %.2f%%\n"
                         "(المسموح فقط: 0%% أو 100%%)"
                     ) % (label , diff_msg , total) )
-           
 
 
 _logger = logging.getLogger ( __name__ )
@@ -217,12 +215,11 @@ class HrPayslip ( models.Model ) :
                 # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
                 analytic_vals = {analytic_account_id.id : 100} if analytic_account_id else {}
 
-
                 for line in move.line_ids :
                     line.analytic_account_id = analytic_account_id
                     ### finance department ###
                     distribution_vals_finance = {
-                        8820 : line.env.user.finance923_perc_101,
+                        8820 : line.env.user.finance923_perc_101 ,
                         8843 : line.env.user.finance923_perc_104 ,
                         8849 : line.env.user.finance923_perc_110 ,
                         8865 : line.env.user.finance923_perc_111 ,
@@ -317,10 +314,10 @@ class HrPayslip ( models.Model ) :
                         line.partner_id = 63815
 
                     else :
-                         line.partner_id = employee_partner.id
+                        line.partner_id = employee_partner.id
 
                     ####### distribution analytic accounts #######
-                        ## finance##
+                    ## finance##
                     if (
                             line.analytic_account_id
                             and line.analytic_account_id.id == 8791
@@ -401,11 +398,10 @@ class HrPayslip ( models.Model ) :
                     ) :
                         line.analytic_distribution = distribution_vals_pub_loc903
 
-                    else:
-                       line.analytic_distribution = analytic_vals
+                    else :
+                        line.analytic_distribution = analytic_vals
 
         return result
-
 
 
 # ---------------- EMPLOYEE Contract -----------------
@@ -430,9 +426,12 @@ class Recruiter ( models.Model ) :
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
                                            help="this field get partner from contact" ,
                                            placeholder="Enter Related Contact" )
-    request_employee_manager= fields.Many2one('res.users',string='المدير ',required=True)
-    contract_state = fields.Selection( related='contract_id.state', string='حالة العقد',store=True )
-    
+    request_employee_manager = fields.Many2one ( 'res.users' , string='المدير ' , required=True )
+    contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
+    border_number = fields.Intger ( string="رقم  الحدود" , store=True )
+    iqama_expiry_date = fields.Date ( string="تاريخ انتهاء الإقامة" , store=True )
+    start_working_date = fields.Date ( string="تاريخ المباشرة" , compute="_compute_start_working_date" )
+    passport_expiry_date = fields.Date ( string="تاريخ انتهاء الجواز" )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
                                             domain="[('plan_id', '=', analytic_plan)]" , readonly=False , store=True )
     wage = fields.Float ( 'الأساسي' , help="Same field as Wage for employee contract" , compute="get_employee_wage" ,
@@ -447,6 +446,15 @@ class Recruiter ( models.Model ) :
                                                  help="Same field as housing allowance for employee contract" ,
                                                  readonly=False , store=True )
 
+    @api.depends ( 'contract_ids.date_start' )
+    def _compute_start_working_date(self) :
+        for rec in self :
+            if rec.contract_ids :
+                first_contract = rec.contract_ids.sorted ( key=lambda c : c.date_start )[0]
+                rec.start_working_date = first_contract.date_start
+            else :
+                rec.start_working_date = False
+                
     @api.depends ( 'contract_id' )
     def get_employee_wage(self) :
         for rec in self :
@@ -519,45 +527,45 @@ class ResPartner ( models.Model ) :
     attachment_ids = fields.Many2many ( 'ir.attachment' , string='Attachments' , compute='_compute_attachments' ,
                                         store=False )
     fax_number = fields.Char ( string='أسم الشخص للتواصل' , readonly=False , required=False )
-    all_sale_order_count = fields.Integer(string='Sale Order Count')
+    all_sale_order_count = fields.Integer ( string='Sale Order Count' )
 
-    @api.onchange('name')
-    def _onchange_name_lock(self):
-        for rec in self:
+    @api.onchange ( 'name' )
+    def _onchange_name_lock(self) :
+        for rec in self :
             # لو الاسم موجود واتغير والمستخدم مش سوبر أدمن
             if rec.id and rec.name and rec._origin.name != rec.name :
-               if not rec.env.user.has_group('base.group_system'):
-                   # ارجع الاسم القديم
-                   rec.name = rec._origin.name
+                if not rec.env.user.has_group ( 'base.group_system' ) :
+                    # ارجع الاسم القديم
+                    rec.name = rec._origin.name
                     # رسالة تحذيرية
-                   return {
-                    'warning': {
-                        'title': "تغيير غير مسموح",
-                        'message': "لا يجوز تغيير اسم العميل، الصلاحية موجودة مع أ/ ناصر عوض" } }
+                    return {
+                        'warning' : {
+                            'title' : "تغيير غير مسموح" ,
+                            'message' : "لا يجوز تغيير اسم العميل، الصلاحية موجودة مع أ/ ناصر عوض"}}
 
-               #else:
-                  #continue
-                    
-    def write(self, vals):
-        if 'name' in vals:
-            for rec in self:
-                if rec.name and rec.name != vals['name'] and not self.env.user.has_group('base.group_system'):
-                    raise UserError("لا يجوز تغيير اسم العميل، الصلاحية موجودة مع أ/ ناصر عوض")
-        return super().write(vals)
-        
-    @api.onchange('sale_order_count')
-    def _onchange_sale_order_count(self):
-        for rec in self:
+                # else:
+                # continue
+
+    def write(self , vals) :
+        if 'name' in vals :
+            for rec in self :
+                if rec.name and rec.name != vals['name'] and not self.env.user.has_group ( 'base.group_system' ) :
+                    raise UserError ( "لا يجوز تغيير اسم العميل، الصلاحية موجودة مع أ/ ناصر عوض" )
+        return super ().write ( vals )
+
+    @api.onchange ( 'sale_order_count' )
+    def _onchange_sale_order_count(self) :
+        for rec in self :
             rec.all_sale_order_count = rec.sale_order_count
-            
-    def action_copy_sale_order_count(self):
+
+    def action_copy_sale_order_count(self) :
         """
         دالة يتم استدعائها عند الضغط على الزر
         لنسخ قيمة sale_order_count لكل سجل مختار
         """
-        for rec in self:  # self = السجلات المختارة
+        for rec in self :  # self = السجلات المختارة
             rec.all_sale_order_count = rec.sale_order_count
-            
+
     def _compute_attachments(self) :
         for rec in self :
             rec.attachment_ids = self.env['ir.attachment'].search ( [
@@ -585,11 +593,11 @@ class ResPartner ( models.Model ) :
 
             # إذا المستخدم الحالي غير مسموح له
             user_not_allowed = self.env.user.id not in allowed_user_ids
-                # ===== phone_customer_contact =====
+            # ===== phone_customer_contact =====
             if rec.company_type != 'person' and user_not_allowed :
                 if not rec.phone and rec.fax_number :
                     raise ValidationError ( "حقل Phone + Contact_name مطلوب لغير الأشخاص وغير المسؤولين." )
-                
+
             # ===== number_700 =====
             if rec.company_type != 'person' and user_not_allowed :
                 if not rec.number_700 :
