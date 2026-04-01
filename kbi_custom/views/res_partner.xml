@@ -53,39 +53,39 @@
             </field>
         </record>
 
-        <record model="ir.ui.view" id="kbi_custom.view_hr_employee_date_form_contract">
-            <field name="name">hr.employee.form.contract.custom</field>
-            <field name="model">hr.employee</field>
-            <field name="inherit_id" ref="hr.view_employee_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='contract_state']" position="after">
-                    <group>
-                    <group string="Employee Important  Data"  col="12">
-                    <!-- Badge widget بلون أزرق -->
-                    <field name="start_working_date" widget="badge" options="{'color':'#1f77b4'}" style="'background-color:#6a5acd;color:white;padding:2px 6px;border-radius:4px;'"
-                           placeholder="تاريخ مباشرة العمل" />
-                    <field name="iqama_expiry_date"  placeholder="تاريخ انتهاء الإقامة" />
-                    <field name="passport_expiry_date" placeholder="تاريخ انتهاء الجواز" />    
-                        
-                    </group> 
-                    
-                    <group string="Employee Basic Information"  col="12">
-                    <!-- Badge widget بلون أزرق -->
-                    <field name="residency_visa_number"  options="{'color':'white'}" style="'background-color:#2ca02c;color:white;padding:2px 6px;border-radius:4px;'"
-                           placeholder="رقم الهوية / رقم الإقامة"  string="رقم الهوية /رقم الإقامة" />
-                    <field name="border_number"  placeholder="رقم الحدود"  col="12"/>
-                   
-                        
-                    </group> 
-                    </group>
-                </xpath>
-   
-                <!--xpath expr="//field[@name='city']" position="before">
-                    <field name="state_id"  />
-                    <field name="city_id" placeholder="City" class="o_address_city"
-                           modifiers="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
-                </xpath-->
-            </field>
-        </record>
+       <record model="ir.ui.view" id="kbi_custom.view_hr_employee_date_form_contract">
+    <field name="name">hr.employee.form.contract.custom</field>
+    <field name="model">hr.employee</field>
+    <field name="inherit_id" ref="hr.view_employee_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='contract_state']" position="after">
+            
+           
+            <group>
+                
+            
+                <group string="Employee Important Data" col="12">
+                    <field name="start_working_date" widget="badge"
+                           options="{'color':'#1f77b4'}"
+                           style="background-color:#6a5acd;color:white;padding:2px 6px;border-radius:4px;"
+                           placeholder="تاريخ مباشرة العمل" col="12"/>
+                    <field name="iqama_expiry_date" placeholder="تاريخ انتهاء الإقامة" col="12"/>
+                    <field name="passport_expiry_date" placeholder="تاريخ انتهاء الجواز" col="12"/>
+                </group>
+
+            
+                <group string="Employee Basic Information" col="12">
+                    <field name="residency_visa_number"
+                           options="{'color':'white'}"
+                           style="background-color:#2ca02c;color:white;padding:2px 6px;border-radius:4px;"
+                           placeholder="رقم الهوية /رقم الإقامة"
+                           string="رقم الهوية /رقم الإقامة" col="12"/>
+                    <field name="border_number" placeholder="رقم الحدود" col="12"/>
+                </group>
+
+            </group>
+        </xpath>
+    </field>
+</record>
     </data>
 </odoo>
