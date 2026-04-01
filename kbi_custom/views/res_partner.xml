@@ -60,7 +60,7 @@
     <field name="arch" type="xml">
         <xpath expr="//field[@name='contract_state']" position="after">
             
-                <group string="Employee Important Data & Basic Information" >
+                <group string="Employee Important Data &amp; Basic Information" >
                     <field name="start_working_date" widget="badge"
                            options="{'color':'#1f77b4'}"
                            style="background-color:#6a5acd;color:white;padding:2px 6px;border-radius:4px;"
