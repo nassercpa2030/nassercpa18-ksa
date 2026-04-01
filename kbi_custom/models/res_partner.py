@@ -428,7 +428,7 @@ class Recruiter ( models.Model ) :
                                            placeholder="Enter Related Contact" )
     request_employee_manager = fields.Many2one ( 'res.users' , string='المدير ' , required=True )
     contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
-    border_number = fields.Intger ( string="رقم  الحدود" , store=True )
+    border_number = fields.Integer ( string="رقم  الحدود" , store=True )
     iqama_expiry_date = fields.Date ( string="تاريخ انتهاء الإقامة" , store=True )
     start_working_date = fields.Date ( string="تاريخ المباشرة" , compute="_compute_start_working_date" )
     passport_expiry_date = fields.Date ( string="تاريخ انتهاء الجواز" )
