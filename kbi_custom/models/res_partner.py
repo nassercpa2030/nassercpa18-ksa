@@ -424,7 +424,7 @@ class Recruiter ( models.Model ) :
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
                                       placeholder="Enter Analytic Plan" )
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
-                                           help="this field get partner from contact" ,
+                                           help="this field get partner from contact" , readonly=False,
                                            placeholder="Enter Related Contact" )
     request_employee_manager = fields.Many2one ( 'res.users' , string='المدير ' , required=True ,store=True)
     contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
