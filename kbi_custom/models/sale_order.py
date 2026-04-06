@@ -23,7 +23,7 @@ class SaleOrder ( models.Model ) :
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
     old_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , stored=True )
     order_lines_count = fields.Integer ( string='Order Lines' , compute='_compute_order_lines_count' , store=True )
-    customer_phone_number = fields.Char ( string='تيلفون العميل' , related='partner_id.mobile' , store=True )
+    customer_phone_number = fields.Char ( string='تيلفون العميل' , comupute='_get_mobile'  )
     convert_orders = fields.Boolean (
         string="تحويل الأوردرات لعقود" ,
         default=False ,
@@ -217,8 +217,18 @@ class SaleOrder ( models.Model ) :
         store=True
     )
 
-    ##########Get order Lines##########
+    ##########Get order Lines#########
+    def _get_mobile(self) :
+         for rec in  self: 
+             if rec.partner_id.mobile != "" :
+                 rec.customer_phone_number = rec.partner_id.mobile
+             else if rec.partner_id.phone != "" and not rec.partner_id.mobile and  not rec.partner_id.fax_number:     
+                 rec.customer_phone_number = rec.partner_id.phone
+             else :
+                 rec.customer_phone_number = rec.partner_id.fax_number
+                 
 
+        
     @api.depends ( 'order_line' )
     def _compute_order_lines_count(self) :
         for rec in self :
