@@ -503,6 +503,7 @@ class ResPartner ( models.Model ) :
                                             placeholder="Enter Analytic Account for employee" )
 
     nationality = fields.Char ( "Nationality" )
+    email=fields.Char("Email",required=True,store=True)
     real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
     nationality = fields.Char ( "Nationality" )
