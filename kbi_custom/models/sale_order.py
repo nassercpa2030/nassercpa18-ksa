@@ -222,10 +222,10 @@ class SaleOrder ( models.Model ) :
          for rec in  self: 
              if rec.partner_id.mobile != "" :
                  rec.customer_phone_number = rec.partner_id.mobile
-             else if rec.partner_id.phone != "" and not rec.partner_id.mobile and  not rec.partner_id.fax_number:     
+             elif rec.partner_id.phone      
                  rec.customer_phone_number = rec.partner_id.phone
              else :
-                 rec.customer_phone_number = rec.partner_id.fax_number
+                 rec.customer_phone_number = rec.partner_id.fax_number or False
                  
 
         
