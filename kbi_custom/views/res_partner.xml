@@ -9,6 +9,10 @@
                 <!--xpath expr="//field[@name='category_id']" position="after">
                      
                 </xpath-->
+                <xpath expr="//field[@name='email']" position="before">
+                  <group>  <field name="fax_number" style="font-weight:bold; font-size:14px;" string="mobile2" placeholder="Mobile number 2"/></group>
+                           
+                </xpath>
                 <xpath expr="//field[@name='partner_vat_placeholder']" position="after">
                    
                             <field name='nationality' modifiers="{'invisible': [('is_broker', '=', True)]}"/>
