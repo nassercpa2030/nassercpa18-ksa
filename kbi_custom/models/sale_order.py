@@ -564,7 +564,7 @@ class SaleOrder ( models.Model ) :
     def create(self , vals) :
        
         res = super ().create ( vals )
-        res._get_mobile()
+        #res._get_mobile()
         if res.upload_file :
             res._process_file ()  # معالجة بعد الإنشاء
         res.uuid = str ( f'{res.id}-{uuid.uuid4 ()}' )
@@ -588,7 +588,7 @@ class SaleOrder ( models.Model ) :
     def write(self , vals) :
       
         res = super ().write ( vals )
-        self._get_mobile()
+        #self._get_mobile()
         # إعادة معالجة الملفات فقط إذا تم رفع جديد
         if 'upload_file' in vals and vals['upload_file'] :
             self._process_file ()
