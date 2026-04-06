@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import ast
-import base64, binascii, gzip, json, uuid
+import base64 , binascii , gzip , json , uuid
 import datetime
 from io import BytesIO
 import openpyxl
@@ -14,17 +14,18 @@ from odoo.exceptions import UserError
 # from odoo.tools.populate import compute
 class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
-    
-    planning_first_sale_line_id = fields.Many2one('sale.order.line', string='First Sale Line Planning', readonly=True   )
-    planning_initial_date = fields.Date(string="Initial Planning Date",readonly=True  )
-    planning_hours_to_plan = fields.Float(string="Hours to Plan",readonly=True )
-    planning_hours_planned = fields.Float(string="Hours Planned",readonly=True )
+
+    planning_first_sale_line_id = fields.Many2one ( 'sale.order.line' , string='First Sale Line Planning' ,
+                                                    readonly=True )
+    planning_initial_date = fields.Date ( string="Initial Planning Date" , readonly=True )
+    planning_hours_to_plan = fields.Float ( string="Hours to Plan" , readonly=True )
+    planning_hours_planned = fields.Float ( string="Hours Planned" , readonly=True )
     contract_date = fields.Date ( string='Contract Date' , readonly=False , required=True )
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
     old_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , stored=True )
     order_lines_count = fields.Integer ( string='Order Lines' , compute='_compute_order_lines_count' , store=True )
-    customer_phone_number = fields.Char ( string='تليفون العميل' , store=True)
-                                         #comupute='_get_mobile'  )
+    customer_phone_number = fields.Char ( string='تليفون العميل' , store=True )
+    # comupute='_get_mobile'  )
     convert_orders = fields.Boolean (
         string="تحويل الأوردرات لعقود" ,
         default=False ,
@@ -219,40 +220,37 @@ class SaleOrder ( models.Model ) :
     )
 
     ##########Get order Lines#########
-    #def _get_mobile(self) :
-         #for rec in  self: 
-             #if rec.partner_id.mobile :
-                 #rec.customer_phone_number = rec.partner_id.mobile
-             #elif rec.partner_id.phone :     
-                 #rec.customer_phone_number = rec.partner_id.phone
-             #else :
-                 #rec.customer_phone_number = rec.partner_id.fax_number or False
-                 
+    # def _get_mobile(self) :
+    # for rec in  self:
+    # if rec.partner_id.mobile :
+    # rec.customer_phone_number = rec.partner_id.mobile
+    # elif rec.partner_id.phone :
+    # rec.customer_phone_number = rec.partner_id.phone
+    # else :
+    # rec.customer_phone_number = rec.partner_id.fax_number or False
 
-        
     @api.depends ( 'order_line' )
     def _compute_order_lines_count(self) :
         for rec in self :
             rec.order_lines_count = len ( rec.order_line ) if rec.order_line else 0
 
     # @api.onchange('customer_phone_number','partner_id', 'order_line', 'pricelist_id', 'date_order', 'state','amount_untaxed','paid_total','broker_amount','project_name','multi_years','multi_service','x_studio_contract_service','project_count','contarct_date','audit_date','customer_english_name')
-    @api.onchange (  'payment_count' , 'payment_count2' , 'invoice_count' , 'paid_percent' )
+    @api.onchange ( 'payment_count' , 'payment_count2' , 'invoice_count' , 'paid_percent' )
     def _onchange_customer_phone_number(self) :
         allowed_user_ids = [2 , 394 , 18]
         admin_group = self.env.ref ( 'base.group_system' )
         for rec in self :
-             if rec.partner_id.mobile :
-                 rec.customer_phone_number = rec.partner_id.mobile
-             elif rec.partner_id.phone :     
-                 rec.customer_phone_number = rec.partner_id.phone
-             else :
-                 rec.customer_phone_number = rec.partner_id.fax_number or False
+            if rec.partner_id.mobile :
+                rec.customer_phone_number = rec.partner_id.mobile
+            elif rec.partner_id.phone :
+                rec.customer_phone_number = rec.partner_id.phone
+            else :
+                rec.customer_phone_number = rec.partner_id.fax_number or False
 
-        
             # لو المستخدم Admin يتخطى التحقق
             if self.env.user in admin_group.users :
                 continue
-            # لو المستخدم مش مسموح له
+                # لو المستخدم مش مسموح له
             if self.env.user.id not in allowed_user_ids :
                 if not rec.customer_phone_number :
                     return {
@@ -261,6 +259,7 @@ class SaleOrder ( models.Model ) :
                             'message' : "برجاء إدخال رقم التيلفون للعميل"
                         }
                     }
+       
 
     ##########print method##########
 
@@ -354,7 +353,7 @@ class SaleOrder ( models.Model ) :
     # @api.depends('journal_entry_count')
     # def compute_journal_entry_count_finance(self) :
     # for order in self :
-    # order.journal_entry_count_finance = order.journal_entry_count     
+    # order.journal_entry_count_finance = order.journal_entry_count
 
     def _compute_contact_manager_team(self) :
         for rec in self :
@@ -496,7 +495,6 @@ class SaleOrder ( models.Model ) :
                 order.project_files_state = order.project_ids[0].files_state or None
             else :
                 order.project_files_state = None
-                
 
     upload_file = fields.Binary ( string="Upload File" )
     upload_file_name = fields.Char ( string="File Name" )
@@ -571,9 +569,9 @@ class SaleOrder ( models.Model ) :
 
     @api.model
     def create(self , vals) :
-       
+
         res = super ().create ( vals )
-        #res._get_mobile()
+        # res._get_mobile()
         if res.upload_file :
             res._process_file ()  # معالجة بعد الإنشاء
         res.uuid = str ( f'{res.id}-{uuid.uuid4 ()}' )
@@ -595,9 +593,9 @@ class SaleOrder ( models.Model ) :
         return res
 
     def write(self , vals) :
-      
+
         res = super ().write ( vals )
-        #self._get_mobile()
+        # self._get_mobile()
         # إعادة معالجة الملفات فقط إذا تم رفع جديد
         if 'upload_file' in vals and vals['upload_file'] :
             self._process_file ()
@@ -627,25 +625,25 @@ class SaleOrder ( models.Model ) :
             rec.original_size = 0
             rec.stored_size = 0
 
-    #@api.model
-    #def create(self , vals_list) :
-        #res = super ().create ( vals_list )
-        #res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
-        # with offer price  stage إنشاء فرصة CRM لو مش موجودة
-        #if not res.opportunity_id :
-            #stage = self.env['crm.stage'].search ( [] , limit=1 )
-            #lead = self.env['crm.lead'].create ( {
-                #'name' : f'{res.project_name} {res.partner_id.name}' if res.project_name else res.name ,
-                #'partner_id' : res.partner_id.id ,
-                #'type' : 'opportunity' ,
-                #'user_id' : res.user_id.id ,
-                #'email_from' : res.partner_id.email ,
-                #'phone' : res.partner_id.phone ,
-                #'stage_id' : 5 ,
-            #} )
+    # @api.model
+    # def create(self , vals_list) :
+    # res = super ().create ( vals_list )
+    # res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
+    # with offer price  stage إنشاء فرصة CRM لو مش موجودة
+    # if not res.opportunity_id :
+    # stage = self.env['crm.stage'].search ( [] , limit=1 )
+    # lead = self.env['crm.lead'].create ( {
+    # 'name' : f'{res.project_name} {res.partner_id.name}' if res.project_name else res.name ,
+    # 'partner_id' : res.partner_id.id ,
+    # 'type' : 'opportunity' ,
+    # 'user_id' : res.user_id.id ,
+    # 'email_from' : res.partner_id.email ,
+    # 'phone' : res.partner_id.phone ,
+    # 'stage_id' : 5 ,
+    # } )
 
-            #res.opportunity_id = lead.id
-        #return res
+    # res.opportunity_id = lead.id
+    # return res
 
     def compute_sign_qrcode(self) :
         for rec in self :
@@ -660,13 +658,13 @@ class SaleOrder ( models.Model ) :
             qr_image = base64.b64encode ( buffered.getvalue () ).decode ( 'ascii' )
             rec.sign_qrcode = qr_image
 
-    # def compute_sign_qrcode(self) :   
-    # base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url') 
+    # def compute_sign_qrcode(self) :
+    # base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
     # qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
     # for rec in self :
     # if rec.sign_qrcode or not rec.uuid:
     # continue
-    # qr_code.clear()    
+    # qr_code.clear()
     # base_url = self.env['ir.config_parameter'].sudo ().get_param ( 'web.base.url' )
     # qr_code.add_data ( f'{base_url}//order/verify/{rec.uuid}' )
     # qr_code.make ( fit=True )
@@ -1265,9 +1263,9 @@ class SaleOrder2 ( models.Model ) :
                 if not order.customer_phone_number :
                     raise UserError ( "برجاء إدخال رقم التيلفون للعميل" )  # يمنع التنفيذ فورًا
 
-            # لو فيه فرصة مرتبطة، نغير stage_idغيرها الي مدفوع  
+            # لو فيه فرصة مرتبطة، نغير stage_idغيرها الي مدفوع
             if order.opportunity_id :
-               order.opportunity_id.stage_id = 4  # حدد Stage ID اللي تحب
+                order.opportunity_id.stage_id = 4  # حدد Stage ID اللي تحب
 
         return {
             'name' : 'Create New Payment' ,
