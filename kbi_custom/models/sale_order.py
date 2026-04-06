@@ -23,7 +23,8 @@ class SaleOrder ( models.Model ) :
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
     old_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , stored=True )
     order_lines_count = fields.Integer ( string='Order Lines' , compute='_compute_order_lines_count' , store=True )
-    customer_phone_number = fields.Char ( string='تيلفون العميل' , comupute='_get_mobile'  )
+    customer_phone_number = fields.Char ( string='تليفون العميل' , store=True)
+                                         #comupute='_get_mobile'  )
     convert_orders = fields.Boolean (
         string="تحويل الأوردرات لعقود" ,
         default=False ,
@@ -218,14 +219,14 @@ class SaleOrder ( models.Model ) :
     )
 
     ##########Get order Lines#########
-    def _get_mobile(self) :
-         for rec in  self: 
-             if rec.partner_id.mobile :
-                 rec.customer_phone_number = rec.partner_id.mobile
-             elif rec.partner_id.phone :     
-                 rec.customer_phone_number = rec.partner_id.phone
-             else :
-                 rec.customer_phone_number = rec.partner_id.fax_number or False
+    #def _get_mobile(self) :
+         #for rec in  self: 
+             #if rec.partner_id.mobile :
+                 #rec.customer_phone_number = rec.partner_id.mobile
+             #elif rec.partner_id.phone :     
+                 #rec.customer_phone_number = rec.partner_id.phone
+             #else :
+                 #rec.customer_phone_number = rec.partner_id.fax_number or False
                  
 
         
@@ -235,11 +236,19 @@ class SaleOrder ( models.Model ) :
             rec.order_lines_count = len ( rec.order_line ) if rec.order_line else 0
 
     # @api.onchange('customer_phone_number','partner_id', 'order_line', 'pricelist_id', 'date_order', 'state','amount_untaxed','paid_total','broker_amount','project_name','multi_years','multi_service','x_studio_contract_service','project_count','contarct_date','audit_date','customer_english_name')
-    @api.onchange ( 'customer_phone_number' , 'payment_count' , 'payment_count2' , 'invoice_count' , 'paid_percent' )
+    @api.onchange (  'payment_count' , 'payment_count2' , 'invoice_count' , 'paid_percent' )
     def _onchange_customer_phone_number(self) :
         allowed_user_ids = [2 , 394 , 18]
         admin_group = self.env.ref ( 'base.group_system' )
         for rec in self :
+             if rec.partner_id.mobile :
+                 rec.customer_phone_number = rec.partner_id.mobile
+             elif rec.partner_id.phone :     
+                 rec.customer_phone_number = rec.partner_id.phone
+             else :
+                 rec.customer_phone_number = rec.partner_id.fax_number or False
+
+        
             # لو المستخدم Admin يتخطى التحقق
             if self.env.user in admin_group.users :
                 continue
