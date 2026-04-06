@@ -220,9 +220,9 @@ class SaleOrder ( models.Model ) :
     ##########Get order Lines#########
     def _get_mobile(self) :
          for rec in  self: 
-             if rec.partner_id.mobile != "" :
+             if rec.partner_id.mobile :
                  rec.customer_phone_number = rec.partner_id.mobile
-             elif rec.partner_id.phone      
+             elif rec.partner_id.phone :     
                  rec.customer_phone_number = rec.partner_id.phone
              else :
                  rec.customer_phone_number = rec.partner_id.fax_number or False
