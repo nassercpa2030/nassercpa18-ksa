@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api, tools, _
 from odoo.exceptions import ValidationError
+import re
 
 
 class CrmStage(models.Model):
