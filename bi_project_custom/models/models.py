@@ -351,9 +351,12 @@ class SaleOrder ( models.Model ) :
 
         for rec in self :
             # لو تفعيل التوقيع مفعل، نحط التوقيع، غير كده يبقى False
-            rec.finance_assign = finance_user.sign_signature if rec.finance_signiture else False
-            rec.archive_assign = archive_user.sign_signature if rec.archive_signiture else False
-            rec.manager_assign = manager_user.sign_signature if rec.manager_signiture else False
+            #rec.finance_assign = finance_user.sign_signature if rec.finance_signiture else False
+            #rec.archive_assign = archive_user.sign_signature if rec.archive_signiture else False
+           # rec.manager_assign = manager_user.sign_signature if rec.manager_signiture else False
+            rec.finance_assign = finance_user.sudo().sign_signature if rec.finance_signiture else False
+            rec.archive_assign = archive_user.sudo().sign_signature if rec.archive_signiture else False
+            rec.manager_assign = manager_user.sudo().sign_signature if rec.manager_signiture else False
 
     @api.depends ( 'project_ids.files_state' )
     def _compute_project_files_state(self) :
