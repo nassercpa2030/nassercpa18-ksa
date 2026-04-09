@@ -409,8 +409,8 @@ class SaleOrder ( models.Model ) :
     def create(self , vals) :
         record = super ().create ( vals )
         record._link_custom_attachments_to_chatter ()
-         if record.amount_due <= 5:
-            record.finance_signiture = True
+        if record.amount_due <= 5:
+           record.finance_signiture = True
         return record
 
     def write(self , vals) :
