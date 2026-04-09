@@ -379,7 +379,11 @@ class SaleOrder ( models.Model ) :
             else :
                 record.broker_percentage_ = False
 
-    # @api.onchange ( 'price1','price2','price3' )
+     @api.onchange ( 'amount_due' )
+     def _check_finance_signiture(self) :
+          if record.amount_due <= 5:
+             record.finance_signiture = True
+         
     # @api.depends ( 'price1','price2','price3' )
     # def compute_taxed_price(self) :
     # for rec in self :
@@ -409,8 +413,7 @@ class SaleOrder ( models.Model ) :
     def create(self , vals) :
         record = super ().create ( vals )
         record._link_custom_attachments_to_chatter ()
-        if record.amount_due <= 5:
-           record.finance_signiture = True
+
         return record
 
     def write(self , vals) :
