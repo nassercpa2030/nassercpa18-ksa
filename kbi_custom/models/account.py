@@ -40,7 +40,7 @@ class AccountMove ( models.Model ) :
         for rec in self :
             if rec.payslip_ids :
                 first_payslip = rec.payslip_ids[0]
-                rec.employee_id = first_payslip.contract_id.name or ''
+                rec.employee_id = first_payslip.contract_id.employee_id.name or ''
             else :
                 rec.employee_id = ''
     ### count refrence number ######
