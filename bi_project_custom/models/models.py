@@ -40,9 +40,10 @@ class ProjectProject ( models.Model ) :
 
     manager_id = fields.Integer ( String="Manager_id" , related="user_id.id" , store=True , readonly=False ,
                                   ondelete='set null' )
-    quality_state = fields.Selection ( [('no_value' , ''),('to_quality' , 'التحويل للجودة') , ('review_again' , 'إعادة للمراجعة') ,
-                                        ('partner_signed' , 'توقيع الشريك') , ] , string='حالة الملف' , store=True ,
-                                       readonly=False , ondelete='set null' )
+    quality_state = fields.Selection (
+        [('no_value' , '') , ('to_quality' , 'التحويل للجودة') , ('review_again' , 'إعادة للمراجعة') ,
+         ('partner_signed' , 'توقيع الشريك') , ] , string='حالة الملف' , store=True ,
+        readonly=False , ondelete='set null' )
     show_quality_state = fields.Boolean ( string='إظهار حالة الجودة' , compute='_compute_show_quality_state' ,
                                           ondelete='set null' )
     quality_state_history_ids = fields.One2many ( 'quality.state.log' , 'project_id' , string='Quality State History' ,
@@ -105,15 +106,15 @@ class ProjectProject ( models.Model ) :
 
     ### changing stage_id using  editing Quality state #######
 
-    @api.onchange ('quality_state')
+    @api.onchange ( 'quality_state' )
     @api.depends ( 'quality_state' )
     def _compute_quality_state_visibility(self) :
         for rec in self :
             if rec.quality_state == 'partner_signed' :
                 # rec.quality_state_invisible = True
-                rec.stage_id = 20 
+                rec.stage_id = 20
                 rec.show_quality_state = False
-                
+
             else :
                 rec.stage_id = 2
                 rec.show_quality_state = True
@@ -379,20 +380,11 @@ class SaleOrder ( models.Model ) :
             else :
                 record.broker_percentage_ = False
 
-     @api.onchange ( 'amount_due' )
-     def _check_finance_signiture(self) :
-          if record.amount_due <= 5:
-             record.finance_signiture = True
-         
-    # @api.depends ( 'price1','price2','price3' )
-    # def compute_taxed_price(self) :
-    # for rec in self :
-    # rec.tax1=rec.price1*0.15
-    # rec.tax2=rec.price2*0.15
-    # rec.tax3=rec.price3*0.15
-    # rec.taxed_price1=rec.price1*1.15
-    # rec.taxed_price2=rec.price2*1.15
-    # rec.taxed_price3=rec.price3*1.15
+    @api.onchange ( 'amount_due' )
+    def _check_finance_signiture(self) :
+        if record.amount_due <= 5 :
+            record.finance_signiture = True
+            
 
     @api.depends ( 'invoice_ids' )
     def _compute_invoice_attachments(self) :
@@ -418,10 +410,10 @@ class SaleOrder ( models.Model ) :
 
     def write(self , vals) :
         res = super ().write ( vals )
-        for order in self:
-            if order.amount_due <= 5:   
+        for order in self :
+            if order.amount_due <= 5 :
                 order.finance_signiture = True
-            
+
         self._link_custom_attachments_to_chatter ()
         return res
 
@@ -526,9 +518,9 @@ class SaleOrder ( models.Model ) :
         for order in self :
             order.state = 'to approve'
             order._auto_code ()  # استدعاء الدالة لكل سجل
-             # لو فيه فرصة مرتبطة، نغير stage_idالي نعاقد  غير مدفوع
-            if order.opportunity_id:
-               order.opportunity_id.stage_id = 3  # حدد Stage ID اللي تحب
+            # لو فيه فرصة مرتبطة، نغير stage_idالي نعاقد  غير مدفوع
+            if order.opportunity_id :
+                order.opportunity_id.stage_id = 3  # حدد Stage ID اللي تحب
             res.append ( order )
 
         return {
@@ -637,30 +629,29 @@ class SaleOrder ( models.Model ) :
     # ] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
     # order.journal_165_date = moves.date if moves else False
 
-
-def action_close_journal_entries(self) :
-    self.ensure_one ()
-    return {
-        'type' : 'ir.actions.act_window' ,
-        'name' : 'Close Journal Entries' ,
-        'view_mode' : 'form' ,
-        'res_model' : 'close.entry.wizard' ,
-        'context' : {'default_sale_order_id' : self.id} ,
-        'target' : 'new' ,
-    }
-
-
-def action_open_close_entry_wizard_deffered(self) :
-    self.ensure_one ()
-    return {
-        'type' : 'ir.actions.act_window' ,
-        'name' : 'Close Entry Deffered' ,
-        'res_model' : 'close.entry.wizard' ,
-        'view_mode' : 'form' ,
-        'target' : 'new' ,
-        'view_id' : self.env.ref ( 'bi_project_custom.view_close_entry_wizard_form_deffered' ).id ,
-        # لو عندك view مخصص
-        'context' : {
-            'default_sale_order_id' : self.id ,
+    def action_close_journal_entries(self) :
+        self.ensure_one ()
+        return {
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'Close Journal Entries' ,
+            'view_mode' : 'form' ,
+            'res_model' : 'close.entry.wizard' ,
+            'context' : {'default_sale_order_id' : self.id} ,
+            'target' : 'new' ,
         }
-    }
+
+    def action_open_close_entry_wizard_deffered(self) :
+        self.ensure_one ()
+        return {
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'Close Entry Deffered' ,
+            'res_model' : 'close.entry.wizard' ,
+            'view_mode' : 'form' ,
+            'target' : 'new' ,
+            'view_id' : self.env.ref ( 'bi_project_custom.view_close_entry_wizard_form_deffered' ).id ,
+            # لو عندك view مخصص
+            'context' : {
+                'default_sale_order_id' : self.id ,
+            }
+        }
+
