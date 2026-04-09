@@ -8,6 +8,7 @@ class AccountMove ( models.Model ) :
     _inherit = 'account.move'
 
     broker_sale_id = fields.Many2one ( 'sale.order' , string='Broker Sale' )
+    employee_id = fields.Char ( string="Employee" , compute="_compute_employee" )
     sale_order_test = fields.Char ( string='Sale Order Test' , readonly=False , required=False )
     x_studio_auto_code = fields.Char ( string="order name" )
     sale_order_id_finance = fields.Many2one (
