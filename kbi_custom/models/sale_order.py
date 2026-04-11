@@ -47,6 +47,7 @@ class SaleOrder ( models.Model ) :
     unpaid_total_refrence = fields.Float ( 'unpaid_total_refrence' , store=True , readonly=False )
     paid_total_refrence = fields.Float ( 'paid_total_refrence' , store=True , readonly=False )
     paid_percentage_refrence = fields.Float ( 'paid_percentage_refrence' , store=True , readonly=False )
+
     customer_English_name_refrence = fields.Char ( 'customer_English_name_refrence' , readonly=False , store=True )
     close_entry_date_refrence = fields.Date ( string="close_entry_date_refrence" , readonly=False , required=False ,
                                               store=True )
@@ -88,6 +89,16 @@ class SaleOrder ( models.Model ) :
     paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count" , searchable=True )
     unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count" , searchable=True )
     paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" , sorted=True )
+    finance_signiture = fields.Boolean ( ' توقيع المالية للختم ' ,  compute="_compute_payment_count" , readonly=False , store=True )
+    archive_signiture = fields.Boolean ( 'توقيع الأرشيف للختم ' , default=False , readonly=False , index=True )
+    manager_signiture = fields.Boolean ( 'توقيع مدير المجموعة للختم ' , default=False , readonly=False , index=True )
+    finance_assign = fields.Binary ( ' ملف توقيع المالية  ' , default=False ,
+                                     compute="_compute_finance_archive_signature" , store=False , readonly=False )
+    archive_assign = fields.Binary ( ' ملف توقيع الأرشيف ' , default=False ,
+                                     compute="_compute_finance_archive_signature" , store=False , readonly=False )
+    manager_assign = fields.Binary ( ' ملف توقيع مدير المجموعة ' , default=False ,
+                                     compute="_compute_finance_archive_signature" , store=False , readonly=False )
+
     auditor = fields.Many2one ( string="Auditor" , comodel_name="hr.employee" ,
                                 domain=[('job_id' , '!=' , 'مدير مراجعة')] )
     # invoice_ids = fields.Many2many ( 'account.move' , compute="compute_invoice_ids" , readonly=True , store=True ,
@@ -235,7 +246,9 @@ class SaleOrder ( models.Model ) :
             rec.order_lines_count = len ( rec.order_line ) if rec.order_line else 0
 
     # @api.onchange('customer_phone_number','partner_id', 'order_line', 'pricelist_id', 'date_order', 'state','amount_untaxed','paid_total','broker_amount','project_name','multi_years','multi_service','x_studio_contract_service','project_count','contarct_date','audit_date','customer_english_name')
-    @api.onchange ('partner_id','amount_untaxed','paid_total','x_studio_contract_service','project_count','contarct_date','audit_date','customer_english_name', 'payment_count' , 'payment_count2' , 'invoice_count' , 'paid_percent' )
+    @api.onchange ( 'partner_id' , 'amount_untaxed' , 'paid_total' , 'x_studio_contract_service' , 'project_count' ,
+                    'contarct_date' , 'audit_date' , 'customer_english_name' , 'payment_count' , 'payment_count2' ,
+                    'invoice_count' , 'paid_percent' )
     def _onchange_customer_phone_number(self) :
         allowed_user_ids = [2 , 394 , 18]
         admin_group = self.env.ref ( 'base.group_system' )
@@ -259,7 +272,6 @@ class SaleOrder ( models.Model ) :
                             'message' : "برجاء إدخال رقم التيلفون للعميل"
                         }
                     }
-       
 
     ##########print method##########
 
@@ -759,7 +771,7 @@ class SaleOrder ( models.Model ) :
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
             rec.paid_total_refrence = paid_total
-
+            rec.finance_signiture = ( rec.paid_total >= 96 and rec.state not in ['draft' , 'sent' , 'cancel'])
             # تحديث convert_orders بناءً على paid_total
             previous_convert = rec.convert_orders
             rec.convert_orders = rec.paid_total > 0
