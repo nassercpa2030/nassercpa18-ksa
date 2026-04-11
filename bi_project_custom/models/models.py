@@ -385,8 +385,9 @@ class SaleOrder ( models.Model ) :
 
     @api.onchange ( 'amount_due' )
     def _check_finance_signiture(self) :
-        if record.amount_due <= 5 :
-            record.finance_signiture = True
+        for rec in self :
+            if rec.amount_due <= 5 :
+               rec.finance_signiture = True
             
 
     @api.depends ( 'invoice_ids' )
