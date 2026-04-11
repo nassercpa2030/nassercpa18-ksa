@@ -784,7 +784,7 @@ class SaleOrder ( models.Model ) :
     @api.onchange('paid_percent')
     def change_finance_signiture(self):
          for rec in self :
-             if  rec.paid_percent >= 96 and rec.state not in ['draft' , 'sent' , 'cancel']:
+             if  rec.paid_percent >= 99 and rec.state not in ['draft' , 'sent' , 'cancel']:
                  rec.finance_signiture = True
              else :
                  rec.finance_signiture = False
