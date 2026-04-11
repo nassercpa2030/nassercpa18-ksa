@@ -89,7 +89,7 @@ class SaleOrder ( models.Model ) :
     paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count" , searchable=True )
     unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count" , searchable=True )
     paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" , sorted=True )
-    finance_signiture = fields.Boolean ( ' توقيع المالية للختم ' ,  compute="_compute_payment_count" , readonly=False , store=True )
+    finance_signiture = fields.Boolean ( ' توقيع المالية للختم ' ,  compute="_compute_payment_count" , readonly=False  )
     archive_signiture = fields.Boolean ( 'توقيع الأرشيف للختم ' , default=False , readonly=False , index=True )
     manager_signiture = fields.Boolean ( 'توقيع مدير المجموعة للختم ' , default=False , readonly=False , index=True )
     finance_assign = fields.Binary ( ' ملف توقيع المالية  ' , default=False ,
