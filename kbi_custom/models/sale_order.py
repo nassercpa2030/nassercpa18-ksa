@@ -89,14 +89,14 @@ class SaleOrder ( models.Model ) :
     paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count" , searchable=True )
     unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count" , searchable=True )
     paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" , sorted=True )
-    finance_signiture = fields.Boolean ( ' توقيع المالية للختم ' ,  compute="_compute_payment_count" , readonly=False  )
-    archive_signiture = fields.Boolean ( 'توقيع الأرشيف للختم ' , default=False , readonly=False , index=True )
-    manager_signiture = fields.Boolean ( 'توقيع مدير المجموعة للختم ' , default=False , readonly=False , index=True )
-    finance_assign = fields.Binary ( ' ملف توقيع المالية  ' , default=False ,
+    finance_signiture = fields.Boolean ( string=' توقيع المالية للختم ' ,  compute="_compute_payment_count" , readonly=False, sorted=True  )
+    archive_signiture = fields.Boolean ( string='توقيع الأرشيف للختم ' , default=False , readonly=False , index=True )
+    manager_signiture = fields.Boolean ( string='توقيع مدير المجموعة للختم ' , default=False , readonly=False , index=True )
+    finance_assign = fields.Binary ( string=' ملف توقيع المالية  ' , default=False ,
                                      compute="_compute_finance_archive_signature" , store=False , readonly=False )
-    archive_assign = fields.Binary ( ' ملف توقيع الأرشيف ' , default=False ,
+    archive_assign = fields.Binary ( string=' ملف توقيع الأرشيف ' , default=False ,
                                      compute="_compute_finance_archive_signature" , store=False , readonly=False )
-    manager_assign = fields.Binary ( ' ملف توقيع مدير المجموعة ' , default=False ,
+    manager_assign = fields.Binary ( string=' ملف توقيع مدير المجموعة ' , default=False ,
                                      compute="_compute_finance_archive_signature" , store=False , readonly=False )
 
     auditor = fields.Many2one ( string="Auditor" , comodel_name="hr.employee" ,
@@ -780,6 +780,11 @@ class SaleOrder ( models.Model ) :
             if rec.convert_orders and not previous_convert :
                 rec.action_convert_orders ()  # استدعاء الدالة مباشرة
 
+    onchange('paid_percent)
+    def change_finance_signiture(self):
+         for rec in self :
+             rec.finance_signiture = ( rec.paid_percent >= 96 and rec.state not in ['draft' , 'sent' , 'cancel'])
+    
     def action_convert_orders(self) :
         """
         دالة لتحويل الأوردرات إلى عقود وإنشاء المشاريع المرتبطة
