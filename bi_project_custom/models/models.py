@@ -236,7 +236,7 @@ class SaleOrder ( models.Model ) :
 
     journal_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string='عدد قيود الإغلاق' ,
                                            index=True , searchable=True )
-    finance_signiture = fields.Boolean ( ' توقيع المالية للختم ' ,  compute="_compute_finance_archive_signature", , readonly=False , store=True )
+    finance_signiture = fields.Boolean ( ' توقيع المالية للختم ' ,  compute="_compute_finance_archive_signature" , readonly=False , store=True )
     archive_signiture = fields.Boolean ( 'توقيع الأرشيف للختم ' , default=False , readonly=False , index=True )
     manager_signiture = fields.Boolean ( 'توقيع مدير المجموعة للختم ' , default=False , readonly=False , index=True )
     finance_assign = fields.Binary ( ' ملف توقيع المالية  ' , default=False ,
