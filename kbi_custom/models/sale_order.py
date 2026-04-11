@@ -780,7 +780,7 @@ class SaleOrder ( models.Model ) :
             if rec.convert_orders and not previous_convert :
                 rec.action_convert_orders ()  # استدعاء الدالة مباشرة
 
-    onchange('paid_percent')
+    @onchange('paid_percent')
     def change_finance_signiture(self):
          for rec in self :
              rec.finance_signiture = ( rec.paid_percent >= 96 and rec.state not in ['draft' , 'sent' , 'cancel'])
