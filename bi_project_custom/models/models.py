@@ -236,7 +236,7 @@ class SaleOrder ( models.Model ) :
 
     journal_entry_count = fields.Integer ( compute='_compute_journal_entry_count' , string='عدد قيود الإغلاق' ,
                                            index=True , searchable=True )
-    finance_signiture = fields.Boolean ( ' توقيع المالية للختم ' , default=False , readonly=False , index=True )
+    finance_signiture = fields.Boolean ( ' توقيع المالية للختم ' ,  compute="_compute_finance_archive_signature", , readonly=False , store=True )
     archive_signiture = fields.Boolean ( 'توقيع الأرشيف للختم ' , default=False , readonly=False , index=True )
     manager_signiture = fields.Boolean ( 'توقيع مدير المجموعة للختم ' , default=False , readonly=False , index=True )
     finance_assign = fields.Binary ( ' ملف توقيع المالية  ' , default=False ,
@@ -350,6 +350,8 @@ class SaleOrder ( models.Model ) :
         # browse ([!563,!18])  # اليوزر اللي id != 563,!=18 manager
 
         for rec in self :
+            if  rec.amount_due <= 5  and rec.state not in ['draft' , 'sent' , 'cancel']:
+                rec.finance_signiture = True
             # لو تفعيل التوقيع مفعل، نحط التوقيع، غير كده يبقى False
             #rec.finance_assign = finance_user.sign_signature if rec.finance_signiture else False
             #rec.archive_assign = archive_user.sign_signature if rec.archive_signiture else False
