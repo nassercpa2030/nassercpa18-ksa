@@ -384,10 +384,10 @@ class SaleOrder ( models.Model ) :
                 record.broker_percentage_ = False
 
    # @api.onchange ( 'amount_due' )
-    #def _check_finance_signiture(self) :
-        #for rec in self :
-            #if rec.amount_due <= 5  and rec.state not in  ['draft','sent','cancel'] :
-               #rec.finance_signiture = True
+    @api.depends('amount_due', 'state')
+    def _check_finance_signiture(self) :
+        for rec in self :
+            rec.finance_signiture = (rec.amount_due <= 5 and rec.state not in ['draft', 'sent', 'cancel'])
             
 
     @api.depends ( 'invoice_ids' )
@@ -414,9 +414,6 @@ class SaleOrder ( models.Model ) :
 
     def write(self , vals) :
         res = super ().write ( vals )
-        for rec in self:
-            if rec.amount_due <= 5 and rec.state not in ['draft', 'sent', 'cancel']:
-               rec.finance_signiture = True
         #for order in self :
             #if order.amount_due <= 5 :
                 #order.finance_signiture = True
