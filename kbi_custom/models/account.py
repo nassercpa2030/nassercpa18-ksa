@@ -214,6 +214,18 @@ class AccountMove ( models.Model ) :
 
                 # 3️⃣ تنفيذ نفس زر Close Entry
                 wizard.close_entry ()
+                ### change close entry state into draft
+            
+                sale_order.with_context ( skip_auto_invoice=True ).write ( {
+                    'state' : 'draft'
+                } )
+
+                # change finance signiture state 
+                if sale_order.paid_percent >= 96 and sale_order.state not in ['draft' , 'sent' , 'cancel'] :
+                    sale_order.finance_signiture = True
+                else :
+                    sale_order.finance_signiture = False
+                    
                 if sale_order.project_ids :
                     project = sale_order.project_ids[0]  # مشروع واحد فقط
                     # if project.stage_id.id != 24:
