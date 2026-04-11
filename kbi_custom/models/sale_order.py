@@ -771,7 +771,7 @@ class SaleOrder ( models.Model ) :
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
             rec.paid_total_refrence = paid_total
-            rec.finance_signiture = ( rec.paid_total >= 96 and rec.state not in ['draft' , 'sent' , 'cancel'])
+            rec.finance_signiture = ( rec.paid_percent >= 96 and rec.state not in ['draft' , 'sent' , 'cancel'])
             # تحديث convert_orders بناءً على paid_total
             previous_convert = rec.convert_orders
             rec.convert_orders = rec.paid_total > 0
