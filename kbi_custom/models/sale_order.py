@@ -89,7 +89,7 @@ class SaleOrder ( models.Model ) :
     paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count" , searchable=True )
     unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count" , searchable=True )
     paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" , sorted=True )
-    finance_signiture = fields.Boolean ( string=' توقيع المالية للختم ' ,  compute="_compute_payment_count" , readonly=False, sorted=True  )
+    finance_signiture = fields.Boolean ( string=' توقيع المالية للختم '  , readonly=False, store=True  )
     archive_signiture = fields.Boolean ( string='توقيع الأرشيف للختم ' , default=False , readonly=False , index=True )
     manager_signiture = fields.Boolean ( string='توقيع مدير المجموعة للختم ' , default=False , readonly=False , index=True )
     finance_assign = fields.Binary ( string=' ملف توقيع المالية  ' , default=False ,
@@ -771,7 +771,7 @@ class SaleOrder ( models.Model ) :
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
             rec.paid_total_refrence = paid_total
-            rec.finance_signiture = ( rec.paid_percent >= 96 and rec.state not in ['draft' , 'sent' , 'cancel'])
+            #rec.finance_signiture = ( rec.paid_percent >= 96 and rec.state not in ['draft' , 'sent' , 'cancel'])
             # تحديث convert_orders بناءً على paid_total
             previous_convert = rec.convert_orders
             rec.convert_orders = rec.paid_total > 0
@@ -784,7 +784,11 @@ class SaleOrder ( models.Model ) :
     @api.onchange('paid_percent')
     def change_finance_signiture(self):
          for rec in self :
-             rec.finance_signiture = ( rec.paid_percent >= 96 and rec.state not in ['draft' , 'sent' , 'cancel'])
+             if  rec.paid_percent >= 96 and rec.state not in ['draft' , 'sent' , 'cancel']:
+                 rec.finance_signiture = True
+             else :
+                 rec.finance_signiture = False
+                 
     
     def action_convert_orders(self) :
         """
