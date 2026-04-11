@@ -386,7 +386,7 @@ class SaleOrder ( models.Model ) :
     @api.onchange ( 'amount_due' )
     def _check_finance_signiture(self) :
         for rec in self :
-            if rec.amount_due <= 5 :
+            if rec.amount_due <= 5  and rec.state not in  ['draft','sent','cancel'] :
                rec.finance_signiture = True
             
 
