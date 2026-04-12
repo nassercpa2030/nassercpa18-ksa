@@ -142,6 +142,60 @@
                 </attribute>
 
             </xpath>
+             <!-- ⭐ quantity as badge (نفس الألوان) -->
+            <xpath expr="//field[@name='line_ids']/list/field[@name='quantity']" position="attributes">
+                <attribute name="widget">badge</attribute>
+
+                <attribute name="decoration-primary">code == 'BASIC-A'</attribute>
+
+                <attribute name="decoration-success">
+                    code and (
+                        'HOUALLOW' in code or
+                        'TRAALLOW' in code or
+                        'OTALLOW' in code
+                    )
+                </attribute>
+
+                <attribute name="decoration-warning">
+                    code and 'GROSS' in code
+                </attribute>
+
+                <attribute name="decoration-info">
+                    code and 'NET' in code
+                </attribute>
+
+                <attribute name="decoration-danger">
+                    code and 'DED' in code
+                </attribute>
+
+            </xpath>
+              <!-- ⭐ rate as badge (نفس الألوان) -->
+            <xpath expr="//field[@name='line_ids']/list/field[@name='rate']" position="attributes">
+                <attribute name="widget">badge</attribute>
+
+                <attribute name="decoration-primary">code == 'BASIC-A'</attribute>
+
+                <attribute name="decoration-success">
+                    code and (
+                        'HOUALLOW' in code or
+                        'TRAALLOW' in code or
+                        'OTALLOW' in code
+                    )
+                </attribute>
+
+                <attribute name="decoration-warning">
+                    code and 'GROSS' in code
+                </attribute>
+
+                <attribute name="decoration-info">
+                    code and 'NET' in code
+                </attribute>
+
+                <attribute name="decoration-danger">
+                    code and 'DED' in code
+                </attribute>
+
+            </xpath>
 
  <!-- ⭐ total as badge (نفس الألوان) -->
             <xpath expr="//field[@name='line_ids']/list/field[@name='total']" position="attributes">
