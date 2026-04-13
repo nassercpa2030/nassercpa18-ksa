@@ -328,7 +328,7 @@ class SaleOrder ( models.Model ) :
             else :
                 rec.product_public_name = False
 
-    @api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
+    @api.onchange ( "product_public_name" , "account_year" , "auto_contract_name" )
     def get_project_name(self) :
         for rec in self :
             # if not rec.project_name and rec.auto_contract_name:
