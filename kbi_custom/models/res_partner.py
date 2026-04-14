@@ -215,191 +215,191 @@ class HrPayslip ( models.Model ) :
                 # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
                 analytic_vals = {analytic_account_id.id : 100} if analytic_account_id else {}
 
-                for line in move.line_ids :
-                    line.analytic_account_id = analytic_account_id
+                #for line in move.line_ids :
+                    #line.analytic_account_id = analytic_account_id
                     ### finance department ###
-                    distribution_vals_finance = {
-                        8820 : line.env.user.finance923_perc_101 ,
-                        8843 : line.env.user.finance923_perc_104 ,
-                        8849 : line.env.user.finance923_perc_110 ,
-                        8865 : line.env.user.finance923_perc_111 ,
-                        8858 : line.env.user.finance923_perc_200 ,
-                        8834 : line.env.user.finance923_perc_103 ,
-                        8791 : 100.0 ,
-                    }
+                    #distribution_vals_finance = {
+                        #8820 : line.env.user.finance923_perc_101 ,
+                        #8843 : line.env.user.finance923_perc_104 ,
+                        #8849 : line.env.user.finance923_perc_110 ,
+                        #8865 : line.env.user.finance923_perc_111 ,
+                       # 8858 : line.env.user.finance923_perc_200 ,
+                      #  8834 : line.env.user.finance923_perc_103 ,
+                     #   8791 : 100.0 ,
+                    #}
                     ### uploading ###
-                    distribution_vals_upload = {
-                        8820 : line.env.user.oper_supp902_perc_101 ,
-                        8843 : line.env.user.oper_supp902_perc_104 ,
-                        8849 : line.env.user.oper_supp902_perc_110 ,
-                        8865 : line.env.user.oper_supp902_perc_111 ,
-                        8858 : line.env.user.oper_supp902_perc_200 ,
-                        8834 : line.env.user.oper_supp902_perc_103 ,
-                        8796 : 100.0 ,
+                    #distribution_vals_upload = {
+                        #8820 : line.env.user.oper_supp902_perc_101 ,
+                        #8843 : line.env.user.oper_supp902_perc_104 ,
+                        #8849 : line.env.user.oper_supp902_perc_110 ,
+                        #8865 : line.env.user.oper_supp902_perc_111 ,
+                       # 8858 : line.env.user.oper_supp902_perc_200 ,
+                      #  8834 : line.env.user.oper_supp902_perc_103 ,
+                     #   8796 : 100.0 ,
 
-                    }
+                    #}
                     ### Archive ###
-                    distribution_vals3_archive = {
-                        8820 : line.env.user.oper_supp902_perc_101 ,
-                        8843 : line.env.user.oper_supp902_perc_104 ,
-                        8849 : line.env.user.oper_supp902_perc_110 ,
-                        8865 : line.env.user.oper_supp902_perc_111 ,
-                        8858 : line.env.user.oper_supp902_perc_200 ,
-                        8834 : line.env.user.oper_supp902_perc_103 ,
-                        8795 : 100.0 ,
+                    #distribution_vals3_archive = {
+                        #8820 : line.env.user.oper_supp902_perc_101 ,
+                        #8843 : line.env.user.oper_supp902_perc_104 ,
+                       # 8849 : line.env.user.oper_supp902_perc_110 ,
+                       # 8865 : line.env.user.oper_supp902_perc_111 ,
+                       # 8858 : line.env.user.oper_supp902_perc_200 ,
+                       # 8834 : line.env.user.oper_supp902_perc_103 ,
+                      #  8795 : 100.0 ,
 
-                    }
+                    #}
                     ### Sercratry_manageral ###
-                    distribution_vals4_secretary = {
-                        8820 : line.env.user.oper_supp902_perc_101 ,
-                        8843 : line.env.user.oper_supp902_perc_104 ,
-                        8849 : line.env.user.oper_supp902_perc_110 ,
-                        8865 : line.env.user.oper_supp902_perc_111 ,
-                        8858 : line.env.user.oper_supp902_perc_200 ,
-                        8834 : line.env.user.oper_supp902_perc_103 ,
-                        8797 : 100.0 ,
-                    }
+                    #distribution_vals4_secretary = {
+                       # 8820 : line.env.user.oper_supp902_perc_101 ,
+                       # 8843 : line.env.user.oper_supp902_perc_104 ,
+                       # 8849 : line.env.user.oper_supp902_perc_110 ,
+                       # 8865 : line.env.user.oper_supp902_perc_111 ,
+                       # 8858 : line.env.user.oper_supp902_perc_200 ,
+                      #  8834 : line.env.user.oper_supp902_perc_103 ,
+                     #   8797 : 100.0 ,
+                    #}
                     ### Quality ###
-                    distribution_vals_quality = {
-                        8820 : line.env.user.quality901_perc_101 ,
-                        8843 : line.env.user.quality901_perc_104 ,
-                        8849 : line.env.user.quality901_perc_110 ,
-                        8865 : line.env.user.quality901_perc_111 ,
-                        8858 : line.env.user.quality901_perc_200 ,
-                        8834 : line.env.user.quality901_perc_103 ,
-                        8790 : 100.0 ,
-                    }
+                    #distribution_vals_quality = {
+                        #8820 : line.env.user.quality901_perc_101 ,
+                        #8843 : line.env.user.quality901_perc_104 ,
+                        #8849 : line.env.user.quality901_perc_110 ,
+                        #8865 : line.env.user.quality901_perc_111 ,
+                       # 8858 : line.env.user.quality901_perc_200 ,
+                      #  8834 : line.env.user.quality901_perc_103 ,
+                     #   8790 : 100.0 ,
+                    #}
                     ### manageral921 ###
-                    distribution_vals_manage_921 = {
-                        8820 : line.env.user.manage_921_perc_101 ,
-                        8843 : line.env.user.manage_921_perc_104 ,
-                        8849 : line.env.user.manage_921_perc_110 ,
-                        8865 : line.env.user.manage_921_perc_111 ,
-                        8858 : line.env.user.manage_921_perc_200 ,
-                        8834 : line.env.user.manage_921_perc_103 ,
-                        8799 : 100.0 ,
-                    }
+                    #distribution_vals_manage_921 = {
+                        #8820 : line.env.user.manage_921_perc_101 ,
+                        #8843 : line.env.user.manage_921_perc_104 ,
+                        #8849 : line.env.user.manage_921_perc_110 ,
+                       # 8865 : line.env.user.manage_921_perc_111 ,
+                       # 8858 : line.env.user.manage_921_perc_200 ,
+                      #  8834 : line.env.user.manage_921_perc_103 ,
+                     #   8799 : 100.0 ,
+                    #}
                     ### technology922 ###
-                    distribution_vals_it = {
-                        8820 : line.env.user.it_922_perc_101 ,
-                        8843 : line.env.user.it_922_perc_104 ,
-                        8849 : line.env.user.it_922_perc_110 ,
-                        8865 : line.env.user.it_922_perc_111 ,
-                        8858 : line.env.user.it_922_perc_200 ,
-                        8834 : line.env.user.it_922_perc_103 ,
-                        8789 : 100.0 ,
-                    }
+                    #distribution_vals_it = {
+                        #8820 : line.env.user.it_922_perc_101 ,
+                        #8843 : line.env.user.it_922_perc_104 ,
+                        #8849 : line.env.user.it_922_perc_110 ,
+                        #8865 : line.env.user.it_922_perc_111 ,
+                       # 8858 : line.env.user.it_922_perc_200 ,
+                      #  8834 : line.env.user.it_922_perc_103 ,
+                     #   8789 : 100.0 ,
+                    #}
                     ### Cleaning ###
-                    distribution_vals_clean_ryd = {
-                        8820 : line.env.user.coff_clean_ryd_perc_101 ,
-                        8843 : line.env.user.coff_clean_ryd_perc_104 ,
-                        8849 : line.env.user.coff_clean_ryd_perc_110 ,
-                        8865 : line.env.user.coff_clean_ryd_perc_111 ,
-                        8858 : line.env.user.coff_clean_ryd_perc_200 ,
-                        8834 : line.env.user.coff_clean_ryd_perc_103 ,
-                        8801 : 100.0 ,
-                    }
+                    #distribution_vals_clean_ryd = {
+                        #8820 : line.env.user.coff_clean_ryd_perc_101 ,
+                        #8843 : line.env.user.coff_clean_ryd_perc_104 ,
+                        #8849 : line.env.user.coff_clean_ryd_perc_110 ,
+                        #8865 : line.env.user.coff_clean_ryd_perc_111 ,
+                       # 8858 : line.env.user.coff_clean_ryd_perc_200 ,
+                      #  8834 : line.env.user.coff_clean_ryd_perc_103 ,
+                     #   8801 : 100.0 ,
+                    #}
                     ### pub_loc903 ###
-                    distribution_vals_pub_loc903 = {
-                        8820 : line.env.user.pub_loc903_perc_101 ,
-                        8843 : line.env.user.pub_loc903_perc_104 ,
-                        8849 : line.env.user.pub_loc903_perc_110 ,
-                        8865 : line.env.user.pub_loc903_perc_111 ,
-                        8858 : line.env.user.pub_loc903_perc_200 ,
-                        8834 : line.env.user.pub_loc903_perc_103 ,
-                        8792 : 100.0 ,
-                    }
+                    #distribution_vals_pub_loc903 = {
+                        #8820 : line.env.user.pub_loc903_perc_101 ,
+                        #8843 : line.env.user.pub_loc903_perc_104 ,
+                        #8849 : line.env.user.pub_loc903_perc_110 ,
+                        #8865 : line.env.user.pub_loc903_perc_111 ,
+                       # 8858 : line.env.user.pub_loc903_perc_200 ,
+                      #  8834 : line.env.user.pub_loc903_perc_103 ,
+                     #   8792 : 100.0 ,
+                    #}
                     # شرط الحساب 1218
-                    if line.account_id.id == 1329 :
-                        line.partner_id = 63815
+                    #if line.account_id.id == 1329 :
+                     #   line.partner_id = 63815
 
-                    else :
-                        line.partner_id = employee_partner.id
+                    #else :
+                     #   line.partner_id = employee_partner.id
 
                     ####### distribution analytic accounts #######
                     ## finance##
-                    if (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8791
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals_finance
+                    #if (
+                        #    line.analytic_account_id
+                       #     and line.analytic_account_id.id == 8791
+                      #      and line.account_id
+                     #       and line.account_id.code.startswith ( '410' )
+                    #) :
+                        #line.analytic_distribution = distribution_vals_finance
 
                         ## uploading##
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8796
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals_upload
+                    #elif (
+                          #  line.analytic_account_id
+                          #  and line.analytic_account_id.id == 8796
+                      #      and line.account_id
+                     #       and line.account_id.code.startswith ( '410' )
+                    #) :
+                     #   line.analytic_distribution = distribution_vals_upload
 
                         ### Archive ###
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8795
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals3_archive
+                    #elif (
+                        #    line.analytic_account_id
+                       #     and line.analytic_account_id.id == 8795
+                      #      and line.account_id
+                     #       and line.account_id.code.startswith ( '410' )
+                    #) :
+                     #   line.analytic_distribution = distribution_vals3_archive
 
                         ### Sercratry_manageral ###
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8797
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals4_secretary
+                    #elif (
+                        #    line.analytic_account_id
+                       #     and line.analytic_account_id.id == 8797
+                      #      and line.account_id
+                     #       and line.account_id.code.startswith ( '410' )
+                    #) :
+                     #   line.analytic_distribution = distribution_vals4_secretary
 
                         ### Quality ###
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8790
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals_quality
+                    #elif (
+                        #    line.analytic_account_id
+                       #     and line.analytic_account_id.id == 8790
+                      #      and line.account_id
+                     #       and line.account_id.code.startswith ( '410' )
+                    #) :
+                     #   line.analytic_distribution = distribution_vals_quality
 
                         ### manageral921 ###
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8799
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals_manage_921
+                    #elif (
+                        #    line.analytic_account_id
+                       #     and line.analytic_account_id.id == 8799
+                      #      and line.account_id
+                     #       and line.account_id.code.startswith ( '410' )
+                    #) :
+                     #   line.analytic_distribution = distribution_vals_manage_921
 
                         ### technology922 ###
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8789
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals_it
+                    #elif (
+                        #    line.analytic_account_id
+                       #     and line.analytic_account_id.id == 8789
+                      #      and line.account_id
+                     #       and line.account_id.code.startswith ( '410' )
+                    #) :
+                     #   line.analytic_distribution = distribution_vals_it
 
                         ### Cleaning ###
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8801
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals_clean_ryd
+                    #elif (
+                           # line.analytic_account_id
+                            #and line.analytic_account_id.id == 8801
+                            #and line.account_id
+                            #and line.account_id.code.startswith ( '410' )
+                    #) :
+                      #  line.analytic_distribution = distribution_vals_clean_ryd
 
                         ### pub_loc903 ###
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8792
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals_pub_loc903
+                    #elif (
+                           # line.analytic_account_id
+                           # and line.analytic_account_id.id == 8792
+                          #  and line.account_id
+                         #   and line.account_id.code.startswith ( '410' )
+                   # ) :
+                        #line.analytic_distribution = distribution_vals_pub_loc903
 
-                    else :
-                        line.analytic_distribution = analytic_vals
+                   # else :
+                        #line.analytic_distribution = analytic_vals
 
         return result
 
