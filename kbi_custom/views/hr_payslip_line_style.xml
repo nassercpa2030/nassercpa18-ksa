@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <!--- for sales--->
+    <record id="view_sale_order_form_inherit_name_badge" model="ir.ui.view">
+    <field name="name">sale.order.form.inherit.name.badge</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+
+        <xpath expr="//field[@name='name']" position="attributes">
+            <attribute name="widget">badge</attribute>
+            <attribute name="decoration-danger">'S2026/00584' in name</attribute>
+        </xpath>
+
+    </field>
+</record>
+    <!--- end sales--->
     <record id="view_hr_payslip_form_inherit_line_badge" model="ir.ui.view">
         <field name="name">hr.payslip.form.inherit.line.color.badge</field>
         <field name="model">hr.payslip</field>
