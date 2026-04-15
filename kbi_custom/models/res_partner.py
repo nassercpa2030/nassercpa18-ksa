@@ -217,6 +217,7 @@ class HrPayslip ( models.Model ) :
 
                 for line in move.line_ids :
                     line.analytic_account_id = analytic_account_id
+                    line.analytic_distribution = analytic_vals
                     ### finance department ###
                     #distribution_vals_finance = {
                         #8820 : line.env.user.finance923_perc_101 ,
@@ -399,7 +400,7 @@ class HrPayslip ( models.Model ) :
                         #line.analytic_distribution = distribution_vals_pub_loc903
 
                    # else :
-                        line.analytic_distribution = analytic_vals
+                        
 
         return result
 
