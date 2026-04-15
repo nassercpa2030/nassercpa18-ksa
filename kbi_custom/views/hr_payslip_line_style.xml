@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!--- for sales--->
+    <!-- for sales -->
     <record id="view_sale_order_form_inherit_name_badge" model="ir.ui.view">
     <field name="name">sale.order.form.inherit.name.badge</field>
     <field name="model">sale.order</field>
@@ -14,7 +14,7 @@
 
     </field>
 </record>
-    <!--- end sales--->
+    <!-- end sales -->
     <record id="view_hr_payslip_form_inherit_line_badge" model="ir.ui.view">
         <field name="name">hr.payslip.form.inherit.line.color.badge</field>
         <field name="model">hr.payslip</field>
