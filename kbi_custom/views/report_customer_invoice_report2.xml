@@ -137,7 +137,7 @@
                 </td>
 
                 <td style="text-align:center;">
-                    <span t-field="o.invoice_date"  t-options="{'format': 'dd MM yyyy'}"/>
+                    <span t-field="o.invoice_date and o.invoice_date.strftime('%d %B %Y')"/>
                 </td>
 
                 <td style="text-align:left;">
