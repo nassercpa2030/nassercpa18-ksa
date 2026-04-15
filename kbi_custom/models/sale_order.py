@@ -25,6 +25,7 @@ class SaleOrder ( models.Model ) :
     old_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , stored=True )
     order_lines_count = fields.Integer ( string='Order Lines' , compute='_compute_order_lines_count' , store=True )
     customer_phone_number = fields.Char ( string='تليفون العميل' , store=True )
+    journal_entry_count = fields.Char ( string='عدد القيود' , store=True )
     # comupute='_get_mobile'  )
     convert_orders = fields.Boolean (
         string="تحويل الأوردرات لعقود" ,
