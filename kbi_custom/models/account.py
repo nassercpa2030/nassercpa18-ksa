@@ -9,6 +9,7 @@ class AccountMove ( models.Model ) :
 
     broker_sale_id = fields.Many2one ( 'sale.order' , string='Broker Sale' )
     sale_order_test = fields.Char ( string='Sale Order Test' , readonly=False , required=False )
+    employee_id = fields.char(string="أسم الموظف", store=True)
     x_studio_auto_code = fields.Char ( string="order name" )
     sale_order_id_finance = fields.Many2one (
         'sale.order' , string='أمر البيع' , compute='_compute_sale_order_id' ,
