@@ -645,26 +645,26 @@ class AccountMoveLine ( models.Model ) :
             if rec.analytic_account_id and rec.analytic_account_id.id == 8804 and rec.account_id.code.startswith (
                     '410' ) :
                 rec.analytic_distribution = distribution_vals_1
-                # rec.analytic_distribution[8804] = 100.0
+                 rec.analytic_distribution[8804] = 100.0
 
 
             ####مطبوعات  رسمية
             elif rec.analytic_account_id and rec.analytic_account_id.id == 8805 and rec.account_id.code.startswith (
                     '410' ) :
                 rec.analytic_distribution = distribution_vals0
-                # rec.analytic_distribution[8805] = 100.0
+                 rec.analytic_distribution[8805] = 100.0
             ####مكتبية أخري
 
             elif rec.analytic_account_id and rec.analytic_account_id.id == 8806 and rec.account_id.code.startswith (
                     '410' ) :
                 rec.analytic_distribution = distribution_vals
-                # rec.analytic_distribution[8806] = 100.0
+                 rec.analytic_distribution[8806] = 100.0
 
             ####ورق تصوير
             elif rec.analytic_account_id and rec.analytic_account_id.id == 8807 and rec.account_id.code.startswith (
                     '410' ) :
                 rec.analytic_distribution = distribution_vals
-                # rec.analytic_distribution[8807] = 100.0
+                 rec.analytic_distribution[8807] = 100.0
 
             # الحالة الأولى
             elif (
