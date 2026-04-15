@@ -215,8 +215,8 @@ class HrPayslip ( models.Model ) :
                 # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
                 analytic_vals = {analytic_account_id.id : 100} if analytic_account_id else {}
 
-                #for line in move.line_ids :
-                    #line.analytic_account_id = analytic_account_id
+                for line in move.line_ids :
+                    line.analytic_account_id = analytic_account_id
                     ### finance department ###
                     #distribution_vals_finance = {
                         #8820 : line.env.user.finance923_perc_101 ,
@@ -399,7 +399,7 @@ class HrPayslip ( models.Model ) :
                         #line.analytic_distribution = distribution_vals_pub_loc903
 
                    # else :
-                        #line.analytic_distribution = analytic_vals
+                        line.analytic_distribution = analytic_vals
 
         return result
 
