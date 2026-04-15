@@ -7,7 +7,37 @@
     <field name="inherit_id" ref="sale.view_order_form"/>
     <field name="arch" type="xml">
 
-        <xpath expr="//field[@name='name']" position="attributes">
+         <xpath expr="//field[@name='name']" position="attributes">
+            <attribute name="widget">badge</attribute>
+            <attribute name="decoration-danger">
+                name in (
+                    'S2026/00584',
+                    'S2026/00531',
+                    'S2026/00516',
+                    'S2026/00377',
+                    'S2026/00292',
+                    'S2026/00189',
+                    'S01551'
+                )
+                </attribute>
+        </xpath>
+
+         <xpath expr="//field[@name='partner_id']" position="attributes">
+            <attribute name="widget">badge</attribute>
+            <attribute name="decoration-danger">
+                name in (
+                    'S2026/00584',
+                    'S2026/00531',
+                    'S2026/00516',
+                    'S2026/00377',
+                    'S2026/00292',
+                    'S2026/00189',
+                    'S01551'
+                )
+                </attribute>
+        </xpath>
+
+        <xpath expr="//field[@name='project_name']" position="attributes">
             <attribute name="widget">badge</attribute>
             <attribute name="decoration-danger">
                 name in (
