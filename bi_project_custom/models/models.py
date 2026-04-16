@@ -339,6 +339,22 @@ class SaleOrder ( models.Model ) :
     ] , string="Project Files State" , compute='_compute_project_files_state' , store=True , searchable=True )
 
     # file_state_history = fields.Char(compute='_compute_project_files_state', string='File_state History')
+    ### function to open invoices ##
+    def action_open_invoices(self) :
+        self.ensure_one ()
+        return {
+            'type' : 'ir.actions.act_window' ,
+            'name' : ' Sale order Invoices' ,
+            'view_mode' : 'list,form' ,
+            'res_model' : 'account.move' ,
+            'domain' : [('id' , 'in' , self.invoice_ids.ids)] ,
+            'context' : {'create' : False} ,
+            'target' : 'new' ,
+            'views' : [
+                (self.env.ref ( 'account.view_out_invoice_tree' ).id , 'list') ,
+                (self.env.ref ( 'account.view_move_form' ).id , 'form') ,
+            ] ,
+        }
 
     # ---get financial and manager signiture for using vendor bills----#####
     @api.depends ( 'finance_signiture' , 'archive_signiture' , 'manager_signiture' )  # لازم تحط الفيلدات اللي هتتابعها
