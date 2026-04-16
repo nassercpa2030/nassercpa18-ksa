@@ -163,7 +163,7 @@ class AccountMove ( models.Model ) :
             } )
 
             # حفظ الفاتورة أولًا
-            invoice.sudo ().write ( {} )
+            #invoice.sudo ().write ( {} )
             # 6️⃣ ترحيل الفاتورة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
