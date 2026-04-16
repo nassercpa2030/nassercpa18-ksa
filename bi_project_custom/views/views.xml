@@ -138,7 +138,7 @@
           <xpath expr="//header" position="inside">
               <field name="is_project_close_stage" invisible="1"/>
               <field name="is_journal_state_not_posted" invisible="1"/>
-             <button name="action_open_invoices" type="object" string="'طباعـة الفواتير" class="btn-primary" modifiers="{'invisible': [('is_journal_state_not_posted', '=', False)]}"/>
+             <!--button name="action_open_invoices" type="object" string="'طباعـة الفواتير" class="btn-primary" modifiers="{'invisible': [('is_journal_state_not_posted', '=', False)]}" /-->
 
          
             
