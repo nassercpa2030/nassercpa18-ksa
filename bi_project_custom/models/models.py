@@ -345,7 +345,8 @@ class SaleOrder ( models.Model ) :
         return {
             'type' : 'ir.actions.act_window' ,
             'name' : ' Sale order Invoices' ,
-            'view_mode' : 'list,form' ,
+            'view_mode' : 'list' ,
+            #'view_mode' : 'list,form' ,
             'res_model' : 'account.move' ,
             'domain' : [('id' , 'in' , self.invoice_ids.ids)] ,
             'context' : {'create' : False} ,
