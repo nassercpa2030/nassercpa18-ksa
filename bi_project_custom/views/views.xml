@@ -25,6 +25,15 @@
 
     </field>
 </record>
+  <template id="hide_import_button_invoice" inherit_id="web.assets_backend">
+    <xpath expr="." position="inside">
+        <style>
+            .o_account_move .o_list_button_import {
+                display: none !important;
+            }
+        </style>
+    </xpath>
+</template>
   <!-- Close Entry Deffered Wizard -->
   <record id="view_close_entry_wizard_form_deffered" model="ir.ui.view">
       <field name="name">close.entry.wizard.form.deffered</field>
