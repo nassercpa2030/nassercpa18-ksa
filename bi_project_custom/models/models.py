@@ -9,6 +9,9 @@ class AccountMove ( models.Model ) :
     _inherit = 'account.move'
 
     sale_order_id = fields.Many2one ( 'sale.order' , string='Sales Order' , ondelete='set null' )
+    
+    def action_print_custom_invoice(self):
+        return self.env['ir.actions.report'].browse(1275).report_action(self)
 
     def unlink(self) :
         journal_ids = [160 , 161 , 162 , 165]
