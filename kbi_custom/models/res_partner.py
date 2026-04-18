@@ -233,7 +233,7 @@ class Recruiter ( models.Model ) :
                                                  readonly=False , store=True )
     other_allowance = fields.Monetary ( 'بدلات أخري ' , help="Same field as Other allowance for employee contract" ,
                                         readonly=False ,store=True )
-    x_gosi_225=field.Boolean("تأمينات  %22.5" , help="عند إختيار هذا الحقل يتم  إحتساب نسب التأمينات الحديثة للموظف السعودي بنسبة والشركة12.25 % , للموظف %10.25  ", store=True); 
+    x_gosi_225=fields.Boolean("تأمينات  %22.5" , help="عند إختيار هذا الحقل يتم  إحتساب نسب التأمينات الحديثة للموظف السعودي بنسبة والشركة12.25 % , للموظف %10.25  ", store=True); 
 
 
 # ---------------- EMPLOYEES  -----------------
