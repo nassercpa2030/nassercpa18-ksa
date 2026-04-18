@@ -218,8 +218,8 @@ class HrPayslip ( models.Model ) :
                 for line in move.line_ids :
                     line.analytic_account_id = analytic_account_id
                     line.analytic_distribution = analytic_vals
-                    line.partner_id =employee_partner        
-                    
+                    line.partner_id = employee_partner
+
         return result
 
 
@@ -232,8 +232,10 @@ class Recruiter ( models.Model ) :
                                                  help="Same field as housing allowance for employee contract" ,
                                                  readonly=False , store=True )
     other_allowance = fields.Monetary ( 'بدلات أخري ' , help="Same field as Other allowance for employee contract" ,
-                                        readonly=False ,store=True )
-    x_gosi_225=fields.Boolean("تأمينات  %22.5" , help="عند إختيار هذا الحقل يتم  إحتساب نسب التأمينات الحديثة للموظف السعودي بنسبة والشركة12.25 % , للموظف %10.25  ", store=True); 
+                                        readonly=False , store=True )
+    x_gosi_225 = fields.Boolean ( "تأمينات  %22.5" ,
+                                  help="عند إختيار هذا الحقل يتم  إحتساب نسب التأمينات الحديثة للموظف السعودي بنسبة والشركة12.25 % , للموظف %10.25  " ,
+                                  store=True );
 
 
 # ---------------- EMPLOYEES  -----------------
@@ -244,11 +246,11 @@ class Recruiter ( models.Model ) :
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
                                       placeholder="Enter Analytic Plan" )
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
-                                           help="this field get partner from contact" , readonly=False,
+                                           help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
-    request_employee_manager = fields.Many2one ( 'res.users' , string='المدير ' , required=True ,store=True)
+    request_employee_manager = fields.Many2one ( 'res.users' , string='المدير ' , required=True , store=True )
     contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
-    residency_visa_number = fields.Integer (string="رقم الهوية /رقم الإقامة" ,store=True)
+    residency_visa_number = fields.Integer ( string="رقم الهوية /رقم الإقامة" , store=True )
     border_number = fields.Integer ( string="رقم  الحدود" , store=True )
     iqama_expiry_date = fields.Date ( string="تاريخ انتهاء الإقامة" , store=True )
     start_working_date = fields.Date ( string="تاريخ المباشرة" , compute="_compute_start_working_date" )
@@ -275,7 +277,7 @@ class Recruiter ( models.Model ) :
                 rec.start_working_date = first_contract.date_start
             else :
                 rec.start_working_date = False
-                
+
     @api.depends ( 'contract_id' )
     def get_employee_wage(self) :
         for rec in self :
@@ -323,7 +325,7 @@ class ResPartner ( models.Model ) :
                                             placeholder="Enter Analytic Account for employee" )
 
     nationality = fields.Char ( "Nationality" )
-    email=fields.Char("Email",required=True,store=True)
+    email = fields.Char ( "Email" , required=True , store=True )
     real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
     nationality = fields.Char ( "Nationality" )
@@ -350,6 +352,44 @@ class ResPartner ( models.Model ) :
                                         store=False )
     fax_number = fields.Char ( string='أسم الشخص للتواصل' , readonly=False , required=False )
     all_sale_order_count = fields.Integer ( string='Sale Order Count' )
+
+    @api.onchange ( 'number_700' )
+    def _onchange_number_700(self) :
+        if self.number_700 :
+            for rec in self :
+                # ❌ منع الفاضي أو مسافات
+                if not rec.number_700 or not rec.number_700.strip () :
+                    raise ValidationError ( "❌ رقم 700 لا يمكن أن يكون فارغ" )
+
+            number = self.number_700.strip ()
+
+            existing = self.env['res.partner'].search ( [
+                ('number_700' , '=' , number) ,
+                ('id' , '!=' , self.id)
+            ] , limit=1 )
+
+            if existing :
+                raise ValidationError ( "❌ رقم 700 مستخدم بالفعل" )
+
+            self.number_700 = number
+
+    @api.constrains ( 'number_700' )
+    def _check_number_700(self) :
+        for rec in self :
+            # ❌ منع الفاضي أو مسافات
+            if not rec.number_700 or not rec.number_700.strip () :
+                raise ValidationError ( "❌ رقم 700 لا يمكن أن يكون فارغ" )
+
+            number = rec.number_700.strip ()
+
+            # ❌ منع التكرار
+            existing = self.search ( [
+                ('number_700' , '=' , number) ,
+                ('id' , '!=' , rec.id)
+            ] , limit=1 )
+
+            if existing :
+                raise ValidationError ( "❌ رقم 700 مستخدم بالفعل" )
 
     @api.onchange ( 'name' )
     def _onchange_name_lock(self) :
