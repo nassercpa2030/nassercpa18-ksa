@@ -353,43 +353,86 @@ class ResPartner ( models.Model ) :
     fax_number = fields.Char ( string='أسم الشخص للتواصل' , readonly=False , required=False )
     all_sale_order_count = fields.Integer ( string='Sale Order Count' )
 
-    @api.onchange ( 'number_700' )
-    def _onchange_number_700(self) :
-        if self.number_700 :
-            for rec in self :
-                # ❌ منع الفاضي أو مسافات
-                if not rec.number_700 or not rec.number_700.strip () :
-                    raise ValidationError ( "❌ رقم 700 لا يمكن أن يكون فارغ" )
+    @api.constrains ( 'name' , 'cr_number_sale' , 'name_english' )
+    def _check_unique_fields(self) :
+        for rec in self :
 
-            number = self.number_700.strip ()
+            # ❌ name لازم يكون موجود
+            if not rec.name or not rec.name.strip () :
+                raise ValidationError ( "❌ الاسم لا يمكن أن يكون فارغ" )
+
+            name = rec.name.strip ()
+            cr = rec.cr_number_sale and rec.cr_number_sale.strip ()
+            en = rec.name_english and rec.name_english.strip ()
+
+            # 1️⃣ check name
+            if name :
+                existing = self.search ( [
+                    ('name' , '=' , name) ,
+                    ('id' , '!=' , rec.id)
+                ] , limit=1 )
+                if existing :
+                    raise ValidationError ( "❌ الاسم مستخدم بالفعل" )
+
+            # 2️⃣ check CR number
+            if cr :
+                existing = self.search ( [
+                    ('cr_number_sale' , '=' , cr) ,
+                    ('id' , '!=' , rec.id)
+                ] , limit=1 )
+                if existing :
+                    raise ValidationError ( "❌ رقم السجل التجاري مستخدم بالفعل" )
+
+            # 3️⃣ check English name
+            if en :
+                existing = self.search ( [
+                    ('name_english' , '=' , en) ,
+                    ('id' , '!=' , rec.id)
+                ] , limit=1 )
+                if existing :
+                    raise ValidationError ( "❌ الاسم الإنجليزي مستخدم بالفعل" )
+                
+
+    @api.onchange ( 'name' , 'cr_number_sale' , 'name_english' )
+    def _onchange_unique_fields(self) :
+
+        if self.name and self.name.strip () :
+
+            name = self.name.strip ()
 
             existing = self.env['res.partner'].search ( [
-                ('number_700' , '=' , number) ,
-                ('id' , '!=' , self.id)
+                ('name' , '=' , name) ,
+                ('id' , '!=' , self._origin.id)
             ] , limit=1 )
 
             if existing :
-                raise ValidationError ( "❌ رقم 700 مستخدم بالفعل" )
+                raise ValidationError ( "❌ الاسم مستخدم بالفعل" )
 
-            self.number_700 = number
+        # CR check
+        if self.cr_number_sale :
+            cr = self.cr_number_sale.strip ()
 
-    @api.constrains ( 'number_700' )
-    def _check_number_700(self) :
-        for rec in self :
-            # ❌ منع الفاضي أو مسافات
-            if not rec.number_700 or not rec.number_700.strip () :
-                raise ValidationError ( "❌ رقم 700 لا يمكن أن يكون فارغ" )
-
-            number = rec.number_700.strip ()
-
-            # ❌ منع التكرار
-            existing = self.search ( [
-                ('number_700' , '=' , number) ,
-                ('id' , '!=' , rec.id)
+            existing = self.env['res.partner'].search ( [
+                ('cr_number_sale' , '=' , cr) ,
+                ('id' , '!=' , self._origin.id)
             ] , limit=1 )
 
             if existing :
-                raise ValidationError ( "❌ رقم 700 مستخدم بالفعل" )
+                raise ValidationError ( "❌ رقم السجل التجاري مستخدم بالفعل" )
+
+        # English name check
+        if self.name_english :
+            en = self.name_english.strip ()
+
+            existing = self.env['res.partner'].search ( [
+                ('name_english' , '=' , en) ,
+                ('id' , '!=' , self._origin.id)
+            ] , limit=1 )
+
+            if existing :
+                raise ValidationError ( "❌ الاسم الإنجليزي مستخدم بالفعل" )
+
+
 
     @api.onchange ( 'name' )
     def _onchange_name_lock(self) :
