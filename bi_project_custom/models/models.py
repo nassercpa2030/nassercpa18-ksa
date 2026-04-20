@@ -9,7 +9,19 @@ class AccountMove ( models.Model ) :
     _inherit = 'account.move'
 
     sale_order_id = fields.Many2one ( 'sale.order' , string='Sales Order' , ondelete='set null' )
-    
+
+    def action_create_new_invoice(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'New Invoice',
+            'res_model': 'account.move',
+            'view_mode': 'form',
+            'context': {
+                'default_move_type': 'out_invoice',
+            },
+            'target': 'current',
+        }
+        
     def action_print_custom_invoice(self):
         return self.env['ir.actions.report'].browse(1275).report_action(self)
 
