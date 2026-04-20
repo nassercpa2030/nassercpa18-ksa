@@ -353,84 +353,44 @@ class ResPartner ( models.Model ) :
     fax_number = fields.Char ( string='أسم الشخص للتواصل' , readonly=False , required=False )
     all_sale_order_count = fields.Integer ( string='Sale Order Count' )
 
-    @api.constrains ( 'name' , 'cr_number_sale' , 'name_english' )
-    def _check_unique_fields(self) :
-        for rec in self :
+    #@api.onchange ( 'name' , 'cr_number_sale' , 'name_english' )
+    #def _onchange_unique_fields(self) :
 
-            # ❌ name لازم يكون موجود
-            if not rec.name or not rec.name.strip () :
-                raise ValidationError ( "❌ الاسم لا يمكن أن يكون فارغ" )
+        #if self.name and self.name.strip () :
 
-            name = rec.name.strip ()
-            cr = rec.cr_number_sale and rec.cr_number_sale.strip ()
-            en = rec.name_english and rec.name_english.strip ()
+            #name = self.name.strip ()
 
-            # 1️⃣ check name
-            if name :
-                existing = self.search ( [
-                    ('name' , '=' , name) ,
-                    ('id' , '!=' , rec.id)
-                ] , limit=1 )
-                if existing :
-                    raise ValidationError ( "❌ الاسم مستخدم بالفعل" )
+            #existing = self.env['res.partner'].search ( [
+                #('name' , '=' , name) ,
+                #('id' , '!=' , self._origin.id)
+           #] , limit=1 )
 
-            # 2️⃣ check CR number
-            if cr :
-                existing = self.search ( [
-                    ('cr_number_sale' , '=' , cr) ,
-                    ('id' , '!=' , rec.id)
-                ] , limit=1 )
-                if existing :
-                    raise ValidationError ( "❌ رقم السجل التجاري مستخدم بالفعل" )
-
-            # 3️⃣ check English name
-            if en :
-                existing = self.search ( [
-                    ('name_english' , '=' , en) ,
-                    ('id' , '!=' , rec.id)
-                ] , limit=1 )
-                if existing :
-                    raise ValidationError ( "❌ الاسم الإنجليزي مستخدم بالفعل" )
-                
-
-    @api.onchange ( 'name' , 'cr_number_sale' , 'name_english' )
-    def _onchange_unique_fields(self) :
-
-        if self.name and self.name.strip () :
-
-            name = self.name.strip ()
-
-            existing = self.env['res.partner'].search ( [
-                ('name' , '=' , name) ,
-                ('id' , '!=' , self._origin.id)
-            ] , limit=1 )
-
-            if existing :
-                raise ValidationError ( "❌ الاسم مستخدم بالفعل" )
+           # if existing :
+            #    raise ValidationError ( "❌ الاسم مستخدم بالفعل" )
 
         # CR check
-        if self.cr_number_sale :
-            cr = self.cr_number_sale.strip ()
+       #if self.cr_number_sale :
+            #cr = self.cr_number_sale.strip ()
 
-            existing = self.env['res.partner'].search ( [
-                ('cr_number_sale' , '=' , cr) ,
-                ('id' , '!=' , self._origin.id)
-            ] , limit=1 )
+            #existing = self.env['res.partner'].search ( [
+                #('cr_number_sale' , '=' , cr) ,
+                #('id' , '!=' , self._origin.id)
+           # ] , limit=1 )
 
-            if existing :
-                raise ValidationError ( "❌ رقم السجل التجاري مستخدم بالفعل" )
+            #if existing :
+                #raise ValidationError ( "❌ رقم السجل التجاري مستخدم بالفعل" )
 
         # English name check
-        if self.name_english :
-            en = self.name_english.strip ()
+        #if self.name_english :
+            #en = self.name_english.strip ()
 
-            existing = self.env['res.partner'].search ( [
-                ('name_english' , '=' , en) ,
-                ('id' , '!=' , self._origin.id)
-            ] , limit=1 )
+            #existing = self.env['res.partner'].search ( [
+                #('name_english' , '=' , en) ,
+                #('id' , '!=' , self._origin.id)
+            #] , limit=1 )
 
-            if existing :
-                raise ValidationError ( "❌ الاسم الإنجليزي مستخدم بالفعل" )
+           # if existing :
+                #raise ValidationError ( "❌ الاسم الإنجليزي مستخدم بالفعل" )
 
 
 
