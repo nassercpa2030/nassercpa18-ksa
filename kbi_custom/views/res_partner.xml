@@ -74,15 +74,15 @@
         <record model="ir.ui.view" id="kbi_custom.view_res_partner_address_form_inherit">
             <field name="name">kbi_custom.view.res.partner.form.inherit</field>
             <field name="model">res.partner</field>
-            <field name="inherit_id" ref="l10n_sa_edi.sa_partner_address_form" invisible="not key_information"/>
+            <field name="inherit_id" ref="l10n_sa_edi.sa_partner_address_form" />
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='city']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='city']" position="before">
-                    <field name="state_id"  invisible="not key_information" />
+                    <field name="state_id"  modifiers="{'invisible': [('key_information', '=', False)]}" />
                     <field name="city_id" placeholder="City" class="o_address_city"
-                           modifiers="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}" invisible="not key_information"/>
+                           modifiers="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}" modifiers="{'invisible': [('key_information', '=', False)]}"/>
                 </xpath>
             </field>
         </record>
