@@ -4,6 +4,15 @@ import logging
 from odoo.exceptions import UserError , ValidationError
 import re
 
+class HrPayrollStructure(models.Model):
+    _inherit = 'hr.payroll.structure'
+
+    type_id = fields.Many2one(
+        'hr.payroll.structure.type',
+        string='Type',
+        required=False
+    )
+
 
 class ResCity ( models.Model ) :
     _name = 'res.country.state.city'
