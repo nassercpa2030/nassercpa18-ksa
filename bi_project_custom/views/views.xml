@@ -32,7 +32,8 @@
     <field name="inherit_id" ref="account.view_move_tree"/>
     <field name="arch" type="xml">
 
-        <xpath expr="//tree" position="inside">
+        <!-- الصحيح -->
+        <xpath expr="//list" position="inside">
             <header>
                 <button name="action_create_new_invoice"
                         type="object"
