@@ -81,8 +81,7 @@
                 </xpath>
                 <xpath expr="//field[@name='city']" position="before">
                     <field name="state_id"  modifiers="{'invisible': [('key_information', '=', False)]}" />
-                    <field name="city_id" placeholder="City" class="o_address_city"
-                           modifiers="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}" modifiers="{'invisible': [('key_information', '=', False)]}"/>
+                   <field name="city_id" placeholder="City" class="o_address_city" modifiers="{ 'readonly': [('type', '=', 'contact'), ('parent_id', '!=', False)], 'invisible': [('key_information', '=', False)] }"/>
                 </xpath>
             </field>
         </record>
