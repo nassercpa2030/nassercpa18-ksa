@@ -355,9 +355,13 @@ class ResPartner ( models.Model ) :
 
     @api.constrains ( 'name' , 'cr_number_sale' , 'name_english' )
     def _check_unique_fields(self) :
-        for rec in self :
 
-            # ❌ name لازم يكون موجود
+        # 👇 مهم: لو مش إنشاء (يعني update) سيبه يعدي
+        for rec in self :
+            if rec.id :
+                continue
+
+            # 👇 كودك زي ما هو
             if not rec.name or not rec.name.strip () :
                 raise ValidationError ( "❌ الاسم لا يمكن أن يكون فارغ" )
 
@@ -365,7 +369,6 @@ class ResPartner ( models.Model ) :
             cr = rec.cr_number_sale and rec.cr_number_sale.strip ()
             en = rec.name_english and rec.name_english.strip ()
 
-            # 1️⃣ check name
             if name :
                 existing = self.search ( [
                     ('name' , '=' , name) ,
@@ -374,7 +377,6 @@ class ResPartner ( models.Model ) :
                 if existing :
                     raise ValidationError ( "❌ الاسم مستخدم بالفعل" )
 
-            # 2️⃣ check CR number
             if cr :
                 existing = self.search ( [
                     ('cr_number_sale' , '=' , cr) ,
@@ -383,7 +385,6 @@ class ResPartner ( models.Model ) :
                 if existing :
                     raise ValidationError ( "❌ رقم السجل التجاري مستخدم بالفعل" )
 
-            # 3️⃣ check English name
             if en :
                 existing = self.search ( [
                     ('name_english' , '=' , en) ,
@@ -431,8 +432,6 @@ class ResPartner ( models.Model ) :
 
             if existing :
                 raise ValidationError ( "❌ الاسم الإنجليزي مستخدم بالفعل" )
-
-
 
     @api.onchange ( 'name' )
     def _onchange_name_lock(self) :
