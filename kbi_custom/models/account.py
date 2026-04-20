@@ -239,6 +239,20 @@ class AccountMove ( models.Model ) :
 
     ##########end post function ##############
 
+    ## create function for creating new customer invoice####
+    def action_create_new_invoice(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'New Invoice',
+            'res_model': 'account.move',
+            'view_mode': 'form',
+            'context': {
+                'default_move_type': 'out_invoice',
+            },
+            'target': 'current',
+        }
+        
+    ########
     @api.depends ( 'partner_id' )
     def compute_vendor_attachements(self) :
         for rec in self :
