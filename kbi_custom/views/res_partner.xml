@@ -35,10 +35,10 @@
                 <!--xpath expr="//field[@name='category_id']" position="after">
                      
                 </xpath-->
-                 <xpath expr="//field[@name='function']" position="after">
+                 <!--xpath expr="//field[@name='function']" position="after">
                   <field name="key_information" style="font-weight:bold  background-color: #d4f8d4; display: inline-block; width: fit-content;padding: 2px 8px;border-radius: 6px; font-size:14px;" widget="boolean_toggle" />
                            
-                </xpath>
+                </xpath-->
                 <xpath expr="//field[@name='email']" position="before">
                   <group>  <field name="fax_number" style="font-weight:bold; font-size:14px;" string="mobile2" placeholder="Mobile number 2" invisible="not key_information"/></group>
                            
@@ -74,15 +74,15 @@
         <record model="ir.ui.view" id="kbi_custom.view_res_partner_address_form_inherit">
             <field name="name">kbi_custom.view.res.partner.form.inherit</field>
             <field name="model">res.partner</field>
-            <field name="inherit_id" ref="l10n_sa_edi.sa_partner_address_form"/>
+            <field name="inherit_id" ref="l10n_sa_edi.sa_partner_address_form" invisible="not key_information"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='city']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='city']" position="before">
-                    <field name="state_id"  />
+                    <field name="state_id"  invisible="not key_information" />
                     <field name="city_id" placeholder="City" class="o_address_city"
-                           modifiers="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+                           modifiers="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}" invisible="not key_information"/>
                 </xpath>
             </field>
         </record>
