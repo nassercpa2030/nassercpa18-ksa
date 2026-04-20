@@ -26,6 +26,24 @@
     </field>
 </record>
   
+  <record id="view_move_tree_inherit_new_btn" model="ir.ui.view">
+    <field name="name">account.move.tree.new.button</field>
+    <field name="model">account.move</field>
+    <field name="inherit_id" ref="account.view_move_tree"/>
+    <field name="arch" type="xml">
+
+        <xpath expr="//tree" position="inside">
+            <header>
+                <button name="action_create_new_invoice"
+                        type="object"
+                        string="New Invoice"
+                        class="btn-primary"/>
+            </header>
+        </xpath>
+
+    </field>
+</record>
+  
   <!-- Close Entry Deffered Wizard -->
   <record id="view_close_entry_wizard_form_deffered" model="ir.ui.view">
       <field name="name">close.entry.wizard.form.deffered</field>
