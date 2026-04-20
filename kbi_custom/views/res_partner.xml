@@ -9,7 +9,7 @@
                 <!--xpath expr="//field[@name='category_id']" position="after">
                      
                 </xpath-->
-                 <xpath expr="//field[@name='function']" position="before">
+                 <xpath expr="//field[@name='function']" position="after">
                   <field name="key_information" style="font-weight:bold  background-color: #d4f8d4; display: inline-block; width: fit-content;padding: 2px 8px;border-radius: 6px; font-size:14px;" widget="boolean_toggle" />
                            
                 </xpath>
