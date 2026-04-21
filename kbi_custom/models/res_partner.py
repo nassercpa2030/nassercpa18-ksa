@@ -333,7 +333,7 @@ class ResPartner ( models.Model ) :
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , related="employee_ids.analytic_account_id" ,
                                             string='الحساب التحليلي' , readonly=True ,
                                             placeholder="Enter Analytic Account for employee" )
-    #building_no = fields.Char ( string="رقم المبنى" , size=4 )
+    building_no = fields.Char ( string="رقم المبنى" , size=4 )
     key_information = fields.Boolean ( string="المعلومات الرئيسية" , default=False ,
                                        help="عند تفعيل هذا الحقل يتم عرض المعلومات الرئيسية الخاصة بجهة الاتصال الحالية." )
     additional_information = fields.Boolean ( string="المعلومات الفرعية" , default=True ,
