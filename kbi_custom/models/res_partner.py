@@ -447,11 +447,11 @@ class ResPartner ( models.Model ) :
         for rec in self :
             name = rec.name or ''
 
-            if rec.vat :
-                name += f' | VAT: {rec.vat}'
+            #if rec.vat  or :
+                #name += f' | VAT: {rec.vat}'
 
-            if rec.identification_number :
-                name += f' | ID: {rec.identification_number}'
+            #if rec.identification_number :
+                #name += f' | ID: {rec.identification_number}'
 
             res.append ( (rec.id , name) )
 
