@@ -449,13 +449,14 @@ class ResPartner ( models.Model ) :
         domain = args
 
         if name :
-            domain = ['|' , '|' ,
-                      ('name' , operator , name) ,
-                      ('vat' , operator , name) ,
-                      ('identification_number' , operator , name) ,  # تأكد إنه موجود
-                      ] + args
+            domain = [
+                         '|' , '|' ,
+                         ('name' , operator , name) ,
+                         ('vat' , operator , name) ,
+                         ('identification_number' , operator , name) ,
+                     ] + args
 
-        return self.search ( domain , limit=limit ).name_get ()
+        return self.search ( domain , limit=limit ).read ( ['name'] )
     
 
     @api.onchange ( 'name' )
