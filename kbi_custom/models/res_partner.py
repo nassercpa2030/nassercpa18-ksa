@@ -442,6 +442,21 @@ class ResPartner ( models.Model ) :
                 # لو عايز تفعل الفلاج
                 rec.employee = True
 
+    def name_get(self) :
+        res = []
+        for rec in self :
+            name = rec.name or ''
+
+            if rec.vat :
+                name += f' | VAT: {rec.vat}'
+
+            if rec.identification_number :
+                name += f' | ID: {rec.identification_number}'
+
+            res.append ( (rec.id , name) )
+
+        return res
+
     @api.model
     def name_search(self , name='' , args=None , operator='ilike' , limit=100) :
         args = args or []
@@ -449,15 +464,14 @@ class ResPartner ( models.Model ) :
         domain = args
 
         if name :
-            domain = [
-                         '|' , '|' ,
-                         ('name' , operator , name) ,
-                         ('vat' , operator , name) ,
-                         ('identification_number' , operator , name) ,
-                     ] + args
+            domain = ['|' , '|' ,
+                      ('name' , operator , name) ,
+                      ('vat' , operator , name) ,
+                      ('identification_number' , operator , name) ,
+                      ] + args
 
-        return self.search ( domain , limit=limit ).read ( ['name'] )
-    
+        return self.search ( domain , limit=limit ).name_get ()
+
 
     @api.onchange ( 'name' )
     def _onchange_name_lock(self) :
