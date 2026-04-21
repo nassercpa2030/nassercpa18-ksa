@@ -328,9 +328,9 @@ class ResPartner ( models.Model ) :
     additional_information = fields.Boolean(string="المعلومات الفرعية",default=True,help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية.")
     national_address = fields.Char(
         string="العنوان الوطني ",
-        compute="_compute_national_address",
-        store=True
-    )
+        compute="_compute_national_address")
+        #store=True
+    
     national_address_progress = fields.Integer(
         string="Progress",compute="_compute_address_progress")
 
@@ -370,7 +370,7 @@ class ResPartner ( models.Model ) :
     all_sale_order_count = fields.Integer ( string='Sale Order Count' )
     
     @api.depends('building_no', 'street', 'city_id', 'zip', 'additional_no')
-    def _compute_short_address(self):
+    def _compute_national_address(self):
         for rec in self:
             parts = []
 
