@@ -4,6 +4,15 @@ import logging
 from odoo.exceptions import UserError , ValidationError
 import re
 
+class HrPayrollStructure(models.Model):
+    _inherit = 'hr.payroll.structure'
+
+    type_id = fields.Many2one(
+        'hr.payroll.structure.type',
+        string='Type',
+        required=False
+    )
+
 
 class ResCity ( models.Model ) :
     _name = 'res.country.state.city'
@@ -324,26 +333,11 @@ class ResPartner ( models.Model ) :
                                             string='الحساب التحليلي' , readonly=True ,
                                             placeholder="Enter Analytic Account for employee" )
 
-    key_information = fields.Boolean(string="المعلومات الرئيسية",default=False,help="عند تفعيل هذا الحقل يتم عرض المعلومات الرئيسية الخاصة بجهة الاتصال الحالية.")
-    additional_information = fields.Boolean(string="المعلومات الفرعية",default=True,help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية.")
-    national_address = fields.Char(
-        string="العنوان الوطني ",
-        compute="_compute_national_address")
-        #store=True
-    
-    national_address_progress = fields.Integer(
-        string="Progress",compute="_compute_address_progress")
-
-    address_stage = fields.Selection([
-        ('0', '0%'),
-        ('25', '25%'),
-        ('50', '50%'),
-        ('75', '75%'),
-        ('100', '100%'), ], string="معدل اكتمال العنوان الوطني", compute="_compute_address_progress")
     nationality = fields.Char ( "Nationality" )
     email = fields.Char ( "Email" , required=True , store=True )
     real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
+    #nationality = fields.Char ( "Nationality" )
     manager_team = fields.Many2one ( comodel_name="res.users" , string='Manager' ,
                                      related="x_studio_related_field_7pm_1j7mp6p7k" , store=True , readonly=False )
     is_broker = fields.Boolean ( string='Broker' )
@@ -367,123 +361,47 @@ class ResPartner ( models.Model ) :
                                         store=False )
     fax_number = fields.Char ( string='رقم فون أرضي' , readonly=False , required=False )
     all_sale_order_count = fields.Integer ( string='Sale Order Count' )
-    
-    @api.depends('building_no', 'street', 'city_id', 'zip')
-    def _compute_national_address(self):
-        for rec in self:
-            parts = []
 
-            if rec.building_no:
-                parts.append(rec.building_no)
+    #@api.onchange ( 'name' , 'cr_number_sale' , 'name_english' )
+    #def _onchange_unique_fields(self) :
 
-            if rec.street_name:
-                parts.append(rec.street)
+        #if self.name and self.name.strip () :
 
-            if rec.city:
-                parts.append(rec.city_id)
+            #name = self.name.strip ()
 
-            if rec.zip:
-                parts.append(rec.zip)
+            #existing = self.env['res.partner'].search ( [
+                #('name' , '=' , name) ,
+                #('id' , '!=' , self._origin.id)
+           #] , limit=1 )
 
-            rec.national_address = "، ".join(parts)
-
-    @api.depends('building_no', 'street', 'city_id', 'zip')
-    def _compute_address_progress(self):
-        for rec in self:
-            filled = 0
-
-            if rec.building_no:
-                filled += 1
-            if rec.street:
-                filled += 1
-            if rec.city_id:
-                filled += 1
-            if rec.zip:
-                filled += 1
-            progress = filled * 25
-
-            rec.national_address_progress = progress
-            rec.address_stage = str(progress)
-
-    @api.constrains ( 'name' , 'cr_number_sale' , 'name_english' )
-    def _check_unique_fields(self) :
-
-        # 👇 مهم: لو مش إنشاء (يعني update) سيبه يعدي
-        for rec in self :
-            if rec.id :
-                continue
-
-            # 👇 كودك زي ما هو
-            if not rec.name or not rec.name.strip () :
-                raise ValidationError ( "❌ الاسم لا يمكن أن يكون فارغ" )
-
-            name = rec.name.strip ()
-            cr = rec.cr_number_sale and rec.cr_number_sale.strip ()
-            en = rec.name_english and rec.name_english.strip ()
-
-            if name :
-                existing = self.search ( [
-                    ('name' , '=' , name) ,
-                    ('id' , '!=' , rec.id)
-                ] , limit=1 )
-                if existing :
-                    raise ValidationError ( "❌ الاسم مستخدم بالفعل" )
-
-            if cr :
-                existing = self.search ( [
-                    ('cr_number_sale' , '=' , cr) ,
-                    ('id' , '!=' , rec.id)
-                ] , limit=1 )
-                if existing :
-                    raise ValidationError ( "❌ رقم السجل التجاري مستخدم بالفعل" )
-
-            if en :
-                existing = self.search ( [
-                    ('name_english' , '=' , en) ,
-                    ('id' , '!=' , rec.id)
-                ] , limit=1 )
-                if existing :
-                    raise ValidationError ( "❌ الاسم الإنجليزي مستخدم بالفعل" )
-                
-
-    @api.onchange ( 'name' , 'cr_number_sale' , 'name_english' )
-    def _onchange_unique_fields(self) :
-
-        if self.name and self.name.strip () :
-
-            name = self.name.strip ()
-
-            existing = self.env['res.partner'].search ( [
-                ('name' , '=' , name) ,
-                ('id' , '!=' , self._origin.id)
-            ] , limit=1 )
-
-            if existing :
-                raise ValidationError ( "❌ الاسم مستخدم بالفعل" )
+           # if existing :
+            #    raise ValidationError ( "❌ الاسم مستخدم بالفعل" )
 
         # CR check
-        if self.cr_number_sale :
-            cr = self.cr_number_sale.strip ()
+       #if self.cr_number_sale :
+            #cr = self.cr_number_sale.strip ()
 
-            existing = self.env['res.partner'].search ( [
-                ('cr_number_sale' , '=' , cr) ,
-                ('id' , '!=' , self._origin.id)
-            ] , limit=1 )
+            #existing = self.env['res.partner'].search ( [
+                #('cr_number_sale' , '=' , cr) ,
+                #('id' , '!=' , self._origin.id)
+           # ] , limit=1 )
 
-            if existing :
-                raise ValidationError ( "❌ رقم السجل التجاري مستخدم بالفعل" )
+            #if existing :
+                #raise ValidationError ( "❌ رقم السجل التجاري مستخدم بالفعل" )
 
         # English name check
-        if self.name_english :
-            en = self.name_english.strip ()
+        #if self.name_english :
+            #en = self.name_english.strip ()
 
-            existing = self.env['res.partner'].search ( [
-                ('name_english' , '=' , en) ,
-                ('id' , '!=' , self._origin.id)
-            ] , limit=1 )
+            #existing = self.env['res.partner'].search ( [
+                #('name_english' , '=' , en) ,
+                #('id' , '!=' , self._origin.id)
+            #] , limit=1 )
 
-            if existing :
-                raise ValidationError ( "❌ الاسم الإنجليزي مستخدم بالفعل" )
+           # if existing :
+                #raise ValidationError ( "❌ الاسم الإنجليزي مستخدم بالفعل" )
+
+
 
     @api.onchange ( 'name' )
     def _onchange_name_lock(self) :
