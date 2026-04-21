@@ -372,13 +372,13 @@ class ResPartner ( models.Model ) :
     all_sale_order_count = fields.Integer ( string='Sale Order Count' )
 
     #@api.depends('building_no', 'street', 'city', 'zip', 'additional_no')
-    @api.depends( 'street', 'city', 'zip', 'additional_no')
+    @api.depends( 'l10n_sa_edi_building_number','street', 'city', 'zip', 'additional_no')
     def _compute_national_address(self):
         for rec in self:
             parts = []
 
-            #if rec.building_no:
-                #parts.append(rec.building_no)
+            if rec.building_no:
+                parts.append(rec.l10n_sa_edi_building_number)
 
             if rec.street:
                 parts.append(rec.street)
