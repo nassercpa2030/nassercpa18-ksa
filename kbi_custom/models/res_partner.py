@@ -332,17 +332,21 @@ class ResPartner ( models.Model ) :
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , related="employee_ids.analytic_account_id" ,
                                             string='الحساب التحليلي' , readonly=True ,
                                             placeholder="Enter Analytic Account for employee" )
+    #building_no = fields.Char(string="رقم المبنى", size=4)
+    zip = fields.Char(string="الرمز البريدي", size=5)
+    additional_no = fields.Char(string="الرقم الإضافي", size=4)
+
+    national_address = fields.Char(
+        string="العنوان الوطني ",
+        compute="_compute_national_address",readonly=False)
+        
+    
 
     nationality = fields.Char ( "Nationality" )
-    key_information = fields.Boolean ( string="المعلومات الرئيسية" , default=False ,
-                                       help="عند تفعيل هذا الحقل يتم عرض المعلومات الرئيسية الخاصة بجهة الاتصال الحالية." )
-    additional_information = fields.Boolean ( string="المعلومات الفرعية" , default=True ,
-                                              help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية." )
-
     email = fields.Char ( "Email" , required=True , store=True )
     real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
-    #nationality = fields.Char ( "Nationality" )
+    nationality = fields.Char ( "Nationality" )
     manager_team = fields.Many2one ( comodel_name="res.users" , string='Manager' ,
                                      related="x_studio_related_field_7pm_1j7mp6p7k" , store=True , readonly=False )
     is_broker = fields.Boolean ( string='Broker' )
@@ -364,9 +368,31 @@ class ResPartner ( models.Model ) :
                                                         [('code' , '=' , '21011001')] , limit=1 ).id )
     attachment_ids = fields.Many2many ( 'ir.attachment' , string='Attachments' , compute='_compute_attachments' ,
                                         store=False )
-    fax_number = fields.Char ( string='رقم فون أرضي' , readonly=False , required=False )
+    fax_number = fields.Char ( string='أسم الشخص للتواصل' , readonly=False , required=False )
     all_sale_order_count = fields.Integer ( string='Sale Order Count' )
 
+    #@api.depends('building_no', 'street', 'city', 'zip', 'additional_no')
+    @api.depends( 'l10n_sa_edi_building_number','street', 'city', 'zip', 'additional_no')
+    def _compute_national_address(self):
+        for rec in self:
+            parts = []
+
+            if rec.l10n_sa_edi_building_number:
+                parts.append(rec.l10n_sa_edi_building_number)
+
+            if rec.street:
+                parts.append(rec.street)
+
+            if rec.city:
+                parts.append(rec.city)
+
+            if rec.zip and rec.additional_no:
+                parts.append(f"{rec.zip}-{rec.additional_no}")
+            elif rec.zip:
+                parts.append(rec.zip)
+
+            rec.national_address = "، ".join(parts)
+            
     #@api.onchange ( 'name' , 'cr_number_sale' , 'name_english' )
     #def _onchange_unique_fields(self) :
 
