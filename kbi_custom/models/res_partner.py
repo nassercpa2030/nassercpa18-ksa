@@ -353,7 +353,7 @@ class ResPartner ( models.Model ) :
     name_english = fields.Char ( string="English name" , readonly=False , store=True )
     partner_vat_placeholder = fields.Char ( string="Vat Number" , readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
-    identification_number= fields.Char ( string="Identification_number" , store=True , readonly=False )
+    identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
     manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' , compute="action_search_manager" ,
                                      store=True , readonly=False )
     manager_id = fields.Integer ( string="Manager Id" , store=True , readonly=False )
@@ -431,7 +431,7 @@ class ResPartner ( models.Model ) :
 
     # if existing :
     # raise ValidationError ( "❌ الاسم الإنجليزي مستخدم بالفعل" )
-    
+
     @api.onchange ( 'employee_ids' )
     def _onchange_name_lock(self) :
         for rec in self :
@@ -443,22 +443,20 @@ class ResPartner ( models.Model ) :
                 rec.employee = True
 
     @api.model
-    def name_search(self, name='', args=None, operator='ilike', limit=100):
+    def name_search(self , name='' , args=None , operator='ilike' , limit=100) :
         args = args or []
 
-        if name:
-            domain = [
-                '|', '|',
-                ('name', operator, name),
-                ('vat', operator, name),
-                ('identification_number', operator, name),
-            ]
-        else:
-            domain = []
+        domain = args
 
-        partners = self.search(domain + args, limit=limit)
-        return partners.name_get()
+        if name :
+            domain = ['|' , '|' ,
+                      ('name' , operator , name) ,
+                      ('vat' , operator , name) ,
+                      ('identification_number' , operator , name) ,  # تأكد إنه موجود
+                      ] + args
 
+        return self.search ( domain , limit=limit ).name_get ()
+    
 
     @api.onchange ( 'name' )
     def _onchange_name_lock(self) :
