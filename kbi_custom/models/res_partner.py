@@ -4,12 +4,13 @@ import logging
 from odoo.exceptions import UserError , ValidationError
 import re
 
-class HrPayrollStructure(models.Model):
+
+class HrPayrollStructure ( models.Model ) :
     _inherit = 'hr.payroll.structure'
 
-    type_id = fields.Many2one(
-        'hr.payroll.structure.type',
-        string='Type',
+    type_id = fields.Many2one (
+        'hr.payroll.structure.type' ,
+        string='Type' ,
         required=False
     )
 
@@ -332,18 +333,19 @@ class ResPartner ( models.Model ) :
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , related="employee_ids.analytic_account_id" ,
                                             string='الحساب التحليلي' , readonly=True ,
                                             placeholder="Enter Analytic Account for employee" )
-    #building_no = fields.Char(string="رقم المبنى", size=4)
-    key_information = fields.Boolean ( string="المعلومات الرئيسية" , default=False ,help="عند تفعيل هذا الحقل يتم عرض المعلومات الرئيسية الخاصة بجهة الاتصال الحالية." )
-    additional_information = fields.Boolean ( string="المعلومات الفرعية" , default=True , help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية." )
+    building_no = fields.Char ( string="رقم المبنى" , size=4 )
+    key_information = fields.Boolean ( string="المعلومات الرئيسية" , default=False ,
+                                       help="عند تفعيل هذا الحقل يتم عرض المعلومات الرئيسية الخاصة بجهة الاتصال الحالية." )
+    additional_information = fields.Boolean ( string="المعلومات الفرعية" , default=True ,
+                                              help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية." )
 
-    zip = fields.Char(string="الرمز البريدي", size=5,readonly=False)
-    additional_no = fields.Char(string="الرقم الإضافي", size=4,readonly=False)
+    zip = fields.Char ( string="الرمز البريدي" , size=5 , readonly=False )
+    identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
+    additional_no = fields.Char ( string="الرقم الإضافي" , size=4 , readonly=False )
 
-    national_address = fields.Char(
-        string="العنوان الوطني ",
-        compute="_compute_national_address",readonly=False)
-        
-    
+    national_address = fields.Char (
+        string="العنوان الوطني " ,
+        compute="_compute_national_address" , readonly=False )
 
     nationality = fields.Char ( "Nationality" )
     email = fields.Char ( "Email" , required=True , store=True )
@@ -357,6 +359,7 @@ class ResPartner ( models.Model ) :
     name_english = fields.Char ( string="English name" , readonly=False , store=True )
     partner_vat_placeholder = fields.Char ( string="Vat Number" , readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
+    identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
     manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' , compute="action_search_manager" ,
                                      store=True , readonly=False )
     manager_id = fields.Integer ( string="Manager Id" , store=True , readonly=False )
@@ -374,67 +377,106 @@ class ResPartner ( models.Model ) :
     fax_number = fields.Char ( string='أسم الشخص للتواصل' , readonly=False , required=False )
     all_sale_order_count = fields.Integer ( string='Sale Order Count' )
 
-    #@api.depends('building_no', 'street', 'city', 'zip', 'additional_no')
-    @api.depends( 'l10n_sa_edi_building_number','street', 'city', 'zip', 'additional_no')
-    def _compute_national_address(self):
-        for rec in self:
+    # @api.depends('building_no', 'street', 'city', 'zip', 'additional_no')
+    @api.depends ( 'l10n_sa_edi_building_number' , 'street' , 'city' , 'zip' , 'additional_no' )
+    def _compute_national_address(self) :
+        for rec in self :
             parts = []
 
-            if rec.l10n_sa_edi_building_number:
-                parts.append(rec.l10n_sa_edi_building_number)
+            if rec.building_no :
+                parts.append ( rec.l10n_sa_edi_building_number )
 
-            if rec.street:
-                parts.append(rec.street)
+            if rec.street :
+                parts.append ( rec.street )
 
-            if rec.city:
-                parts.append(rec.city)
+            if rec.city :
+                parts.append ( rec.city )
 
-            if rec.zip and rec.additional_no:
-                parts.append(f"{rec.zip}-{rec.additional_no}")
-            elif rec.zip:
-                parts.append(rec.zip)
+            if rec.zip and rec.additional_no :
+                parts.append ( f"{rec.zip}-{rec.additional_no}" )
+            elif rec.zip :
+                parts.append ( rec.zip )
 
-            rec.national_address = "، ".join(parts)
-            
-    #@api.onchange ( 'name' , 'cr_number_sale' , 'name_english' )
-    #def _onchange_unique_fields(self) :
+            rec.national_address = "، ".join ( parts )
 
-        #if self.name and self.name.strip () :
+    # @api.onchange ( 'name' , 'cr_number_sale' , 'name_english' )
+    # def _onchange_unique_fields(self) :
 
-            #name = self.name.strip ()
+    # if self.name and self.name.strip () :
 
-            #existing = self.env['res.partner'].search ( [
-                #('name' , '=' , name) ,
-                #('id' , '!=' , self._origin.id)
-           #] , limit=1 )
+    # name = self.name.strip ()
 
-           # if existing :
-            #    raise ValidationError ( "❌ الاسم مستخدم بالفعل" )
+    # existing = self.env['res.partner'].search ( [
+    # ('name' , '=' , name) ,
+    # ('id' , '!=' , self._origin.id)
+    # ] , limit=1 )
 
-        # CR check
-       #if self.cr_number_sale :
-            #cr = self.cr_number_sale.strip ()
+    # if existing :
+    #    raise ValidationError ( "❌ الاسم مستخدم بالفعل" )
 
-            #existing = self.env['res.partner'].search ( [
-                #('cr_number_sale' , '=' , cr) ,
-                #('id' , '!=' , self._origin.id)
-           # ] , limit=1 )
+    # CR check
+    # if self.cr_number_sale :
+    # cr = self.cr_number_sale.strip ()
 
-            #if existing :
-                #raise ValidationError ( "❌ رقم السجل التجاري مستخدم بالفعل" )
+    # existing = self.env['res.partner'].search ( [
+    # ('cr_number_sale' , '=' , cr) ,
+    # ('id' , '!=' , self._origin.id)
+    # ] , limit=1 )
 
-        # English name check
-        #if self.name_english :
-            #en = self.name_english.strip ()
+    # if existing :
+    # raise ValidationError ( "❌ رقم السجل التجاري مستخدم بالفعل" )
 
-            #existing = self.env['res.partner'].search ( [
-                #('name_english' , '=' , en) ,
-                #('id' , '!=' , self._origin.id)
-            #] , limit=1 )
+    # English name check
+    # if self.name_english :
+    # en = self.name_english.strip ()
 
-           # if existing :
-                #raise ValidationError ( "❌ الاسم الإنجليزي مستخدم بالفعل" )
+    # existing = self.env['res.partner'].search ( [
+    # ('name_english' , '=' , en) ,
+    # ('id' , '!=' , self._origin.id)
+    # ] , limit=1 )
 
+    # if existing :
+    # raise ValidationError ( "❌ الاسم الإنجليزي مستخدم بالفعل" )
+
+    @api.onchange ( 'employee_ids' )
+    def _onchange_name_lock(self) :
+        for rec in self :
+            if rec.employee_ids :
+                # لو Many2one
+                rec.identification_number = rec.employee_ids.identification_id or False
+
+                # لو عايز تفعل الفلاج
+                rec.employee = True
+
+    def name_get(self) :
+        res = []
+        for rec in self :
+            name = rec.name or ''
+
+            #if rec.vat  or :
+                #name += f' | VAT: {rec.vat}'
+
+            #if rec.identification_number :
+                #name += f' | ID: {rec.identification_number}'
+
+            res.append ( (rec.id , name) )
+
+        return res
+
+    @api.model
+    def name_search(self , name='' , args=None , operator='ilike' , limit=100) :
+        args = args or []
+
+        domain = args
+
+        if name :
+            domain = ['|' , '|' ,
+                      ('name' , operator , name) ,
+                      ('vat' , operator , name) ,
+                      ('identification_number' , operator , name) ,
+                      ] + args
+
+        return self.search ( domain , limit=limit ).name_get ()
 
 
     @api.onchange ( 'name' )
