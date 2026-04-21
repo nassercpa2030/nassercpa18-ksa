@@ -353,7 +353,7 @@ class ResPartner ( models.Model ) :
     name_english = fields.Char ( string="English name" , readonly=False , store=True )
     partner_vat_placeholder = fields.Char ( string="Vat Number" , readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
-    identification_number= fields.Integer ( string="Identification_number" , store=True , readonly=False )
+    identification_number= fields.BigInteger ( string="Identification_number" , store=True , readonly=False )
     manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' , compute="action_search_manager" ,
                                      store=True , readonly=False )
     manager_id = fields.Integer ( string="Manager Id" , store=True , readonly=False )
