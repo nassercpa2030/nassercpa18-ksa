@@ -332,6 +332,15 @@ class ResPartner ( models.Model ) :
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , related="employee_ids.analytic_account_id" ,
                                             string='الحساب التحليلي' , readonly=True ,
                                             placeholder="Enter Analytic Account for employee" )
+    building_no = fields.Char(string="رقم المبنى", size=4)
+    zip = fields.Char(string="الرمز البريدي", size=5)
+    additional_no = fields.Char(string="الرقم الإضافي", size=4)
+
+    national_address = fields.Char(
+        string="العنوان الوطني ",
+        compute="_compute_national_address")
+       # store=True
+    
 
     nationality = fields.Char ( "Nationality" )
     email = fields.Char ( "Email" , required=True , store=True )
@@ -362,6 +371,27 @@ class ResPartner ( models.Model ) :
     fax_number = fields.Char ( string='أسم الشخص للتواصل' , readonly=False , required=False )
     all_sale_order_count = fields.Integer ( string='Sale Order Count' )
 
+    @api.depends('building_no', 'street', 'city', 'zip', 'additional_no')
+    def _compute_short_address(self):
+        for rec in self:
+            parts = []
+
+            if rec.building_no:
+                parts.append(rec.building_no)
+
+            if rec.street:
+                parts.append(rec.street)
+
+            if rec.city:
+                parts.append(rec.city)
+
+            if rec.zip and rec.additional_no:
+                parts.append(f"{rec.zip}-{rec.additional_no}")
+            elif rec.zip:
+                parts.append(rec.zip)
+
+            rec.short_address = "، ".join(parts)
+            
     #@api.onchange ( 'name' , 'cr_number_sale' , 'name_english' )
     #def _onchange_unique_fields(self) :
 
