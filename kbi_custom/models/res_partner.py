@@ -373,7 +373,7 @@ class ResPartner ( models.Model ) :
 
     #@api.depends('building_no', 'street', 'city', 'zip', 'additional_no')
     @api.depends( 'street', 'city', 'zip', 'additional_no')
-    def _compute_short_address(self):
+    def _compute_national_address(self):
         for rec in self:
             parts = []
 
