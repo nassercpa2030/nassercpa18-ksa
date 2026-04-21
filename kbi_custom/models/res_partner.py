@@ -332,7 +332,7 @@ class ResPartner ( models.Model ) :
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , related="employee_ids.analytic_account_id" ,
                                             string='الحساب التحليلي' , readonly=True ,
                                             placeholder="Enter Analytic Account for employee" )
-    #building_no = fields.Char(string="رقم المبنى", size=4)
+    building_no = fields.Char(string="رقم المبنى", size=4)
     zip = fields.Char(string="الرمز البريدي", size=5)
     additional_no = fields.Char(string="الرقم الإضافي", size=4)
 
