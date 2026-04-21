@@ -338,7 +338,7 @@ class ResPartner ( models.Model ) :
 
     national_address = fields.Char(
         string="العنوان الوطني ",
-        compute="_compute_national_address",store=True,readonly=False)
+        compute="_compute_national_address",readonly=False)
         
     
 
