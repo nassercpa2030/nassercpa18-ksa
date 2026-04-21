@@ -371,13 +371,14 @@ class ResPartner ( models.Model ) :
     fax_number = fields.Char ( string='أسم الشخص للتواصل' , readonly=False , required=False )
     all_sale_order_count = fields.Integer ( string='Sale Order Count' )
 
-    @api.depends('building_no', 'street', 'city', 'zip', 'additional_no')
+    #@api.depends('building_no', 'street', 'city', 'zip', 'additional_no')
+    @api.depends( 'street', 'city', 'zip', 'additional_no')
     def _compute_short_address(self):
         for rec in self:
             parts = []
 
-            if rec.building_no:
-                parts.append(rec.building_no)
+            #if rec.building_no:
+                #parts.append(rec.building_no)
 
             if rec.street:
                 parts.append(rec.street)
