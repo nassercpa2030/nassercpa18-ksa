@@ -326,11 +326,25 @@ class ResPartner ( models.Model ) :
 
     key_information = fields.Boolean(string="المعلومات الرئيسية",default=False,help="عند تفعيل هذا الحقل يتم عرض المعلومات الرئيسية الخاصة بجهة الاتصال الحالية.")
     additional_information = fields.Boolean(string="المعلومات الفرعية",default=True,help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية.")
+    national_address = fields.Char(
+        string="العنوان الوطني ",
+        compute="_compute_national_address",
+        store=True
+    )
+    national_address_progress = fields.Integer(
+        string="Progress",compute="_compute_address_progress")
+
+    address_stage = fields.Selection([
+        ('0', '0%'),
+        ('20', '20%'),
+        ('40', '40%'),
+        ('60', '60%'),
+        ('80', '80%'),
+        ('100', '100%'), ], string="Stage", compute="_compute_address_progress", store=True)
     nationality = fields.Char ( "Nationality" )
     email = fields.Char ( "Email" , required=True , store=True )
     real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
-    nationality = fields.Char ( "Nationality" )
     manager_team = fields.Many2one ( comodel_name="res.users" , string='Manager' ,
                                      related="x_studio_related_field_7pm_1j7mp6p7k" , store=True , readonly=False )
     is_broker = fields.Boolean ( string='Broker' )
@@ -352,8 +366,50 @@ class ResPartner ( models.Model ) :
                                                         [('code' , '=' , '21011001')] , limit=1 ).id )
     attachment_ids = fields.Many2many ( 'ir.attachment' , string='Attachments' , compute='_compute_attachments' ,
                                         store=False )
-    fax_number = fields.Char ( string='أسم الشخص للتواصل' , readonly=False , required=False )
+    fax_number = fields.Char ( string='رقم فون أرضي' , readonly=False , required=False )
     all_sale_order_count = fields.Integer ( string='Sale Order Count' )
+    
+    @api.depends('building_no', 'street', 'city_id', 'zip', 'additional_no')
+    def _compute_short_address(self):
+        for rec in self:
+            parts = []
+
+            if rec.building_no:
+                parts.append(rec.building_no)
+
+            if rec.street_name:
+                parts.append(rec.street)
+
+            if rec.city:
+                parts.append(rec.city_id)
+
+            if rec.zip and rec.additional_no:
+                parts.append(f"{rec.zip}-{rec.additional_no}")
+            elif rec.zip:
+                parts.append(rec.zip)
+
+            rec.national_address = "، ".join(parts)
+
+    @api.depends('building_no', 'street', 'city_id', 'zip', 'additional_no')
+    def _compute_address_progress(self):
+        for rec in self:
+            filled = 0
+
+            if rec.building_no:
+                filled += 1
+            if rec.street:
+                filled += 1
+            if rec.city_id:
+                filled += 1
+            if rec.zip:
+                filled += 1
+            if rec.additional_no:
+                filled += 1
+
+            progress = filled * 20
+
+            rec.national_address_progress = progress
+            rec.address_stage = str(progress)
 
     @api.constrains ( 'name' , 'cr_number_sale' , 'name_english' )
     def _check_unique_fields(self) :
