@@ -336,10 +336,9 @@ class ResPartner ( models.Model ) :
 
     address_stage = fields.Selection([
         ('0', '0%'),
-        ('20', '20%'),
-        ('40', '40%'),
-        ('60', '60%'),
-        ('80', '80%'),
+        ('25', '25%'),
+        ('50', '50%'),
+        ('75', '75%'),
         ('100', '100%'), ], string="معدل اكتمال العنوان الوطني", compute="_compute_address_progress")
     nationality = fields.Char ( "Nationality" )
     email = fields.Char ( "Email" , required=True , store=True )
@@ -369,7 +368,7 @@ class ResPartner ( models.Model ) :
     fax_number = fields.Char ( string='رقم فون أرضي' , readonly=False , required=False )
     all_sale_order_count = fields.Integer ( string='Sale Order Count' )
     
-    @api.depends('building_no', 'street', 'city_id', 'zip', 'additional_no')
+    @api.depends('building_no', 'street', 'city_id', 'zip')
     def _compute_national_address(self):
         for rec in self:
             parts = []
@@ -383,14 +382,12 @@ class ResPartner ( models.Model ) :
             if rec.city:
                 parts.append(rec.city_id)
 
-            if rec.zip and rec.additional_no:
-                parts.append(f"{rec.zip}-{rec.additional_no}")
-            elif rec.zip:
+            if rec.zip:
                 parts.append(rec.zip)
 
             rec.national_address = "، ".join(parts)
 
-    @api.depends('building_no', 'street', 'city_id', 'zip', 'additional_no')
+    @api.depends('building_no', 'street', 'city_id', 'zip')
     def _compute_address_progress(self):
         for rec in self:
             filled = 0
@@ -403,10 +400,7 @@ class ResPartner ( models.Model ) :
                 filled += 1
             if rec.zip:
                 filled += 1
-            if rec.additional_no:
-                filled += 1
-
-            progress = filled * 20
+            progress = filled * 25
 
             rec.national_address_progress = progress
             rec.address_stage = str(progress)
