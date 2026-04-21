@@ -340,7 +340,7 @@ class ResPartner ( models.Model ) :
         ('40', '40%'),
         ('60', '60%'),
         ('80', '80%'),
-        ('100', '100%'), ], string="Stage", compute="_compute_address_progress", store=True)
+        ('100', '100%'), ], string="معدل اكتمال العنوان الوطني", compute="_compute_address_progress")
     nationality = fields.Char ( "Nationality" )
     email = fields.Char ( "Email" , required=True , store=True )
     real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
