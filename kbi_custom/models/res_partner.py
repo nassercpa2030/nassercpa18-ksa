@@ -391,7 +391,7 @@ class ResPartner ( models.Model ) :
             elif rec.zip:
                 parts.append(rec.zip)
 
-            rec.short_address = "، ".join(parts)
+            rec.national_address = "، ".join(parts)
             
     #@api.onchange ( 'name' , 'cr_number_sale' , 'name_english' )
     #def _onchange_unique_fields(self) :
