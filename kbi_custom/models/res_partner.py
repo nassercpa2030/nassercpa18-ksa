@@ -334,10 +334,10 @@ class ResPartner ( models.Model ) :
                                             string='الحساب التحليلي' , readonly=True ,
                                             placeholder="Enter Analytic Account for employee" )
     building_no = fields.Char ( string="رقم المبنى" , size=4 )
-    key_information = fields.Boolean ( string="المعلومات الرئيسية" , default=False ,
-                                       help="عند تفعيل هذا الحقل يتم عرض المعلومات الرئيسية الخاصة بجهة الاتصال الحالية." )
-    additional_information = fields.Boolean ( string="المعلومات الفرعية" , default=True ,
-                                              help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية." )
+    #key_information = fields.Boolean ( string="المعلومات الرئيسية" , default=False ,
+                                       #help="عند تفعيل هذا الحقل يتم عرض المعلومات الرئيسية الخاصة بجهة الاتصال الحالية." )
+    #additional_information = fields.Boolean ( string="المعلومات الفرعية" , default=True ,
+                                              #help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية." )
 
     zip = fields.Char ( string="الرمز البريدي" , size=5 , readonly=False )
     identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
