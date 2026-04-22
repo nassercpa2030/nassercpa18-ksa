@@ -1,4 +1,31 @@
 <odoo>
+  <record id="view_invoice_list_inherit_print" model="ir.ui.view">
+    <field name="name">account.move.list.print.button</field>
+    <field name="model">account.move</field>
+
+    <!-- الفيو الصح عندك -->
+    <field name="inherit_id" ref="account.view_out_invoice_tree"/>
+
+    <field name="arch" type="xml">
+
+        <!-- نخلي الليست readonly -->
+        <xpath expr="//tree | //list" position="attributes">
+            <attribute name="edit">false</attribute>
+            <attribute name="create">false</attribute>
+            <attribute name="delete">false</attribute>
+        </xpath>
+
+        <!-- زرار الطباعة -->
+        <xpath expr="//tree | //list" position="inside">
+            <button name="action_print_custom_invoice"
+                    type="object"
+                    icon="fa-print"
+                    class="btn-link"/>
+        </xpath>
+
+    </field>
+</record>
+  
   <!-- Close Entry Deffered Wizard -->
   <record id="view_close_entry_wizard_form_deffered" model="ir.ui.view">
       <field name="name">close.entry.wizard.form.deffered</field>
@@ -111,6 +138,8 @@
           <xpath expr="//header" position="inside">
               <field name="is_project_close_stage" invisible="1"/>
               <field name="is_journal_state_not_posted" invisible="1"/>
+             <!--button name="action_open_invoices" type="object" string="'طباعـة الفواتير" class="btn-primary" modifiers="{'invisible': [('is_journal_state_not_posted', '=', False)]}" /-->
+
          
             
               <button name="action_close_journal_entries"

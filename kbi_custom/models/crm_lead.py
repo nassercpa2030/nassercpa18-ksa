@@ -2,6 +2,7 @@
 
 from odoo import models , fields , api , tools , _
 from odoo.exceptions import ValidationError
+import re
 
 
 class CrmStage ( models.Model ) :
@@ -168,12 +169,74 @@ class CrmLead ( models.Model ) :
     number_700 = fields.Char ( '700 Nubmer' , related='partner_id.number_700' , readonly=False )
     stage_history_ids = fields.One2many ( comodel_name='crm.stage.history' , inverse_name='crm_lead_id' )
 
+<<<<<<< HEAD
+=======
+    @api.constrains ( 'name' , 'isic_code' )
+    def _check_unique_fields(self) :
+        for rec in self :
+
+            # ❌ name لازم يكون موجود
+            if not rec.name or not rec.name.strip () :
+                raise ValidationError ( "❌ الاسم لا يمكن أن يكون فارغ" )
+
+            name = rec.name.strip ()
+
+            isic = rec.isic_code and rec.isic_code.strip ()
+
+            # 1️⃣ check name
+            if name :
+                existing = self.search ( [
+                    ('name' , '=' , name) ,
+                    ('id' , '!=' , rec.id)
+                ] , limit=1 )
+                if existing :
+                    raise ValidationError ( "❌ الفرصة موجودة بالفعل" )
+
+            # 3️⃣ check isic
+            if isic :
+                existing = self.search ( [
+                    ('isic_code' , '=' , isic) ,
+                    ('id' , '!=' , rec.id)
+                ] , limit=1 )
+                if existing :
+                    raise ValidationError ( "❌ الـ isic مستخدم بالفعل" )
+
+    @api.onchange ( 'name' , 'isic_code'  )
+    def _onchange_unique_fields(self) :
+
+        if self.name and self.name.strip () :
+
+            name = self.name.strip ()
+
+            existing = self.env['crm.lead'].search ( [
+                ('name' , '=' , name) ,
+                ('id' , '!=' , self._origin.id)
+            ] , limit=1 )
+
+            if existing :
+                raise ValidationError ( "❌ الفرصة موجودة بالفعل" )
+
+
+        # English name check
+        if self.name_english :
+            isic = rec.isic_code and rec.isic_code.strip ()
+
+            existing = self.env['crm.lead'].search ( [
+                ('isic_code' , '=' , isic) ,
+                ('id' , '!=' , self._origin.id)
+            ] , limit=1 )
+
+            if existing :
+                raise ValidationError ( "❌ الـ isic مستخدم بالفعل" )
+
+>>>>>>> 885d64ceafa3179c2afa405dbc4c490c76f60742
     @api.onchange ( 'sale_person' )
     def _get_sale_team_from_saleperson(self) :
         for rec in self :
             if rec.sale_person :
                 rec.sale_team = rec.sale_person.department_id
 
+<<<<<<< HEAD
     def action_call_mobile(self):
         self.ensure_one()
         phone_number = self.phone or (self.partner_id.phone if self.partner_id else False)
@@ -193,6 +256,8 @@ class CrmLead ( models.Model ) :
             }
         }
 
+=======
+>>>>>>> 885d64ceafa3179c2afa405dbc4c490c76f60742
     @api.constrains ( 'number_700' )
     def _check700_number(self) :
         pattern = r'^7\d*$'

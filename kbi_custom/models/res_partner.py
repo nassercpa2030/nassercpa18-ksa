@@ -5,6 +5,16 @@ from odoo.exceptions import UserError , ValidationError
 import re
 
 
+class HrPayrollStructure ( models.Model ) :
+    _inherit = 'hr.payroll.structure'
+
+    type_id = fields.Many2one (
+        'hr.payroll.structure.type' ,
+        string='Type' ,
+        required=False
+    )
+
+
 class ResCity ( models.Model ) :
     _name = 'res.country.state.city'
     _rec_name = 'name'
@@ -50,8 +60,7 @@ class ResCity ( models.Model ) :
     oper_supp902_perc_111 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 111" , store=True , readonly=False )
     oper_supp902_perc_200 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 200" , store=True , readonly=False )
     oper_supp902_perc_103 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 103" , store=True , readonly=False )
-    
-    
+
     # ===== التسويق عام =====
     sale_gen911_perc_101 = fields.Float ( string="نسبة توزيع التسويق عام علي 101" , store=True , readonly=False )
     sale_gen911_perc_104 = fields.Float ( string="نسبة توزيع التسويق عام علي 104" , store=True , readonly=False )
@@ -178,7 +187,6 @@ class ResCity ( models.Model ) :
                         "الإجمالي الحالي: %.2f%%\n"
                         "(المسموح فقط: 0%% أو 100%%)"
                     ) % (label , diff_msg , total) )
-           
 
 
 _logger = logging.getLogger ( __name__ )
@@ -217,195 +225,12 @@ class HrPayslip ( models.Model ) :
                 # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
                 analytic_vals = {analytic_account_id.id : 100} if analytic_account_id else {}
 
-
                 for line in move.line_ids :
                     line.analytic_account_id = analytic_account_id
-                    ### finance department ###
-                    distribution_vals_finance = {
-                        8820 : line.env.user.finance923_perc_101,
-                        8843 : line.env.user.finance923_perc_104 ,
-                        8849 : line.env.user.finance923_perc_110 ,
-                        8865 : line.env.user.finance923_perc_111 ,
-                        8858 : line.env.user.finance923_perc_200 ,
-                        8834 : line.env.user.finance923_perc_103 ,
-                        8791 : 100.0 ,
-                    }
-                    ### uploading ###
-                    distribution_vals_upload = {
-                        8820 : line.env.user.oper_supp902_perc_101 ,
-                        8843 : line.env.user.oper_supp902_perc_104 ,
-                        8849 : line.env.user.oper_supp902_perc_110 ,
-                        8865 : line.env.user.oper_supp902_perc_111 ,
-                        8858 : line.env.user.oper_supp902_perc_200 ,
-                        8834 : line.env.user.oper_supp902_perc_103 ,
-                        8796 : 100.0 ,
-
-                    }
-                    ### Archive ###
-                    distribution_vals3_archive = {
-                        8820 : line.env.user.oper_supp902_perc_101 ,
-                        8843 : line.env.user.oper_supp902_perc_104 ,
-                        8849 : line.env.user.oper_supp902_perc_110 ,
-                        8865 : line.env.user.oper_supp902_perc_111 ,
-                        8858 : line.env.user.oper_supp902_perc_200 ,
-                        8834 : line.env.user.oper_supp902_perc_103 ,
-                        8795 : 100.0 ,
-
-                    }
-                    ### Sercratry_manageral ###
-                    distribution_vals4_secretary = {
-                        8820 : line.env.user.oper_supp902_perc_101 ,
-                        8843 : line.env.user.oper_supp902_perc_104 ,
-                        8849 : line.env.user.oper_supp902_perc_110 ,
-                        8865 : line.env.user.oper_supp902_perc_111 ,
-                        8858 : line.env.user.oper_supp902_perc_200 ,
-                        8834 : line.env.user.oper_supp902_perc_103 ,
-                        8797 : 100.0 ,
-                    }
-                    ### Quality ###
-                    distribution_vals_quality = {
-                        8820 : line.env.user.quality901_perc_101 ,
-                        8843 : line.env.user.quality901_perc_104 ,
-                        8849 : line.env.user.quality901_perc_110 ,
-                        8865 : line.env.user.quality901_perc_111 ,
-                        8858 : line.env.user.quality901_perc_200 ,
-                        8834 : line.env.user.quality901_perc_103 ,
-                        8790 : 100.0 ,
-                    }
-                    ### manageral921 ###
-                    distribution_vals_manage_921 = {
-                        8820 : line.env.user.manage_921_perc_101 ,
-                        8843 : line.env.user.manage_921_perc_104 ,
-                        8849 : line.env.user.manage_921_perc_110 ,
-                        8865 : line.env.user.manage_921_perc_111 ,
-                        8858 : line.env.user.manage_921_perc_200 ,
-                        8834 : line.env.user.manage_921_perc_103 ,
-                        8799 : 100.0 ,
-                    }
-                    ### technology922 ###
-                    distribution_vals_it = {
-                        8820 : line.env.user.it_922_perc_101 ,
-                        8843 : line.env.user.it_922_perc_104 ,
-                        8849 : line.env.user.it_922_perc_110 ,
-                        8865 : line.env.user.it_922_perc_111 ,
-                        8858 : line.env.user.it_922_perc_200 ,
-                        8834 : line.env.user.it_922_perc_103 ,
-                        8789 : 100.0 ,
-                    }
-                    ### Cleaning ###
-                    distribution_vals_clean_ryd = {
-                        8820 : line.env.user.coff_clean_ryd_perc_101 ,
-                        8843 : line.env.user.coff_clean_ryd_perc_104 ,
-                        8849 : line.env.user.coff_clean_ryd_perc_110 ,
-                        8865 : line.env.user.coff_clean_ryd_perc_111 ,
-                        8858 : line.env.user.coff_clean_ryd_perc_200 ,
-                        8834 : line.env.user.coff_clean_ryd_perc_103 ,
-                        8801 : 100.0 ,
-                    }
-                    ### pub_loc903 ###
-                    distribution_vals_pub_loc903 = {
-                        8820 : line.env.user.pub_loc903_perc_101 ,
-                        8843 : line.env.user.pub_loc903_perc_104 ,
-                        8849 : line.env.user.pub_loc903_perc_110 ,
-                        8865 : line.env.user.pub_loc903_perc_111 ,
-                        8858 : line.env.user.pub_loc903_perc_200 ,
-                        8834 : line.env.user.pub_loc903_perc_103 ,
-                        8792 : 100.0 ,
-                    }
-                    # شرط الحساب 1218
-                    if line.account_id.id == 1329 :
-                        line.partner_id = 63815
-
-                    else :
-                         line.partner_id = employee_partner.id
-
-                    ####### distribution analytic accounts #######
-                        ## finance##
-                    if (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8791
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals_finance
-
-                        ## uploading##
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8796
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals_upload
-
-                        ### Archive ###
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8795
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals3_archive
-
-                        ### Sercratry_manageral ###
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8797
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals4_secretary
-
-                        ### Quality ###
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8790
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals_quality
-
-                        ### manageral921 ###
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8799
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals_manage_921
-
-                        ### technology922 ###
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8789
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals_it
-
-                        ### Cleaning ###
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8801
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals_clean_ryd
-
-                        ### pub_loc903 ###
-                    elif (
-                            line.analytic_account_id
-                            and line.analytic_account_id.id == 8792
-                            and line.account_id
-                            and line.account_id.code.startswith ( '410' )
-                    ) :
-                        line.analytic_distribution = distribution_vals_pub_loc903
-
-                    else:
-                       line.analytic_distribution = analytic_vals
+                    line.analytic_distribution = analytic_vals
+                    line.partner_id = employee_partner
 
         return result
-
 
 
 # ---------------- EMPLOYEE Contract -----------------
@@ -418,6 +243,9 @@ class Recruiter ( models.Model ) :
                                                  readonly=False , store=True )
     other_allowance = fields.Monetary ( 'بدلات أخري ' , help="Same field as Other allowance for employee contract" ,
                                         readonly=False , store=True )
+    x_gosi_225 = fields.Boolean ( "تأمينات  %22.5" ,
+                                  help="عند إختيار هذا الحقل يتم  إحتساب نسب التأمينات الحديثة للموظف السعودي بنسبة والشركة12.25 % , للموظف %10.25  " ,
+                                  store=True );
 
 
 # ---------------- EMPLOYEES  -----------------
@@ -428,8 +256,15 @@ class Recruiter ( models.Model ) :
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
                                       placeholder="Enter Analytic Plan" )
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
-                                           help="this field get partner from contact" ,
+                                           help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
+    request_employee_manager = fields.Many2one ( 'res.users' , string='المدير ' , required=True , store=True )
+    contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
+    residency_visa_number = fields.Integer ( string="رقم الهوية /رقم الإقامة" , store=True )
+    border_number = fields.Integer ( string="رقم  الحدود" , store=True )
+    iqama_expiry_date = fields.Date ( string="تاريخ انتهاء الإقامة" , store=True )
+    start_working_date = fields.Date ( string="تاريخ المباشرة" , compute="_compute_start_working_date" )
+    passport_expiry_date = fields.Date ( string="تاريخ انتهاء الجواز" )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
                                             domain="[('plan_id', '=', analytic_plan)]" , readonly=False , store=True )
     wage = fields.Float ( 'الأساسي' , help="Same field as Wage for employee contract" , compute="get_employee_wage" ,
@@ -443,6 +278,15 @@ class Recruiter ( models.Model ) :
     transportation_allowance = fields.Monetary ( 'بدل المواصلات' , related="contract_id.transportation_allowance" ,
                                                  help="Same field as housing allowance for employee contract" ,
                                                  readonly=False , store=True )
+
+    @api.depends ( 'contract_ids.date_start' )
+    def _compute_start_working_date(self) :
+        for rec in self :
+            if rec.contract_ids :
+                first_contract = rec.contract_ids.sorted ( key=lambda c : c.date_start )[0]
+                rec.start_working_date = first_contract.date_start
+            else :
+                rec.start_working_date = False
 
     @api.depends ( 'contract_id' )
     def get_employee_wage(self) :
@@ -489,8 +333,16 @@ class ResPartner ( models.Model ) :
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , related="employee_ids.analytic_account_id" ,
                                             string='الحساب التحليلي' , readonly=True ,
                                             placeholder="Enter Analytic Account for employee" )
+    #building_no = fields.Char ( string="رقم المبنى" , size=4 )
+    zip = fields.Char ( string="الرمز البريدي" , size=5 )
+    additional_no = fields.Char ( string="الرقم الإضافي" , size=4 )
+
+    national_address = fields.Char (
+        string="العنوان الوطني " ,
+        compute="_compute_national_address" , readonly=False )
 
     nationality = fields.Char ( "Nationality" )
+    email = fields.Char ( "Email" , required=True , store=True )
     real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
     nationality = fields.Char ( "Nationality" )
@@ -501,6 +353,7 @@ class ResPartner ( models.Model ) :
     name_english = fields.Char ( string="English name" , readonly=False , store=True )
     partner_vat_placeholder = fields.Char ( string="Vat Number" , readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
+    identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
     manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' , compute="action_search_manager" ,
                                      store=True , readonly=False )
     manager_id = fields.Integer ( string="Manager Id" , store=True , readonly=False )
@@ -516,21 +369,147 @@ class ResPartner ( models.Model ) :
     attachment_ids = fields.Many2many ( 'ir.attachment' , string='Attachments' , compute='_compute_attachments' ,
                                         store=False )
     fax_number = fields.Char ( string='أسم الشخص للتواصل' , readonly=False , required=False )
-    all_sale_order_count = fields.Integer(string='Sale Order Count')
+    all_sale_order_count = fields.Integer ( string='Sale Order Count' )
 
-    @api.onchange('sale_order_count')
-    def _onchange_sale_order_count(self):
-        for rec in self:
+    # @api.depends('building_no', 'street', 'city', 'zip', 'additional_no')
+    @api.depends ( 'l10n_sa_edi_building_number' , 'street' , 'city' , 'zip' , 'additional_no' )
+    def _compute_national_address(self) :
+        for rec in self :
+            parts = []
+
+            if rec.building_no :
+                parts.append ( rec.l10n_sa_edi_building_number )
+
+            if rec.street :
+                parts.append ( rec.street )
+
+            if rec.city :
+                parts.append ( rec.city )
+
+            if rec.zip and rec.additional_no :
+                parts.append ( f"{rec.zip}-{rec.additional_no}" )
+            elif rec.zip :
+                parts.append ( rec.zip )
+
+            rec.national_address = "، ".join ( parts )
+
+    # @api.onchange ( 'name' , 'cr_number_sale' , 'name_english' )
+    # def _onchange_unique_fields(self) :
+
+    # if self.name and self.name.strip () :
+
+    # name = self.name.strip ()
+
+    # existing = self.env['res.partner'].search ( [
+    # ('name' , '=' , name) ,
+    # ('id' , '!=' , self._origin.id)
+    # ] , limit=1 )
+
+    # if existing :
+    #    raise ValidationError ( "❌ الاسم مستخدم بالفعل" )
+
+    # CR check
+    # if self.cr_number_sale :
+    # cr = self.cr_number_sale.strip ()
+
+    # existing = self.env['res.partner'].search ( [
+    # ('cr_number_sale' , '=' , cr) ,
+    # ('id' , '!=' , self._origin.id)
+    # ] , limit=1 )
+
+    # if existing :
+    # raise ValidationError ( "❌ رقم السجل التجاري مستخدم بالفعل" )
+
+    # English name check
+    # if self.name_english :
+    # en = self.name_english.strip ()
+
+    # existing = self.env['res.partner'].search ( [
+    # ('name_english' , '=' , en) ,
+    # ('id' , '!=' , self._origin.id)
+    # ] , limit=1 )
+
+    # if existing :
+    # raise ValidationError ( "❌ الاسم الإنجليزي مستخدم بالفعل" )
+
+    @api.onchange ( 'employee_ids' )
+    def _onchange_name_lock(self) :
+        for rec in self :
+            if rec.employee_ids :
+                # لو Many2one
+                rec.identification_number = rec.employee_ids.identification_id or False
+
+                # لو عايز تفعل الفلاج
+                rec.employee = True
+
+    def name_get(self) :
+        res = []
+        for rec in self :
+            name = rec.name or ''
+
+            #if rec.vat  or :
+                #name += f' | VAT: {rec.vat}'
+
+            #if rec.identification_number :
+                #name += f' | ID: {rec.identification_number}'
+
+            res.append ( (rec.id , name) )
+
+        return res
+
+    @api.model
+    def name_search(self , name='' , args=None , operator='ilike' , limit=100) :
+        args = args or []
+
+        domain = args
+
+        if name :
+            domain = ['|' , '|' ,
+                      ('name' , operator , name) ,
+                      ('vat' , operator , name) ,
+                      ('identification_number' , operator , name) ,
+                      ] + args
+
+        return self.search ( domain , limit=limit ).name_get ()
+
+
+    @api.onchange ( 'name' )
+    def _onchange_name_lock(self) :
+        for rec in self :
+            # لو الاسم موجود واتغير والمستخدم مش سوبر أدمن
+            if rec.id and rec.name and rec._origin.name != rec.name :
+                if not rec.env.user.has_group ( 'base.group_system' ) :
+                    # ارجع الاسم القديم
+                    rec.name = rec._origin.name
+                    # رسالة تحذيرية
+                    return {
+                        'warning' : {
+                            'title' : "تغيير غير مسموح" ,
+                            'message' : "لا يجوز تغيير اسم العميل، الصلاحية موجودة مع أ/ ناصر عوض"}}
+
+                # else:
+                # continue
+
+    def write(self , vals) :
+        if 'name' in vals :
+            for rec in self :
+                if rec.name and rec.name != vals['name'] and not self.env.user.has_group ( 'base.group_system' ) :
+                    raise UserError ( "لا يجوز تغيير اسم العميل، الصلاحية موجودة مع أ/ ناصر عوض" )
+        return super ().write ( vals )
+
+    @api.onchange ( 'sale_order_count' )
+    def _onchange_sale_order_count(self) :
+        for rec in self :
             rec.all_sale_order_count = rec.sale_order_count
-            
-    def action_copy_sale_order_count(self):
+
+    def action_copy_sale_order_count(self) :
         """
         دالة يتم استدعائها عند الضغط على الزر
         لنسخ قيمة sale_order_count لكل سجل مختار
         """
-        for rec in self:  # self = السجلات المختارة
+        for rec in self :  # self = السجلات المختارة
             rec.all_sale_order_count = rec.sale_order_count
-            
+
     def _compute_attachments(self) :
         for rec in self :
             rec.attachment_ids = self.env['ir.attachment'].search ( [
@@ -557,12 +536,21 @@ class ResPartner ( models.Model ) :
                 #continue
 
             # إذا المستخدم الحالي غير مسموح له
+<<<<<<< HEAD
             #user_not_allowed = self.env.user.id not in allowed_user_ids
                 # ===== phone_customer_contact =====
             #if rec.company_type != 'person' and user_not_allowed :
                 #if not rec.phone and rec.fax_number :
                     #raise ValidationError ( "حقل Phone + Contact_name مطلوب لغير الأشخاص وغير المسؤولين." )
                 
+=======
+            user_not_allowed = self.env.user.id not in allowed_user_ids
+            # ===== phone_customer_contact =====
+            if rec.company_type != 'person' and user_not_allowed :
+                if not rec.phone and rec.fax_number :
+                    raise ValidationError ( "حقل Phone + Contact_name مطلوب لغير الأشخاص وغير المسؤولين." )
+
+>>>>>>> 885d64ceafa3179c2afa405dbc4c490c76f60742
             # ===== number_700 =====
             #if rec.company_type != 'person' and user_not_allowed :
                 #if not rec.number_700 :

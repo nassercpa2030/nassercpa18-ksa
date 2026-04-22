@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 import ast
-import base64
+import base64 , binascii , gzip , json , uuid
 import datetime
-import uuid
 from io import BytesIO
-
+import openpyxl
 import qrcode
 
 from odoo import models , fields , api , _
@@ -15,16 +14,19 @@ from odoo.exceptions import UserError
 # from odoo.tools.populate import compute
 class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
-    
-    planning_first_sale_line_id = fields.Many2one('sale.order.line', string='First Sale Line Planning', readonly=True   )
-    planning_initial_date = fields.Date(string="Initial Planning Date",readonly=True  )
-    planning_hours_to_plan = fields.Float(string="Hours to Plan",readonly=True )
-    planning_hours_planned = fields.Float(string="Hours Planned",readonly=True )
+
+    planning_first_sale_line_id = fields.Many2one ( 'sale.order.line' , string='First Sale Line Planning' ,
+                                                    readonly=True )
+    planning_initial_date = fields.Date ( string="Initial Planning Date" , readonly=True )
+    planning_hours_to_plan = fields.Float ( string="Hours to Plan" , readonly=True )
+    planning_hours_planned = fields.Float ( string="Hours Planned" , readonly=True )
     contract_date = fields.Date ( string='Contract Date' , readonly=False , required=True )
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
     old_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , stored=True )
     order_lines_count = fields.Integer ( string='Order Lines' , compute='_compute_order_lines_count' , store=True )
-    customer_phone_number = fields.Char ( string='تيلفون العميل' , related='partner_id.mobile' , store=True )
+    customer_phone_number = fields.Char ( string='تليفون العميل' , store=True )
+    journal_entry_count = fields.Char ( string='عدد القيود' , store=True )
+    # comupute='_get_mobile'  )
     convert_orders = fields.Boolean (
         string="تحويل الأوردرات لعقود" ,
         default=False ,
@@ -46,6 +48,7 @@ class SaleOrder ( models.Model ) :
     unpaid_total_refrence = fields.Float ( 'unpaid_total_refrence' , store=True , readonly=False )
     paid_total_refrence = fields.Float ( 'paid_total_refrence' , store=True , readonly=False )
     paid_percentage_refrence = fields.Float ( 'paid_percentage_refrence' , store=True , readonly=False )
+
     customer_English_name_refrence = fields.Char ( 'customer_English_name_refrence' , readonly=False , store=True )
     close_entry_date_refrence = fields.Date ( string="close_entry_date_refrence" , readonly=False , required=False ,
                                               store=True )
@@ -87,6 +90,16 @@ class SaleOrder ( models.Model ) :
     paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count" , searchable=True )
     unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count" , searchable=True )
     paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" , sorted=True )
+    finance_signiture = fields.Boolean ( string=' توقيع المالية للختم '  , readonly=False, store=True  )
+    archive_signiture = fields.Boolean ( string='توقيع الأرشيف للختم ' , default=False , readonly=False , index=True )
+    manager_signiture = fields.Boolean ( string='توقيع مدير المجموعة للختم ' , default=False , readonly=False , index=True )
+    finance_assign = fields.Binary ( string=' ملف توقيع المالية  ' , default=False ,
+                                     compute="_compute_finance_archive_signature" , store=False , readonly=False )
+    archive_assign = fields.Binary ( string=' ملف توقيع الأرشيف ' , default=False ,
+                                     compute="_compute_finance_archive_signature" , store=False , readonly=False )
+    manager_assign = fields.Binary ( string=' ملف توقيع مدير المجموعة ' , default=False ,
+                                     compute="_compute_finance_archive_signature" , store=False , readonly=False )
+
     auditor = fields.Many2one ( string="Auditor" , comodel_name="hr.employee" ,
                                 domain=[('job_id' , '!=' , 'مدير مراجعة')] )
     # invoice_ids = fields.Many2many ( 'account.move' , compute="compute_invoice_ids" , readonly=True , store=True ,
@@ -218,7 +231,15 @@ class SaleOrder ( models.Model ) :
         store=True
     )
 
-    ##########Get order Lines##########
+    ##########Get order Lines#########
+    # def _get_mobile(self) :
+    # for rec in  self:
+    # if rec.partner_id.mobile :
+    # rec.customer_phone_number = rec.partner_id.mobile
+    # elif rec.partner_id.phone :
+    # rec.customer_phone_number = rec.partner_id.phone
+    # else :
+    # rec.customer_phone_number = rec.partner_id.fax_number or False
 
     @api.depends ( 'order_line' )
     def _compute_order_lines_count(self) :
@@ -226,15 +247,24 @@ class SaleOrder ( models.Model ) :
             rec.order_lines_count = len ( rec.order_line ) if rec.order_line else 0
 
     # @api.onchange('customer_phone_number','partner_id', 'order_line', 'pricelist_id', 'date_order', 'state','amount_untaxed','paid_total','broker_amount','project_name','multi_years','multi_service','x_studio_contract_service','project_count','contarct_date','audit_date','customer_english_name')
-    @api.onchange ( 'customer_phone_number' , 'payment_count' , 'payment_count2' , 'invoice_count' , 'paid_percent' )
+    @api.onchange ( 'partner_id' , 'amount_untaxed' , 'paid_total' , 'x_studio_contract_service' , 'project_count' ,
+                    'contarct_date' , 'audit_date' , 'customer_english_name' , 'payment_count' , 'payment_count2' ,
+                    'invoice_count' , 'paid_percent' )
     def _onchange_customer_phone_number(self) :
         allowed_user_ids = [2 , 394 , 18]
         admin_group = self.env.ref ( 'base.group_system' )
         for rec in self :
+            if rec.partner_id.mobile :
+                rec.customer_phone_number = rec.partner_id.mobile
+            elif rec.partner_id.phone :
+                rec.customer_phone_number = rec.partner_id.phone
+            else :
+                rec.customer_phone_number = rec.partner_id.fax_number or False
+
             # لو المستخدم Admin يتخطى التحقق
             if self.env.user in admin_group.users :
                 continue
-            # لو المستخدم مش مسموح له
+                # لو المستخدم مش مسموح له
             if self.env.user.id not in allowed_user_ids :
                 if not rec.customer_phone_number :
                     return {
@@ -299,7 +329,7 @@ class SaleOrder ( models.Model ) :
             else :
                 rec.product_public_name = False
 
-    @api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
+    @api.onchange ( "product_public_name" , "account_year" , "auto_contract_name" )
     def get_project_name(self) :
         for rec in self :
             # if not rec.project_name and rec.auto_contract_name:
@@ -336,7 +366,7 @@ class SaleOrder ( models.Model ) :
     # @api.depends('journal_entry_count')
     # def compute_journal_entry_count_finance(self) :
     # for order in self :
-    # order.journal_entry_count_finance = order.journal_entry_count     
+    # order.journal_entry_count_finance = order.journal_entry_count
 
     def _compute_contact_manager_team(self) :
         for rec in self :
@@ -479,25 +509,154 @@ class SaleOrder ( models.Model ) :
             else :
                 order.project_files_state = None
 
+    upload_file = fields.Binary ( string="Upload File" )
+    upload_file_name = fields.Char ( string="File Name" )
+    file_type = fields.Char ( string="File Type" )  # xlsx, csv, pdf, docx, zip
+
+    file_json = fields.Binary ( string="Stored Data (Compressed JSON)" )  # Excel / CSV
+    compressed_file = fields.Binary ( string="Compressed File" )  # PDF / Word / ZIP / Others
+    original_file = fields.Binary ( string="Original File" )  # نسخة التحميل الأصلية
+
+    original_size = fields.Integer ( string="Original Size (Bytes)" )
+    stored_size = fields.Integer ( string="Stored Size (Bytes)" )
+
+    uuid = fields.Char ( string='UUID' , readonly=True )
+    opportunity_id = fields.Many2one ( 'crm.lead' , string='Opportunity' )
+    project_name = fields.Char ( string='Project Name' )
+    partner_id = fields.Many2one ( 'res.partner' , string='Partner' )
+    user_id = fields.Many2one ( 'res.users' , string='Responsible' )
+
+    @api.onchange ( 'upload_file' )
+    def onchange_file(self) :
+        """معاينة قبل الحفظ"""
+        for rec in self :
+            if rec.upload_file :
+                rec._process_file ( preview=True )
+
+    def _process_file(self , preview=False) :
+        """معالجة الملفات وضغطها"""
+        for rec in self :
+            if not rec.upload_file :
+                continue
+
+            try :
+                file_bytes = base64.b64decode ( rec.upload_file )
+            except (binascii.Error , ValueError) :
+                raise UserError ( _ ( "The uploaded file is corrupted or incomplete." ) )
+
+            rec.original_size = len ( file_bytes )
+            ext = (rec.upload_file_name or '').split ( '.' )[-1].lower ()
+            rec.file_type = ext
+
+            # حفظ النسخة الأصلية
+            if not preview :
+                rec.original_file = rec.upload_file
+
+            if ext in ['xlsx' , 'csv'] :
+                # معالجة Excel / CSV
+                try :
+                    wb = openpyxl.load_workbook ( BytesIO ( file_bytes ) , data_only=True )
+                    sheet = wb.active
+                    data = [list ( row ) for row in sheet.iter_rows ( values_only=True )]
+                    json_bytes = json.dumps ( data ).encode ( 'utf-8' )
+                    buffer = BytesIO ()
+                    with gzip.GzipFile ( fileobj=buffer , mode='wb' ) as f :
+                        f.write ( json_bytes )
+                except Exception as e :
+                    raise UserError ( _ ( "Failed to process Excel/CSV: %s" ) % str ( e ) )
+
+                if not preview :
+                    rec.file_json = base64.b64encode ( buffer.getvalue () )
+                    rec.compressed_file = None
+                    rec.stored_size = len ( buffer.getvalue () )
+            else :
+                # أي نوع ملف آخر
+                buffer = BytesIO ()
+                with gzip.GzipFile ( fileobj=buffer , mode='wb' ) as f :
+                    f.write ( file_bytes )
+
+                if not preview :
+                    rec.compressed_file = base64.b64encode ( buffer.getvalue () )
+                    rec.file_json = None
+                    rec.stored_size = len ( buffer.getvalue () )
+
     @api.model
-    def create(self , vals_list) :
-        res = super ().create ( vals_list )
-        res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
-        # with offer price  stage إنشاء فرصة CRM لو مش موجودة
+    def create(self , vals) :
+
+        res = super ().create ( vals )
+        # res._get_mobile()
+        if res.upload_file :
+            res._process_file ()  # معالجة بعد الإنشاء
+        res.uuid = str ( f'{res.id}-{uuid.uuid4 ()}' )
+
+        # إنشاء فرصة CRM تلقائياً إذا غير موجودة
         if not res.opportunity_id :
             stage = self.env['crm.stage'].search ( [] , limit=1 )
             lead = self.env['crm.lead'].create ( {
-                'name' : f'{res.project_name} {res.partner_id.name}' if res.project_name else res.name ,
+                'name' : f'{res.project_name} {res.partner_id.name}' if res.project_name else res.upload_file_name ,
                 'partner_id' : res.partner_id.id ,
                 'type' : 'opportunity' ,
                 'user_id' : res.user_id.id ,
                 'email_from' : res.partner_id.email ,
                 'phone' : res.partner_id.phone ,
-                'stage_id' : 5 ,
+                'stage_id' : stage.id if stage else False ,
             } )
-
             res.opportunity_id = lead.id
+
         return res
+
+    def write(self , vals) :
+
+        res = super ().write ( vals )
+        # self._get_mobile()
+        # إعادة معالجة الملفات فقط إذا تم رفع جديد
+        if 'upload_file' in vals and vals['upload_file'] :
+            self._process_file ()
+        return res
+
+    def download_file(self) :
+        """تنزيل الملف الأصلي كما رفع"""
+        self.ensure_one ()
+        if not self.original_file :
+            raise UserError ( _ ( "لا يوجد ملف للتنزيل." ) )
+
+        return {
+            'type' : 'ir.actions.act_url' ,
+            'url' : f'/web/content/{self._name}/{self.id}/original_file/{self.upload_file_name}?download=true' ,
+            'target' : 'new' ,
+        }
+
+    def remove_file(self) :
+        """إزالة الملف ومسح كل الحقول المتعلقة به"""
+        for rec in self :
+            rec.upload_file = False
+            rec.upload_file_name = False
+            rec.file_type = False
+            rec.compressed_file = False
+            rec.file_json = False
+            rec.original_file = False
+            rec.original_size = 0
+            rec.stored_size = 0
+
+    # @api.model
+    # def create(self , vals_list) :
+    # res = super ().create ( vals_list )
+    # res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
+    # with offer price  stage إنشاء فرصة CRM لو مش موجودة
+    # if not res.opportunity_id :
+    # stage = self.env['crm.stage'].search ( [] , limit=1 )
+    # lead = self.env['crm.lead'].create ( {
+    # 'name' : f'{res.project_name} {res.partner_id.name}' if res.project_name else res.name ,
+    # 'partner_id' : res.partner_id.id ,
+    # 'type' : 'opportunity' ,
+    # 'user_id' : res.user_id.id ,
+    # 'email_from' : res.partner_id.email ,
+    # 'phone' : res.partner_id.phone ,
+    # 'stage_id' : 5 ,
+    # } )
+
+    # res.opportunity_id = lead.id
+    # return res
 
     def compute_sign_qrcode(self) :
         for rec in self :
@@ -512,13 +671,13 @@ class SaleOrder ( models.Model ) :
             qr_image = base64.b64encode ( buffered.getvalue () ).decode ( 'ascii' )
             rec.sign_qrcode = qr_image
 
-    # def compute_sign_qrcode(self) :   
-    # base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url') 
+    # def compute_sign_qrcode(self) :
+    # base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
     # qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
     # for rec in self :
     # if rec.sign_qrcode or not rec.uuid:
     # continue
-    # qr_code.clear()    
+    # qr_code.clear()
     # base_url = self.env['ir.config_parameter'].sudo ().get_param ( 'web.base.url' )
     # qr_code.add_data ( f'{base_url}//order/verify/{rec.uuid}' )
     # qr_code.make ( fit=True )
@@ -613,7 +772,7 @@ class SaleOrder ( models.Model ) :
             rec.unpaid_total = rec.amount_total - rec.paid_total
             rec.amount_due = rec.amount_total - rec.paid_total
             rec.paid_total_refrence = paid_total
-
+            #rec.finance_signiture = ( rec.paid_percent >= 96 and rec.state not in ['draft' , 'sent' , 'cancel'])
             # تحديث convert_orders بناءً على paid_total
             previous_convert = rec.convert_orders
             rec.convert_orders = rec.paid_total > 0
@@ -622,6 +781,16 @@ class SaleOrder ( models.Model ) :
             if rec.convert_orders and not previous_convert :
                 rec.action_convert_orders ()  # استدعاء الدالة مباشرة
 
+                
+    #@api.onchange('paid_percent')
+    #def change_finance_signiture(self):
+         #for rec in self :
+             #if  rec.paid_percent >= 99 and rec.state not in ['draft' , 'sent' , 'cancel']:
+                 #rec.finance_signiture = True
+             #else :
+                 #rec.finance_signiture = False
+                 
+    
     def action_convert_orders(self) :
         """
         دالة لتحويل الأوردرات إلى عقود وإنشاء المشاريع المرتبطة
@@ -777,7 +946,7 @@ class SaleOrder ( models.Model ) :
         }
 
 
-class SaleOrder ( models.Model ) :
+class SaleOrder2 ( models.Model ) :
     _inherit = 'sale.order'
 
     # contract_date = fields.Date(string='Contract Date')
@@ -1117,9 +1286,9 @@ class SaleOrder ( models.Model ) :
                 if not order.customer_phone_number :
                     raise UserError ( "برجاء إدخال رقم التيلفون للعميل" )  # يمنع التنفيذ فورًا
 
-            # لو فيه فرصة مرتبطة، نغير stage_idغيرها الي مدفوع  
+            # لو فيه فرصة مرتبطة، نغير stage_idغيرها الي مدفوع
             if order.opportunity_id :
-               order.opportunity_id.stage_id = 4  # حدد Stage ID اللي تحب
+                order.opportunity_id.stage_id = 4  # حدد Stage ID اللي تحب
 
         return {
             'name' : 'Create New Payment' ,

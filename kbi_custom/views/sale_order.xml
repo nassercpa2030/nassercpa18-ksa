@@ -7,6 +7,10 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="xf_approval_route_sale.sale_order_approval_form"/>
             <field name="arch" type="xml">
+                      <xpath expr="//field[@name='name']" position="attributes">
+            <attribute name="widget">badge</attribute>
+            <attribute name="decoration-danger">'S2026/00584' in name</attribute>
+                     </xpath>
                 <!-- Modify attributes of approval_route_id -->
                 <xpath expr="//field[@name='approval_route_id']" position="attributes">
                     <attribute name="modifiers">{'invisible':[('use_approval_route','=','no')],'required':[('use_approval_route','=','required')],'readonly':[('can_edit_approve','=',False)]}</attribute>
