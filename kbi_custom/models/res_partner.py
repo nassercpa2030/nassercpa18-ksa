@@ -340,6 +340,7 @@ class ResPartner ( models.Model ) :
                                               #help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية." )
 
     zip = fields.Char ( string="الرمز البريدي" , size=5 , readonly=False )
+    name=fields.Char("أسم المنشأة ",store=True,readonly=False,placeholder="برجاء وضع  اسم  المنشأة أو جهة الإتصال")
     identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
     additional_no = fields.Char ( string="الرقم الإضافي" , size=4 , readonly=False )
 
