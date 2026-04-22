@@ -192,6 +192,7 @@ class AccountMove ( models.Model ) :
                 # 1️⃣ استدعاء دالة الإقفال من Sale Order
                 if hasattr ( sale_order , 'action_close_journal_entries' ) :
                     sale_order.action_close_journal_entries ()
+                    sale_order.finance_signiture= True
 
                 # 2️⃣ إنشاء Wizard مع context الصحيح (زي الزرار)
                 wizard = self.env['close.entry.wizard'].with_context (
@@ -205,7 +206,7 @@ class AccountMove ( models.Model ) :
 
                 # 3️⃣ تنفيذ نفس زر Close Entry
                 wizard.close_entry ()
-                finance_signiture= True
+                
                 if sale_order.project_ids :
                     project = sale_order.project_ids[0]  # مشروع واحد فقط
                     # if project.stage_id.id != 24:
