@@ -333,9 +333,15 @@ class ResPartner ( models.Model ) :
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , related="employee_ids.analytic_account_id" ,
                                             string='الحساب التحليلي' , readonly=True ,
                                             placeholder="Enter Analytic Account for employee" )
-    #building_no = fields.Char ( string="رقم المبنى" , size=4 )
-    zip = fields.Char ( string="الرمز البريدي" , size=5 )
-    additional_no = fields.Char ( string="الرقم الإضافي" , size=4 )
+    building_no = fields.Char ( string="رقم المبنى" , size=4 )
+    key_information = fields.Boolean ( string="المعلومات الرئيسية" , default=False ,
+                                       help="عند تفعيل هذا الحقل يتم عرض المعلومات الرئيسية الخاصة بجهة الاتصال الحالية." )
+    additional_information = fields.Boolean ( string="المعلومات الفرعية" , default=True ,
+                                              help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية." )
+
+    zip = fields.Char ( string="الرمز البريدي" , size=5 , readonly=False )
+    identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
+    additional_no = fields.Char ( string="الرقم الإضافي" , size=4 , readonly=False )
 
     national_address = fields.Char (
         string="العنوان الوطني " ,
@@ -522,46 +528,37 @@ class ResPartner ( models.Model ) :
         for partner in self :
             partner.cr_number_sale = partner.sale_order_ids[-1].cr_number_sale if partner.sale_order_ids else False
 
-    #@api.constrains ( 'number_700' , 'cr_number_sale' , 'company_type' )
-    #def _check_numbers(self) :
-        #pattern_700 = r'^7\d*$'
-        #pattern_cr = r'^\d+$'
+    @api.constrains ( 'number_700' , 'cr_number_sale' , 'company_type' )
+    def _check_numbers(self) :
+        pattern_700 = r'^7\d*$'
+        pattern_cr = r'^\d+$'
 
-        #allowed_user_ids = [2 , 394 , 18]
-        #admin_group = self.env.ref ( 'base.group_system' )  # مجموعة الـ Admin
+        allowed_user_ids = [2 , 394 , 18]
+        admin_group = self.env.ref ( 'base.group_system' )  # مجموعة الـ Admin
 
-        #for rec in self :
+        for rec in self :
             # إذا المستخدم الحالي Admin → تخطى التحقق
-            #if self.env.user in admin_group.users :
-                #continue
+            if self.env.user in admin_group.users :
+                continue
 
             # إذا المستخدم الحالي غير مسموح له
-<<<<<<< HEAD
-            #user_not_allowed = self.env.user.id not in allowed_user_ids
-                # ===== phone_customer_contact =====
-            #if rec.company_type != 'person' and user_not_allowed :
-                #if not rec.phone and rec.fax_number :
-                    #raise ValidationError ( "حقل Phone + Contact_name مطلوب لغير الأشخاص وغير المسؤولين." )
-                
-=======
             user_not_allowed = self.env.user.id not in allowed_user_ids
             # ===== phone_customer_contact =====
             if rec.company_type != 'person' and user_not_allowed :
                 if not rec.phone and rec.fax_number :
                     raise ValidationError ( "حقل Phone + Contact_name مطلوب لغير الأشخاص وغير المسؤولين." )
 
->>>>>>> 885d64ceafa3179c2afa405dbc4c490c76f60742
             # ===== number_700 =====
-            #if rec.company_type != 'person' and user_not_allowed :
-                #if not rec.number_700 :
-                    #raise ValidationError ( "حقل Number 700 مطلوب لغير الأشخاص وغير المسؤولين." )
-                #if not re.match ( pattern_700 , rec.number_700 ) :
-                    #raise ValidationError ( "Number 700 must start with 7 and contain numbers only." )
+            if rec.company_type != 'person' and user_not_allowed :
+                if not rec.number_700 :
+                    raise ValidationError ( "حقل Number 700 مطلوب لغير الأشخاص وغير المسؤولين." )
+                if not re.match ( pattern_700 , rec.number_700 ) :
+                    raise ValidationError ( "Number 700 must start with 7 and contain numbers only." )
 
             # ===== cr_number_sale =====
-            #if rec.company_type != 'person' and user_not_allowed :
-                #if not rec.cr_number_sale :
-                    #continue
+            if rec.company_type != 'person' and user_not_allowed :
+                if not rec.cr_number_sale :
+                    continue
                 # raise ValidationError("حقل CR Number Sale مطلوب لغير الأشخاص وغير المسؤولين.")
             # if not re.match(pattern_cr, rec.cr_number_sale):
             # raise ValidationError("CR Number Sale must contain numbers only.")
