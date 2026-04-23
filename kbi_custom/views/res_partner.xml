@@ -39,11 +39,11 @@
                   <field name="key_information" style="font-weight:bold  background-color: #d4f8d4; display: inline-block; width: fit-content;padding: 2px 8px;border-radius: 6px; font-size:14px;" widget="boolean_toggle" />
                            
                 </xpath-->
-                <xpath expr="//field[@name='email']" position="before">
+                <!--xpath expr="//field[@name='email']" position="before">
                   <group>  <field name="fax_number" style="font-weight:bold; font-size:14px;" string="mobile2" placeholder="Mobile number 2" invisible="not key_information"/></group>
                            
-                </xpath>
-                <xpath expr="//field[@name='partner_vat_placeholder']" position="after">
+                </xpath-->
+                <xpath expr="//field[@name='function']" position="after">
                    
                             <field name='nationality' modifiers="{'invisible': [('is_broker', '=', True)]}"/>
                             <field name="is_broker"/>
