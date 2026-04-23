@@ -336,6 +336,10 @@ class ResPartner ( models.Model ) :
     building_no = fields.Char ( string="رقم المبنى" , size=4 )
     key_information = fields.Boolean ( string="المعلومات الرئيسية" , default=False ,
                                        help="عند تفعيل هذا الحقل يتم عرض المعلومات الرئيسية الخاصة بجهة الاتصال الحالية." )
+    call_information = fields.Boolean ( string="معلومات الإتصال " , default=False ,
+                                       help="عند تفعيل هذا الحقل يتم عرض معلومات الإتصال الخاصة بجهة الاتصال الحالية." )
+    history_information = fields.Boolean ( string=" عقود  العميل " , default=False ,
+                                       help="عند تفعيل هذا الحقل يتم عرض معلومات العقود الخاصة بجهة الاتصال الحالية." )
     additional_information = fields.Boolean ( string="المعلومات الفرعية" , default=True ,
                                               help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية." )
 
