@@ -771,7 +771,7 @@ class SaleOrder ( models.Model ) :
             rec.paid_percent = (rec.paid_total / (rec.amount_total or 1)) * 100
             rec.paid_percentage_refrence = rec.paid_percent
             rec.unpaid_total = rec.amount_total - rec.paid_total
-            rec.unpaid_total_untaxed = rec.unpaid_total/ 1.15
+            rec.unpaid_total_untaxed = round(rec.unpaid_total / 1.15, 2)
             rec.amount_due = rec.amount_total - rec.paid_total
             rec.paid_total_refrence = paid_total
             #rec.finance_signiture = ( rec.paid_percent >= 96 and rec.state not in ['draft' , 'sent' , 'cancel'])
