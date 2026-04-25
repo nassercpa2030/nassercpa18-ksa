@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates>
+    <t t-name="button_expense.ListView.Buttons" t-inherit="hr_expense.ListView" t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('o_button_upload_expense')]" position="before">
+            <button t-if="!isExpenseSheet and !env.isSmall" type="button" class="btn btn-primary" style="margin-left: 10px;" t-on-click="onClickOCRExpense">
+                Create Via OCR
+            </button>
+        </xpath>
+   </t>
+</templates>
+
