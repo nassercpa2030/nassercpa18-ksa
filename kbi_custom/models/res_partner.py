@@ -353,7 +353,7 @@ class ResPartner ( models.Model ) :
 
     nationality = fields.Char ( "Nationality" )
     email = fields.Char ( "Main Email" , required=True , store=True )
-    another_email = fields.Char ( "Another Email" , required=True , store=True )
+    another_email = fields.Char ( "Another Email"  , store=True )
     real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
     nationality = fields.Char ( "Nationality" )
