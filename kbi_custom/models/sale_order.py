@@ -89,6 +89,7 @@ class SaleOrder ( models.Model ) :
     payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
     paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count" , searchable=True )
     unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count" , searchable=True )
+    unpaid_total_untaxed = fields.Float ( string="Unpaid Total Untaxed" , compute="_compute_payment_count" , searchable=True )
     paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" , sorted=True )
     finance_signiture = fields.Boolean ( string=' توقيع المالية للختم '  , readonly=False, store=True  )
     archive_signiture = fields.Boolean ( string='توقيع الأرشيف للختم ' , default=False , readonly=False , index=True )
@@ -770,6 +771,7 @@ class SaleOrder ( models.Model ) :
             rec.paid_percent = (rec.paid_total / (rec.amount_total or 1)) * 100
             rec.paid_percentage_refrence = rec.paid_percent
             rec.unpaid_total = rec.amount_total - rec.paid_total
+            rec.unpaid_total_untaxed = rec.unpaid_total/ 1.15
             rec.amount_due = rec.amount_total - rec.paid_total
             rec.paid_total_refrence = paid_total
             #rec.finance_signiture = ( rec.paid_percent >= 96 and rec.state not in ['draft' , 'sent' , 'cancel'])
