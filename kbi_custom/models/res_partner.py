@@ -369,7 +369,7 @@ class ResPartner ( models.Model ) :
                                      store=True , readonly=False )
     financial_manager_name = fields.Char ( string="Financial Manager" , store=True , readonly=False )
     company_main_location = fields.Char ( string="المقر الرئيسي للشركة" , store=True , readonly=False )
-    last_auditor = fields.Many2one ( string="اسم المراجع  السابق" , store=True , readonly=False )
+    last_auditor = fields.Char ( string="اسم المراجع  السابق" , store=True , readonly=False )
     manager_id = fields.Integer ( string="Manager Id" , store=True , readonly=False )
     # cr_number_sale = fields.Char ( related="sale_order_ids.cr_number_sale" , string="Commercial number" ,
     # readonly=False , store=True )
