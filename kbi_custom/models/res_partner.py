@@ -361,7 +361,7 @@ class ResPartner ( models.Model ) :
     is_broker = fields.Boolean ( string='Broker' )
     ref = fields.Char ( string=_ ( "1 Audit No" ) , store=True , index=True )
     name_english = fields.Char ( string="English name" , readonly=False , store=True )
-    partner_vat_placeholder = fields.Char ( string="Vat Number" related="vat", readonly=False )
+    partner_vat_placeholder = fields.Char ( string="Vat Number", related="vat", readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
     identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
     manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' , compute="action_search_manager" ,
