@@ -367,7 +367,7 @@ class ResPartner ( models.Model ) :
     identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
     manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' ,
                                      store=True , readonly=False )
-    financial_manager_name = fields.Many2one ( string="Financial Manager" , store=True , readonly=False )
+    financial_manager_name = fields.Char ( string="Financial Manager" , store=True , readonly=False )
     company_main_location = fields.Many2one ( string="المقر الرئيسي للشركة" , store=True , readonly=False )
     last_auditor = fields.Many2one ( string="اسم المراجع  السابق" , store=True , readonly=False )
     manager_id = fields.Integer ( string="Manager Id" , store=True , readonly=False )
