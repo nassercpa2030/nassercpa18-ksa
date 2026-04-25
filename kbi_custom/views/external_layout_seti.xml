@@ -193,7 +193,7 @@
             </strong><br/>
         </t>
 
-        <t t-if="o.partner_id.vat">
+        <t t-if="o.partner_id.partner_vat_placeholder">
             <strong>VAT Number:
                 <span t-esc="o.partner_id.partner_vat_placeholder"/>
             </strong><br/>
