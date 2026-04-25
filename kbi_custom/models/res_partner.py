@@ -352,7 +352,8 @@ class ResPartner ( models.Model ) :
         compute="_compute_national_address" , readonly=False )
 
     nationality = fields.Char ( "Nationality" )
-    email = fields.Char ( "Email" , required=True , store=True )
+    email = fields.Char ( "Main Email" , required=True , store=True )
+    another_email = fields.Char ( "Another Email" , required=True , store=True )
     real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
     nationality = fields.Char ( "Nationality" )
@@ -364,8 +365,11 @@ class ResPartner ( models.Model ) :
     partner_vat_placeholder = fields.Char ( string="Vat Number", related="vat", readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
     identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
-    manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' , compute="action_search_manager" ,
+    manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' ,
                                      store=True , readonly=False )
+    financial_manager_name = fields.Many2one ( string="Financial Manager" , store=True , readonly=False )
+    company_main_location = fields.Many2one ( string="المقر الرئيسي للشركة" , store=True , readonly=False )
+    last_auditor = fields.Many2one ( string="اسم المراجع  السابق" , store=True , readonly=False )
     manager_id = fields.Integer ( string="Manager Id" , store=True , readonly=False )
     # cr_number_sale = fields.Char ( related="sale_order_ids.cr_number_sale" , string="Commercial number" ,
     # readonly=False , store=True )
