@@ -95,6 +95,7 @@
                      <field name="ass_from" modifiers="{'invisible':[('review_manager_id','=',Flase)]}"/>
                     <field name="ass_to" modifiers="{'invisible':[('review_manager_id','=',Flase)]}"/>
                     <field name="ass_to_percentage" modifiers="{'invisible':[('review_manager_id','=',Flase)]}"/>
+                    <field name="customer_state" widget="boolean_toggle"/>
                     <field name="audit_date" modifiers="{'readonly':[('from_crm','=',True)]}"/>
                     <field name="account_year" modifiers="{'readonly':[('from_crm','=',True)]}"/>
                     <field name="from_crm" invisible="1"/>
