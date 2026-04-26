@@ -23,6 +23,7 @@ class SaleOrder ( models.Model ) :
     contract_date = fields.Date ( string='Contract Date' , readonly=False , required=True )
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
     old_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , stored=True )
+    customer_state = fields.Boolean ( string="عميــل غير مستـقر" , stored=True )
     order_lines_count = fields.Integer ( string='Order Lines' , compute='_compute_order_lines_count' , store=True )
     customer_phone_number = fields.Char ( string='تليفون العميل' , store=True )
     journal_entry_count = fields.Char ( string='عدد القيود' , store=True )
