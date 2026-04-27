@@ -391,8 +391,10 @@ class ResPartner ( models.Model ) :
         for rec in self :
             parts = []
 
-            if rec.building_no :
-                parts.append ( rec.l10n_sa_edi_building_number )
+            #if rec.building_no :
+                #parts.append ( rec.l10n_sa_edi_building_number )
+            if rec.l10n_sa_edi_building_number:
+                parts.append(str(rec.l10n_sa_edi_building_number))
 
             if rec.street :
                 parts.append ( rec.street )
