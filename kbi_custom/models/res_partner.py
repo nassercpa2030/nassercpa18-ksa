@@ -350,7 +350,7 @@ class ResPartner ( models.Model ) :
     national_address = fields.Char (
         string="العنوان الوطني " ,
         compute="_compute_national_address" , readonly=False )
-    district = fields.Char ( "الحــي" )
+    district2 = fields.Char ( "الحــي" )
 
     nationality = fields.Char ( "Nationality" )
     email = fields.Char ( "Main Email" , required=True , store=True )
@@ -396,10 +396,10 @@ class ResPartner ( models.Model ) :
                 parts.append ( rec.building_no )
             #if rec.l10n_sa_edi_building_number:
                 #parts.append(str(rec.l10n_sa_edi_building_number))
-
             if rec.street :
                 parts.append ( rec.street )
-
+            if rec.district2 :
+                parts.append ( rec.district2 )
             if rec.city :
                 parts.append ( rec.city )
 
