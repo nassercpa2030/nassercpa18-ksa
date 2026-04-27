@@ -350,6 +350,7 @@ class ResPartner ( models.Model ) :
     national_address = fields.Char (
         string="العنوان الوطني " ,
         compute="_compute_national_address" , readonly=False )
+    district = fields.Char ( "الحــي" )
 
     nationality = fields.Char ( "Nationality" )
     email = fields.Char ( "Main Email" , required=True , store=True )
