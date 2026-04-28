@@ -343,11 +343,16 @@ class SaleOrder ( models.Model ) :
     @api.depends ( 'product_public_name' , 'account_year' , 'auto_contract_name' )
     def get_project_name(self) :
         for rec in self :
-            if rec.auto_contract_name and rec.product_public_name and rec.account_year :
-                rec.project_name = f"{rec.product_public_name} {rec.account_year}"
-            else :
-                rec.project_name = False
-                
+            if auto_contract_name:
+               parts = []
+               if product_public_name :
+                  parts.append ( rec.product_public_name )
+
+               if rec.account_year :
+                  parts.append ( rec.account_year )
+
+               rec.project_name = "، ".join ( parts )
+
     #@api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
     #def get_project_name(self) :
         #for rec in self :
