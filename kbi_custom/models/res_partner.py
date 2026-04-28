@@ -343,7 +343,7 @@ class ResPartner ( models.Model ) :
     additional_information = fields.Boolean ( string="المعلومات الفرعية" , default=True ,
                                               help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية." )
 
-    zip = fields.Char ( string="الرمز البريدي" , size=5 , readonly=False ).
+    zip = fields.Char ( string="الرمز البريدي" , size=5 , readonly=False )
     district2=fields.Char(string="الحي",size=10,readonly=False)
     identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
     additional_no = fields.Char ( string="الرقم الإضافي" , size=4 , readonly=False )
