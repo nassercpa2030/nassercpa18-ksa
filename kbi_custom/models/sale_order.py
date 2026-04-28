@@ -326,10 +326,16 @@ class SaleOrder ( models.Model ) :
     @api.depends ( "x_studio_contract_service" )
     def get_pr_nam_fr_service(self) :
         for rec in self :
-            if rec.x_studio_contract_service :
-                rec.product_public_name = rec.x_studio_contract_service.public_name
-            else :
-                rec.product_public_name = False
+            product = rec.x_studio_contract_service
+            rec.product_public_name = (
+                product.product_tmpl_id.public_name
+                if product and product.product_tmpl_id
+                else False 
+            )
+            #if rec.x_studio_contract_service :
+                #rec.product_public_name = rec.x_studio_contract_service.public_name
+            #else :
+                #rec.product_public_name = False
 
     @api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
     def get_project_name(self) :
