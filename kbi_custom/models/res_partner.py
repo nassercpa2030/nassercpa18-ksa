@@ -397,7 +397,10 @@ class ResPartner ( models.Model ) :
 
             if rec.street :
                 parts.append ( rec.street )
-
+                
+            if rec.district2 :
+                parts.append ( rec.district2 )
+                
             if rec.city :
                 parts.append ( rec.city )
 
