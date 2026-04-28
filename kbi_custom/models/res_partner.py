@@ -1,1449 +1,613 @@
 # -*- coding: utf-8 -*-
-import ast
-import base64 , binascii , gzip , json , uuid
-import datetime
-from io import BytesIO
-import openpyxl
-import qrcode
-
 from odoo import models , fields , api , _
-from odoo.exceptions import ValidationError
-from odoo.exceptions import UserError
+import logging
+from odoo.exceptions import UserError , ValidationError
+import re
 
 
-# from odoo.tools.populate import compute
-class SaleOrder ( models.Model ) :
-    _inherit = 'sale.order'
+class HrPayrollStructure ( models.Model ) :
+    _inherit = 'hr.payroll.structure'
 
-    planning_first_sale_line_id = fields.Many2one ( 'sale.order.line' , string='First Sale Line Planning' ,
-                                                    readonly=True )
-    planning_initial_date = fields.Date ( string="Initial Planning Date" , readonly=True )
-    planning_hours_to_plan = fields.Float ( string="Hours to Plan" , readonly=True )
-    planning_hours_planned = fields.Float ( string="Hours Planned" , readonly=True )
-    contract_date = fields.Date ( string='Contract Date' , readonly=False , required=True )
-    local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
-    old_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , stored=True )
-    customer_state = fields.Boolean ( string="عميــل غير مستـقر" , stored=True )
-    order_lines_count = fields.Integer ( string='Order Lines' , compute='_compute_order_lines_count' , store=True )
-    customer_phone_number = fields.Char ( string='تليفون العميل' , store=True )
-    journal_entry_count = fields.Char ( string='عدد القيود' , store=True )
-    # comupute='_get_mobile'  )
-    convert_orders = fields.Boolean (
-        string="تحويل الأوردرات لعقود" ,
-        default=False ,
-        store=True ,
-        help="عند تفعيل هذا الاختيار، سيتم تنفيذ Server Action لتحويل الأوردرات المرتبطة إلى مشاريع."
+    type_id = fields.Many2one (
+        'hr.payroll.structure.type' ,
+        string='Type' ,
+        required=False
     )
-    next_number = fields.Integer ( string="next sequence number" , store=True )
-    product_code = fields.Char ( string="Product Code" , related="x_studio_contract_service.barcode" , store=True )
-    one_audit_archive = fields.Boolean ( string="أرشفة علي ون أودت " , stored=True )
-    papers_archive = fields.Boolean ( string="أرشفة ورقية" , stored=True )
-    box_paper_archive = fields.Integer ( string="رقم أرشيف الصندوق" , stored=True )
-    image_one_audit = fields.Binary ( string="صورة ميل ون أودت" , stored=True )
-    project_file_state_test = fields.Char ( "Project File State Demo" , readonly=False , required=False , store=True )
-    project_stage_test = fields.Char ( "Project Stage Demo" , readonly=False , required=False , store=True )
 
-    # first_payment_test2 = fields.Boolean ( string="first Payment amount test" , readonly=False , required=False , store=True )
 
-    first_payment_journal_test = fields.Char ( 'First Payment Journal Name' , readonly=False , store=True )
-    unpaid_total_refrence = fields.Float ( 'unpaid_total_refrence' , store=True , readonly=False )
-    paid_total_refrence = fields.Float ( 'paid_total_refrence' , store=True , readonly=False )
-    paid_percentage_refrence = fields.Float ( 'paid_percentage_refrence' , store=True , readonly=False )
+class ResCity ( models.Model ) :
+    _name = 'res.country.state.city'
+    _rec_name = 'name'
+    _description = 'City'
 
-    customer_English_name_refrence = fields.Char ( 'customer_English_name_refrence' , readonly=False , store=True )
-    close_entry_date_refrence = fields.Date ( string="close_entry_date_refrence" , readonly=False , required=False ,
-                                              store=True )
-    invoice_status_refrence = fields.Char ( 'invoice_status_refrence' , readonly=False , required=False , store=True )
-    journal_entry_count_finance = fields.Integer ( string='عدد قيود الإغلاق' , store=True , index=True )
-    project_budget_refrence = fields.Float ( 'project_budget_refrence' , store=True , readonly=False )
-    payment_count_reference = fields.Integer ( 'payment_count_reference' , store=True , readonly=False )
-    customer_test_refrence = fields.Char ( 'customer_test_refrence' , store=True , readonly=False )
-    order_line_total_refrence = fields.Float ( 'order_line_total_refrence' , store=True , readonly=False )
-    order_line_subtotal_refrence = fields.Float ( 'order_line_subtotal_refrence' , store=True , readonly=False )
-    qrcode_refrence = fields.Binary ( 'QR refrence' , store=True , readonly=False )
-    partner_shipping_id = fields.Many2one ( string='Delivery Address' , required=False , readonly=False )
-    archived_sale = fields.Boolean ( 'Archived' , readonly=False , required=False , default=False )
-    amount_tax = fields.Float ( "Taxes" , readonly=False , required=False )
-    audit_date = fields.Date ( string='Audit Date' , readonly=False , required=True , store=True )
-    # close_entry_date = fields.Date (string="Close Entry Date" ,compute="calc_close_date",store=True, readonly=True ,searchable=True)
-    # close_entry_year = fields.Integer ( string="Close Entry Year" ,compute="calc_close_date",store=True, readonly=False,searchable=True )
+    country_id = fields.Many2one ( comodel_name='res.country' , string='Country' , required=True )
+    state_id = fields.Many2one ( comodel_name='res.country.state' , string='State' , required=True )
+    name = fields.Char ( string='Name' , required=True )
+    code = fields.Char ( string='Code' )
 
-    date = fields.Datetime ( string='Date' )
-    review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Assigned To' , readonly=False ,
-                                          domain=[('job_id' , '=' , 'مدير مراجعة')] )
-    # review_manager_id=fields.Many2one(comodel_name='res.users',string='Manager',readonly=False )
-    # partner_manager = fields.Many2one(comodel_name="res.partner",related='partner_id.user_id',store=True)
-    user_id = fields.Many2one ( 'res.users' , string='Manager' , readonly=False )
-    sequence = fields.Integer ( string='Sequence' , )
-    report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
-                                  domain="[('id', 'in', exist_report_ids)]" )
-    x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="Contract_service" )
-    report_template_id = fields.Many2one ( comodel_name='ir.actions.report' , string='Report Template' ,
-                                           related="report_id.report_template_id" )
-    printdate = fields.Date ( string='تاريخ  الطباعة' , default=fields.Datetime.now )
-    # printdate = fields.Date ( string='تاريخ  الطباعة'  , default=lambda self : fields.Date.today () )
-    # printing_date = fields.Datetime(string='Printing Date', default=lambda self: fields.Datetime.context_timestamp(self, fields.Datetime.now()) )
-    # printdate = fields.Datetime(string='تاريخ  الطباعة',  default=lambda self: datetime.now() )
 
-    agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreement' )
-    payment_ids = fields.Many2many ( 'account.payment' , string='Payments' , compute='_compute_payment_ids' )
-    payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
-    paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count" , searchable=True )
-    unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count" , searchable=True )
-    unpaid_total_untaxed = fields.Float ( string="Unpaid Total Untaxed" , compute="_compute_payment_count" ,
-                                          searchable=True )
-    paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" , sorted=True )
-    finance_signiture = fields.Boolean ( string=' توقيع المالية للختم ' , readonly=False , store=True )
-    archive_signiture = fields.Boolean ( string='توقيع الأرشيف للختم ' , default=False , readonly=False , index=True )
-    manager_signiture = fields.Boolean ( string='توقيع مدير المجموعة للختم ' , default=False , readonly=False ,
-                                         index=True )
-    finance_assign = fields.Binary ( string=' ملف توقيع المالية  ' , default=False ,
-                                     compute="_compute_finance_archive_signature" , store=False , readonly=False )
-    archive_assign = fields.Binary ( string=' ملف توقيع الأرشيف ' , default=False ,
-                                     compute="_compute_finance_archive_signature" , store=False , readonly=False )
-    manager_assign = fields.Binary ( string=' ملف توقيع مدير المجموعة ' , default=False ,
-                                     compute="_compute_finance_archive_signature" , store=False , readonly=False )
+class ResCity ( models.Model ) :
+    _inherit = 'res.users'
 
-    auditor = fields.Many2one ( string="Auditor" , comodel_name="hr.employee" ,
-                                domain=[('job_id' , '!=' , 'مدير مراجعة')] )
-    # invoice_ids = fields.Many2many ( 'account.move' , compute="compute_invoice_ids" , readonly=True , store=True ,
-    #                                string="Invoices" )
-    invoice_ids = fields.Many2many ( 'account.move' , compute="compute_invoice_ids" , readonly=True , store=True ,
-                                     string="Invoices" )
-    payment_count2 = fields.Integer ( compute='_compute_payment_count' )
-    # paid_total = fields.Float(compute='_compute_payment_count')
-    # unpaid_total = fields.Float(compute='_compute_payment_count')
-    # paid_percent = fields.Float(compute='_compute_payment_count')
-    amount_due = fields.Float ( compute="_compute_payment_count" , string="Amount Due" , readonly=False )
-    project_budget = fields.Float ( string='Project Budget' , copy=False )
-    project_name = fields.Char ( string='Auto Project Name' , compute="get_project_name" , readonly=False , store=True )
-    auto_contract_name = fields.Boolean ( string="Auto Name" , readonly=False , default=True )
-    product_public_name = fields.Char ( string="Product Public Name" , compute="get_pr_nam_fr_service" , store=True ,
-                                        readonly=False )
-    project_code = fields.Char ( string='Project Code' , related="auto_code" )
-    contract_signature = fields.Boolean ( "Contract Signature" )
-    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
-    analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
-                                            domain="[('plan_id', '=', project_type_id)]" ,
-                                            compute='_compute_analytic_account_id' , readonly=False , store=True )
-    approve_uid = fields.Many2one ( 'res.users' , string='Approve User' , )
-    approve_date = fields.Datetime ( string='Approve Date' )
-    reject_reason = fields.Text ( string='Reject Reason' )
-    broker_id = fields.Many2one ( comodel_name='res.partner' , string='Salesperson' ,
-                                  domain="[('is_broker', '=', True)]" )
-    number_700_sale = fields.Char ( related='partner_id.number_700' , string="(700) الرقم الموحد" , readonly=False ,
-                                    required=True , store=True )
-    manager_id_sale = fields.Integer ( related="partner_id.manager_id" , string="Manager Id" , store=True ,
-                                       readonly=False )
-    contact_manager_team = fields.Many2one ( comodel_name="res.users" , related="user_id" ,
-                                             string="contact_manager_team" , store=True , readonly=False )
-    # cr_number_sale =fields.Char(related='partner_id.cr_number_sale',string="Customer CR Number",readonly=False,store=True)
-    cr_number_sale = fields.Char ( string="رقم السجل التجاري" , related='partner_id.cr_number_sale' , readonly=False ,
-                                   store=True )
-    broker_amount = fields.Float ( string='Broker Amount' , tracking=True )
-    broker_invoiced_amount = fields.Float ( string='قيمة إستحقاق فاتورة المسوق' ,
-                                            compute="_compute_broker_invoiced_amount" , searchable=True )
-    broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
-                                              compute="_compute_broker_invoiced_amount" , searchable=True )
-    broker_invoice_payment_state = fields.Selection (
-        [('not_paid' , 'غيرمدفوع') , ('partial' , 'مدفوع جزئي') , ('paid' , 'مدفوع كلي') , ('blocked' , 'محظور') ,
-         ('reversed' , 'مرتجع') , ('in_payment' , 'للدفع') ,
-         ('invoicing_legacy' , 'Invoicing App Legacy')] , string='حالة دفع فاتورة المسوق' ,
-        compute="_compute_broker_invoiced_amount" , store=True , searchable=True , )
-    first_payment_id = fields.Many2one ( 'account.payment' , string="First Payment" ,
-                                         compute="_compute_first_payment_id" )
-    first_payment_code = fields.Char ( string="First Payment Code" , compute="_compute_payment_count" )
-    first_payment_code_date = fields.Date ( string='First Journal Date' , compute='_compute_payment_count' )
-    first_payment_bank = fields.Char ( string='First Journal Bank' , compute='_compute_payment_count' )
-    first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' , stored=True ,
-                                       index=True )
-    first_payment_amount = fields.Monetary ( string='First Payment Amount' , related='first_payment_id.amount' ,
-                                             stored=True , index=True )
-    # first_payment_date = fields.Date ( string='First Payment Date' , compute='_compute_first_payment_fields' )
-    # first_payment_amount = fields.Monetary ( string='First Payment Amount' , compute='_compute_first_payment_fields' )
-    first_payment_date_test = fields.Date ( string="تاريخ أول دفعة " , readonly=False , required=False , store=True )
-    first_payment_original = fields.Float ( string="first_payment_original" , readonly=False , required=False ,
-                                            store=True )
-    project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
-                                         related='project_ids.stage_id' , store=True , groups='base.group_user' )
-    # close_type = fields.Char(comodel_name='project.project.close_type',string='Close_type', related='close_type', store=True)
-    from_crm = fields.Boolean ( string='From CRM' )
-    can_edit_analytic = fields.Boolean ( string='Can Edit Analytic Account' , compute='compute_can_edit_analytic' , )
-    can_edit_approve = fields.Boolean ( string='Can Edit Approve Route' , compute='compute_can_edit_approve' , )
-    print_history_ids = fields.One2many ( comodel_name='sale.order.print.history' , inverse_name='sale_id' ,
-                                          string='Print History' )
-    invoice_count_odoo16 = fields.Integer ( string="" , compute="_compute_invoice_count_odoo16" , store=True )
-    sign_qrcode = fields.Binary ( string='Sign QR Code' , compute='compute_sign_qrcode' , store=False )
-    uuid = fields.Char ( string='UUID' )
-    validity_date = fields.Date ( string='Validity Date' ,
-                                  default=fields.Date.today () + datetime.timedelta ( days=30 ) )
-    project_files_state = fields.Selection ( [
-        ('done' , 'طبيعي') ,
-        ('not_done' , '(مستثني)غير مكتمل') ,
-        ('last_done' , '(مستثني) مكتمل-مدفوع') ,
-        ('last_notdone' , '( مستثني ) مكتمل-غيرمدفوع') ,
-    ] , string="Project Files State" , store=True , searchable=True )
-    # identifying new variable not signed by _customer
-    state = fields.Selection (
-        [('draft' , 'Quotation') , ('to approve' , 'To Approve') , ('done' , 'Locked') , ('sale' , 'Sales Order') ,
-         ('archived' , 'Archived') , ('customer_notsigned' , 'NOT_Customer_Signed') ,
-         ('cancel' , 'Cancelled') , ('archive2025' , 'Archive2025') , ('archive2024' , 'Archive2024')] , store=True ,
+    analytic_account_ids = fields.Many2many (
+        'account.analytic.account' ,
+        'account_analytic_account_res_users_rel' ,  # relation table
+        'res_users_id' ,  # column 1
+        'account_analytic_account_id' ,  # column 2
+        string='الحسابات التحليلية' ,
         readonly=False )
-    project_id = fields.Many2one ( 'project.project' , string="المشروع" )
-    auto_code = fields.Char ( string="Auto Code" , readonly=False , store=True )
-    x_studio_auto_code = fields.Char ( string="Auto Code_printing" , related='auto_code' , readonly=False , store=True )
-    last_service = fields.Many2one ( string="Last Contract Service" , comodel_name='service.contract' )
-    assigned_to = fields.Many2one ( 'res.users' , string="Assigned To" )
-    ass_to_percentage = fields.Integer ( "Ass_to Percentage" )
-    ass_to = fields.Float ( string="Ass_to" , compute="_compute_ass_to" , store=True )
-    ass_from = fields.Float ( string="Ass_from" , compute="_compute_ass_to" , store=True )
-    #################### multi_services ############
-    multi_service = fields.Boolean ( string="Multi_Service" )
-    mulit_service_no = fields.Integer ( string="No of Services" , readonly=False )
-    service1 = fields.Many2one ( comodel_name='product.product' , readonly=False , string="Service1" , searchable=True )
-    service2 = fields.Many2one ( comodel_name='product.product' , readonly=False , string="Service2" , searchable=True )
-    service3 = fields.Many2one ( comodel_name='product.product' , readonly=False , string="Service3" , searchable=True )
-    service4 = fields.Many2one ( comodel_name='product.product' , readonly=False , string="Service4" , searchable=True )
-    service_price1 = fields.Float ( string="Price1" , readonly=False , store=True )
-    service_price2 = fields.Float ( string="Price2" , readonly=False , store=True )
-    service_price3 = fields.Float ( string="Price3" , readonly=False , store=True )
-    service_price4 = fields.Float ( string="Price4" , readonly=False , store=True )
-    ###########################
-    multi_years = fields.Boolean ( string="Multi_Years" )
-    multi_years_no = fields.Integer ( sring="Multi Years No" )
-    mulit_year1 = fields.Integer ( string="Year1" , readonly=False )
-    mulit_year2 = fields.Integer ( string="Year2" , readonly=False )
-    mulit_year3 = fields.Integer ( string="Year3" , readonly=False )
-    taxed_price1 = fields.Integer ( string="Taxed Price1" , readonly=False , compute="compute_taxed_price" ,
-                                    store=True )
-    taxed_price2 = fields.Integer ( string="Taxed Price2" , readonly=False , compute="compute_taxed_price" ,
-                                    store=True )
-    taxed_price3 = fields.Integer ( string="Taxed Price3" , readonly=False , compute="compute_taxed_price" ,
-                                    store=True )
-    ass_visible = fields.Boolean ( string="Visible" , compute='_compute_ass_visible' )
-    partner_id = fields.Many2one ( string="Customer" , comodel_name="res.partner" , strore=True , required=False ,
-                                   readonly=False )
-    old_manager = fields.Char ( string="المدير القديم" , store=True , searchable=True , index=True , default="لا يوجد" ,
-                                readonly=False )
-    customer_english_name = fields.Char ( string="Customer_English_Name" , related="partner_id.name_english" ,
-                                          store=True , readonly=False )
+    # ===== المالية =====
+    finance923_perc_101 = fields.Float ( string="نسبة توزيع المالية علي 101" , store=True , readonly=False )
+    finance923_perc_104 = fields.Float ( string="نسبة توزيع المالية علي 104" , store=True , readonly=False )
+    finance923_perc_110 = fields.Float ( string="نسبة توزيع المالية علي 110" , store=True , readonly=False )
+    finance923_perc_111 = fields.Float ( string="نسبة توزيع المالية علي 111" , store=True , readonly=False )
+    finance923_perc_200 = fields.Float ( string="نسبة توزيع المالية علي 200" , store=True , readonly=False )
+    finance923_perc_103 = fields.Float ( string="نسبة توزيع المالية علي 103" , store=True , readonly=False )
 
-    project_ids = fields.Many2many ( 'project.project' , 'sale_order_project_rel' , 'sale_order_id' , 'project_id' ,
-                                     string='Projects' )
-    project_count = fields.Integer (
-        string="Project Count" ,
-        compute="_compute_project_count" ,
-        store=True
+    # ===== الجودة =====
+    quality901_perc_101 = fields.Float ( string="نسبة توزيع الجودة علي 101" , store=True , readonly=False )
+    quality901_perc_104 = fields.Float ( string="نسبة توزيع الجودة علي 104" , store=True , readonly=False )
+    quality901_perc_110 = fields.Float ( string="نسبة توزيع الجودة علي 110" , store=True , readonly=False )
+
+    quality901_perc_111 = fields.Float ( string="نسبة توزيع الجودة علي 111" , store=True , readonly=False )
+    quality901_perc_200 = fields.Float ( string="نسبة توزيع الجودة علي 200" , store=True , readonly=False )
+    quality901_perc_103 = fields.Float ( string="نسبة توزيع الجودة علي 103" , store=True , readonly=False )
+
+    # ===== الدعم التشغيلي =====
+    oper_supp902_perc_101 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 101" , store=True , readonly=False )
+    oper_supp902_perc_104 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 104" , store=True , readonly=False )
+    oper_supp902_perc_110 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 110" , store=True , readonly=False )
+    oper_supp902_perc_111 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 111" , store=True , readonly=False )
+    oper_supp902_perc_200 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 200" , store=True , readonly=False )
+    oper_supp902_perc_103 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 103" , store=True , readonly=False )
+
+    # ===== التسويق عام =====
+    sale_gen911_perc_101 = fields.Float ( string="نسبة توزيع التسويق عام علي 101" , store=True , readonly=False )
+    sale_gen911_perc_104 = fields.Float ( string="نسبة توزيع التسويق عام علي 104" , store=True , readonly=False )
+    sale_gen911_perc_110 = fields.Float ( string="نسبة توزيع التسويق عام علي 110" , store=True , readonly=False )
+    sale_gen911_perc_111 = fields.Float ( string="نسبة توزيع التسويق عام علي 111" , store=True , readonly=False )
+    sale_gen911_perc_200 = fields.Float ( string="نسبة توزيع التسويق عام علي 200" , store=True , readonly=False )
+    sale_gen911_perc_103 = fields.Float ( string="نسبة توزيع التسويق عام علي 103" , store=True , readonly=False )
+
+    # ===== المستلزمات المكتبية =====
+    office_supp_perc_101 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 101" , store=True ,
+                                          readonly=False )
+    office_supp_perc_104 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 104" , store=True ,
+                                          readonly=False )
+    office_supp_perc_110 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 110" , store=True ,
+                                          readonly=False )
+    office_supp_perc_111 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 111" , store=True ,
+                                          readonly=False )
+    office_supp_perc_200 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 200" , store=True ,
+                                          readonly=False )
+    office_supp_perc_103 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 103" , store=True ,
+                                          readonly=False )
+
+    # ===== الشئون الإدارية =====
+    manage_921_perc_101 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 101" , store=True , readonly=False )
+    manage_921_perc_104 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 104" , store=True , readonly=False )
+    manage_921_perc_110 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 110" , store=True , readonly=False )
+    manage_921_perc_111 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 111" , store=True , readonly=False )
+    manage_921_perc_200 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 200" , store=True , readonly=False )
+    manage_921_perc_103 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 103" , store=True , readonly=False )
+
+    # ===== الدعم التقني =====
+    it_922_perc_101 = fields.Float ( string="نسبة توزيع الدعم التقني علي 101" , store=True , readonly=False )
+    it_922_perc_104 = fields.Float ( string="نسبة توزيع الدعم التقني علي 104" , store=True , readonly=False )
+    it_922_perc_110 = fields.Float ( string="نسبة توزيع الدعم التقني علي 110" , store=True , readonly=False )
+    it_922_perc_111 = fields.Float ( string="نسبة توزيع الدعم التقني علي 111" , store=True , readonly=False )
+    it_922_perc_200 = fields.Float ( string="نسبة توزيع الدعم التقني علي 200" , store=True , readonly=False )
+    it_922_perc_103 = fields.Float ( string="نسبة توزيع الدعم التقني علي 103" , store=True , readonly=False )
+
+    # ===== المباني والمرافق =====
+    build_facil950_perc_101 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 101" , store=True ,
+                                             readonly=False )
+    build_facil950_perc_104 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 104" , store=True ,
+                                             readonly=False )
+    build_facil950_perc_110 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 110" , store=True ,
+                                             readonly=False )
+    build_facil950_perc_111 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 111" , store=True ,
+                                             readonly=False )
+    build_facil950_perc_200 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 200" , store=True ,
+                                             readonly=False )
+    build_facil950_perc_103 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 103" , store=True ,
+                                             readonly=False )
+
+    # ===== القهوة والضيافة والنضافة (الرياض) =====
+    coff_clean_ryd_perc_101 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 101" ,
+                                             store=True , readonly=False )
+    coff_clean_ryd_perc_104 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 104" ,
+                                             store=True , readonly=False )
+    coff_clean_ryd_perc_110 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 110" ,
+                                             store=True , readonly=False )
+    coff_clean_ryd_perc_111 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 111" ,
+                                             store=True , readonly=False )
+    coff_clean_ryd_perc_200 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 200" ,
+                                             store=True , readonly=False )
+    coff_clean_ryd_perc_103 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 103" ,
+                                             store=True , readonly=False )
+
+    # ===== التوطين العام =====
+    pub_loc903_perc_101 = fields.Float ( string="نسبة توزيع التوطين العام علي 101" , store=True , readonly=False )
+    pub_loc903_perc_104 = fields.Float ( string="نسبة توزيع التوطين العام علي 104" , store=True , readonly=False )
+    pub_loc903_perc_110 = fields.Float ( string="نسبة توزيع التوطين العام علي 110" , store=True , readonly=False )
+    pub_loc903_perc_111 = fields.Float ( string="نسبة توزيع التوطين العام علي 111" , store=True , readonly=False )
+    pub_loc903_perc_200 = fields.Float ( string="نسبة توزيع التوطين العام علي 200" , store=True , readonly=False )
+    pub_loc903_perc_103 = fields.Float ( string="نسبة توزيع التوطين العام علي 103" , store=True , readonly=False )
+
+    # 🔥 Constrain واحد فقط لكل المجموعات
+    @api.constrains (
+        'finance923_perc_101' , 'finance923_perc_104' , 'finance923_perc_110' ,
+        'finance923_perc_111' , 'finance923_perc_200' , 'finance923_perc_103' ,
+        'quality901_perc_101' , 'quality901_perc_104' , 'quality901_perc_110' ,
+        'quality901_perc_111' , 'quality901_perc_200' , 'quality901_perc_103' ,
+        'oper_supp902_perc_101' , 'oper_supp902_perc_104' , 'oper_supp902_perc_110' ,
+        'oper_supp902_perc_111' , 'oper_supp902_perc_200' , 'oper_supp902_perc_103' ,
+        'sale_gen911_perc_101' , 'sale_gen911_perc_104' , 'sale_gen911_perc_110' ,
+        'sale_gen911_perc_111' , 'sale_gen911_perc_200' , 'sale_gen911_perc_103' ,
+        'office_supp_perc_101' , 'office_supp_perc_104' , 'office_supp_perc_110' ,
+        'office_supp_perc_111' , 'office_supp_perc_200' , 'office_supp_perc_103' ,
+        'manage_921_perc_101' , 'manage_921_perc_104' , 'manage_921_perc_110' ,
+        'manage_921_perc_111' , 'manage_921_perc_200' , 'manage_921_perc_103' ,
+        'it_922_perc_101' , 'it_922_perc_104' , 'it_922_perc_110' ,
+        'it_922_perc_111' , 'it_922_perc_200' , 'it_922_perc_103' ,
+        'build_facil950_perc_101' , 'build_facil950_perc_104' , 'build_facil950_perc_110' ,
+        'build_facil950_perc_111' , 'build_facil950_perc_200' , 'build_facil950_perc_103' ,
+        'coff_clean_ryd_perc_101' , 'coff_clean_ryd_perc_104' , 'coff_clean_ryd_perc_110' ,
+        'coff_clean_ryd_perc_111' , 'coff_clean_ryd_perc_200' , 'coff_clean_ryd_perc_103' ,
+        'pub_loc903_perc_101' , 'pub_loc903_perc_104' , 'pub_loc903_perc_110' ,
+        'pub_loc903_perc_111' , 'pub_loc903_perc_200' , 'pub_loc903_perc_103'
     )
-
-    ##########Get order Lines#########
-    # def _get_mobile(self) :
-    # for rec in  self:
-    # if rec.partner_id.mobile :
-    # rec.customer_phone_number = rec.partner_id.mobile
-    # elif rec.partner_id.phone :
-    # rec.customer_phone_number = rec.partner_id.phone
-    # else :
-    # rec.customer_phone_number = rec.partner_id.fax_number or False
-
-    @api.depends ( 'order_line' )
-    def _compute_order_lines_count(self) :
-        for rec in self :
-            rec.order_lines_count = len ( rec.order_line ) if rec.order_line else 0
-
-    # @api.onchange('customer_phone_number','partner_id', 'order_line', 'pricelist_id', 'date_order', 'state','amount_untaxed','paid_total','broker_amount','project_name','multi_years','multi_service','x_studio_contract_service','project_count','contarct_date','audit_date','customer_english_name')
-    @api.onchange ( 'partner_id' , 'amount_untaxed' , 'paid_total' , 'x_studio_contract_service' , 'project_count' ,
-                    'contarct_date' , 'audit_date' , 'customer_english_name' , 'payment_count' , 'payment_count2' ,
-                    'invoice_count' , 'paid_percent' )
-    def _onchange_customer_phone_number(self) :
-        allowed_user_ids = [2 , 394 , 18]
-        admin_group = self.env.ref ( 'base.group_system' )
-        for rec in self :
-            if rec.partner_id.mobile :
-                rec.customer_phone_number = rec.partner_id.mobile
-            elif rec.partner_id.phone :
-                rec.customer_phone_number = rec.partner_id.phone
-            else :
-                rec.customer_phone_number = rec.partner_id.fax_number or False
-
-            # لو المستخدم Admin يتخطى التحقق
-            if self.env.user in admin_group.users :
-                continue
-                # لو المستخدم مش مسموح له
-            if self.env.user.id not in allowed_user_ids :
-                if not rec.customer_phone_number :
-                    return {
-                        'warning' : {
-                            'title' : "خطأ" ,
-                            'message' : "برجاء إدخال رقم التيلفون للعميل"
-                        }
-                    }
-
-    ##########print method##########
-
-    def action_print_project_history(self) :
-        # إحنا هنا بنجيب التقرير بالـ ID مباشرة
-        report = self.env['ir.actions.report'].browse ( 1299 )
-        if not report :
-            # لو التقرير مش موجود، ممكن نعمل raise أو نرجع التقرير الافتراضي
-            raise ValueError ( "Report with ID 1299 not found!" )
-        # ترجع الـ report action عشان أودو يفتح PDF
-        return report.report_action ( self )
-
-    def calc_close_date(self) :
-        for rec in self :
-            move = self.env['account.move'].search (
-                [('sale_order_id_finance' , '=' , rec.id) , ('journal_id' , '=' , 165) , ('state' , '=' , 'posted') ,
-                 ('date' , '!=' , False)] , limit=1 )
-            rec.close_entry_date = move.date if move else False
-            if rec.close_entry_date :
-                rec.close_entry_year = rec.close_entry_date.year
-                print ( 'DEBUG: Sale Order ID:' , rec.id , 'Move ID:' , move.id , 'Move Name:' , move.name )
-            else :
-                rec.close_entry_year = False
-                print ( 'DEBUG: Sale Order ID:' , rec.id , 'No move found with journal 165' )
-
-    def action_set_project_stage_20(self) :
-        stage = self.env['project.project.stage'].browse ( 20 )
-        if not stage.exists () :
-            raise UserError ( 'Project Stage with ID 20 not found.' )
-
-        for order in self :
-            if not order.project_ids :
-                continue
-            order.project_ids.write ( {
-                'stage_id' : stage.id
-            } )
-
-        return {
-            'type' : 'ir.actions.client' ,
-            'tag' : 'reload' ,
+    def _check_all_percentages(self) :
+        groups = {
+            "المالية" : "finance923" ,
+            "الجودة" : "quality901" ,
+            "الدعم التشغيلي" : "oper_supp902" ,
+            "التسويق عام" : "sale_gen911" ,
+            "المستلزمات المكتبية" : "office_supp" ,
+            "الشئون الإدارية" : "manage_921" ,
+            "الدعم التقني" : "it_922" ,
+            "المباني والمرافق" : "build_facil950" ,
+            "القهوة والضيافة والنضافة (الرياض)" : "coff_clean_ryd" ,
+            "التوطين العام" : "pub_loc903" ,
         }
 
-    @api.depends ( 'amount_untaxed' , 'ass_to_percentage' )
-    def _compute_ass_to(self) :
+        codes = ['101' , '104' , '110' , '111' , '200' , '103']
+
         for rec in self :
-            rec.ass_to = rec.amount_untaxed * rec.ass_to_percentage / 100
-            rec.ass_from = rec.amount_untaxed - rec.ass_to
+            for label , prefix in groups.items () :
+                total = sum ( getattr ( rec , f"{prefix}_perc_{code}" ) or 0.0 for code in codes )
+                total = round ( total , 2 )
+                if total not in (0.0 , 100.0) :
+                    diff = total - 100
+                    diff_msg = _ ( "أكبر من 100 بنسبة %.2f%%" ) % diff if diff > 0 else _ (
+                        "أقل من 100 بنسبة %.2f%%" ) % (-diff)
+                    raise ValidationError ( _ (
+                        "خطأ في توزيع %s (%s)\n"
+                        "الإجمالي الحالي: %.2f%%\n"
+                        "(المسموح فقط: 0%% أو 100%%)"
+                    ) % (label , diff_msg , total) )
 
-    @api.depends ( "x_studio_contract_service" )
-    def get_pr_nam_fr_service(self) :
-        for rec in self :
-            product = rec.x_studio_contract_service
-            rec.product_public_name = (
-                product.product_tmpl_id.public_name
-                if product and product.product_tmpl_id
-                else False
-            )
-            # if rec.x_studio_contract_service :
-            # rec.product_public_name = rec.x_studio_contract_service.public_name
-            # else :
-            # rec.product_public_name = False
 
-    @api.depends ( 'product_public_name' , 'account_year' , 'auto_contract_name' )
-    def get_project_name(self) :
-        for rec in self :
-            if auto_contract_name:
-               parts = []
-               if product_public_name :
-                  parts.append ( rec.product_public_name )
+_logger = logging.getLogger ( __name__ )
 
-               if rec.account_year :
-                  parts.append ( rec.account_year )
 
-               rec.project_name = "، ".join ( parts )
+class HrPayslip ( models.Model ) :
+    _inherit = 'hr.payslip'
 
-    #@api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
-    #def get_project_name(self) :
-        #for rec in self :
-            # if not rec.project_name and rec.auto_contract_name:
-            # if rec.product_public_name and rec.account_year:
-            # rec.project_name = f"{rec.product_public_name} {rec.account_year}"
-            #if rec.auto_contract_name :
-                #if not rec.product_public_name or not rec.account_year :
-                    #rec.project_name = ""
-                #else :
-                    #rec.project_name = f"{rec.product_public_name} {rec.account_year}"
+    def action_payslip_done(self) :
+        result = super ().action_payslip_done ()
 
-    # @api.depends("x_studio_contract_service")
-    # def get_audit_date (self):
-    #   for rec in self :
-    #   if rec.x_studio_contract_service :
-    #      if x_studio_contract_service.id in []
+        messages = []  # لتجميع الرسائل لكل slip
 
-    @api.depends ( 'review_manager_id' )
-    def _compute_ass_visible(self) :
-        for rec in self :
-            rec.ass_visible = bool ( rec.review_manager_id )
-
-    @api.onchange ( 'price1' , 'price2' , 'price3' )
-    @api.depends ( 'price1' , 'price2' , 'price3' )
-    def compute_taxed_price(self) :
-        for rec in self :
-            rec.tax1 = rec.price1 * 0.15
-            rec.tax2 = rec.price2 * 0.15
-            rec.tax3 = rec.price3 * 0.15
-            rec.taxed_price1 = round ( rec.price1 * 1.15 , 1 )
-            rec.taxed_price2 = round ( rec.price2 * 1.15 , 1 )
-            rec.taxed_price3 = round ( rec.price3 * 1.15 , 1 )
-
-    # @api.depends('journal_entry_count')
-    # def compute_journal_entry_count_finance(self) :
-    # for order in self :
-    # order.journal_entry_count_finance = order.journal_entry_count
-
-    def _compute_contact_manager_team(self) :
-        for rec in self :
-            # إذا عنده أوامر بيع، نأخذ الفريق من آخر أمر بيع
-            if rec.sale_order_ids :
-                last_order = rec.sale_order_ids[-1]  # آخر أمر بيع
-                rec.contact_manager_team = last_order.team_id
-            else :
-                rec.contact_manager_team = False
-
-    @api.depends ( 'project_ids' )
-    def _compute_project_count(self) :
-        for order in self :
-            order.project_count = len ( order.project_ids )
-
-    @api.depends ( 'project_ids' )
-    def _compute_project_count(self) :
-        for order in self :
-            order.project_count = len ( order.project_ids )
-
-    def action_set_not_custom_signed(self) :
-        for order in self :
-            order.state = 'customer_notsigned'
-            stage = self.env['project.project.stage'].search ( [('name' , '=' , 'عميل لم يوقع')] , limit=1 )
-            if stage :
-                order.project_stage_id = stage.id
-            else :
-                raise ValidationError ( _ ( "مرحلة المشروع 'عميل لم يوقع' غير موجودة، يرجى إنشاؤها أولًا." ) )
-            if order.project_ids :
-                order.project_ids.stage_id = stage.id
-            else :
-                raise ValidationError ( _ ( "لا يوجد مشروع مرتبط بهذا الطلب لتحديث مرحلته." ) )
-
-    # def action_confirm(self) :
-    # for order in self :
-    # order.state = 'to approve'
-    # return {
-    #  'type' : 'ir.actions.client' ,
-    #  'tag' : 'display_notification' ,
-    #  'params' : {
-    #     'title' : _ ( 'تم التنفيذ' ) ,
-    #     'message' : _ ( 'العقد تم عمله بإنتظار السداد' ) ,
-    #      'type' : 'success' ,  # ممكن success, warning, danger, info
-    #       'sticky' : False ,  # لو True الرسالة تفضل لحد ما المستخدم يقفلها
-    #    }
-    # }
-
-    @api.onchange ( 'analytic_account_id' )
-    def _onchange_analytic_account_id(self) :
-        for line in self.order_line :
-            if self.analytic_account_id :
-                line.analytic_distribution = {
-                    self.analytic_account_id.id : 100
-                }
-            else :
-                line.analytic_distribution = {}
-
-    def action_view_invoice(self , invoices=False) :
-        self.ensure_one ()  # لو عايزين نتعامل مع order واحد في context
-
-        # 1️⃣ جلب الفواتير المرتبطة بالـ invoice_ids
-        invoices = invoices or self.mapped ( 'invoice_ids' )
-
-        # 2️⃣ جلب الفواتير اللي فيها sale_order_test مطابق للاسم
-        extra_invoices = self.env['account.move'].search ( [
-            ('invoice_origin' , 'ilike' , self.name.strip ()) ,
-            # ('sale_order_id_finance' , '=' , self.id) ,
-            ('move_type' , '=' , 'out_invoice')
-        ] )
-
-        # 3️⃣ دمج الاثنين وإزالة التكرار
-        invoices |= extra_invoices
-
-        # 4️⃣ جلب action الافتراضي للفواتير الصادرة
-        action = self.env['ir.actions.actions']._for_xml_id ( 'account.action_move_out_invoice_type' )
-
-        if invoices :
-            if len ( invoices ) == 1 :
-                # فتح الفورم مباشرة للفاتورة الواحدة
-                action['views'] = [(self.env.ref ( 'account.view_move_form' ).id , 'form')]
-                action['res_id'] = invoices.id
-            else :
-                # عرض قائمة الفواتير
-                action['domain'] = [('id' , 'in' , invoices.ids)]
-        else :
-            # لو مفيش فواتير، يغلق الـ action
-            return {'type' : 'ir.actions.act_window_close'}
-
-        # 5️⃣ تحضير context للفواتير الجديدة
-        context = {
-            'default_move_type' : 'out_invoice' ,
-            'default_partner_id' : self.partner_id.id ,
-            'default_partner_shipping_id' : self.partner_shipping_id.id ,
-            'default_invoice_payment_term_id' : self.payment_term_id.id
-                                                or self.partner_id.property_payment_term_id.id
-                                                or self.env['account.move'].default_get (
-                ['invoice_payment_term_id'] ).get ( 'invoice_payment_term_id' ) ,
-            'default_invoice_origin' : self.name ,
-        }
-        action['context'] = context
-
-        return action
-
-    # @api.depends ( 'order_line.invoice_lines.move_id.state' )  # يعتمد على الفواتير المرتبطة بالخطوط
-    def compute_invoice_ids(self) :
-        for order in self :
-            order.invoice_ids = self.env['account.move'].search ( [
-                ('invoice_origin' , 'ilike' , self.name.strip ()) ,
-                ('move_type' , '=' , 'out_invoice')  # إذا أردت فقط فواتير المبيعات
-            ] )
-            # جميع الفواتير المرتبطة مباشرة بالـ Sale Order
-        # invoices = self.env['account.move'].search ( [
-        # ('sale_order_id_finance' , '=' , order.id) ,
-        #    ('sale_order_id_finance' , '=' , self.id)
-        #   ('move_type' , '=' , 'out_invoice')
-        # ] )
-        # order.invoice_ids = invoices
-
-    @api.onchange ( 'number_700_sale' , 'cr_number_sale' )
-    def _onchange_customer_by_number(self) :
-        """تحديث العميل تلقائيًا بناءً على الرقم المدخل"""
-        for order in self :
-            partner = False
-            if order.number_700_sale :
-                partner = self.env['res.partner'].search ( [('number_700' , '=' , order.number_700_sale)] , limit=1 )
-            if not partner and order.cr_number_sale :
-                partner = self.env['res.partner'].search (
-                    [('cr_number_sale' , '=' , order.cr_number_sale)] , limit=1
-                    # [('l10n_sa_additional_identification_number', '=', order.cr_number_sale)], limit=1
-                )
-
-            if partner :
-                order.partner_id = partner.id
-
-    @api.depends ( 'project_ids' )
-    def _compute_project_files_state(self) :
-        for order in self :
-            if order.project_ids :
-                order.project_files_state = order.project_ids[0].files_state or None
-            else :
-                order.project_files_state = None
-
-    upload_file = fields.Binary ( string="Upload File" )
-    upload_file_name = fields.Char ( string="File Name" )
-    file_type = fields.Char ( string="File Type" )  # xlsx, csv, pdf, docx, zip
-
-    file_json = fields.Binary ( string="Stored Data (Compressed JSON)" )  # Excel / CSV
-    compressed_file = fields.Binary ( string="Compressed File" )  # PDF / Word / ZIP / Others
-    original_file = fields.Binary ( string="Original File" )  # نسخة التحميل الأصلية
-
-    original_size = fields.Integer ( string="Original Size (Bytes)" )
-    stored_size = fields.Integer ( string="Stored Size (Bytes)" )
-
-    uuid = fields.Char ( string='UUID' , readonly=True )
-    opportunity_id = fields.Many2one ( 'crm.lead' , string='Opportunity' )
-    project_name = fields.Char ( string='Project Name' )
-    partner_id = fields.Many2one ( 'res.partner' , string='Partner' )
-    user_id = fields.Many2one ( 'res.users' , string='Responsible' )
-
-    @api.onchange ( 'upload_file' )
-    def onchange_file(self) :
-        """معاينة قبل الحفظ"""
-        for rec in self :
-            if rec.upload_file :
-                rec._process_file ( preview=True )
-
-    def _process_file(self , preview=False) :
-        """معالجة الملفات وضغطها"""
-        for rec in self :
-            if not rec.upload_file :
+        for slip in self :
+            employee = slip.employee_id
+            if not employee :
                 continue
 
-            try :
-                file_bytes = base64.b64decode ( rec.upload_file )
-            except (binascii.Error , ValueError) :
-                raise UserError ( _ ( "The uploaded file is corrupted or incomplete." ) )
+            # جلب partner الموظف أو إنشاء واحد جديد إذا لم يكن موجود
+            employee_partner = getattr ( employee , 'user_id' , False ) and getattr ( employee.user_id , 'partner_id' ,
+                                                                                      False )
+            if not employee_partner :
+                employee_partner = self.env['res.partner'].create ( {
+                    'name' : employee.name ,
+                    'email' : getattr ( employee , 'work_email' , False ) ,
+                    'phone' : getattr ( employee , 'work_phone' , False ) ,
+                    'is_company' : False ,
+                } )
 
-            rec.original_size = len ( file_bytes )
-            ext = (rec.upload_file_name or '').split ( '.' )[-1].lower ()
-            rec.file_type = ext
+            # جلب القيود المرتبطة بالرواتب
+            move = slip.move_id
+            if move :
+                # جلب الحساب التحليلي من الموظف
+                analytic_account_id = getattr ( employee , 'analytic_account_id' , False )
 
-            # حفظ النسخة الأصلية
-            if not preview :
-                rec.original_file = rec.upload_file
+                # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
+                analytic_vals = {analytic_account_id.id : 100} if analytic_account_id else {}
 
-            if ext in ['xlsx' , 'csv'] :
-                # معالجة Excel / CSV
-                try :
-                    wb = openpyxl.load_workbook ( BytesIO ( file_bytes ) , data_only=True )
-                    sheet = wb.active
-                    data = [list ( row ) for row in sheet.iter_rows ( values_only=True )]
-                    json_bytes = json.dumps ( data ).encode ( 'utf-8' )
-                    buffer = BytesIO ()
-                    with gzip.GzipFile ( fileobj=buffer , mode='wb' ) as f :
-                        f.write ( json_bytes )
-                except Exception as e :
-                    raise UserError ( _ ( "Failed to process Excel/CSV: %s" ) % str ( e ) )
+                for line in move.line_ids :
+                    line.analytic_account_id = analytic_account_id
+                    line.analytic_distribution = analytic_vals
+                    line.partner_id = employee_partner
 
-                if not preview :
-                    rec.file_json = base64.b64encode ( buffer.getvalue () )
-                    rec.compressed_file = None
-                    rec.stored_size = len ( buffer.getvalue () )
+        return result
+
+
+# ---------------- EMPLOYEE Contract -----------------
+class Recruiter ( models.Model ) :
+    _inherit = 'hr.contract'
+    housing_allowance = fields.Monetary ( 'بدل السكن ' , help="Same field as housing allowance for employee contract" ,
+                                          readonly=False , store=True )
+    transportation_allowance = fields.Monetary ( 'بدل المواصلات' ,
+                                                 help="Same field as housing allowance for employee contract" ,
+                                                 readonly=False , store=True )
+    other_allowance = fields.Monetary ( 'بدلات أخري ' , help="Same field as Other allowance for employee contract" ,
+                                        readonly=False , store=True )
+    x_gosi_225 = fields.Boolean ( "تأمينات  %22.5" ,
+                                  help="عند إختيار هذا الحقل يتم  إحتساب نسب التأمينات الحديثة للموظف السعودي بنسبة والشركة12.25 % , للموظف %10.25  " ,
+                                  store=True );
+
+
+# ---------------- EMPLOYEES  -----------------
+class Recruiter ( models.Model ) :
+    _inherit = 'hr.employee'
+
+    analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
+                                      help="Same field as in Journal Entry (account.move) for analytic distribution" ,
+                                      placeholder="Enter Analytic Plan" )
+    related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
+                                           help="this field get partner from contact" , readonly=False ,
+                                           placeholder="Enter Related Contact" )
+    request_employee_manager = fields.Many2one ( 'res.users' , string='المدير ' , required=True , store=True )
+    contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
+    residency_visa_number = fields.Integer ( string="رقم الهوية /رقم الإقامة" , store=True )
+    border_number = fields.Integer ( string="رقم  الحدود" , store=True )
+    iqama_expiry_date = fields.Date ( string="تاريخ انتهاء الإقامة" , store=True )
+    start_working_date = fields.Date ( string="تاريخ المباشرة" , compute="_compute_start_working_date" )
+    passport_expiry_date = fields.Date ( string="تاريخ انتهاء الجواز" )
+    analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
+                                            domain="[('plan_id', '=', analytic_plan)]" , readonly=False , store=True )
+    wage = fields.Float ( 'الأساسي' , help="Same field as Wage for employee contract" , compute="get_employee_wage" ,
+                          readonly=False , store=True )
+    housing_allowance = fields.Monetary ( 'بدل السكن ' , related="contract_id.housing_allowance" ,
+                                          help="Same field as housing allowance for employee contract" ,
+                                          readonly=False , store=True )
+    other_allowance = fields.Monetary ( 'بدلات أخري ' , related="contract_id.other_allowance" ,
+                                        help="Same field as Other allowance for employee contract" , readonly=False ,
+                                        store=True )
+    transportation_allowance = fields.Monetary ( 'بدل المواصلات' , related="contract_id.transportation_allowance" ,
+                                                 help="Same field as housing allowance for employee contract" ,
+                                                 readonly=False , store=True )
+
+    @api.depends ( 'contract_ids.date_start' )
+    def _compute_start_working_date(self) :
+        for rec in self :
+            if rec.contract_ids :
+                first_contract = rec.contract_ids.sorted ( key=lambda c : c.date_start )[0]
+                rec.start_working_date = first_contract.date_start
             else :
-                # أي نوع ملف آخر
-                buffer = BytesIO ()
-                with gzip.GzipFile ( fileobj=buffer , mode='wb' ) as f :
-                    f.write ( file_bytes )
+                rec.start_working_date = False
 
-                if not preview :
-                    rec.compressed_file = base64.b64encode ( buffer.getvalue () )
-                    rec.file_json = None
-                    rec.stored_size = len ( buffer.getvalue () )
+    @api.depends ( 'contract_id' )
+    def get_employee_wage(self) :
+        for rec in self :
+            rec.wage = rec.contract_id.wage if rec.contract_id else 0.0
+            # rec.housing_allowance = rec.contract_id.l10n_sa_housing_allowance if rec.contract_id else 0.0اً
+            # rec.other_allowance = rec.contract_id.l10n_sa_other_allowances if rec.contract_id else 0.0
+
+
+class Recruiter ( models.Model ) :
+    _inherit = 'hr.job'
+    recruiter_id = fields.Many2one ( 'hr.employee' , string="Recruiter" , readonly=False )
+    interviewer_ids = fields.Many2many ( 'hr.employee' , string="Interviewers" , readonly=False , domain=lambda self : [
+        ('id' , 'in' , self.env['hr.employee'].sudo ().search ( [] ).ids)] )
+
+
+class Recruiter ( models.Model ) :
+    _inherit = 'hr.employee'
+
+    def _create_recruitment_interviewers(self) :
+        return True
+
+    def _remove_recruitment_interviewers(self) :
+        return True
+
+
+################## HR ATTACHMENTS###################
+class HrAttachement ( models.Model ) :
+    _inherit = 'hr.salary.attachment'
+    monthly_amount = fields.Monetary (
+        string="Amount" ,
+        required=True ,  # الحقل إجباري
+        readonly=False ,  # يمكن تعديله
+        store=True ,  # يُخزن في قاعدة البيانات
+        index=True ,  # يتم فهرسته
+        copy=True ,  # يتم نسخه عند نسخ السجل
+        tracking=True ,  # تتبع التغييرات
+        currency_field='currency_id' )
+
+
+class ResPartner ( models.Model ) :
+    _inherit = 'res.partner'
+    city_id = fields.Many2one ( comodel_name='res.country.state.city' , string='City' )
+    analytic_account_id = fields.Many2one ( 'account.analytic.account' , related="employee_ids.analytic_account_id" ,
+                                            string='الحساب التحليلي' , readonly=True ,
+                                            placeholder="Enter Analytic Account for employee" )
+    building_no = fields.Char ( string="رقم المبنى" , size=4 )
+    key_information = fields.Boolean ( string="المعلومات الرئيسية" , default=False ,
+                                       help="عند تفعيل هذا الحقل يتم عرض المعلومات الرئيسية الخاصة بجهة الاتصال الحالية." )
+    call_information = fields.Boolean ( string="معلومات الإتصال " , default=False ,
+                                       help="عند تفعيل هذا الحقل يتم عرض معلومات الإتصال الخاصة بجهة الاتصال الحالية." )
+    history_information = fields.Boolean ( string=" عقود  العميل " , default=False ,
+                                       help="عند تفعيل هذا الحقل يتم عرض معلومات العقود الخاصة بجهة الاتصال الحالية." )
+    additional_information = fields.Boolean ( string="المعلومات الفرعية" , default=True ,
+                                              help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية." )
+
+    zip = fields.Char ( string="الرمز البريدي" , size=5 , readonly=False )
+    identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
+    additional_no = fields.Char ( string="الرقم الإضافي" , size=4 , readonly=False )
+
+    national_address = fields.Char (
+        string="العنوان الوطني " ,
+        compute="_compute_national_address" , readonly=False )
+
+    nationality = fields.Char ( "Nationality" )
+    email = fields.Char ( "Main Email" , required=True , store=True )
+    another_email = fields.Char ( "Another Email"  , store=True )
+    real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
+    agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
+    nationality = fields.Char ( "Nationality" )
+    manager_team = fields.Many2one ( comodel_name="res.users" , string='Manager' ,
+                                     related="x_studio_related_field_7pm_1j7mp6p7k" , store=True , readonly=False )
+    is_broker = fields.Boolean ( string='Broker' )
+    ref = fields.Char ( string=_ ( "1 Audit No" ) , store=True , index=True )
+    name_english = fields.Char ( string="English name" , readonly=False , store=True )
+    partner_vat_placeholder = fields.Char ( string="Vat Number", related="vat", readonly=False )
+    number_700 = fields.Char ( string="700 Number" , readonly=False )
+    identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
+    manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' ,
+                                     store=True , readonly=False )
+    financial_manager_name = fields.Char ( string="Financial Manager" , store=True , readonly=False )
+    company_main_location = fields.Char ( string="المقر الرئيسي للشركة" , store=True , readonly=False )
+    last_auditor = fields.Char ( string="اسم المراجع  السابق" , store=True , readonly=False )
+    manager_id = fields.Integer ( string="Manager Id" , store=True , readonly=False )
+    # cr_number_sale = fields.Char ( related="sale_order_ids.cr_number_sale" , string="Commercial number" ,
+    # readonly=False , store=True )
+    cr_number_sale = fields.Char ( string="Commercial number" , compute="_compute_cr_number_sale" , readonly=False ,
+                                   store=True )
+    property_account_payable_id = fields.Many2one ( comodel_name="account.account" ,
+                                                    domain=[('code' , '=' , '21011001')] , store=True , readonly=False ,
+                                                    string='Account Payable' ,
+                                                    default=lambda self : self.env['account.account'].search (
+                                                        [('code' , '=' , '21011001')] , limit=1 ).id )
+    attachment_ids = fields.Many2many ( 'ir.attachment' , string='Attachments' , compute='_compute_attachments' ,
+                                        store=False )
+    fax_number = fields.Char ( string='أسم الشخص للتواصل' , readonly=False , required=False )
+    all_sale_order_count = fields.Integer ( string='Sale Order Count' )
+
+    # @api.depends('building_no', 'street', 'city', 'zip', 'additional_no')
+    @api.depends ( 'l10n_sa_edi_building_number' , 'street' , 'city' , 'zip' , 'additional_no' )
+    def _compute_national_address(self) :
+        for rec in self :
+            parts = []
+
+            if rec.building_no :
+                parts.append ( rec.l10n_sa_edi_building_number )
+
+            if rec.street :
+                parts.append ( rec.street )
+
+            if rec.city :
+                parts.append ( rec.city )
+
+            if rec.zip and rec.additional_no :
+                parts.append ( f"{rec.zip}-{rec.additional_no}" )
+            elif rec.zip :
+                parts.append ( rec.zip )
+
+            rec.national_address = "، ".join ( parts )
+
+    # @api.onchange ( 'name' , 'cr_number_sale' , 'name_english' )
+    # def _onchange_unique_fields(self) :
+
+    # if self.name and self.name.strip () :
+
+    # name = self.name.strip ()
+
+    # existing = self.env['res.partner'].search ( [
+    # ('name' , '=' , name) ,
+    # ('id' , '!=' , self._origin.id)
+    # ] , limit=1 )
+
+    # if existing :
+    #    raise ValidationError ( "❌ الاسم مستخدم بالفعل" )
+
+    # CR check
+    # if self.cr_number_sale :
+    # cr = self.cr_number_sale.strip ()
+
+    # existing = self.env['res.partner'].search ( [
+    # ('cr_number_sale' , '=' , cr) ,
+    # ('id' , '!=' , self._origin.id)
+    # ] , limit=1 )
+
+    # if existing :
+    # raise ValidationError ( "❌ رقم السجل التجاري مستخدم بالفعل" )
+
+    # English name check
+    # if self.name_english :
+    # en = self.name_english.strip ()
+
+    # existing = self.env['res.partner'].search ( [
+    # ('name_english' , '=' , en) ,
+    # ('id' , '!=' , self._origin.id)
+    # ] , limit=1 )
+
+    # if existing :
+    # raise ValidationError ( "❌ الاسم الإنجليزي مستخدم بالفعل" )
+
+    @api.onchange ( 'employee_ids' )
+    def _onchange_name_lock(self) :
+        for rec in self :
+            if rec.employee_ids :
+                # لو Many2one
+                rec.identification_number = rec.employee_ids.identification_id or False
+
+                # لو عايز تفعل الفلاج
+                rec.employee = True
+
+    def name_get(self) :
+        res = []
+        for rec in self :
+            name = rec.name or ''
+
+            #if rec.vat  or :
+                #name += f' | VAT: {rec.vat}'
+
+            #if rec.identification_number :
+                #name += f' | ID: {rec.identification_number}'
+
+            res.append ( (rec.id , name) )
+
+        return res
 
     @api.model
-    def create(self , vals) :
+    def name_search(self , name='' , args=None , operator='ilike' , limit=100) :
+        args = args or []
 
-        res = super ().create ( vals )
-        # res._get_mobile()
-        if res.upload_file :
-            res._process_file ()  # معالجة بعد الإنشاء
-        res.uuid = str ( f'{res.id}-{uuid.uuid4 ()}' )
+        domain = args
 
-        # إنشاء فرصة CRM تلقائياً إذا غير موجودة
-        if not res.opportunity_id :
-            stage = self.env['crm.stage'].search ( [] , limit=1 )
-            lead = self.env['crm.lead'].create ( {
-                'name' : f'{res.project_name} {res.partner_id.name}' if res.project_name else res.upload_file_name ,
-                'partner_id' : res.partner_id.id ,
-                'type' : 'opportunity' ,
-                'user_id' : res.user_id.id ,
-                'email_from' : res.partner_id.email ,
-                'phone' : res.partner_id.phone ,
-                'stage_id' : stage.id if stage else False ,
-            } )
-            res.opportunity_id = lead.id
+        if name :
+            domain = ['|' , '|' ,
+                      ('name' , operator , name) ,
+                      ('vat' , operator , name) ,
+                      ('identification_number' , operator , name) ,
+                      ] + args
 
-        return res
+        return self.search ( domain , limit=limit ).name_get ()
+
+
+    @api.onchange ( 'name' )
+    def _onchange_name_lock(self) :
+        for rec in self :
+            # لو الاسم موجود واتغير والمستخدم مش سوبر أدمن
+            if rec.id and rec.name and rec._origin.name != rec.name :
+                if not rec.env.user.has_group ( 'base.group_system' ) :
+                    # ارجع الاسم القديم
+                    rec.name = rec._origin.name
+                    # رسالة تحذيرية
+                    return {
+                        'warning' : {
+                            'title' : "تغيير غير مسموح" ,
+                            'message' : "لا يجوز تغيير اسم العميل، الصلاحية موجودة مع أ/ ناصر عوض"}}
+
+                # else:
+                # continue
 
     def write(self , vals) :
+        if 'name' in vals :
+            for rec in self :
+                if rec.name and rec.name != vals['name'] and not self.env.user.has_group ( 'base.group_system' ) :
+                    raise UserError ( "لا يجوز تغيير اسم العميل، الصلاحية موجودة مع أ/ ناصر عوض" )
+        return super ().write ( vals )
 
-        res = super ().write ( vals )
-        # self._get_mobile()
-        # إعادة معالجة الملفات فقط إذا تم رفع جديد
-        if 'upload_file' in vals and vals['upload_file'] :
-            self._process_file ()
-        return res
-
-    def download_file(self) :
-        """تنزيل الملف الأصلي كما رفع"""
-        self.ensure_one ()
-        if not self.original_file :
-            raise UserError ( _ ( "لا يوجد ملف للتنزيل." ) )
-
-        return {
-            'type' : 'ir.actions.act_url' ,
-            'url' : f'/web/content/{self._name}/{self.id}/original_file/{self.upload_file_name}?download=true' ,
-            'target' : 'new' ,
-        }
-
-    def remove_file(self) :
-        """إزالة الملف ومسح كل الحقول المتعلقة به"""
+    @api.onchange ( 'sale_order_count' )
+    def _onchange_sale_order_count(self) :
         for rec in self :
-            rec.upload_file = False
-            rec.upload_file_name = False
-            rec.file_type = False
-            rec.compressed_file = False
-            rec.file_json = False
-            rec.original_file = False
-            rec.original_size = 0
-            rec.stored_size = 0
+            rec.all_sale_order_count = rec.sale_order_count
 
-    # @api.model
-    # def create(self , vals_list) :
-    # res = super ().create ( vals_list )
-    # res.uuid = str ( f'{res.id}{uuid.uuid4 ()}' )
-    # with offer price  stage إنشاء فرصة CRM لو مش موجودة
-    # if not res.opportunity_id :
-    # stage = self.env['crm.stage'].search ( [] , limit=1 )
-    # lead = self.env['crm.lead'].create ( {
-    # 'name' : f'{res.project_name} {res.partner_id.name}' if res.project_name else res.name ,
-    # 'partner_id' : res.partner_id.id ,
-    # 'type' : 'opportunity' ,
-    # 'user_id' : res.user_id.id ,
-    # 'email_from' : res.partner_id.email ,
-    # 'phone' : res.partner_id.phone ,
-    # 'stage_id' : 5 ,
-    # } )
-
-    # res.opportunity_id = lead.id
-    # return res
-
-    def compute_sign_qrcode(self) :
-        for rec in self :
-            qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
-            base_url = self.env['ir.config_parameter'].sudo ().get_param ( 'web.base.url' )
-            qr_code.add_data ( f'{base_url}//order/verify/{rec.uuid}' )
-            qr_code.make ( fit=True )
-            qr_img = qr_code.make_image ()
-            im = qr_img._img.convert ( "RGB" )
-            buffered = BytesIO ()
-            im.save ( buffered , format="png" )
-            qr_image = base64.b64encode ( buffered.getvalue () ).decode ( 'ascii' )
-            rec.sign_qrcode = qr_image
-
-    # def compute_sign_qrcode(self) :
-    # base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-    # qr_code = qrcode.QRCode ( version=4 , box_size=4 , border=1 )
-    # for rec in self :
-    # if rec.sign_qrcode or not rec.uuid:
-    # continue
-    # qr_code.clear()
-    # base_url = self.env['ir.config_parameter'].sudo ().get_param ( 'web.base.url' )
-    # qr_code.add_data ( f'{base_url}//order/verify/{rec.uuid}' )
-    # qr_code.make ( fit=True )
-    # qr_img = qr_code.make_image ()
-    # im = qr_img._img.convert ( "RGB" )
-    # img=qr_code.make_image(
-    # fill_color="black",
-    # back_color="white"
-    # ).convert("RGB")
-    # buffered = BytesIO ()
-    # img.save ( buffered , format="png" )
-    # rec.sign_qrcode = base64.b64encode ( buffered.getvalue () ).decode ( 'ascii' )
-
-    @api.depends ( 'user_id' )
-    def compute_can_edit_analytic(self) :
-        for rec in self :
-            rec.can_edit_analytic = self.env.user.has_group ( 'kbi_custom.can_edit_analytic_account_in_sale' )
-
-    @api.depends ( 'user_id' )
-    def compute_can_edit_approve(self) :
-        for rec in self :
-            rec.can_edit_approve = self.env.user.has_group ( 'kbi_custom.can_edit_approve_route_in_sale' )
-
-    @api.depends ( 'user_id' )
-    def action_set_manager_id_sale(self) :
-        for rec in self :
-            if not rec.manager_id_sale and rec.user_id :
-                rec.manager_id_sale = rec.user_id.id
-
-    @api.depends ( 'partner_id' )
-    def _compute_payment_ids(self) :
-        for rec in self :
-            payments = []
-            for payment in self.env['account.payment'].search ( [('partner_id' , '=' , rec.partner_id.id)] ) :
-                if payment.multi_sale :
-                    payment_sale = payment.sale_order_ids.filtered ( lambda d : d.sale_order_id.id == rec.id )
-                    if payment_sale :
-                        payments.append ( payment.id )
-                if payment.sale_order_id.id == rec.id :
-                    payments.append ( payment.id )
-
-            rec.payment_ids = [(6 , 0 , payments)]
-
-    @api.depends ( 'payment_ids' , 'order_line.move_ids' )
-    def _compute_first_payment_id(self) :
-        for rec in self :
-            rec.first_payment_id = self.env['account.payment'].search ( [('id' , 'in' , rec.payment_ids.ids)] ,
-                                                                        order="date asc" , limit=1 )
-            rec.first_payment_date_test = rec.first_payment_id.date
-
-    @api.depends ( 'payment_ids' )
-    def _compute_payment_count(self) :
-        for rec in self :
-            paid_total = 0
-
-            # جمع المدفوعات من account.payment
-            payments = self.env['account.payment'].search ( [('partner_id' , '=' , rec.partner_id.id)] )
-            for payment in payments :
-                if payment.multi_sale :
-                    sale_payment = payment.sale_order_ids.filtered ( lambda d : d.sale_order_id.id == rec.id )
-                    paid_total += sum ( sale_payment.mapped ( 'amount' ) )
-                elif payment.sale_order_id.id == rec.id :
-                    paid_total += payment.amount
-
-            # جمع المدفوعات من قيود اليومية
-            move_lines = self.env['account.move.line'].search ( [
-                ('sale_order_id' , '=' , rec.id) ,
-                ('credit' , '>' , 0) , ('account_id' , '=' , 62)
-            ] )
-            paid_total += sum ( move_lines.mapped ( 'credit' ) )
-
-            # أول دفعة
-            if move_lines :
-                first_line = move_lines.sorted ( 'date' )[0]
-                rec.first_payment_code = first_line.move_id
-                rec.first_payment_code_date = first_line.date
-                rec.first_payment_bank = first_line.journal_id.name
-
-                # rec.first_payment_date = first_line.date
-                # rec.first_payment_amount = first_line.amount
-            else :
-                rec.first_payment_code = False
-                rec.first_payment_code_date = False
-                rec.first_payment_bank = ''  # فارغ لو مفيش دفعة
-
-            # تحديث الحقول الأخرى
-            rec.paid_total = paid_total
-            rec.payment_count = len ( rec.payment_ids )
-            rec.payment_count2 = len ( move_lines )
-            rec.paid_percent = (rec.paid_total / (rec.amount_total or 1)) * 100
-            rec.paid_percentage_refrence = rec.paid_percent
-            rec.unpaid_total = rec.amount_total - rec.paid_total
-            rec.unpaid_total_untaxed = round ( rec.unpaid_total / 1.15 , 2 )
-            rec.amount_due = rec.amount_total - rec.paid_total
-            rec.paid_total_refrence = paid_total
-            # rec.finance_signiture = ( rec.paid_percent >= 96 and rec.state not in ['draft' , 'sent' , 'cancel'])
-            # تحديث convert_orders بناءً على paid_total
-            previous_convert = rec.convert_orders
-            rec.convert_orders = rec.paid_total > 0
-
-            # تنفيذ الدالة بدل السيرفر أكشن لو convert_orders أصبح True لأول مرة
-            if rec.convert_orders and not previous_convert :
-                rec.action_convert_orders ()  # استدعاء الدالة مباشرة
-
-    # @api.onchange('paid_percent')
-    # def change_finance_signiture(self):
-    # for rec in self :
-    # if  rec.paid_percent >= 99 and rec.state not in ['draft' , 'sent' , 'cancel']:
-    # rec.finance_signiture = True
-    # else :
-    # rec.finance_signiture = False
-
-    def action_convert_orders(self) :
+    def action_copy_sale_order_count(self) :
         """
-        دالة لتحويل الأوردرات إلى عقود وإنشاء المشاريع المرتبطة
+        دالة يتم استدعائها عند الضغط على الزر
+        لنسخ قيمة sale_order_count لكل سجل مختار
         """
-        # فلترة الأوردرات المراد تحويلها
-        records_to_update = self.filtered (
-            lambda r : r.state in ["to approve" , "draft" , "sent" , "archived" , "archived2024" , "archive2025"]
-                       and r.paid_total > 0
-        )
+        for rec in self :  # self = السجلات المختارة
+            rec.all_sale_order_count = rec.sale_order_count
 
-        converted_count = 0
-        skipped_orders = []
-
-        for order in self :
-            # تجاهل الأوردرات بدون دفعات
-            if order.paid_total <= 0 :
-                skipped_orders.append ( order.name )
-                continue
-
-            # تجاهل الأوردرات التي تم تحويلها مسبقًا (state = 'sale')
-            if order.state == 'sale' :
-                continue
-
-            # تغيير الحالة مباشرة
-            order.write ( {'state' : 'sale'} )
-
-            # إنشاء مشروع مرتبط إذا لم يكن موجود
-            if not order.project_ids :
-                project = self.env['project.project'].create ( {
-                    'name' : f"Project - {order.name}" ,
-                    'partner_id' : order.partner_id.id ,
-                    'sale_order_id' : order.id ,
-                    'user_id' : order.user_id.id ,
-                    'account_id' : order.analytic_account_id.id ,
-                    'contract_name' : order.project_name ,
-                    'company_id' : order.company_id.id ,
-                    'code' : order.auto_code ,
-                    'sale_person2' : order.broker_id.id if order.broker_id else False ,
-                    'paid_percent' : order.paid_percent ,
-                } )
-
-                # ربط المشروع بالسيل أوردر
-                order.write ( {
-                    'project_ids' : [(4 , project.id)] ,
-                    'project_id' : project.id
-                } )
-
-                project.write ( {'sale_order_id' : order.id} )
-
-            converted_count += 1
-
-        # تحضير الرسالة
-        message = f'تم تحويل {converted_count} أوردر إلى عقود وإنشاء المشاريع بنجاح ✅'
-        if skipped_orders :
-            message += "\n⚠️ لم يتم تحويل الأوردرات التالية لأنها لا تحتوي على أي دفعات:\n" + ", ".join (
-                skipped_orders )
-
-        # عرض الإشعار
-        return {
-            'type' : 'ir.actions.client' ,
-            'tag' : 'display_notification' ,
-            'params' : {
-                'title' : _ ( 'التحويل لعقود' ) ,
-                'message' : message ,
-                'type' : 'success' if converted_count > 0 else 'warning' ,
-                'sticky' : False ,
-            }
-        }
-
-    # 2️⃣ Onchange method لتغيير state بناءً على paid_total
-    # @api.onchange ( 'paid_total' )
-    # def _onchange_paid_total_state(self) :
-    # for rec in self :
-    # if rec.paid_total > 0 and rec.state in ('draft' , 'to approve') :
-    # rec.state = 'done'
-
-    def _compute_amount_due(self) :
+    def _compute_attachments(self) :
         for rec in self :
-            if rec.unpaid_total != 0 :
-                rec.amount_due = rec.unpaid_total - rec.paid_total
-            else :
-                rec.amount_due = 0
-
-    @api.onchange ( 'partner_id' )
-    def _onchange_agreement_id(self) :
-        if self.partner_id :
-            self.agreement_id = self.partner_id.agreement_id.id
-
-    # @api.depends ( 'project_type_id' , 'order_line' )
-    # @api.onchange ( 'project_type_id' , 'order_line' )
-    # def _onchange_project_type_approve(self) :
-    # for rec in self :
-    # rec.approval_route_id = rec.project_type_id.approval_route_ids[
-    # 0].id if rec.project_type_id.approval_route_ids else False
-    # account = False
-    # if rec.order_line :
-    # account = rec.order_line[0].product_id.product_analytic_ids.filtered (
-    # lambda x : x.analytic_plan_id.id == rec.project_type_id.id )
-    # if account :
-    # rec.analytic_account_id = account.analytic_account_id.id
-    # else :
-    # rec.analytic_account_id = False
-    # else :
-    # rec.analytic_account_id = False
-
-    @api.depends ( 'project_type_id' , 'order_line' )
-    @api.onchange ( 'project_type_id' , 'order_line' )
-    def _compute_analytic_account_id(self) :
-        for rec in self :
-            if rec.order_line :
-                account = rec.order_line[0].product_id.product_analytic_ids.filtered (
-                    lambda x : x.analytic_plan_id.id == rec.project_type_id.id )
-                if account :
-                    rec.analytic_account_id = account.analytic_account_id.id
-                # else :
-                # rec.analytic_account_id = False
-            else :
-                rec.analytic_account_id = False
-
-    def action_open_payment(self) :
-        return {
-            'name' : 'Create Payment' ,
-            'type' : 'ir.actions.act_window' ,
-            'view_mode' : 'list,form' ,
-            'res_model' : 'account.payment' ,
-            'domain' : ['|' , ('sale_order_id' , 'in' , self.ids) ,
-                        ('sale_order_ids.sale_order_id' , 'in' , self.ids)] ,
-            # 'domain' : ['|',('sale_order_id' , 'in' , self.ids),'&',('sale_order_id', '=', False),('amount','=','0')] ,
-            # 'domain': ['|',('sale_order_ids', 'in', [self.id] if self.id else []),('id', '=', 0)],
-            'context' : {
-                # 'default_sale_order_ids' :self.id ,
-                # 'default_sale_order_ids': [self.id] if self.id else [],
-                'default_sale_order_id' : self.id ,
-                'default_partner_id' : self.partner_id.id ,
-                'default_payment_type' : 'inbound' ,
-                'default_from_sale' : True ,
-                'create' : self.state == 'sale' ,
-            }
-        }
-
-    def action_open_order_lines(self) :
-        self.ensure_one ()
-        return {
-            'name' : 'Paid Move Lines' ,
-            'type' : 'ir.actions.act_window' ,
-            'view_mode' : 'list,form' ,
-            'res_model' : 'account.move.line' ,
-            'domain' : [
-                ('sale_order_id' , '=' , self.id) ,
-                ('credit' , '>' , 0)
-            ] ,
-            'context' : {'create' : False} ,
-        }
-
-
-class SaleOrder2 ( models.Model ) :
-    _inherit = 'sale.order'
-
-    # contract_date = fields.Date(string='Contract Date')
-    audit_date = fields.Date ( string='Audit Date' )
-    # account_year = fields.Integer ( string='Year' , required=True , default=lambda self : fields.Date.today ().year )
-    account_year = fields.Integer ( string='Year' , required=True , compute='compute_audit_year' , index=True ,
-                                    readonly=False )
-    agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreement' )
-    payment_ids = fields.Many2many ( 'account.payment' , string='Payments' , compute='_compute_payment_ids' )
-    payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
-    # paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count" )
-    # unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count" )
-    # paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" )
-    # payment_count = fields.Integer(compute='_compute_payment_count')
-    # paid_total = fields.Float(compute='_compute_payment_count')
-    # unpaid_total = fields.Float(compute='_compute_payment_count')
-    # paid_percent = fields.Float(compute='_compute_payment_count')
-    project_budget = fields.Float ( string='Project Budget' , copy=False )
-    amount_due = fields.Float ( string='Amount Due' , compute="_compute_amount_due" )
-    # project_name = fields.Char ( string='Project Name' )
-    # project_code = fields.Char ( string='Project Code' )
-    # invoice_count=fields.Integer(string="",store=True,readonly=False)
-    contract_signature = fields.Boolean ( "Contract Signature" )
-    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
-    # analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
-    #                                        domain="[('plan_id', '=', project_type_id)]" ,
-    #                                        compute='_compute_analytic_account_id' , readonly=False , store=True )
-    approve_uid = fields.Many2one ( 'res.users' , string='Approve User' , )
-    approve_date = fields.Datetime ( string='Approve Date' )
-    reject_reason = fields.Text ( string='Reject Reason' )
-    # broker_id = fields.Many2one(comodel_name='res.partner', string='Broker', domain="[('is_broker', '=', True)]")
-    # broker_amount = fields.Float ( string='Broker Amount' , tracking=True )
-    # broker_invoiced_amount = fields.Float ( string='Broker Paid Amount' , compute="_compute_broker_invoiced_amount" )
-    # broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
-    #                                          compute="_compute_broker_invoiced_amount" )
-    # first_payment_id = fields.Many2one ( string='First Payment' , compute='_compute_first_payment_id' )
-    # first_payment_id = fields.Many2one ( comodel_name='account.payment' , string='First Payment' ,
-    # compute='_compute_first_payment_id' )
-    # first_payment_date = fields.Date ( string='First Payment Date' , related='first_payment_id.date' )
-    # first_payment_amount = fields.Monetary ( string='First Payment Amount' , related='first_payment_id.amount' )
-    # project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
-    # related='project_ids.stage_id' , store=True , groups='base.group_user' )
-    # close_type = fields.Char(comodel_name='project.project.close_type',string='Close_type', related='close_type', store=True)
-    from_crm = fields.Boolean ( string='From CRM' )
-
-    can_edit_analytic = fields.Boolean ( string='Can Edit Analytic Account' , compute='compute_can_edit_analytic' , )
-    can_edit_approve = fields.Boolean ( string='Can Edit Approve Route' , compute='compute_can_edit_approve' , )
-    print_history_ids = fields.One2many ( comodel_name='sale.order.print.history' , inverse_name='sale_id' ,
-                                          string='Print History' )
-    sign_qrcode = fields.Binary ( string='Sign QR Code' , compute='compute_sign_qrcode' , store=False )
-    # sign_qrcode = fields.Binary ( string='Sign QR Code'  , store=False )
-    price1 = fields.Float ( string="Untaxed Price1" , readonly=False , deFault=False )
-    price2 = fields.Float ( string="Untaxed Price2" , readonly=False , deFault=False )
-    price3 = fields.Float ( string="Untaxed Price3" , readonly=False , deFault=False )
-    year1 = fields.Char ( string="Year_1" , readonly=False , deFault=False )
-    year2 = fields.Char ( string="Year_2" , readonly=False , deFault=False )
-    year3 = fields.Char ( string="Year_3" , readonly=False , deFault=False )
-    uuid = fields.Char ( string='UUID' )
-    final_close_entry_date = fields.Date ( string=" تاريخ قيد الايراد" , compute='_compute_final_close_entry_date' ,
-                                           readonly=False , index=True , searchable=True )
-    final_close_entry = fields.Char ( string="قيد الايراد" , compute='_compute_final_close_entry_date' ,
-                                      readonly=False , index=True , searchable=True )
-    close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , store=True , related="final_close_entry_date" ,
-                                     readonly=False , index=True , searchable=True )
-    close_entry_year = fields.Integer ( string="Close Entry Year" , store=True , readonly=False , searchable=True )
-    validity_date = fields.Date ( string='Validity Date' ,
-                                  default=fields.Date.today () + datetime.timedelta ( days=30 ) )
-    project_files_state = fields.Selection ( [
-        ('done' , 'طبيعي') ,
-        ('not_done' , '(مستثني)غير مكتمل') ,
-    ] , string="Project Files State" , store=True )
-
-    @api.depends ( 'name' )
-    def _compute_final_close_entry_date(self) :
-        for order in self :
-            # تنظيف الاسم من مسافات إضافية وتحويله لأحرف صغيرة
-            order_name_clean = (order.name or '').strip ().lower ()
-
-            # البحث عن أول قيد مرتبط بالـ Sale Order
-            move = self.env['account.move'].search ( [
-                ('invoice_origin' , 'ilike' , order_name_clean) ,  # بحث غير حساس لحالة الأحرف
-                ('journal_id' , 'in' , [165 , 160 , 162])
-                # ('line_ids.account_id', 'in', [1341,1342])          # حسب Journals اللي انت عايزهم
-            ] , order='date asc' , limit=1 )
-
-            if move :
-                order.final_close_entry_date = move.date
-                order.final_close_entry = move.name
-
-    # @api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
-    # def _compute_final_close_entry_date(self) :
-    # for order in self :
-    # moves = self.env['account.move'].search ( [  # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
-    # ('invoice_origin' , '=' , order.name) ,
-    # ('journal_id' , 'in' , [165,160,162])
-    # ] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
-    # order.final_close_entry_date = moves.date if moves else False
-    # order.close_entry_date = moves.date if moves else False
-
-    # @api.depends('final_close_entry_date')
-    # def _compute_final_close_entry_date(self):
-    #   for rec in self:
-    #      rec.close_entry_date = rec.final_close_entry_date
-
-    @api.depends ( 'audit_date' )
-    def compute_audit_year(self) :
-        for rec in self :
-            if rec.audit_date :
-                rec.account_year = rec.audit_date.year
-            else :
-                # rec.account_year = fields.Date.today ().year
-                rec.account_year = False
-
-    def action_open_close_entry_wizard_deffered(self) :
-        self.ensure_one ()
-        return {
-            'type' : 'ir.actions.act_window' ,
-            'name' : 'Close Entry Deffered' ,
-            'res_model' : 'close.entry.wizard' ,
-            'view_mode' : 'form' ,
-            'target' : 'new' ,
-            'view_id' : self.env.ref ( 'bi_project_custom.view_close_entry_wizard_form_deffered' ).id ,
-            # لو عندك view مخصص
-            'context' : {
-                'default_sale_order_id' : self.id ,
-            }
-        }
-
-    @api.depends ( 'name' )
-    def _compute_journal_165_date(self) :
-        for order in self :
-            moves = self.env['account.move'].search ( [  # البحث عن قيود الحسابات المرتبطة بالـ Sale Order
-                ('invoice_origin' , '=' , order.name) ,
-                ('journal_id' , '=' , 165)
-            ] , order='date asc' , limit=1 )  # ممكن تختار أول قيد حسب التاريخ
-            order.journal_165_date = moves.date if moves else False
-
-    def action_open_print_sale_wizard(self) :
-        return {
-            'type' : 'ir.actions.act_window' ,
-            'view_mode' : 'form' ,
-            'res_model' : 'sale.order.print.wizard' ,
-            'target' : 'new' ,
-            'context' : {
-                'default_sale_id' : self.id ,
-                # 'default_exist_report_ids': self.order_line.mapped('product_template_id').mapped('report_template_ids').ids,
-                'default_exist_report_ids' : self.x_studio_contract_service.product_tmpl_id.report_template_ids.ids ,
-                'default_exist_sale_ids' : self.ids
-            }
-        }
-
-    def action_open_reject_sale_wizard(self) :
-        return {
-            'type' : 'ir.actions.act_window' ,
-            'view_mode' : 'form' ,
-            'res_model' : 'sale.order.reject.wizard' ,
-            'target' : 'new' ,
-            'context' : {
-                'default_sale_id' : self.id ,
-            }
-        }
-
-    @api.onchange ( 'project_type_id' , 'broker_id' , 'amount_total' , 'amount_untaxed' )
-    @api.depends ( 'project_type_id' , 'broker_id' , 'amount_total' , 'amount_untaxed' )
-    def _onchange_compute_broker_amount(self) :
-        if self.broker_id :
-            broker_lines = self.env['account.analytic.plan.broker'].search (
-                [('partner_id' , '=' , self.broker_id.id) , ('plan_id' , '=' , self.project_type_id.id)] )
-            broker_ids = []
-            if broker_lines :
-                for line in broker_lines :
-                    if line.condition :
-                        sales = self.filtered_domain ( list ( ast.literal_eval ( line.condition ) ) )
-                        if sales :
-                            broker_ids.append ( line )
-                    else :
-                        broker_ids.append ( line )
-            if len ( broker_ids ) > 1 :
-                raise ValidationError ( 'You have more then one broker for this project type. ' )
-            if not broker_ids :
-                self.broker_amount = 0
-            else :
-                if broker_ids[0].value_type == 'fixed' :
-                    self.broker_amount = broker_ids[0].value
-                if broker_ids[0].value_type == 'percentage' :
-                    self.broker_amount = (self.amount_untaxed * broker_ids[0].value) / 100
-        else :
-            self.broker_amount = 0
-
-    def action_open_broker_bill(self) :
-        self.ensure_one ()
-
-        # جلب المنتج ودفتر اليومية
-        settings = self.env['res.config.settings'].search ( [('company_id' , '=' , self.company_id.id)] , limit=1 )
-        product = settings.broker_comm_product_id
-        journal = settings.broker_comm_journal_id
-
-        # if not product :
-        #  raise ValidationError ( 'No broker commission product found' )
-        # if not journal :
-        #  raise ValidationError ( 'No broker commission journal found' )
-
-        # التحقق إذا كانت هناك فاتورة وسيط موجودة بالفعل
-        existing_invoice = self.env['account.move'].search ( [
-            # ('sale_order_id_finance' , '=' , self.id) ,
-            ('broker_sale_id' , '=' , self.id) ,
-            # ('is_broker_move' , '=' , True),
-            # ('journal_id','=',163),
-            ('journal_id' , '=' , journal.id) ,
-        ] , limit=1 )
-
-        payment_ref = f"{self.name or ''} - مكافأة تسويق عن - {self.partner_id.name or ''}"
-
-        if existing_invoice :
-            # فتح الفاتورة الموجودة
-            invoice = existing_invoice
-        else :
-            # إنشاء فاتورة جديدة
-            move_vals = {
-                'partner_id' : self.broker_id.id ,
-                'move_type' : 'in_invoice' ,
-                'broker_sale_id' : self.id ,
-                'invoice_origin' : self.name ,
-                'journal_id' : journal.id ,
-                'ref' : payment_ref ,
-                'is_broker_move' : True ,
-                'invoice_line_ids' : [(0 , 0 , {
-                    'product_id' : product.id ,
-                    'quantity' : 1 ,
-                    'price_subtotal' : self.broker_amount ,
-                    'price_unit' : self.broker_amount ,
-                    'analytic_distribution' : {
-                        self.analytic_account_id.id : 100
-                    } ,
-                })]
-            }
-            invoice = self.env['account.move'].create ( move_vals )
-
-        # فتح الفاتورة (سواء موجودة أو جديدة)
-        return {
-            'type' : 'ir.actions.act_window' ,
-            'name' : 'Broker Bill' ,
-            'view_mode' : 'list,form' ,
-            'res_model' : 'account.move' ,
-            'res_id' : invoice.id ,
-            'domain' : [('broker_sale_id' , '=' , self.id) , ('sale_order_id_finance' , '=' , self.id) ,
-                        ('journal_id' , '=' , 163)] ,
-            'target' : 'current' ,
-        }
-
-    def _compute_broker_invoiced_amount(self) :
-        for rec in self :
-            moves = self.env['account.move'].search ( [('broker_sale_id' , '=' , rec.id)] )
-            if moves :
-                rec.broker_invoiced_amount = sum ( moves.mapped ( 'amount_untaxed' ) )
-                rec.broker_uninvoiced_amount = rec.broker_amount - rec.broker_invoiced_amount
-                payment_states = moves.mapped ( 'payment_state' )
-                if all ( state == 'paid' for state in payment_states ) :
-                    rec.broker_invoice_payment_state = 'paid'
-                elif all ( state == 'not_paid' for state in payment_states ) :
-                    rec.broker_invoice_payment_state = 'not_paid'
-                elif any ( state == 'in_payment' for state in payment_states ) :
-                    rec.broker_invoice_payment_state = 'in_payment'
-                else :
-                    rec.broker_invoice_payment_state = 'partial'
-            else :
-                rec.broker_invoiced_amount = 0
-                rec.broker_uninvoiced_amount = rec.broker_amount
-                rec.broker_invoice_payment_state = 'not_paid'
-
-    def action_update_and_open_projects(self) :
-        for record in self :
-            # البحث عن المشاريع المرتبطة
-            linked_projects = self.env['project.project'].search ( [
-                ('sale_order_id' , '=' , record.id)
+            rec.attachment_ids = self.env['ir.attachment'].search ( [
+                ('res_model' , '=' , 'res.partner') ,
+                ('res_id' , '=' , rec.id)
             ] )
 
-            # تحديث نسبة الدفع في كل مشروع
-            for project in linked_projects :
-                project.write ( {
-                    'paid_percent' : record.paid_percent or 0.0
-                } )
+    @api.depends ( 'sale_order_ids' )
+    def _compute_cr_number_sale(self) :
+        for partner in self :
+            partner.cr_number_sale = partner.sale_order_ids[-1].cr_number_sale if partner.sale_order_ids else False
 
-        # فتح شاشة المشاريع المرتبطة
-        return self.action_update_and_open_projects ()
+    @api.constrains ( 'number_700' , 'cr_number_sale' , 'company_type' )
+    def _check_numbers(self) :
+        pattern_700 = r'^7\d*$'
+        pattern_cr = r'^\d+$'
 
-    def action_update_and_open_projects(self) :
-        self.ensure_one ()  # التأكد أن المستخدم ضغط على سجل واحد
+        allowed_user_ids = [2 , 394 , 18]
+        admin_group = self.env.ref ( 'base.group_system' )  # مجموعة الـ Admin
 
-        # البحث عن المشروع المرتبط بهذا السجل
-        project = self.project_id
-        if not project :
-            return {
-                'type' : 'ir.actions.client' ,
-                'tag' : 'display_notification' ,
-                'params' : {
-                    'title' : 'تنبيه' ,
-                    'message' : 'لا يوجد مشروع مرتبط بهذا الطلب.' ,
-                    'type' : 'warning' ,
-                    'sticky' : False ,
-                }
-            }
-
-        # تحديث نسبة الدفع
-        project.write ( {
-            'paid_percent' : self.paid_percent or 0.0
-        } )
-
-        # فتح المشروع المرتبط
-        return {
-            'name' : 'Project' ,
-            'type' : 'ir.actions.act_window' ,
-            'res_model' : 'project.project' ,
-            'view_mode' : 'form' ,
-            'res_id' : project.id ,
-            'target' : 'current' ,  # 'new' لفتح نافذة منبثقة
-        }
-
-    def get_print_sequence(self) :
         for rec in self :
-            sequence = self.env['sale.order.print.history'].search ( [('sale_id' , '=' , rec.id)] , order="date desc" ,
-                                                                     limit=1 )
-            if sequence :
-                return sequence.sequence
-            else :
-                return 1
+            # إذا المستخدم الحالي Admin → تخطى التحقق
+            if self.env.user in admin_group.users :
+                continue
 
-    def action_create_new_payment2(self) :
-        # self.ensure_one()
-        # allowed_user_ids = [2 , 394 , 18]
-        allowed_user_ids = [2 , 394]
-        # admin_group = self.env.ref ( 'base.group_system' )
-        # لو مش Admin
-        # if self.env.user not in admin_group.users :
-        for order in self :
-            if self.env.user.id not in allowed_user_ids :
-                if not order.customer_phone_number :
-                    raise UserError ( "برجاء إدخال رقم التيلفون للعميل" )  # يمنع التنفيذ فورًا
+            # إذا المستخدم الحالي غير مسموح له
+            user_not_allowed = self.env.user.id not in allowed_user_ids
+            # ===== phone_customer_contact =====
+            if rec.company_type != 'person' and user_not_allowed :
+                if not rec.phone and rec.fax_number :
+                    raise ValidationError ( "حقل Phone + Contact_name مطلوب لغير الأشخاص وغير المسؤولين." )
 
-            # لو فيه فرصة مرتبطة، نغير stage_idغيرها الي مدفوع
-            if order.opportunity_id :
-                order.opportunity_id.stage_id = 4  # حدد Stage ID اللي تحب
+            # ===== number_700 =====
+            if rec.company_type != 'person' and user_not_allowed :
+                if not rec.number_700 :
+                    raise ValidationError ( "حقل Number 700 مطلوب لغير الأشخاص وغير المسؤولين." )
+                if not re.match ( pattern_700 , rec.number_700 ) :
+                    raise ValidationError ( "Number 700 must start with 7 and contain numbers only." )
 
-        return {
-            'name' : 'Create New Payment' ,
-            'type' : 'ir.actions.act_window' ,
-            'res_model' : 'account.payment' ,
-            'view_mode' : 'form' ,
-            'target' : 'current' ,
-            'context' : {
-                'default_sale_order_id' : self.id ,
-                'default_partner_id' : self.partner_id.id if self.partner_id else False ,
-                'default_payment_type' : 'inbound' ,
-                'default_date' : False ,
-                # 'default_amount': 0.0,  # اختياري حسب الحاجة
-            }
-        }
+            # ===== cr_number_sale =====
+            if rec.company_type != 'person' and user_not_allowed :
+                if not rec.cr_number_sale :
+                    continue
+                # raise ValidationError("حقل CR Number Sale مطلوب لغير الأشخاص وغير المسؤولين.")
+            # if not re.match(pattern_cr, rec.cr_number_sale):
+            # raise ValidationError("CR Number Sale must contain numbers only.")
 
-
-class SaleOrderLine ( models.Model ) :
-    _inherit = 'sale.order.line'
-
-    downpayment_ok = fields.Boolean ( string='Downpayment Service' , related='product_id.downpayment_ok' )
-    budget_percentage = fields.Float ( string='Percentage(%)' , help='The Percentage from total Budget of SO' )
-    order_budget = fields.Float ( related='order_id.project_budget' )
-    working_days = fields.Integer ()
-    relative_dalivery = fields.Integer ()
-    relative_invoicing = fields.Integer ()
-    product_id = fields.Many2one (
-        comodel_name='product.product' ,
-        string="Product" ,
-        change_default=True , ondelete='restrict' , check_company=True , index='btree_not_null' ,
-        domain="['&',('sale_ok', '=', True),'|',('finance_service_ok', '=', True),('downpayment_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', company_id)]" )
-    product_template_id = fields.Many2one (
-        string="Product Template" ,
-        comodel_name='product.template' ,
-        compute='_compute_product_template_id' ,
-        readonly=False ,
-        search='_search_product_template_id' ,
-        # previously related='product_id.product_tmpl_id'
-        # not anymore since the field must be considered editable for product configurator logic
-        # without modifying the related product_id when updated.
-        domain=['&' , ('sale_ok' , '=' , True) , '|' , ('finance_service_ok' , '=' , True) ,
-                ('downpayment_ok' , '=' , True)] )
-    finance_service_ok = fields.Boolean ( string='Finance Service' , related='product_id.finance_service_ok' )
-    downpayment_ok = fields.Boolean ( string='Downpayment Service' , related='product_id.downpayment_ok' )
-    public_name = fields.Char ( string='Public Name' , related='product_id.public_name' )
-
-    # analytic_distribution=fields.Json(string='Analytic Distribution',compute='_compute_analytic_distribution',store=True)
-
-    # @api.depends ( 'order_id.analytic_account_id' )
-    # def _compute_analytic_distribution(self) :
-    # for line in self :
-    # if line.order_id.analytic_account_id :
-    # JSON format: [{"account_id": <id>, "percent": 100}]
-    # line.analytic_distribution = [{"account_id" : line.order_id.analytic_account_id.id , "percent" : 100}]
-    # else :
-    # line.analytic_distribution = []
-
-    @api.onchange ( 'budget_percentage' )
-    def _onchange_budget_percentage(self) :
-        for line in self :
-            if line.order_budget :
-                line.price_unit = round ( (line.budget_percentage / 100) * line.order_id.project_budget , 2 )
-
-    @api.depends ( 'display_type' , 'product_id' , 'product_packaging_qty' )
-    def _compute_product_uom_qty(self) :
-        for line in self :
-            line.product_uom_qty = 1
-
-
-class SaleOrderPrint ( models.Model ) :
-    _name = 'sale.order.print.wizard'
-    _description = 'Sale Order Print Wizard'
-
-    exist_sale_ids = fields.Many2many ( 'sale.order' , string='Sale Order' , )
-    sale_id = fields.Many2one ( 'sale.order' , string='Sale Order' , required=True ,
-                                domain="[('id', 'in', exist_sale_ids)]" )
-    exist_report_ids = fields.Many2many ( 'product.report.template' , string='Report' , )
-    report_id = fields.Many2one ( 'product.report.template' , string='Report' , required=True ,
-                                  domain="[('id', 'in', exist_report_ids)]" )
-    from_crm = fields.Boolean ( string='From CRM' , default=False , store=False )
-
-    @api.onchange ( 'report_id' )
-    def _onchange_report_id(self) :
-        if self.report_id :
-            if not self.env.uid in self.report_id.allowed_users_ids.ids + self.report_id.product_tmpl_id.super_report_user_ids.ids :
-                raise ValidationError ( _ ( 'You are not allowed to print this report' ) )
-            else :
-                if self.report_id.need_approved and not self.sale_id._is_fully_approved () :
-                    raise ValidationError ( _ ( 'This template needs approve order to be printed' ) )
-
-    def print_report(self) :
-        sequence = 1
-        report = self.env['sale.order.print.history'].search (
-            [('sale_id' , '=' , self.sale_id.id) , ('report_id' , '=' , self.report_id.id)] , order="date desc" ,
-            limit=1 )
-        if report :
-            sequence = report.sequence + 1
-        self.env['sale.order.print.history'].create ( {
-            'sale_id' : self.sale_id.id ,
-            'user_id' : self.env.uid ,
-            'date' : fields.Datetime.now () ,
-            'sequence' : sequence ,
-            'report_id' : self.report_id.id ,
-        } )
-        return self.report_id.report_template_id.report_action ( self.sale_id )
-
-
-class SaleOrderRejectWizard ( models.TransientModel ) :
-    _name = 'sale.order.reject.wizard'
-
-    sale_id = fields.Many2one ( 'sale.order' , string='Sale Order' , required=True )
-    reject_reason = fields.Text ( string='Reject Reason' , required=True )
-
-    def action_reject(self) :
+    @api.depends ( 'manager_id' )
+    def _compute_manager_name(self) :
         for rec in self :
-            rec.sale_id.action_reject ()
-            rec.sale_id.approve_uid = self.env.uid
-            rec.sale_id.approve_date = fields.Datetime.now ()
-            rec.sale_id.reject_reason = rec.reject_reason
-            rec.sale_id.message_post ( body=rec.reject_reason )
+            rec.manager_name = rec.manager_id if rec.manager_id else False
 
+    def action_merge_specific_duplicates(self) :
+        """
+        دمج كل الشركاء المكررة بناءً على الاسم فقط.
+        السجل الأول يصبح الرئيسي، والباقي يتم دمجهم فيه.
+        """
+        # الحصول على الأسماء المكررة
+        self._cr.execute ( """
+            SELECT name
+            FROM res_partner
+            WHERE active=TRUE
+            GROUP BY name
+            HAVING COUNT(*) > 1
+        """ )
+        duplicate_names = [row[0] for row in self._cr.fetchall ()]
+        if not duplicate_names :
+            return {'type' : 'ir.actions.act_window_close'}
 
-class SaleOrderPrintHistory ( models.Model ) :
-    _name = 'sale.order.print.history'
-    _description = 'Sale Order Print History'
+        for name in duplicate_names :
+            # جميع الشركاء بنفس الاسم
+            partners = self.env['res.partner'].search ( [('name' , '=' , name) , ('active' , '=' , True)] )
+            main_partner = partners[0]  # السجل الرئيسي
+            for dup in partners[1 :] :
+                # تحديث كل المراجع على السجل الرئيسي
+                self.env['account.move'].search ( [('partner_id' , '=' , dup.id)] ).write (
+                    {'partner_id' : main_partner.id} )
+                self.env['sale.order'].search ( [('partner_id' , '=' , dup.id)] ).write (
+                    {'partner_id' : main_partner.id} )
+                self.env['purchase.order'].search ( [('partner_id' , '=' , dup.id)] ).write (
+                    {'partner_id' : main_partner.id} )
+                # نقل الـ child partners إذا وجدت
+                dup.child_ids.write ( {'parent_id' : main_partner.id} )
+                # حذف السجل المكرر
+                dup.unlink ()
 
-    _order = 'date , sequence, sale_id desc'
-
-    sale_id = fields.Many2one ( comodel_name='sale.order' , string='Sale Order' )
-    user_id = fields.Many2one ( comodel_name='res.users' , string='User' )
-    date = fields.Datetime ( string='Date' , )
-    sequence = fields.Integer ( string='Sequence' , )
-    report_id = fields.Many2one ( comodel_name='product.report.template' , string='Report' , )
-    report_template_id = fields.Many2one ( comodel_name='ir.actions.report' , string='Report Template' ,
-                                           related="report_id.report_template_id" )
+        return {'type' : 'ir.actions.act_window_close'}
