@@ -77,7 +77,7 @@ class SaleOrder ( models.Model ) :
     sequence = fields.Integer ( string='Sequence' , )
     report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
                                   domain="[('id', 'in', exist_report_ids)]" )
-    x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="Contract_service" )
+    x_studio_contract_service = fields.Many2one ( comodel_name='product.template' , string="Contract_service" )
     report_template_id = fields.Many2one ( comodel_name='ir.actions.report' , string='Report Template' ,
                                            related="report_id.report_template_id" )
     printdate = fields.Date ( string='تاريخ  الطباعة' , default=fields.Datetime.now )
