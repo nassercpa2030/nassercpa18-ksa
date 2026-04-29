@@ -547,7 +547,7 @@ class SaleOrder ( models.Model ) :
 
     uuid = fields.Char ( string='UUID' , readonly=True )
     opportunity_id = fields.Many2one ( 'crm.lead' , string='Opportunity' )
-    project_name = fields.Char ( string='Project Name' )
+    #project_name = fields.Char ( string='Project Name' )
     partner_id = fields.Many2one ( 'res.partner' , string='Partner' )
     user_id = fields.Many2one ( 'res.users' , string='Responsible' )
 
