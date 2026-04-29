@@ -351,7 +351,7 @@ class SaleOrder ( models.Model ) :
             if rec.account_year :
                 parts.append ( str ( rec.account_year ) )  # مهم لو رقم
 
-            rec.project_name = "، ".join ( parts )
+            rec.project_name = "- ".join ( parts )
 
 
     #@api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
