@@ -10,20 +10,20 @@ class AccountMove ( models.Model ) :
 
     sale_order_id = fields.Many2one ( 'sale.order' , string='Sales Order' , ondelete='set null' )
 
-    #def action_create_new_invoice(self):
-        #return {
-            #'type': 'ir.actions.act_window',
-            #'name': 'New Invoice',
-            #'res_model': 'account.move',
-            #'view_mode': 'form',
-            #'context': {
-                #'default_move_type': 'out_invoice',
-            #},
-            #'target': 'current',
-        #}
-        
-    def action_print_custom_invoice(self):
-        return self.env['ir.actions.report'].browse(1275).report_action(self)
+    # def action_create_new_invoice(self):
+    # return {
+    # 'type': 'ir.actions.act_window',
+    # 'name': 'New Invoice',
+    # 'res_model': 'account.move',
+    # 'view_mode': 'form',
+    # 'context': {
+    # 'default_move_type': 'out_invoice',
+    # },
+    # 'target': 'current',
+    # }
+
+    def action_print_custom_invoice(self) :
+        return self.env['ir.actions.report'].browse ( 1275 ).report_action ( self )
 
     def unlink(self) :
         journal_ids = [160 , 161 , 162 , 165]
@@ -246,6 +246,76 @@ class QualityStateLog ( models.Model ) :
     new_change_date = fields.Datetime ( string="تاريخ التغيير الجديد" )
 
 
+class HrPayslipRun ( models.Model ) :
+    _inherit = 'hr.payslip.run'
+
+    def action_generate_aggregated_move(self) :
+        for batch in self:
+
+            # 👇 ده أهم سطر (نحول batch → payslips)
+            records = batch.slip_ids
+
+            if not records:
+                continue
+
+            # 1- تنفيذ الرواتب
+            for rec in records:
+                rec.with_context(payslip_generate_pdf=True).action_payslip_done()
+
+            # 2- جمع القيود
+            moves = records.mapped('move_id').filtered(lambda m: m)
+
+            if moves:
+
+                months_ar = {
+                    1: "يناير", 2: "فبراير", 3: "مارس", 4: "أبريل",
+                    5: "مايو", 6: "يونيو", 7: "يوليو", 8: "أغسطس",
+                    9: "سبتمبر", 10: "أكتوبر", 11: "نوفمبر", 12: "ديسمبر"
+                }
+
+                date = records[0].date or fields.Date.today()
+
+                month_name = months_ar.get(date.month, "")
+                year = date.year
+
+                move_name = f"صرف رواتب موظفي شركة ناصر عوض أل كيرعان عن شهر {month_name} لعام {year}"
+
+                all_lines = []
+
+                # 👇 نفس الكود بدون أي تعديل (No Grouping)
+                for move in moves:
+                    for line in move.line_ids:
+                        all_lines.append((0, 0, {
+                            'name': line.name,
+                            'account_id': line.account_id.id,
+                            'debit': line.debit,
+                            'credit': line.credit,
+                            'partner_id': line.partner_id.id,
+                            'analytic_account_id': line.analytic_account_id.id,
+                            'analytic_distribution': line.analytic_distribution,
+                        }))
+
+                # إنشاء القيد
+                new_move = self.env['account.move'].create({
+                    'move_type': 'entry',
+                    'journal_id': moves[0].journal_id.id,
+                    'date': date,
+                    'ref': move_name,
+                    'employee_id': move_name,
+                    'line_ids': all_lines,
+                })
+
+                # حذف القديم
+                moves.button_cancel()
+                moves.unlink()
+
+                # ربط الجديد
+                records.write({'move_id': new_move.id})
+
+        return True
+
+
+
 class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
@@ -361,7 +431,7 @@ class SaleOrder ( models.Model ) :
             'type' : 'ir.actions.act_window' ,
             'name' : ' Sale order Invoices' ,
             'view_mode' : 'list' ,
-            #'view_mode' : 'list,form' ,
+            # 'view_mode' : 'list,form' ,
             'res_model' : 'account.move' ,
             'domain' : [('id' , 'in' , self.invoice_ids.ids)] ,
             'context' : {'create' : False} ,
@@ -382,15 +452,15 @@ class SaleOrder ( models.Model ) :
         # browse ([!563,!18])  # اليوزر اللي id != 563,!=18 manager
 
         for rec in self :
-            if  rec.amount_due <= 5  and rec.state not in ['draft' , 'sent' , 'cancel']:
+            if rec.amount_due <= 5 and rec.state not in ['draft' , 'sent' , 'cancel'] :
                 rec.finance_signiture = True
             # لو تفعيل التوقيع مفعل، نحط التوقيع، غير كده يبقى False
-            #rec.finance_assign = finance_user.sign_signature if rec.finance_signiture else False
-            #rec.archive_assign = archive_user.sign_signature if rec.archive_signiture else False
-           # rec.manager_assign = manager_user.sign_signature if rec.manager_signiture else False
-            rec.finance_assign = finance_user.sudo().sign_signature if rec.finance_signiture else False
-            rec.archive_assign = archive_user.sudo().sign_signature if rec.archive_signiture else False
-            rec.manager_assign = manager_user.sudo().sign_signature if rec.manager_signiture else False
+            # rec.finance_assign = finance_user.sign_signature if rec.finance_signiture else False
+            # rec.archive_assign = archive_user.sign_signature if rec.archive_signiture else False
+            # rec.manager_assign = manager_user.sign_signature if rec.manager_signiture else False
+            rec.finance_assign = finance_user.sudo ().sign_signature if rec.finance_signiture else False
+            rec.archive_assign = archive_user.sudo ().sign_signature if rec.archive_signiture else False
+            rec.manager_assign = manager_user.sudo ().sign_signature if rec.manager_signiture else False
 
     @api.depends ( 'project_ids.files_state' )
     def _compute_project_files_state(self) :
@@ -417,12 +487,11 @@ class SaleOrder ( models.Model ) :
             else :
                 record.broker_percentage_ = False
 
-   # @api.onchange ( 'amount_due' )
-    #@api.depends('amount_due', 'state')
-    #def _check_finance_signiture(self) :
-        #for rec in self :
-            #rec.finance_signiture = (rec.amount_due <= 5 and rec.state not in ['draft', 'sent', 'cancel'])
-            
+    # @api.onchange ( 'amount_due' )
+    # @api.depends('amount_due', 'state')
+    # def _check_finance_signiture(self) :
+    # for rec in self :
+    # rec.finance_signiture = (rec.amount_due <= 5 and rec.state not in ['draft', 'sent', 'cancel'])
 
     @api.depends ( 'invoice_ids' )
     def _compute_invoice_attachments(self) :
@@ -448,9 +517,9 @@ class SaleOrder ( models.Model ) :
 
     def write(self , vals) :
         res = super ().write ( vals )
-        #for order in self :
-            #if order.amount_due <= 5 :
-                #order.finance_signiture = True
+        # for order in self :
+        # if order.amount_due <= 5 :
+        # order.finance_signiture = True
 
         self._link_custom_attachments_to_chatter ()
         return res
@@ -692,4 +761,3 @@ class SaleOrder ( models.Model ) :
                 'default_sale_order_id' : self.id ,
             }
         }
-
