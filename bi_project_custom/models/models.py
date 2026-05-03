@@ -246,73 +246,73 @@ class QualityStateLog ( models.Model ) :
     new_change_date = fields.Datetime ( string="تاريخ التغيير الجديد" )
 
 
-class HrPayslipRun ( models.Model ) :
-    _inherit = 'hr.payslip.run'
+# # class HrPayslipRun ( models.Model ) :
+#     _inherit = 'hr.payslip.run'
 
-    def action_generate_aggregated_move(self) :
-        for batch in self:
+#     def action_generate_aggregated_move(self) :
+#         for batch in self:
 
-            # 👇 ده أهم سطر (نحول batch → payslips)
-            records = batch.slip_ids
+#             # 👇 ده أهم سطر (نحول batch → payslips)
+#             records = batch.slip_ids
 
-            if not records:
-                continue
+#             if not records:
+#                 continue
 
-            # 1- تنفيذ الرواتب
-            for rec in records:
-                rec.with_context(payslip_generate_pdf=True).action_payslip_done()
+#             # 1- تنفيذ الرواتب
+#             for rec in records:
+#                 rec.with_context(payslip_generate_pdf=True).action_payslip_done()
 
-            # 2- جمع القيود
-            moves = records.mapped('move_id').filtered(lambda m: m)
+#             # 2- جمع القيود
+#             moves = records.mapped('move_id').filtered(lambda m: m)
 
-            if moves:
+#             if moves:
 
-                months_ar = {
-                    1: "يناير", 2: "فبراير", 3: "مارس", 4: "أبريل",
-                    5: "مايو", 6: "يونيو", 7: "يوليو", 8: "أغسطس",
-                    9: "سبتمبر", 10: "أكتوبر", 11: "نوفمبر", 12: "ديسمبر"
-                }
+#                 months_ar = {
+#                     1: "يناير", 2: "فبراير", 3: "مارس", 4: "أبريل",
+#                     5: "مايو", 6: "يونيو", 7: "يوليو", 8: "أغسطس",
+#                     9: "سبتمبر", 10: "أكتوبر", 11: "نوفمبر", 12: "ديسمبر"
+#                 }
 
-                date = records[0].date or fields.Date.today()
+#                 date = records[0].date or fields.Date.today()
 
-                month_name = months_ar.get(date.month, "")
-                year = date.year
+#                 month_name = months_ar.get(date.month, "")
+#                 year = date.year
 
-                move_name = f"صرف رواتب موظفي شركة ناصر عوض أل كيرعان عن شهر {month_name} لعام {year}"
+#                 move_name = f"صرف رواتب موظفي شركة ناصر عوض أل كيرعان عن شهر {month_name} لعام {year}"
 
-                all_lines = []
+#                 all_lines = []
 
-                # 👇 نفس الكود بدون أي تعديل (No Grouping)
-                for move in moves:
-                    for line in move.line_ids:
-                        all_lines.append((0, 0, {
-                            'name': line.name,
-                            'account_id': line.account_id.id,
-                            'debit': line.debit,
-                            'credit': line.credit,
-                            'partner_id': line.partner_id.id,
-                            'analytic_account_id': line.analytic_account_id.id,
-                            'analytic_distribution': line.analytic_distribution,
-                        }))
+#                 # 👇 نفس الكود بدون أي تعديل (No Grouping)
+#                 for move in moves:
+#                     for line in move.line_ids:
+#                         all_lines.append((0, 0, {
+#                             'name': line.name,
+#                             'account_id': line.account_id.id,
+#                             'debit': line.debit,
+#                             'credit': line.credit,
+#                             'partner_id': line.partner_id.id,
+#                             'analytic_account_id': line.analytic_account_id.id,
+#                             'analytic_distribution': line.analytic_distribution,
+#                         }))
 
-                # إنشاء القيد
-                new_move = self.env['account.move'].create({
-                    'move_type': 'entry',
-                    'journal_id': moves[0].journal_id.id,
-                    'date': date,
-                    'ref': move_name,
-                    'employee_id': move_name,
-                    'line_ids': all_lines,
-                })
+#                 # إنشاء القيد
+#                 new_move = self.env['account.move'].create({
+#                     'move_type': 'entry',
+#                     'journal_id': moves[0].journal_id.id,
+#                     'date': date,
+#                     'ref': move_name,
+#                     'employee_id': move_name,
+#                     'line_ids': all_lines,
+#                 })
 
-                # حذف القديم
-                moves.button_cancel()
-                moves.unlink()
+#                 # حذف القديم
+#                 moves.button_cancel()
+#                 moves.unlink()
 
-                # ربط الجديد
-                records.write({'move_id': new_move.id})
+#                 # ربط الجديد
+#                 records.write({'move_id': new_move.id})
 
-        return True
+#         return True
 
 
 
