@@ -36,157 +36,157 @@ class ResCity ( models.Model ) :
         'account_analytic_account_id' ,  # column 2
         string='الحسابات التحليلية' ,
         readonly=False )
-    # # ===== المالية =====
-    # finance923_perc_101 = fields.Float ( string="نسبة توزيع المالية علي 101" , store=True , readonly=False )
-    # finance923_perc_104 = fields.Float ( string="نسبة توزيع المالية علي 104" , store=True , readonly=False )
-    # finance923_perc_110 = fields.Float ( string="نسبة توزيع المالية علي 110" , store=True , readonly=False )
-    # finance923_perc_111 = fields.Float ( string="نسبة توزيع المالية علي 111" , store=True , readonly=False )
-    # finance923_perc_200 = fields.Float ( string="نسبة توزيع المالية علي 200" , store=True , readonly=False )
-    # finance923_perc_103 = fields.Float ( string="نسبة توزيع المالية علي 103" , store=True , readonly=False )
+    # ===== المالية =====
+    finance923_perc_101 = fields.Float ( string="نسبة توزيع المالية علي 101" , store=True , readonly=False )
+    finance923_perc_104 = fields.Float ( string="نسبة توزيع المالية علي 104" , store=True , readonly=False )
+    finance923_perc_110 = fields.Float ( string="نسبة توزيع المالية علي 110" , store=True , readonly=False )
+    finance923_perc_111 = fields.Float ( string="نسبة توزيع المالية علي 111" , store=True , readonly=False )
+    finance923_perc_200 = fields.Float ( string="نسبة توزيع المالية علي 200" , store=True , readonly=False )
+    finance923_perc_103 = fields.Float ( string="نسبة توزيع المالية علي 103" , store=True , readonly=False )
 
-    # # ===== الجودة =====
-    # quality901_perc_101 = fields.Float ( string="نسبة توزيع الجودة علي 101" , store=True , readonly=False )
-    # quality901_perc_104 = fields.Float ( string="نسبة توزيع الجودة علي 104" , store=True , readonly=False )
-    # quality901_perc_110 = fields.Float ( string="نسبة توزيع الجودة علي 110" , store=True , readonly=False )
+    # ===== الجودة =====
+    quality901_perc_101 = fields.Float ( string="نسبة توزيع الجودة علي 101" , store=True , readonly=False )
+    quality901_perc_104 = fields.Float ( string="نسبة توزيع الجودة علي 104" , store=True , readonly=False )
+    quality901_perc_110 = fields.Float ( string="نسبة توزيع الجودة علي 110" , store=True , readonly=False )
 
-    # quality901_perc_111 = fields.Float ( string="نسبة توزيع الجودة علي 111" , store=True , readonly=False )
-    # quality901_perc_200 = fields.Float ( string="نسبة توزيع الجودة علي 200" , store=True , readonly=False )
-    # quality901_perc_103 = fields.Float ( string="نسبة توزيع الجودة علي 103" , store=True , readonly=False )
+    quality901_perc_111 = fields.Float ( string="نسبة توزيع الجودة علي 111" , store=True , readonly=False )
+    quality901_perc_200 = fields.Float ( string="نسبة توزيع الجودة علي 200" , store=True , readonly=False )
+    quality901_perc_103 = fields.Float ( string="نسبة توزيع الجودة علي 103" , store=True , readonly=False )
 
-    # # ===== الدعم التشغيلي =====
-    # oper_supp902_perc_101 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 101" , store=True , readonly=False )
-    # oper_supp902_perc_104 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 104" , store=True , readonly=False )
-    # oper_supp902_perc_110 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 110" , store=True , readonly=False )
-    # oper_supp902_perc_111 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 111" , store=True , readonly=False )
-    # oper_supp902_perc_200 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 200" , store=True , readonly=False )
-    # oper_supp902_perc_103 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 103" , store=True , readonly=False )
+    # ===== الدعم التشغيلي =====
+    oper_supp902_perc_101 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 101" , store=True , readonly=False )
+    oper_supp902_perc_104 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 104" , store=True , readonly=False )
+    oper_supp902_perc_110 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 110" , store=True , readonly=False )
+    oper_supp902_perc_111 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 111" , store=True , readonly=False )
+    oper_supp902_perc_200 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 200" , store=True , readonly=False )
+    oper_supp902_perc_103 = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 103" , store=True , readonly=False )
 
-    # # ===== التسويق عام =====
-    # sale_gen911_perc_101 = fields.Float ( string="نسبة توزيع التسويق عام علي 101" , store=True , readonly=False )
-    # sale_gen911_perc_104 = fields.Float ( string="نسبة توزيع التسويق عام علي 104" , store=True , readonly=False )
-    # sale_gen911_perc_110 = fields.Float ( string="نسبة توزيع التسويق عام علي 110" , store=True , readonly=False )
-    # sale_gen911_perc_111 = fields.Float ( string="نسبة توزيع التسويق عام علي 111" , store=True , readonly=False )
-    # sale_gen911_perc_200 = fields.Float ( string="نسبة توزيع التسويق عام علي 200" , store=True , readonly=False )
-    # sale_gen911_perc_103 = fields.Float ( string="نسبة توزيع التسويق عام علي 103" , store=True , readonly=False )
+    # ===== التسويق عام =====
+    sale_gen911_perc_101 = fields.Float ( string="نسبة توزيع التسويق عام علي 101" , store=True , readonly=False )
+    sale_gen911_perc_104 = fields.Float ( string="نسبة توزيع التسويق عام علي 104" , store=True , readonly=False )
+    sale_gen911_perc_110 = fields.Float ( string="نسبة توزيع التسويق عام علي 110" , store=True , readonly=False )
+    sale_gen911_perc_111 = fields.Float ( string="نسبة توزيع التسويق عام علي 111" , store=True , readonly=False )
+    sale_gen911_perc_200 = fields.Float ( string="نسبة توزيع التسويق عام علي 200" , store=True , readonly=False )
+    sale_gen911_perc_103 = fields.Float ( string="نسبة توزيع التسويق عام علي 103" , store=True , readonly=False )
 
-    # # ===== المستلزمات المكتبية =====
-    # office_supp_perc_101 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 101" , store=True ,
-    #                                       readonly=False )
-    # office_supp_perc_104 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 104" , store=True ,
-    #                                       readonly=False )
-    # office_supp_perc_110 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 110" , store=True ,
-    #                                       readonly=False )
-    # office_supp_perc_111 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 111" , store=True ,
-    #                                       readonly=False )
-    # office_supp_perc_200 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 200" , store=True ,
-    #                                       readonly=False )
-    # office_supp_perc_103 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 103" , store=True ,
-    #                                       readonly=False )
+    # ===== المستلزمات المكتبية =====
+    office_supp_perc_101 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 101" , store=True ,
+                                          readonly=False )
+    office_supp_perc_104 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 104" , store=True ,
+                                          readonly=False )
+    office_supp_perc_110 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 110" , store=True ,
+                                          readonly=False )
+    office_supp_perc_111 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 111" , store=True ,
+                                          readonly=False )
+    office_supp_perc_200 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 200" , store=True ,
+                                          readonly=False )
+    office_supp_perc_103 = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 103" , store=True ,
+                                          readonly=False )
 
-    # # ===== الشئون الإدارية =====
-    # manage_921_perc_101 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 101" , store=True , readonly=False )
-    # manage_921_perc_104 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 104" , store=True , readonly=False )
-    # manage_921_perc_110 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 110" , store=True , readonly=False )
-    # manage_921_perc_111 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 111" , store=True , readonly=False )
-    # manage_921_perc_200 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 200" , store=True , readonly=False )
-    # manage_921_perc_103 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 103" , store=True , readonly=False )
+    # ===== الشئون الإدارية =====
+    manage_921_perc_101 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 101" , store=True , readonly=False )
+    manage_921_perc_104 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 104" , store=True , readonly=False )
+    manage_921_perc_110 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 110" , store=True , readonly=False )
+    manage_921_perc_111 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 111" , store=True , readonly=False )
+    manage_921_perc_200 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 200" , store=True , readonly=False )
+    manage_921_perc_103 = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 103" , store=True , readonly=False )
 
-    # # ===== الدعم التقني =====
-    # it_922_perc_101 = fields.Float ( string="نسبة توزيع الدعم التقني علي 101" , store=True , readonly=False )
-    # it_922_perc_104 = fields.Float ( string="نسبة توزيع الدعم التقني علي 104" , store=True , readonly=False )
-    # it_922_perc_110 = fields.Float ( string="نسبة توزيع الدعم التقني علي 110" , store=True , readonly=False )
-    # it_922_perc_111 = fields.Float ( string="نسبة توزيع الدعم التقني علي 111" , store=True , readonly=False )
-    # it_922_perc_200 = fields.Float ( string="نسبة توزيع الدعم التقني علي 200" , store=True , readonly=False )
-    # it_922_perc_103 = fields.Float ( string="نسبة توزيع الدعم التقني علي 103" , store=True , readonly=False )
+    # ===== الدعم التقني =====
+    it_922_perc_101 = fields.Float ( string="نسبة توزيع الدعم التقني علي 101" , store=True , readonly=False )
+    it_922_perc_104 = fields.Float ( string="نسبة توزيع الدعم التقني علي 104" , store=True , readonly=False )
+    it_922_perc_110 = fields.Float ( string="نسبة توزيع الدعم التقني علي 110" , store=True , readonly=False )
+    it_922_perc_111 = fields.Float ( string="نسبة توزيع الدعم التقني علي 111" , store=True , readonly=False )
+    it_922_perc_200 = fields.Float ( string="نسبة توزيع الدعم التقني علي 200" , store=True , readonly=False )
+    it_922_perc_103 = fields.Float ( string="نسبة توزيع الدعم التقني علي 103" , store=True , readonly=False )
 
-    # # ===== المباني والمرافق =====
-    # build_facil950_perc_101 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 101" , store=True ,
-    #                                          readonly=False )
-    # build_facil950_perc_104 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 104" , store=True ,
-    #                                          readonly=False )
-    # build_facil950_perc_110 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 110" , store=True ,
-    #                                          readonly=False )
-    # build_facil950_perc_111 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 111" , store=True ,
-    #                                          readonly=False )
-    # build_facil950_perc_200 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 200" , store=True ,
-    #                                          readonly=False )
-    # build_facil950_perc_103 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 103" , store=True ,
-    #                                          readonly=False )
+    # ===== المباني والمرافق =====
+    build_facil950_perc_101 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 101" , store=True ,
+                                             readonly=False )
+    build_facil950_perc_104 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 104" , store=True ,
+                                             readonly=False )
+    build_facil950_perc_110 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 110" , store=True ,
+                                             readonly=False )
+    build_facil950_perc_111 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 111" , store=True ,
+                                             readonly=False )
+    build_facil950_perc_200 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 200" , store=True ,
+                                             readonly=False )
+    build_facil950_perc_103 = fields.Float ( string="نسبة توزيع المباني والمرافق علي 103" , store=True ,
+                                             readonly=False )
 
-    # # ===== القهوة والضيافة والنضافة (الرياض) =====
-    # coff_clean_ryd_perc_101 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 101" ,
-    #                                          store=True , readonly=False )
-    # coff_clean_ryd_perc_104 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 104" ,
-    #                                          store=True , readonly=False )
-    # coff_clean_ryd_perc_110 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 110" ,
-    #                                          store=True , readonly=False )
-    # coff_clean_ryd_perc_111 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 111" ,
-    #                                          store=True , readonly=False )
-    # coff_clean_ryd_perc_200 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 200" ,
-    #                                          store=True , readonly=False )
-    # coff_clean_ryd_perc_103 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 103" ,
-    #                                          store=True , readonly=False )
+    # ===== القهوة والضيافة والنضافة (الرياض) =====
+    coff_clean_ryd_perc_101 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 101" ,
+                                             store=True , readonly=False )
+    coff_clean_ryd_perc_104 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 104" ,
+                                             store=True , readonly=False )
+    coff_clean_ryd_perc_110 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 110" ,
+                                             store=True , readonly=False )
+    coff_clean_ryd_perc_111 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 111" ,
+                                             store=True , readonly=False )
+    coff_clean_ryd_perc_200 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 200" ,
+                                             store=True , readonly=False )
+    coff_clean_ryd_perc_103 = fields.Float ( string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 103" ,
+                                             store=True , readonly=False )
 
-    # # ===== التوطين العام =====
-    # pub_loc903_perc_101 = fields.Float ( string="نسبة توزيع التوطين العام علي 101" , store=True , readonly=False )
-    # pub_loc903_perc_104 = fields.Float ( string="نسبة توزيع التوطين العام علي 104" , store=True , readonly=False )
-    # pub_loc903_perc_110 = fields.Float ( string="نسبة توزيع التوطين العام علي 110" , store=True , readonly=False )
-    # pub_loc903_perc_111 = fields.Float ( string="نسبة توزيع التوطين العام علي 111" , store=True , readonly=False )
-    # pub_loc903_perc_200 = fields.Float ( string="نسبة توزيع التوطين العام علي 200" , store=True , readonly=False )
-    # pub_loc903_perc_103 = fields.Float ( string="نسبة توزيع التوطين العام علي 103" , store=True , readonly=False )
+    # ===== التوطين العام =====
+    pub_loc903_perc_101 = fields.Float ( string="نسبة توزيع التوطين العام علي 101" , store=True , readonly=False )
+    pub_loc903_perc_104 = fields.Float ( string="نسبة توزيع التوطين العام علي 104" , store=True , readonly=False )
+    pub_loc903_perc_110 = fields.Float ( string="نسبة توزيع التوطين العام علي 110" , store=True , readonly=False )
+    pub_loc903_perc_111 = fields.Float ( string="نسبة توزيع التوطين العام علي 111" , store=True , readonly=False )
+    pub_loc903_perc_200 = fields.Float ( string="نسبة توزيع التوطين العام علي 200" , store=True , readonly=False )
+    pub_loc903_perc_103 = fields.Float ( string="نسبة توزيع التوطين العام علي 103" , store=True , readonly=False )
 
-    # # 🔥 Constrain واحد فقط لكل المجموعات
-    # @api.constrains (
-    #     'finance923_perc_101' , 'finance923_perc_104' , 'finance923_perc_110' ,
-    #     'finance923_perc_111' , 'finance923_perc_200' , 'finance923_perc_103' ,
-    #     'quality901_perc_101' , 'quality901_perc_104' , 'quality901_perc_110' ,
-    #     'quality901_perc_111' , 'quality901_perc_200' , 'quality901_perc_103' ,
-    #     'oper_supp902_perc_101' , 'oper_supp902_perc_104' , 'oper_supp902_perc_110' ,
-    #     'oper_supp902_perc_111' , 'oper_supp902_perc_200' , 'oper_supp902_perc_103' ,
-    #     'sale_gen911_perc_101' , 'sale_gen911_perc_104' , 'sale_gen911_perc_110' ,
-    #     'sale_gen911_perc_111' , 'sale_gen911_perc_200' , 'sale_gen911_perc_103' ,
-    #     'office_supp_perc_101' , 'office_supp_perc_104' , 'office_supp_perc_110' ,
-    #     'office_supp_perc_111' , 'office_supp_perc_200' , 'office_supp_perc_103' ,
-    #     'manage_921_perc_101' , 'manage_921_perc_104' , 'manage_921_perc_110' ,
-    #     'manage_921_perc_111' , 'manage_921_perc_200' , 'manage_921_perc_103' ,
-    #     'it_922_perc_101' , 'it_922_perc_104' , 'it_922_perc_110' ,
-    #     'it_922_perc_111' , 'it_922_perc_200' , 'it_922_perc_103' ,
-    #     'build_facil950_perc_101' , 'build_facil950_perc_104' , 'build_facil950_perc_110' ,
-    #     'build_facil950_perc_111' , 'build_facil950_perc_200' , 'build_facil950_perc_103' ,
-    #     'coff_clean_ryd_perc_101' , 'coff_clean_ryd_perc_104' , 'coff_clean_ryd_perc_110' ,
-    #     'coff_clean_ryd_perc_111' , 'coff_clean_ryd_perc_200' , 'coff_clean_ryd_perc_103' ,
-    #     'pub_loc903_perc_101' , 'pub_loc903_perc_104' , 'pub_loc903_perc_110' ,
-    #     'pub_loc903_perc_111' , 'pub_loc903_perc_200' , 'pub_loc903_perc_103'
-    # )
-    # def _check_all_percentages(self) :
-    #     groups = {
-    #         "المالية" : "finance923" ,
-    #         "الجودة" : "quality901" ,
-    #         "الدعم التشغيلي" : "oper_supp902" ,
-    #         "التسويق عام" : "sale_gen911" ,
-    #         "المستلزمات المكتبية" : "office_supp" ,
-    #         "الشئون الإدارية" : "manage_921" ,
-    #         "الدعم التقني" : "it_922" ,
-    #         "المباني والمرافق" : "build_facil950" ,
-    #         "القهوة والضيافة والنضافة (الرياض)" : "coff_clean_ryd" ,
-    #         "التوطين العام" : "pub_loc903" ,
-    #     }
+    # 🔥 Constrain واحد فقط لكل المجموعات
+    @api.constrains (
+        'finance923_perc_101' , 'finance923_perc_104' , 'finance923_perc_110' ,
+        'finance923_perc_111' , 'finance923_perc_200' , 'finance923_perc_103' ,
+        'quality901_perc_101' , 'quality901_perc_104' , 'quality901_perc_110' ,
+        'quality901_perc_111' , 'quality901_perc_200' , 'quality901_perc_103' ,
+        'oper_supp902_perc_101' , 'oper_supp902_perc_104' , 'oper_supp902_perc_110' ,
+        'oper_supp902_perc_111' , 'oper_supp902_perc_200' , 'oper_supp902_perc_103' ,
+        'sale_gen911_perc_101' , 'sale_gen911_perc_104' , 'sale_gen911_perc_110' ,
+        'sale_gen911_perc_111' , 'sale_gen911_perc_200' , 'sale_gen911_perc_103' ,
+        'office_supp_perc_101' , 'office_supp_perc_104' , 'office_supp_perc_110' ,
+        'office_supp_perc_111' , 'office_supp_perc_200' , 'office_supp_perc_103' ,
+        'manage_921_perc_101' , 'manage_921_perc_104' , 'manage_921_perc_110' ,
+        'manage_921_perc_111' , 'manage_921_perc_200' , 'manage_921_perc_103' ,
+        'it_922_perc_101' , 'it_922_perc_104' , 'it_922_perc_110' ,
+        'it_922_perc_111' , 'it_922_perc_200' , 'it_922_perc_103' ,
+        'build_facil950_perc_101' , 'build_facil950_perc_104' , 'build_facil950_perc_110' ,
+        'build_facil950_perc_111' , 'build_facil950_perc_200' , 'build_facil950_perc_103' ,
+        'coff_clean_ryd_perc_101' , 'coff_clean_ryd_perc_104' , 'coff_clean_ryd_perc_110' ,
+        'coff_clean_ryd_perc_111' , 'coff_clean_ryd_perc_200' , 'coff_clean_ryd_perc_103' ,
+        'pub_loc903_perc_101' , 'pub_loc903_perc_104' , 'pub_loc903_perc_110' ,
+        'pub_loc903_perc_111' , 'pub_loc903_perc_200' , 'pub_loc903_perc_103'
+    )
+    def _check_all_percentages(self) :
+        groups = {
+            "المالية" : "finance923" ,
+            "الجودة" : "quality901" ,
+            "الدعم التشغيلي" : "oper_supp902" ,
+            "التسويق عام" : "sale_gen911" ,
+            "المستلزمات المكتبية" : "office_supp" ,
+            "الشئون الإدارية" : "manage_921" ,
+            "الدعم التقني" : "it_922" ,
+            "المباني والمرافق" : "build_facil950" ,
+            "القهوة والضيافة والنضافة (الرياض)" : "coff_clean_ryd" ,
+            "التوطين العام" : "pub_loc903" ,
+        }
 
-    #     codes = ['101' , '104' , '110' , '111' , '200' , '103']
+        codes = ['101' , '104' , '110' , '111' , '200' , '103']
 
-    #     for rec in self :
-    #         for label , prefix in groups.items () :
-    #             total = sum ( getattr ( rec , f"{prefix}_perc_{code}" ) or 0.0 for code in codes )
-    #             total = round ( total , 2 )
-    #             if total not in (0.0 , 100.0) :
-    #                 diff = total - 100
-    #                 diff_msg = _ ( "أكبر من 100 بنسبة %.2f%%" ) % diff if diff > 0 else _ (
-    #                     "أقل من 100 بنسبة %.2f%%" ) % (-diff)
-    #                 raise ValidationError ( _ (
-    #                     "خطأ في توزيع %s (%s)\n"
-    #                     "الإجمالي الحالي: %.2f%%\n"
-    #                     "(المسموح فقط: 0%% أو 100%%)"
-    #                 ) % (label , diff_msg , total) )
+        for rec in self :
+            for label , prefix in groups.items () :
+                total = sum ( getattr ( rec , f"{prefix}_perc_{code}" ) or 0.0 for code in codes )
+                total = round ( total , 2 )
+                if total not in (0.0 , 100.0) :
+                    diff = total - 100
+                    diff_msg = _ ( "أكبر من 100 بنسبة %.2f%%" ) % diff if diff > 0 else _ (
+                        "أقل من 100 بنسبة %.2f%%" ) % (-diff)
+                    raise ValidationError ( _ (
+                        "خطأ في توزيع %s (%s)\n"
+                        "الإجمالي الحالي: %.2f%%\n"
+                        "(المسموح فقط: 0%% أو 100%%)"
+                    ) % (label , diff_msg , total) )
 
 
 _logger = logging.getLogger ( __name__ )
