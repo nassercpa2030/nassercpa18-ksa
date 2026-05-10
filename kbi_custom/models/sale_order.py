@@ -372,25 +372,42 @@ class SaleOrder ( models.Model ) :
     #   if rec.x_studio_contract_service :
     #      if x_studio_contract_service.id in []
 
-    def action_get_crm_lead(self):
-        self.ensure_one() # for insuring that it is one lead
-         lead = self.opportunity_id
+    #def action_get_crm_lead(self):
+       # self.ensure_one() # for insuring that it is one lead
+        # lead = self.opportunity_id
 
         #leads = self.env['crm.lead'].search([
             #('partner_id', '=', self.partner_id.id)
-        ])# for getting lead of saleorder
+        #])# for getting lead of saleorder
         # then
 
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'CRM Lead ',
-            'res_model': 'crm.lead',
-            'view_mode':'form',
+        #return {
+         #   'type': 'ir.actions.act_window',
+          #  'name': 'CRM Lead ',
+           # 'res_model': 'crm.lead',
+            #'view_mode':'form',
             #'list,form',
-            'domain': lead.id,
+            #'domain': lead.id,
             #[('id', 'in', leads.ids)],
-            'target': 'new',
+            #'target': 'new',
+        #}
+    def action_get_crm_lead(self) :
+        self.ensure_one ()
+
+        lead = self.opportunity_id
+
+        if not lead :
+            return False
+
+        return {
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'CRM Lead' ,
+            'res_model' : 'crm.lead' ,
+            'view_mode' : 'form' ,
+            'res_id' : lead.id ,
+            'target' : 'new' ,
         }
+    
 
     @api.depends ( 'review_manager_id' )
     def _compute_ass_visible(self) :
