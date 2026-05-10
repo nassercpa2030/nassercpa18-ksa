@@ -374,9 +374,10 @@ class SaleOrder ( models.Model ) :
 
     def action_get_crm_lead(self):
         self.ensure_one() # for insuring that it is one lead
+         lead = self.opportunity_id
 
-        leads = self.env['crm.lead'].search([
-            ('partner_id', '=', self.partner_id.id)
+        #leads = self.env['crm.lead'].search([
+            #('partner_id', '=', self.partner_id.id)
         ])# for getting lead of saleorder
         # then
 
@@ -384,8 +385,10 @@ class SaleOrder ( models.Model ) :
             'type': 'ir.actions.act_window',
             'name': 'CRM Lead ',
             'res_model': 'crm.lead',
-            'view_mode': 'list,form',
-            'domain': [('id', 'in', leads.ids)],
+            'view_mode':'form',
+            #'list,form',
+            'domain': lead.id,
+            #[('id', 'in', leads.ids)],
             'target': 'new',
         }
 
