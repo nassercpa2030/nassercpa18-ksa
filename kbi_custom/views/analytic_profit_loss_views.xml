@@ -15,14 +15,15 @@
                                 <field name="company_id" groups="base.group_multi_company"/>
                             </group>
                             <group>
+                                <field name="allowed_analytic_plan_ids" invisible="1"/>
                                 <field name="allowed_analytic_account_ids" invisible="1"/>
-                                <field name="analytic_account_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                <field name="analytic_account_ids" invisible="1"/>
+                                <field name="analytic_plan_ids" widget="many2many_tags" options="{'no_create': True}"/>
                                 <field name="show_details"/>
                             </group>
                         </group>
                         <div class="alert alert-info" role="alert">
-                            This report groups by Analytic Plan, then Analytic Account, then Financial Account.
-                            Amounts are calculated from analytic distribution percentages, not from the full journal item balance.
+                            يتم اختيار التقرير على مستوى الخطة التحليلية كاملة. يقوم التقرير بالتجميع حسب الخطة التحليلية ثم الحساب التحليلي ثم الحساب المالي، ويتم احتساب القيم حسب نسب التوزيع التحليلي وليس كامل قيمة سطر القيد.
                         </div>
                     </sheet>
                     <footer>

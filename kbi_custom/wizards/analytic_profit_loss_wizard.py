@@ -16,6 +16,24 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         required=True,
         default=lambda self: self.env.company,
     )
+
+    allowed_analytic_plan_ids = fields.Many2many(
+        'account.analytic.plan',
+        string='Allowed Analytic Plans',
+        compute='_compute_allowed_analytic_plan_ids',
+    )
+    analytic_plan_ids = fields.Many2many(
+        'account.analytic.plan',
+        'kbi_analytic_pl_wizard_plan_rel',
+        'wizard_id',
+        'analytic_plan_id',
+        string='Analytic Plans',
+        required=True,
+        domain="[('id', 'in', allowed_analytic_plan_ids)]",
+        help='اختر الخطة/الخطط التحليلية كاملة. سيقوم التقرير بإظهار كل الحسابات التحليلية الواقعة تحت الخطط المختارة حسب صلاحيات المستخدم.',
+    )
+
+    # Kept for internal compatibility and details. The user selection is now by plan, not by analytic account.
     allowed_analytic_account_ids = fields.Many2many(
         'account.analytic.account',
         string='Allowed Analytic Accounts',
@@ -27,9 +45,10 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         'wizard_id',
         'analytic_account_id',
         string='Analytic Accounts',
-        required=True,
-        domain="[('id', 'in', allowed_analytic_account_ids)]",
+        compute='_compute_effective_analytic_account_ids',
+        readonly=True,
     )
+
     show_details = fields.Boolean(string='Show Journal Item Details', default=False)
     line_ids = fields.One2many(
         'kbi.analytic.profit.loss.line',
@@ -38,17 +57,52 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         readonly=True,
     )
 
+    def _is_analytic_report_admin(self):
+        """Admins can select multiple full analytic plans and see all their accounts."""
+        self.ensure_one()
+        return self.env.user.has_group('base.group_system')
+
     @api.depends_context('uid')
-    def _compute_allowed_analytic_account_ids(self):
+    def _compute_allowed_analytic_plan_ids(self):
+        Plan = self.env['account.analytic.plan']
         for wizard in self:
-            wizard.allowed_analytic_account_ids = self.env.user.analytic_account_ids
+            if wizard._is_analytic_report_admin():
+                wizard.allowed_analytic_plan_ids = Plan.search([])
+            else:
+                wizard.allowed_analytic_plan_ids = self.env.user.analytic_account_ids.mapped('plan_id')
+
+    @api.depends_context('uid')
+    @api.depends('analytic_plan_ids')
+    def _compute_allowed_analytic_account_ids(self):
+        Analytic = self.env['account.analytic.account']
+        for wizard in self:
+            if wizard._is_analytic_report_admin():
+                if wizard.analytic_plan_ids:
+                    wizard.allowed_analytic_account_ids = Analytic.search([('plan_id', 'in', wizard.analytic_plan_ids.ids)])
+                else:
+                    wizard.allowed_analytic_account_ids = Analytic.search([])
+            else:
+                user_accounts = self.env.user.analytic_account_ids
+                if wizard.analytic_plan_ids:
+                    user_accounts = user_accounts.filtered(lambda account: account.plan_id in wizard.analytic_plan_ids)
+                wizard.allowed_analytic_account_ids = user_accounts
+
+    @api.depends('allowed_analytic_account_ids')
+    def _compute_effective_analytic_account_ids(self):
+        for wizard in self:
+            wizard.analytic_account_ids = wizard.allowed_analytic_account_ids
 
     @api.model
     def default_get(self, fields_list):
         values = super().default_get(fields_list)
-        user_accounts = self.env.user.analytic_account_ids
-        if 'analytic_account_ids' in fields_list and user_accounts:
-            values['analytic_account_ids'] = [(6, 0, user_accounts.ids)]
+        Plan = self.env['account.analytic.plan']
+        if self.env.user.has_group('base.group_system'):
+            allowed_plans = Plan.search([])
+        else:
+            allowed_plans = self.env.user.analytic_account_ids.mapped('plan_id')
+
+        if 'analytic_plan_ids' in fields_list and allowed_plans:
+            values['analytic_plan_ids'] = [(6, 0, allowed_plans.ids)]
         return values
 
     @api.constrains('date_from', 'date_to')
@@ -57,25 +111,52 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
             if wizard.date_from and wizard.date_to and wizard.date_from > wizard.date_to:
                 raise UserError(_('Date From must be before or equal to Date To.'))
 
-    @api.constrains('analytic_account_ids')
-    def _check_analytic_access(self):
+    @api.constrains('analytic_plan_ids')
+    def _check_analytic_plan_access(self):
         for wizard in self:
-            allowed_ids = set(self.env.user.analytic_account_ids.ids)
-            selected_ids = set(wizard.analytic_account_ids.ids)
-            if selected_ids and not selected_ids.issubset(allowed_ids):
-                raise UserError(_('You selected analytic accounts that are not assigned to your user.'))
+            selected_ids = set(wizard.analytic_plan_ids.ids)
+            if not selected_ids:
+                continue
+            if wizard._is_analytic_report_admin():
+                continue
+            allowed_ids = set(wizard.allowed_analytic_plan_ids.ids)
+            if not selected_ids.issubset(allowed_ids):
+                raise UserError(_('You selected analytic plans that are not assigned to your user.'))
+
+    def _get_effective_analytic_accounts(self):
+        """
+        Returns the accounts that the report is allowed to read.
+
+        - Admin: all analytic accounts under the selected analytic plans.
+        - Normal user: only the user's analytic accounts under the selected analytic plans.
+        """
+        self.ensure_one()
+        Analytic = self.env['account.analytic.account']
+        if not self.analytic_plan_ids:
+            return Analytic.browse()
+
+        if self._is_analytic_report_admin():
+            return Analytic.search([('plan_id', 'in', self.analytic_plan_ids.ids)])
+
+        return self.env.user.analytic_account_ids.filtered(lambda account: account.plan_id in self.analytic_plan_ids)
+
+    def _validate_before_report(self):
+        self.ensure_one()
+
+        if not self.analytic_plan_ids:
+            raise UserError(_('Please select at least one analytic plan.'))
+
+        self._check_analytic_plan_access()
+
+        effective_accounts = self._get_effective_analytic_accounts()
+        if not effective_accounts:
+            raise UserError(_('No analytic accounts were found under the selected analytic plans for your user.'))
+
+        return effective_accounts
 
     def action_generate_report(self):
         self.ensure_one()
-
-        if not self.env.user.analytic_account_ids:
-            raise UserError(_('No analytic accounts are assigned to your user. Please contact the system administrator.'))
-
-        if not self.analytic_account_ids:
-            raise UserError(_('Please select at least one analytic account.'))
-
-        self._check_analytic_access()
-
+        self._validate_before_report()
         self.env['kbi.analytic.profit.loss.service'].generate_lines(self)
 
         return {
@@ -95,29 +176,12 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
 
     def action_preview_qweb_report(self):
         self.ensure_one()
-
-        if not self.env.user.analytic_account_ids:
-            raise UserError(_('No analytic accounts are assigned to your user. Please contact the system administrator.'))
-
-        if not self.analytic_account_ids:
-            raise UserError(_('Please select at least one analytic account.'))
-
-        self._check_analytic_access()
+        self._validate_before_report()
         self.env['kbi.analytic.profit.loss.service'].generate_lines(self)
-
         return self.env.ref('kbi_custom.action_report_kbi_analytic_profit_loss_html').report_action(self)
 
     def action_print_pdf_report(self):
         self.ensure_one()
-
-        if not self.env.user.analytic_account_ids:
-            raise UserError(_('No analytic accounts are assigned to your user. Please contact the system administrator.'))
-
-        if not self.analytic_account_ids:
-            raise UserError(_('Please select at least one analytic account.'))
-
-        self._check_analytic_access()
+        self._validate_before_report()
         self.env['kbi.analytic.profit.loss.service'].generate_lines(self)
-
         return self.env.ref('kbi_custom.action_report_kbi_analytic_profit_loss_pdf').report_action(self)
-

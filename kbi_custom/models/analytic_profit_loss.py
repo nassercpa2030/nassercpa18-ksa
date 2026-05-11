@@ -187,7 +187,7 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
 
         Line.search([('wizard_id', '=', wizard.id)]).unlink()
 
-        allowed_accounts = wizard.analytic_account_ids
+        allowed_accounts = wizard._get_effective_analytic_accounts()
         allowed_analytic_ids = set(allowed_accounts.ids)
         if not allowed_analytic_ids:
             return Line.browse()
