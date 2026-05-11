@@ -95,7 +95,7 @@
                                     </tbody>
                                 </table>
 
-<<<<<<< HEAD
+
                                 <table class="kbi-table">
                                     <thead>
                                         <tr>
@@ -105,7 +105,7 @@
                                             <th style="width: 13%;">الإيرادات</th>
                                             <th style="width: 13%;">المصروفات</th>
                                             <th style="width: 13%;">الصافي</th>
-=======
+
                                     <t t-foreach="doc_data['lines']" t-as="line">
                                         <tr t-att-class="'kbi-level-%s' % line.level">
                                             <td>
@@ -139,7 +139,7 @@
                                             <td class="kbi-amount"><span t-esc="'{:,.2f}'.format(line.income_amount or 0.0)"/></td>
                                             <td class="kbi-amount"><span t-esc="'{:,.2f}'.format(line.expense_amount or 0.0)"/></td>
                                             <td class="kbi-amount"><span t-esc="'{:,.2f}'.format(line.net_amount or 0.0)"/></td>
->>>>>>> ddabb6556d0f97f22bb68dc73aa10cd96b74b6ed
+
                                         </tr>
                                     </thead>
                                     <tbody>
