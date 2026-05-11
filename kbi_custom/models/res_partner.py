@@ -330,6 +330,7 @@ class HrAttachement ( models.Model ) :
 class ResPartner ( models.Model ) :
     _inherit = 'res.partner'
     city_id = fields.Many2one ( comodel_name='res.country.state.city' , string='City' )
+    key_information = fields.Text()
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , related="employee_ids.analytic_account_id" ,
                                             string='الحساب التحليلي' , readonly=True ,
                                             placeholder="Enter Analytic Account for employee" )
