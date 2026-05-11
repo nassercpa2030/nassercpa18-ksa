@@ -334,13 +334,17 @@ class ResPartner ( models.Model ) :
                                             string='الحساب التحليلي' , readonly=True ,
                                             placeholder="Enter Analytic Account for employee" )
     building_no = fields.Char ( string="رقم المبنى" , size=4 )
-    #key_information = fields.Boolean ( string="المعلومات الرئيسية" , default=False ,
-                                       #help="عند تفعيل هذا الحقل يتم عرض المعلومات الرئيسية الخاصة بجهة الاتصال الحالية." )
-    #additional_information = fields.Boolean ( string="المعلومات الفرعية" , default=True ,
-                                              #help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية." )
+    key_information = fields.Boolean ( string="المعلومات الرئيسية" , default=False ,
+                                       help="عند تفعيل هذا الحقل يتم عرض المعلومات الرئيسية الخاصة بجهة الاتصال الحالية." )
+    call_information = fields.Boolean ( string="معلومات الإتصال " , default=False ,
+                                       help="عند تفعيل هذا الحقل يتم عرض معلومات الإتصال الخاصة بجهة الاتصال الحالية." )
+    history_information = fields.Boolean ( string=" عقود  العميل " , default=False ,
+                                       help="عند تفعيل هذا الحقل يتم عرض معلومات العقود الخاصة بجهة الاتصال الحالية." )
+    additional_information = fields.Boolean ( string="المعلومات الفرعية" , default=True ,
+                                              help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية." )
 
     zip = fields.Char ( string="الرمز البريدي" , size=5 , readonly=False )
-    name=fields.Char("أسم المنشأة ",store=True,readonly=False,placeholder="برجاء وضع  اسم  المنشأة أو جهة الإتصال")
+    district2=fields.Char(string="الحي",size=10,readonly=False)
     identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
     additional_no = fields.Char ( string="الرقم الإضافي" , size=4 , readonly=False )
 
@@ -349,7 +353,8 @@ class ResPartner ( models.Model ) :
         compute="_compute_national_address" , readonly=False )
 
     nationality = fields.Char ( "Nationality" )
-    email = fields.Char ( "Email" , required=True , store=True )
+    email = fields.Char ( "Main Email" , required=True , store=True )
+    another_email = fields.Char ( "Another Email"  , store=True )
     real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
     nationality = fields.Char ( "Nationality" )
@@ -358,11 +363,14 @@ class ResPartner ( models.Model ) :
     is_broker = fields.Boolean ( string='Broker' )
     ref = fields.Char ( string=_ ( "1 Audit No" ) , store=True , index=True )
     name_english = fields.Char ( string="English name" , readonly=False , store=True )
-    partner_vat_placeholder = fields.Char ( string="Vat Number" , readonly=False )
+    partner_vat_placeholder = fields.Char ( string="Vat Number", related="vat", readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
     identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
-    manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' , compute="action_search_manager" ,
+    manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' ,
                                      store=True , readonly=False )
+    financial_manager_name = fields.Char ( string="Financial Manager" , store=True , readonly=False )
+    company_main_location = fields.Char ( string="المقر الرئيسي للشركة" , store=True , readonly=False )
+    last_auditor = fields.Char ( string="اسم المراجع  السابق" , store=True , readonly=False )
     manager_id = fields.Integer ( string="Manager Id" , store=True , readonly=False )
     # cr_number_sale = fields.Char ( related="sale_order_ids.cr_number_sale" , string="Commercial number" ,
     # readonly=False , store=True )
@@ -389,7 +397,10 @@ class ResPartner ( models.Model ) :
 
             if rec.street :
                 parts.append ( rec.street )
-
+                
+            if rec.district2 :
+                parts.append ( rec.district2 )
+                
             if rec.city :
                 parts.append ( rec.city )
 
