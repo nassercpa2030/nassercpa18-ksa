@@ -138,7 +138,8 @@
                                             <td><span t-field="line.move_id"/></td>
                                             <td class="kbi-amount">
                                                 <t t-if="line.percentage">
-                                                    <span t-esc="'%.2f%%' % line.percentage"/>
+                                                    <span t-esc="'{:.2f}%'.format(line.percentage or 0.0)"/>
+                                                    <!-- <span t-esc="'%.2f%%' % line.percentage"/> -->
                                                 </t>
                                             </td>
                                             <td class="kbi-amount"><span t-esc="'{:,.2f}'.format(line.income_amount or 0.0)"/></td>
