@@ -23,15 +23,20 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         compute='_compute_allowed_analytic_plan_ids',
     )
     analytic_plan_ids = fields.Many2many(
-        'account.analytic.plan',
-        'kbi_analytic_pl_wizard_plan_rel',
-        'wizard_id',
-        'analytic_plan_id',
-        string='Analytic Plans',
-        required=True,
-        domain="[('id', 'in', allowed_analytic_plan_ids)]",
-        help='اختر الخطة/الخطط التحليلية كاملة. سيقوم التقرير بإظهار كل الحسابات التحليلية الواقعة تحت الخطط المختارة حسب صلاحيات المستخدم.',
-    )
+    'account.analytic.plan',
+    string='Analytic Plans',
+    required=True,
+    readonly=False,
+    help='اختر الخطة/الخطط التحليلية كاملة. سيقوم التقرير بإظهار كل الحسابات التحليلية الواقعة تحت الخطط المختارة حسب صلاحيات المستخدم.')
+    # analytic_plan_ids = fields.Many2many(
+    #     'account.analytic.plan',
+    #     'kbi_analytic_pl_wizard_plan_rel',
+    #     'wizard_id',
+    #     'analytic_plan_id',
+    #     string='Analytic Plans',
+    #     required=True,
+    #     domain="[('id', 'in', allowed_analytic_plan_ids)]",
+
 
     # Kept for internal compatibility and details. The user selection is now by plan, not by analytic account.
     allowed_analytic_account_ids = fields.Many2many(
