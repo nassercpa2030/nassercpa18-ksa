@@ -27,8 +27,8 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         'wizard_id',
         'analytic_account_id',
         string='Analytic Accounts',
-        required=True,
-        domain="[('id', 'in', allowed_analytic_account_ids)]",
+        #required=True,
+        #domain="[('id', 'in', allowed_analytic_account_ids)]",
     )
     show_details = fields.Boolean(string='Show Journal Item Details', default=False)
     line_ids = fields.One2many(
