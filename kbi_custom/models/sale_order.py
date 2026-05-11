@@ -23,6 +23,7 @@ class SaleOrder ( models.Model ) :
     contract_date = fields.Date ( string='Contract Date' , readonly=False , required=True )
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
     old_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , stored=True )
+    customer_state = fields.Boolean ( string="عميــل غير مؤكـــد" , stored=True )
     order_lines_count = fields.Integer ( string='Order Lines' , compute='_compute_order_lines_count' , store=True )
     customer_phone_number = fields.Char ( string='تليفون العميل' , store=True )
     journal_entry_count = fields.Char ( string='عدد القيود' , store=True )
@@ -89,10 +90,13 @@ class SaleOrder ( models.Model ) :
     payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
     paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count" , searchable=True )
     unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count" , searchable=True )
+    unpaid_total_untaxed = fields.Float ( string="Unpaid Total Untaxed" , compute="_compute_payment_count" ,
+                                          searchable=True )
     paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" , sorted=True )
-    finance_signiture = fields.Boolean ( string=' توقيع المالية للختم '  , readonly=False, store=True  )
+    finance_signiture = fields.Boolean ( string=' توقيع المالية للختم ' , readonly=False , store=True )
     archive_signiture = fields.Boolean ( string='توقيع الأرشيف للختم ' , default=False , readonly=False , index=True )
-    manager_signiture = fields.Boolean ( string='توقيع مدير المجموعة للختم ' , default=False , readonly=False , index=True )
+    manager_signiture = fields.Boolean ( string='توقيع مدير المجموعة للختم ' , default=False , readonly=False ,
+                                         index=True )
     finance_assign = fields.Binary ( string=' ملف توقيع المالية  ' , default=False ,
                                      compute="_compute_finance_archive_signature" , store=False , readonly=False )
     archive_assign = fields.Binary ( string=' ملف توقيع الأرشيف ' , default=False ,
@@ -114,7 +118,8 @@ class SaleOrder ( models.Model ) :
     project_budget = fields.Float ( string='Project Budget' , copy=False )
     project_name = fields.Char ( string='Auto Project Name' , compute="get_project_name" , readonly=False , store=True )
     auto_contract_name = fields.Boolean ( string="Auto Name" , readonly=False , default=True )
-    product_public_name = fields.Char ( string="Product Public Name" , compute="get_pr_nam_fr_service" , readonly=True )
+    product_public_name = fields.Char ( string="Product Public Name" , compute="get_pr_nam_fr_service" , store=True ,
+                                        readonly=False )
     project_code = fields.Char ( string='Project Code' , related="auto_code" )
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
@@ -324,28 +329,85 @@ class SaleOrder ( models.Model ) :
     @api.depends ( "x_studio_contract_service" )
     def get_pr_nam_fr_service(self) :
         for rec in self :
-            if rec.x_studio_contract_service :
-                rec.product_public_name = rec.x_studio_contract_service.public_name
-            else :
-                rec.product_public_name = False
+            product = rec.x_studio_contract_service
+            rec.product_public_name = (
+                product.product_tmpl_id.public_name
+                if product and product.product_tmpl_id
+                else False
+            )
+            # if rec.x_studio_contract_service :
+            # rec.product_public_name = rec.x_studio_contract_service.public_name
+            # else :
+            # rec.product_public_name = False
 
-    @api.onchange ( "product_public_name" , "account_year" , "auto_contract_name" )
+    @api.depends ( 'product_public_name' , 'account_year' , 'auto_contract_name' )
     def get_project_name(self) :
         for rec in self :
+            parts = []
+
+            if rec.product_public_name :
+                parts.append ( rec.product_public_name )
+
+            if rec.account_year :
+                parts.append ( str ( rec.account_year ) )  # مهم لو رقم
+
+            rec.project_name = "- ".join ( parts )
+
+
+    #@api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
+    #def get_project_name(self) :
+        #for rec in self :
             # if not rec.project_name and rec.auto_contract_name:
             # if rec.product_public_name and rec.account_year:
             # rec.project_name = f"{rec.product_public_name} {rec.account_year}"
-            if not rec.project_name and rec.auto_contract_name :
-                if not rec.product_public_name or not rec.account_year :
-                    rec.project_name = ""
-                else :
-                    rec.project_name = f"{rec.product_public_name} {rec.account_year}"
+            #if rec.auto_contract_name :
+                #if not rec.product_public_name or not rec.account_year :
+                    #rec.project_name = ""
+                #else :
+                    #rec.project_name = f"{rec.product_public_name} {rec.account_year}"
 
     # @api.depends("x_studio_contract_service")
     # def get_audit_date (self):
     #   for rec in self :
     #   if rec.x_studio_contract_service :
     #      if x_studio_contract_service.id in []
+
+    #def action_get_crm_lead(self):
+       # self.ensure_one() # for insuring that it is one lead
+        # lead = self.opportunity_id
+
+        #leads = self.env['crm.lead'].search([
+            #('partner_id', '=', self.partner_id.id)
+        #])# for getting lead of saleorder
+        # then
+
+        #return {
+         #   'type': 'ir.actions.act_window',
+          #  'name': 'CRM Lead ',
+           # 'res_model': 'crm.lead',
+            #'view_mode':'form',
+            #'list,form',
+            #'domain': lead.id,
+            #[('id', 'in', leads.ids)],
+            #'target': 'new',
+        #}
+    def action_get_crm_lead(self) :
+        self.ensure_one ()
+
+        lead = self.opportunity_id
+
+        if not lead :
+            return False
+
+        return {
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'CRM Lead' ,
+            'res_model' : 'crm.lead' ,
+            'view_mode' : 'form' ,
+            'res_id' : lead.id ,
+            'target' : 'new' ,
+        }
+    
 
     @api.depends ( 'review_manager_id' )
     def _compute_ass_visible(self) :
@@ -522,7 +584,7 @@ class SaleOrder ( models.Model ) :
 
     uuid = fields.Char ( string='UUID' , readonly=True )
     opportunity_id = fields.Many2one ( 'crm.lead' , string='Opportunity' )
-    project_name = fields.Char ( string='Project Name' )
+    #project_name = fields.Char ( string='Project Name' )
     partner_id = fields.Many2one ( 'res.partner' , string='Partner' )
     user_id = fields.Many2one ( 'res.users' , string='Responsible' )
 
@@ -770,9 +832,10 @@ class SaleOrder ( models.Model ) :
             rec.paid_percent = (rec.paid_total / (rec.amount_total or 1)) * 100
             rec.paid_percentage_refrence = rec.paid_percent
             rec.unpaid_total = rec.amount_total - rec.paid_total
+            rec.unpaid_total_untaxed = round ( rec.unpaid_total / 1.15 , 2 )
             rec.amount_due = rec.amount_total - rec.paid_total
             rec.paid_total_refrence = paid_total
-            #rec.finance_signiture = ( rec.paid_percent >= 96 and rec.state not in ['draft' , 'sent' , 'cancel'])
+            # rec.finance_signiture = ( rec.paid_percent >= 96 and rec.state not in ['draft' , 'sent' , 'cancel'])
             # تحديث convert_orders بناءً على paid_total
             previous_convert = rec.convert_orders
             rec.convert_orders = rec.paid_total > 0
@@ -781,16 +844,14 @@ class SaleOrder ( models.Model ) :
             if rec.convert_orders and not previous_convert :
                 rec.action_convert_orders ()  # استدعاء الدالة مباشرة
 
-                
-    #@api.onchange('paid_percent')
-    #def change_finance_signiture(self):
-         #for rec in self :
-             #if  rec.paid_percent >= 99 and rec.state not in ['draft' , 'sent' , 'cancel']:
-                 #rec.finance_signiture = True
-             #else :
-                 #rec.finance_signiture = False
-                 
-    
+    # @api.onchange('paid_percent')
+    # def change_finance_signiture(self):
+    # for rec in self :
+    # if  rec.paid_percent >= 99 and rec.state not in ['draft' , 'sent' , 'cancel']:
+    # rec.finance_signiture = True
+    # else :
+    # rec.finance_signiture = False
+
     def action_convert_orders(self) :
         """
         دالة لتحويل الأوردرات إلى عقود وإنشاء المشاريع المرتبطة

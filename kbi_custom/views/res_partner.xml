@@ -1,5 +1,31 @@
 <odoo>
     <data>
+        <!--record model="ir.ui.view" id="kbi_custom.view_res_partner_form_inherit_v2">
+    <field name="name">kbi_custom.view.res.partner.form.inherit.v2</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="arch" type="xml">
+
+  
+
+        <xpath expr="//field[@name='mobile']" position="before">
+           
+                 <field name="key_information"
+                   widget="boolean_toggle"
+                   style="font-weight:bold; background-color:#d4f8d4;
+                          display:inline-block; width:fit-content;
+                          padding:2px 8px; border-radius:6px;
+                          font-size:14px;"/>
+                <field name="fax_number"
+                       string=" فون أرضي"
+                       placeholder="Mobile number 2"
+                       invisible="not key_information"
+                       style="font-weight:bold; font-size:14px;"/>
+           
+        </xpath>
+
+    </field>
+</record-->
 
         <record model="ir.ui.view" id="kbi_custom.view_res_partner_form_inherit">
             <field name="name">kbi_custom.view.res.partner.form.inherit</field>
@@ -9,11 +35,15 @@
                 <!--xpath expr="//field[@name='category_id']" position="after">
                      
                 </xpath-->
-                <xpath expr="//field[@name='email']" position="before">
-                  <group>  <field name="fax_number" style="font-weight:bold; font-size:14px;" string="mobile2" placeholder="Mobile number 2"/></group>
+                 <!--xpath expr="//field[@name='function']" position="after">
+                  <field name="key_information" style="font-weight:bold  background-color: #d4f8d4; display: inline-block; width: fit-content;padding: 2px 8px;border-radius: 6px; font-size:14px;" widget="boolean_toggle" />
                            
-                </xpath>
-                <xpath expr="//field[@name='partner_vat_placeholder']" position="after">
+                </xpath-->
+                <!--xpath expr="//field[@name='email']" position="before">
+                  <group>  <field name="fax_number" style="font-weight:bold; font-size:14px;" string="mobile2" placeholder="Mobile number 2" invisible="not key_information"/></group>
+                           
+                </xpath-->
+                <xpath expr="//field[@name='function']" position="after">
                    
                             <field name='nationality' modifiers="{'invisible': [('is_broker', '=', True)]}"/>
                             <field name="is_broker"/>
@@ -44,15 +74,14 @@
         <record model="ir.ui.view" id="kbi_custom.view_res_partner_address_form_inherit">
             <field name="name">kbi_custom.view.res.partner.form.inherit</field>
             <field name="model">res.partner</field>
-            <field name="inherit_id" ref="l10n_sa_edi.sa_partner_address_form"/>
+            <field name="inherit_id" ref="l10n_sa_edi.sa_partner_address_form" />
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='city']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='city']" position="before">
-                    <field name="state_id"  />
-                    <field name="city_id" placeholder="City" class="o_address_city"
-                           modifiers="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+                    <field name="state_id"  modifiers="{'invisible': [('key_information', '=', False)]}" />
+                   <field name="city_id" placeholder="City" class="o_address_city" modifiers="{ 'readonly': [('type', '=', 'contact'), ('parent_id', '!=', False)], 'invisible': [('key_information', '=', False)] }"/>
                 </xpath>
             </field>
         </record>

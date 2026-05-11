@@ -192,6 +192,7 @@ class AccountMove ( models.Model ) :
                 # 1️⃣ استدعاء دالة الإقفال من Sale Order
                 if hasattr ( sale_order , 'action_close_journal_entries' ) :
                     sale_order.action_close_journal_entries ()
+                    sale_order.finance_signiture= True
 
                 # 2️⃣ إنشاء Wizard مع context الصحيح (زي الزرار)
                 wizard = self.env['close.entry.wizard'].with_context (
@@ -205,6 +206,7 @@ class AccountMove ( models.Model ) :
 
                 # 3️⃣ تنفيذ نفس زر Close Entry
                 wizard.close_entry ()
+                
                 if sale_order.project_ids :
                     project = sale_order.project_ids[0]  # مشروع واحد فقط
                     # if project.stage_id.id != 24:
@@ -239,6 +241,20 @@ class AccountMove ( models.Model ) :
 
     ##########end post function ##############
 
+    ## create function for creating new customer invoice####
+    def action_create_new_invoice(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'New Invoice',
+            'res_model': 'account.move',
+            'view_mode': 'form',
+            'context': {
+                'default_move_type': 'out_invoice',
+            },
+            'target': 'current',
+        }
+        
+    ########
     @api.depends ( 'partner_id' )
     def compute_vendor_attachements(self) :
         for rec in self :
