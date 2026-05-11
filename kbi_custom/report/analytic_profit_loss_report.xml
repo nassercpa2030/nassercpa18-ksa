@@ -302,7 +302,7 @@
                                                     <span t-esc="'{:,.2f}'.format(line.expense_amount or 0.0)"/>
                                                 </td>
 
-                                                <td t-att-class="'kbi-amount %s' % ('kbi-negative' if (line.net_amount or 0.0) < 0 else '')">
+                                                <td t-att-class="'kbi-amount %s' % ('kbi-negative' if (line.net_amount or 0.0) &lt; 0 else '')">
                                                     <span t-esc="'{:,.2f}'.format(line.net_amount or 0.0)"/>
                                                 </td>
 
