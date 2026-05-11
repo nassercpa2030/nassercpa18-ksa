@@ -17,8 +17,8 @@
                             <group>
                                 <field name="allowed_analytic_plan_ids" invisible="1"/>
                                 <field name="allowed_analytic_account_ids" invisible="1"/>
-                                <field name="analytic_account_ids" invisible="1"/>
-                                <field name="analytic_plan_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                <!-- <field name="analytic_account_ids" invisible="1"/>
+                                <field name="analytic_plan_ids" widget="many2many_tags" options="{'no_create': True}"/> -->
                                 <field name="show_details"/>
                             </group>
                         </group>
