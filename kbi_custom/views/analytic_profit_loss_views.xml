@@ -48,7 +48,7 @@
                     <field name="level" optional="hide"/>
                     <field name="line_type"/>
                     <field name="analytic_plan_id"/>
-                    <field name="analytic_account_id"/>
+                    <!-- <field name="analytic_account_id"/> -->
                     <field name="account_code"/>
                     <field name="account_name"/>
                     <field name="date" optional="show"/>
@@ -77,7 +77,7 @@
                             <group>
                                 <field name="line_type"/>
                                 <field name="analytic_plan_id"/>
-                                <field name="analytic_account_id"/>
+                                <!-- <field name="analytic_account_id"/> -->
                                 <field name="account_id"/>
                                 <field name="move_id"/>
                                 <field name="move_line_id"/>
@@ -108,11 +108,11 @@
             <field name="arch" type="xml">
                 <search string="Analytic Profit and Loss">
                     <field name="analytic_plan_id"/>
-                    <field name="analytic_account_id"/>
+                    <!-- <field name="analytic_account_id"/> -->
                     <field name="account_id"/>
                     <field name="move_id"/>
                     <filter string="Plans" name="group_by_plan" context="{'group_by': 'analytic_plan_id'}"/>
-                    <filter string="Analytic Accounts" name="group_by_analytic" context="{'group_by': 'analytic_account_id'}"/>
+                    <!-- <filter string="Analytic Accounts" name="group_by_analytic" context="{'group_by': 'analytic_account_id'}"/> -->
                     <filter string="Financial Accounts" name="group_by_account" context="{'group_by': 'account_id'}"/>
                     <filter string="Line Type" name="group_by_line_type" context="{'group_by': 'line_type'}"/>
                 </search>
@@ -125,7 +125,7 @@
             <field name="arch" type="xml">
                 <pivot string="Analytic Profit and Loss" disable_linking="1">
                     <field name="analytic_plan_id" type="row"/>
-                    <field name="analytic_account_id" type="row"/>
+                    <!-- <field name="analytic_account_id" type="row"/> -->
                     <field name="account_id" type="row"/>
                     <field name="income_amount" type="measure"/>
                     <field name="expense_amount" type="measure"/>
