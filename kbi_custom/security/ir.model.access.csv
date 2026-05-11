@@ -13,3 +13,5 @@ access_kbi_custom_crm_stage_route_rule,kbi_custom.crm_stage_route_rule,model_crm
 access_kbi_custom_crm_stage_history,kbi_custom.crm_stage_history,model_crm_stage_history,base.group_user,1,1,1,1
 access_kbi_custom_product_report_template,kbi_custom.product_report_template,model_product_report_template,base.group_user,1,1,1,1
 access_kbi_custom_account_payment_sale,kbi_custom.account_payment_sale,model_account_payment_sale,base.group_user,1,1,1,1
+access_kbi_analytic_profit_loss_wizard,kbi.analytic.profit.loss.wizard,model_kbi_analytic_profit_loss_wizard,base.group_user,1,1,1,1
+access_kbi_analytic_profit_loss_line,kbi.analytic.profit.loss.line,model_kbi_analytic_profit_loss_line,base.group_user,1,0,0,0

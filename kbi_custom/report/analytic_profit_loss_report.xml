@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="action_report_kbi_analytic_profit_loss_html" model="ir.actions.report">
+            <field name="name">Analytic Profit and Loss Preview</field>
+            <field name="model">kbi.analytic.profit.loss.wizard</field>
+            <field name="report_type">qweb-html</field>
+            <field name="report_name">kbi_custom.report_kbi_analytic_profit_loss_document</field>
+            <field name="report_file">kbi_custom.report_kbi_analytic_profit_loss_document</field>
+            <field name="print_report_name">'Analytic Profit and Loss - %s' % (object.date_to or '')</field>
+        </record>
+
+        <record id="action_report_kbi_analytic_profit_loss_pdf" model="ir.actions.report">
+            <field name="name">Analytic Profit and Loss PDF</field>
+            <field name="model">kbi.analytic.profit.loss.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">kbi_custom.report_kbi_analytic_profit_loss_document</field>
+            <field name="report_file">kbi_custom.report_kbi_analytic_profit_loss_document</field>
+            <field name="print_report_name">'Analytic Profit and Loss - %s' % (object.date_to or '')</field>
+        </record>
+
+        <template id="report_kbi_analytic_profit_loss_document">
+            <t t-call="web.html_container">
+                <t t-foreach="docs_data" t-as="doc_data">
+                    <t t-set="doc" t-value="doc_data['wizard']"/>
+                    <t t-call="web.external_layout">
+                        <div class="page kbi-analytic-pl-page" dir="ltr">
+                            <style>
+                                .kbi-analytic-pl-page { font-size: 12px; }
+                                .kbi-title { text-align: center; margin-bottom: 14px; }
+                                .kbi-title h2 { margin: 0 0 6px 0; font-size: 22px; }
+                                .kbi-subtitle { color: #555; }
+                                .kbi-filters, .kbi-summary { width: 100%; margin: 10px 0 14px 0; border-collapse: collapse; }
+                                .kbi-filters td, .kbi-summary td, .kbi-summary th { border: 1px solid #ddd; padding: 6px; }
+                                .kbi-summary th { background: #f3f3f3; text-align: center; }
+                                .kbi-report-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                                .kbi-report-table th { background: #f3f3f3; border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold; }
+                                .kbi-report-table td { border: 1px solid #ddd; padding: 5px; vertical-align: top; }
+                                .kbi-amount { text-align: right; white-space: nowrap; }
+                                .kbi-level-1 td { background: #fff4cc; font-weight: bold; }
+                                .kbi-level-2 td { background: #fffaf0; font-weight: bold; }
+                                .kbi-level-3 td { background: #f7f7f7; }
+                                .kbi-level-4 td { color: #555; font-size: 11px; }
+                                .kbi-indent-1 { padding-left: 4px; }
+                                .kbi-indent-2 { padding-left: 24px; }
+                                .kbi-indent-3 { padding-left: 44px; }
+                                .kbi-indent-4 { padding-left: 64px; }
+                                .kbi-empty { text-align: center; color: #777; padding: 18px; }
+                            </style>
+
+                            <div class="kbi-title">
+                                <h2>Analytic Profit and Loss Report</h2>
+                                <div class="kbi-subtitle">تقرير الربح والخسارة التحليلي</div>
+                            </div>
+
+                            <table class="kbi-filters">
+                                <tr>
+                                    <td><strong>Company</strong></td>
+                                    <td><span t-field="doc.company_id"/></td>
+                                    <td><strong>Date From</strong></td>
+                                    <td><span t-field="doc.date_from"/></td>
+                                    <td><strong>Date To</strong></td>
+                                    <td><span t-field="doc.date_to"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Analytic Accounts</strong></td>
+                                    <td colspan="5">
+                                        <t t-if="doc_data['allowed_accounts']">
+                                            <t t-foreach="doc_data['allowed_accounts']" t-as="analytic">
+                                                <span t-esc="analytic.display_name"/>
+                                                <t t-if="not analytic_last">, </t>
+                                            </t>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table class="kbi-summary">
+                                <thead>
+                                    <tr>
+                                        <th>Total Income</th>
+                                        <th>Total Expense</th>
+                                        <th>Net Profit / Loss</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="kbi-amount"><span t-esc="'{:,.2f}'.format(doc_data['total_income'] or 0.0)"/></td>
+                                        <td class="kbi-amount"><span t-esc="'{:,.2f}'.format(doc_data['total_expense'] or 0.0)"/></td>
+                                        <td class="kbi-amount"><span t-esc="'{:,.2f}'.format(doc_data['total_net'] or 0.0)"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="kbi-report-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 34%;">Grouping / Description</th>
+                                        <th style="width: 10%;">Date</th>
+                                        <th style="width: 12%;">Journal Entry</th>
+                                        <th style="width: 8%;">Analytic %</th>
+                                        <th style="width: 12%;">Income</th>
+                                        <th style="width: 12%;">Expense</th>
+                                        <th style="width: 12%;">Net</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-if="not doc_data['lines']">
+                                        <tr>
+                                            <td colspan="7" class="kbi-empty">No data found for the selected filters.</td>
+                                        </tr>
+                                    </t>
+
+                                    <t t-foreach="doc_data['lines']" t-as="line">
+                                        <tr t-att-class="'kbi-level-%s' % line.level">
+                                            <td>
+                                                <div t-att-class="'kbi-indent-%s' % line.level">
+                                                    <t t-if="line.line_type == 'plan'">
+                                                        <strong>Analytic Plan:</strong>
+                                                        <span t-esc="line.name"/>
+                                                    </t>
+                                                    <t t-elif="line.line_type == 'analytic'">
+                                                        <strong>Analytic Account:</strong>
+                                                        <span t-esc="line.name"/>
+                                                    </t>
+                                                    <t t-elif="line.line_type == 'account'">
+                                                        <strong>Financial Account:</strong>
+                                                        <span t-esc="line.name"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span t-esc="line.name"/>
+                                                        <t t-if="line.partner_id"> - <span t-field="line.partner_id"/></t>
+                                                    </t>
+                                                </div>
+                                            </td>
+                                            <td><span t-field="line.date"/></td>
+                                            <td><span t-field="line.move_id"/></td>
+                                            <td class="kbi-amount">
+                                                <t t-if="line.percentage">
+                                                    <span t-esc="'%.2f%%' % line.percentage"/>
+                                                </t>
+                                            </td>
+                                            <td class="kbi-amount"><span t-esc="'{:,.2f}'.format(line.income_amount or 0.0)"/></td>
+                                            <td class="kbi-amount"><span t-esc="'{:,.2f}'.format(line.expense_amount or 0.0)"/></td>
+                                            <td class="kbi-amount"><span t-esc="'{:,.2f}'.format(line.net_amount or 0.0)"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>
