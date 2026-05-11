@@ -45,13 +45,8 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         'wizard_id',
         'analytic_account_id',
         string='Analytic Accounts',
-<<<<<<< HEAD
         compute='_compute_effective_analytic_account_ids',
         readonly=True,
-=======
-        #required=True,
-        #domain="[('id', 'in', allowed_analytic_account_ids)]",
->>>>>>> ddabb6556d0f97f22bb68dc73aa10cd96b74b6ed
     )
 
     show_details = fields.Boolean(string='Show Journal Item Details', default=False)
