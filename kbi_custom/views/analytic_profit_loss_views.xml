@@ -19,12 +19,15 @@
                                 <field name="allowed_analytic_account_ids" invisible="1"/>
                                 <!-- <field name="analytic_account_ids" invisible="1"/>
                                 <field name="analytic_plan_ids" widget="many2many_tags" options="{'no_create': True}"/> -->
-                                <field name="show_details"/>
+                                <field name="show_details"  groups="base.group_system"/>
                             </group>
                         </group>
-                        <div class="alert alert-info" role="alert">
-                            يتم اختيار التقرير على مستوى الخطة التحليلية كاملة. يقوم التقرير بالتجميع حسب الخطة التحليلية ثم الحساب التحليلي ثم الحساب المالي، ويتم احتساب القيم حسب نسب التوزيع التحليلي وليس كامل قيمة سطر القيد.
+                            <div class="alert alert-info" role="alert">
+                            يتم اختيار التقرير على مستوى الخطة التحليلية كاملة. يقوم التقرير بالتجميع حسب الخطة التحليلية  ثم الحساب المالي، ويتم احتساب القيم حسب نسب التوزيع التحليلي وليس كامل قيمة سطر القيد.
                         </div>
+                        <!-- <div class="alert alert-info" role="alert">
+                            يتم اختيار التقرير على مستوى الخطة التحليلية كاملة. يقوم التقرير بالتجميع حسب الخطة التحليلية ثم الحساب التحليلي ثم الحساب المالي، ويتم احتساب القيم حسب نسب التوزيع التحليلي وليس كامل قيمة سطر القيد.
+                        </div> -->
                     </sheet>
                     <footer>
                         <button name="action_preview_qweb_report" type="object" string="Preview QWeb Report" class="btn-primary"/>
