@@ -219,8 +219,10 @@
                                             <td class="kbi-amount">
                                                 <span t-esc="'{:,.2f}'.format(doc_data['total_expense'] or 0.0)"/>
                                             </td>
-                                            <td t-att-class="'kbi-amount %s' % ('kbi-negative' if (doc_data['total_net'] or 0.0) < 0 else '')">
+                                            <!-- <td t-att-class="'kbi-amount %s' % ('kbi-negative' if (doc_data['total_net'] or 0.0) < 0 else '')"> -->
+                                            <td t-att-class="'kbi-amount %s' % ('kbi-negative' if (doc_data['total_net'] or 0.0) &lt; 0 else '')">
                                                 <span t-esc="'{:,.2f}'.format(doc_data['total_net'] or 0.0)"/>
+                                                
                                             </td>
                                         </tr>
                                     </tbody>
