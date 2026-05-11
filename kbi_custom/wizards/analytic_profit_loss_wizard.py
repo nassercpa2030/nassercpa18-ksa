@@ -125,8 +125,8 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
             if wizard._is_analytic_report_admin():
                 continue
             allowed_ids = set(wizard.allowed_analytic_plan_ids.ids)
-            if not selected_ids.issubset(allowed_ids):
-                raise UserError(_('You selected analytic plans that are not assigned to your user.'))
+            #if not selected_ids.issubset(allowed_ids):
+                #raise UserError(_('You selected analytic plans that are not assigned to your user.'))
 
     def _get_effective_analytic_accounts(self):
         """
