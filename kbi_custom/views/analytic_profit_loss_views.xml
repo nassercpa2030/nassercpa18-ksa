@@ -18,7 +18,7 @@
                                 <field name="allowed_analytic_plan_ids" invisible="1"/>
                                 <field name="allowed_analytic_account_ids" invisible="1"/>
                                 <!-- <field name="analytic_account_ids" invisible="1"/>-->
-                                <field name="analytic_plan_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True}" modifiers="{'readonly': [('user_has_groups', '!=', 'base.group_system')]}"/> 
+                                <field name="analytic_plan_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True,}"   groups="base.group_system"/> 
                                 <field name="show_details"  groups="base.group_system"/>
                             </group>
                         </group>
@@ -146,7 +146,7 @@
         </record>
 
         <menuitem id="menu_kbi_analytic_profit_loss"
-                  name="Analytic Profit and Loss"
+                  name="تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة"
                   parent="account.menu_finance_reports"
                   action="action_kbi_analytic_profit_loss_wizard"
                   sequence="90"/>
