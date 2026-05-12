@@ -19,7 +19,7 @@
                                 <field name="allowed_analytic_account_ids" invisible="1"/>
                                 <!-- <field name="analytic_account_ids" invisible="1"/>-->
                                 <field name="analytic_plan_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True,}"   groups="base.group_system"/> 
-                                <field name="show_details"  groups="base.group_system"/>
+                                <field name="show_details"  groups="base.group_system,104__team.shaker"/>
                             </group>
                         </group>
                             <div class="alert alert-info" role="alert">
@@ -32,7 +32,7 @@
                     <footer>
                         <button name="action_preview_qweb_report" type="object" string="Preview QWeb Report" class="btn-primary"/>
                         <button name="action_print_pdf_report" type="object" string="Print PDF" class="btn-secondary"/>
-                        <button name="action_generate_report" type="object" string="Open Lines" class="btn-secondary" groups="base.group_system"/>
+                        <button name="action_generate_report" type="object" string="Open Lines" class="btn-secondary" groups="base.group_system,104__team.shaker"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>
