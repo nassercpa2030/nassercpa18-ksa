@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'contacts', 'sale', 'account', 'analytic', 'xf_approval_route_sale', 'report_py3o', 'l10n_sa_edi'],
+    'depends': ['base','contacts', 'sale','xf_approval_route_sale','report_py3o','l10n_sa_edi'],
 
     # always loaded
     'data': [
@@ -28,8 +28,6 @@
         'security/ir.model.access.csv',
         'data/sequence.xml',
         'views/analytic.xml',
-        'views/analytic_profit_loss_views.xml',
-        'report/analytic_profit_loss_report.xml',
         'views/sale_order.xml',
         'views/product.xml',
         'views/crm_lead.xml',
