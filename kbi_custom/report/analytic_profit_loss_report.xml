@@ -386,8 +386,8 @@
 
                             <div class="kbi-report-card">
                                 <div class="kbi-title">
-                                    <h2>تقرير الربح والخسارة التحليلي</h2>
-                                    <div class="kbi-subtitle">Analytic Profit and Loss Report</div>
+                                    <h1>تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة</h1>
+                                    <div class="kbi-subtitle"><h2>Profit and Loss Report Including Allocated Amounts</h2></div>
                                 </div>
 
                                 <div class="kbi-filter-line">
