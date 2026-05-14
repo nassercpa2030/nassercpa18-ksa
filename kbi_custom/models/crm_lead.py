@@ -148,7 +148,12 @@ class CrmLead(models.Model):
     old_sale_wo_agreement_ids = fields.Many2many(comodel_name='sale.order', string='Old Orders', compute='_compute_old_sale_wo_agreement_ids')
     number_700 = fields.Char ( '700 Nubmer' , related='partner_id.number_700' , readonly=False )
     stage_history_ids = fields.One2many(comodel_name='crm.stage.history', inverse_name='crm_lead_id')
-    
+
+    def action_voice_note_ar(self):
+        return True
+
+    def action_voice_note_en(self):
+        return True
     @api.onchange ( 'sale_person' )
     def _get_sale_team_from_saleperson(self) :
         for rec in self :
