@@ -73,6 +73,21 @@
                             string="Print Offer/Contract"
                             class="oe_highlight"/>
                 </xpath>
+                <xpath expr="//header" position="inside">
+
+    <button
+        string="🎤 عربي"
+        type="button"
+        class="btn btn-primary"
+        id="voice_note_ar"/>
+
+    <button
+        string="🎤 English"
+        type="button"
+        class="btn btn-secondary"
+        id="voice_note_en"/>
+
+</xpath>
 
                 <!-- Hide default buttons -->
                 <xpath expr="//button[@name='action_schedule_meeting']" position="attributes">
