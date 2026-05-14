@@ -67,16 +67,11 @@
         'views/hr_payslip_line_style.xml',
 
     ],
-
-    'assets': {
-
-        'web.assets_backend': [
-
-            'kbi_custom/static/JS/call_mobile.js'
-
-
-        ],
-    },
+'assets': {
+    'web.assets_backend': [
+        'kbi_custom/static/src/js/call_mobile.js',
+    ],
+},
 
     'installable': True,
 

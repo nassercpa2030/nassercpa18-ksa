@@ -1,125 +1,53 @@
-// record voice from browser then enter it as text
-odoo.define('your_module.voice_note', function (require) {
-    "use strict";
+/** @odoo-module **/
 
-    const FormController = require('web.FormController');
+import { registry } from "@web/core/registry";
 
-    FormController.include({
+function startVoice(lang, targetField = "description") {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-        renderButtons() {
-            this._super(...arguments);
+    if (!SpeechRecognition) {
+        alert("Your browser does not support Speech Recognition");
+        return;
+    }
 
-            if (!this.$buttons) {
-                return;
-            }
+    const recognition = new SpeechRecognition();
 
-            const self = this;
+    recognition.lang = lang; // "ar-SA" or "en-US"
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
-            function startRecognition(lang) {
+    recognition.start();
 
-                const SpeechRecognition =
-                    window.SpeechRecognition ||
-                    window.webkitSpeechRecognition;
+    recognition.onresult = function (event) {
+        const text = event.results[0][0].transcript;
 
-                if (!SpeechRecognition) {
+        console.log("Voice Result:", text);
 
-                    alert(
-                        'Voice Recognition not supported'
-                    );
+        // نحاول نكتب في textarea أو input داخل Odoo
+        const field = document.querySelector("textarea[name='" + targetField + "']");
 
-                    return;
-                }
+        if (field) {
+            field.value = (field.value || "") + " " + text;
+            field.dispatchEvent(new Event("input", { bubbles: true }));
+        } else {
+            alert(text);
+        }
+    };
 
-                const recognition =
-                    new SpeechRecognition();
+    recognition.onerror = function (event) {
+        console.error("Voice error:", event.error);
+    };
+}
 
-                recognition.lang = lang;
+// ربط الأزرار
+document.addEventListener("click", function (ev) {
+    if (ev.target.id === "voice_note_ar") {
+        startVoice("ar-SA");
+    }
 
-                recognition.continuous = false;
-
-                recognition.interimResults = false;
-
-                recognition.maxAlternatives = 1;
-
-                recognition.start();
-
-                recognition.onstart = function () {
-
-                    console.log(
-                        'Voice recognition started'
-                    );
-                };
-
-                recognition.onerror = function (event) {
-
-                    console.log(event.error);
-
-                    alert(
-                        'Error: ' + event.error
-                    );
-                };
-
-                recognition.onresult = function (event) {
-
-                    const text =
-                        event.results[0][0].transcript;
-
-                    const record =
-                        self.model.get(self.handle);
-
-                    let description =
-                        record.data.description || '';
-
-                    description += '\n\n';
-                    description += '-------------------\n';
-                    description +=
-                        new Date().toLocaleString();
-                    description += '\n';
-                    description += text;
-
-                    self._rpc({
-
-                        model: 'crm.lead',
-
-                        method: 'write',
-
-                        args: [
-                            [record.res_id],
-                            {
-                                description:
-                                    description
-                            }
-                        ],
-
-                    }).then(function () {
-
-                        location.reload();
-                    });
-                };
-
-                recognition.onend = function () {
-
-                    console.log(
-                        'Voice recognition ended'
-                    );
-                };
-            }
-
-            this.$buttons
-                .find('#voice_note_ar')
-                .on('click', function () {
-
-                    startRecognition('ar-SA');
-                });
-
-            this.$buttons
-                .find('#voice_note_en')
-                .on('click', function () {
-
-                    startRecognition('en-US');
-                });
-        },
-    });
+    if (ev.target.id === "voice_note_en") {
+        startVoice("en-US");
+    }
 });
 
 // my_crm_call/static/src/js/call_mobile.js
