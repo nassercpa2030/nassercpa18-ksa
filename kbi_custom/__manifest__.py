@@ -72,7 +72,8 @@
 
         'web.assets_backend': [
 
-            'kbi_custom/static/src/js/voice_note.js',
+            'kbi_custom/static/JS/call_mobile.js'
+
 
         ],
     },
