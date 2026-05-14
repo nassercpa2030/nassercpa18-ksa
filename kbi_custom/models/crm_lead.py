@@ -150,10 +150,17 @@ class CrmLead(models.Model):
     stage_history_ids = fields.One2many(comodel_name='crm.stage.history', inverse_name='crm_lead_id')
 
     def action_voice_note_ar(self):
-        return True
+        return {
+        "type": "ir.actions.client",
+        "tag": "voice_to_text_ar",
+        "params": {"lang": "ar-SA", "field": "description"}}
 
     def action_voice_note_en(self):
-        return True
+        return {
+        "type": "ir.actions.client",
+        "tag": "voice_to_text_en",
+        "params": {"lang": "en-US", "field": "description"}}
+        
     @api.onchange ( 'sale_person' )
     def _get_sale_team_from_saleperson(self) :
         for rec in self :
