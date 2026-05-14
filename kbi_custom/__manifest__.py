@@ -47,7 +47,7 @@
 
     'assets': {
         'web.assets_backend': [
-            'kbi_custom/static/js/voice_to_text.js',
+            'kbi_custom/static/src/js/voice_to_text.js',
         ],
     },
 
