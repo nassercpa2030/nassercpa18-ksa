@@ -1,55 +1,125 @@
-// record data from browser
-odoo.define('your_module.voice_recorder', function (require) {
+// record voice from browser then enter it as text
+odoo.define('your_module.voice_note', function (require) {
     "use strict";
 
-    const rpc = require('web.rpc');
+    const FormController = require('web.FormController');
 
-    let chunks = [];
+    FormController.include({
 
-    async function startRecording(leadId) {
+        renderButtons() {
+            this._super(...arguments);
 
-        const stream = await navigator.mediaDevices.getUserMedia({
-            audio: true
-        });
+            if (!this.$buttons) {
+                return;
+            }
 
-        const recorder = new MediaRecorder(stream);
+            const self = this;
 
-        recorder.ondataavailable = e => {
-            chunks.push(e.data);
-        };
+            function startRecognition(lang) {
 
-        recorder.onstop = async () => {
+                const SpeechRecognition =
+                    window.SpeechRecognition ||
+                    window.webkitSpeechRecognition;
 
-            const blob = new Blob(chunks, {
-                type: 'audio/webm'
-            });
+                if (!SpeechRecognition) {
 
-            const reader = new FileReader();
+                    alert(
+                        'Voice Recognition not supported'
+                    );
 
-            reader.readAsDataURL(blob);
+                    return;
+                }
 
-            reader.onloadend = async () => {
+                const recognition =
+                    new SpeechRecognition();
 
-                const base64data = reader.result.split(',')[1];
+                recognition.lang = lang;
 
-                await rpc.query({
-                    model: 'crm.lead',
-                    method: 'action_transcribe_audio',
-                    args: [[leadId], base64data],
+                recognition.continuous = false;
+
+                recognition.interimResults = false;
+
+                recognition.maxAlternatives = 1;
+
+                recognition.start();
+
+                recognition.onstart = function () {
+
+                    console.log(
+                        'Voice recognition started'
+                    );
+                };
+
+                recognition.onerror = function (event) {
+
+                    console.log(event.error);
+
+                    alert(
+                        'Error: ' + event.error
+                    );
+                };
+
+                recognition.onresult = function (event) {
+
+                    const text =
+                        event.results[0][0].transcript;
+
+                    const record =
+                        self.model.get(self.handle);
+
+                    let description =
+                        record.data.description || '';
+
+                    description += '\n\n';
+                    description += '-------------------\n';
+                    description +=
+                        new Date().toLocaleString();
+                    description += '\n';
+                    description += text;
+
+                    self._rpc({
+
+                        model: 'crm.lead',
+
+                        method: 'write',
+
+                        args: [
+                            [record.res_id],
+                            {
+                                description:
+                                    description
+                            }
+                        ],
+
+                    }).then(function () {
+
+                        location.reload();
+                    });
+                };
+
+                recognition.onend = function () {
+
+                    console.log(
+                        'Voice recognition ended'
+                    );
+                };
+            }
+
+            this.$buttons
+                .find('#voice_note_ar')
+                .on('click', function () {
+
+                    startRecognition('ar-SA');
                 });
 
-                location.reload();
-            };
-        };
+            this.$buttons
+                .find('#voice_note_en')
+                .on('click', function () {
 
-        recorder.start();
-
-        setTimeout(() => {
-            recorder.stop();
-        }, 10000);
-    }
-
-    window.startCRMRecording = startRecording;
+                    startRecognition('en-US');
+                });
+        },
+    });
 });
 
 // my_crm_call/static/src/js/call_mobile.js
