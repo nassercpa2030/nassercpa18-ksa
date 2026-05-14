@@ -72,7 +72,7 @@
 
         'web.assets_backend': [
 
-            'your_module_name/static/src/js/voice_note.js',
+            'kbi_custom/static/src/js/voice_note.js',
 
         ],
     },
