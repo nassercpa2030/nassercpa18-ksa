@@ -2,9 +2,9 @@
 
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { Component, useState, xml, onWillUnmount } from "@odoo/owl";
+import { Component, useState, xml } from "@odoo/owl";
 
-export class VoiceToTextAI extends Component {
+export class VoiceToText extends Component {
 
     setup() {
 
@@ -17,49 +17,6 @@ export class VoiceToTextAI extends Component {
         });
 
         this.recognition = null;
-        this.finalText = "";
-    }
-
-    // 🧠 AI TEXT CLEANER (simple smart engine)
-    aiCleanText(text, lang) {
-
-        if (!text) return "";
-
-        let cleaned = text;
-
-        // remove extra spaces
-        cleaned = cleaned.replace(/\s+/g, " ").trim();
-
-        // Arabic enhancement
-        if (lang.startsWith("ar")) {
-
-            cleaned = cleaned
-                .replace(/ و /g, " و")
-                .replace(/ ،/g, "،")
-                .replace(/ ?\./g, "۔");
-
-        }
-
-        // English enhancement
-        else {
-
-            cleaned = cleaned
-                .replace(/\bi\b/g, "I")
-                .replace(/\s+,/g, ",")
-                .replace(/\s+\./g, ".")
-                .replace(/ i /g, " I ");
-
-        }
-
-        // simple sentence capitalization
-        cleaned = cleaned
-            .split(". ")
-            .map(s =>
-                s.charAt(0).toUpperCase() + s.slice(1)
-            )
-            .join(". ");
-
-        return cleaned;
     }
 
     startRecording() {
@@ -69,40 +26,41 @@ export class VoiceToTextAI extends Component {
             window.webkitSpeechRecognition;
 
         if (!SpeechRecognition) {
-            alert("Speech Recognition not supported");
+            alert("Speech Recognition not supported in this browser");
             return;
         }
 
         const lang =
             this.props.action.params?.lang || "en-US";
 
-        this.finalText = "";
-        this.state.text = "";
-        this.state.recording = true;
-
         this.recognition = new SpeechRecognition();
 
+        // 🔥 Google-like settings
         this.recognition.lang = lang;
         this.recognition.continuous = true;
         this.recognition.interimResults = true;
 
+        this.state.recording = true;
+        this.state.text = "";
+
         this.recognition.onresult = (event) => {
 
-            let interim = "";
+            let finalText = "";
+            let interimText = "";
 
             for (let i = event.resultIndex; i < event.results.length; i++) {
 
                 const transcript = event.results[i][0].transcript;
 
                 if (event.results[i].isFinal) {
-                    this.finalText += transcript + " ";
+                    finalText += transcript + " ";
                 } else {
-                    interim += transcript;
+                    interimText += transcript;
                 }
             }
 
             this.state.text =
-                (this.finalText + interim).trim();
+                (finalText + interimText).trim();
         };
 
         this.recognition.onerror = () => {
@@ -126,38 +84,35 @@ export class VoiceToTextAI extends Component {
         const field =
             this.props.action.params?.field || "description";
 
-        const lang =
-            this.props.action.params?.lang || "en-US";
+        const text =
+            (this.state.text || "").trim();
 
-        // 🧠 AI CLEANING STEP
-        const rawText =
-            this.finalText || this.state.text;
+        console.log("🧠 FINAL TEXT:", text);
+        console.log("📌 RECORD ID:", recordId);
 
-        const aiText =
-            this.aiCleanText(rawText, lang);
-
-        if (!recordId || !aiText) {
+        if (!recordId || !text) {
             this.action.doAction({
                 type: "ir.actions.act_window_close",
             });
             return;
         }
 
-        const existing =
-            await this.orm.read(
-                "crm.lead",
-                [recordId],
-                [field]
-            );
+        // 📥 read old value
+        const existing = await this.orm.read(
+            "crm.lead",
+            [recordId],
+            [field]
+        );
 
         const oldText =
             existing?.[0]?.[field] || "";
 
         const newText =
             oldText
-                ? oldText + "\n" + aiText
-                : aiText;
+                ? oldText + "\n" + text
+                : text;
 
+        // 💾 write to crm.lead.description
         await this.orm.write(
             "crm.lead",
             [recordId],
@@ -172,14 +127,14 @@ export class VoiceToTextAI extends Component {
     }
 }
 
-VoiceToTextAI.template = xml/* xml */`
+VoiceToText.template = xml/* xml */`
 
 <div class="p-4 text-center">
 
-    <h2>🤖 AI Voice Dictation</h2>
+    <h2>🎤 Voice Dictation</h2>
 
     <p t-if="state.recording" class="text-success">
-        ● AI Listening...
+        ● Listening...
     </p>
 
     <textarea
@@ -196,7 +151,7 @@ VoiceToTextAI.template = xml/* xml */`
             t-on-click="startRecording"
             class="btn btn-primary me-2"
         >
-            ▶ Start AI Dictation
+            ▶ Start
         </button>
 
         <button
@@ -204,7 +159,7 @@ VoiceToTextAI.template = xml/* xml */`
             t-on-click="stopRecording"
             class="btn btn-danger"
         >
-            ■ Stop &amp; AI Save
+            ■ Stop & Save
         </button>
 
     </div>
@@ -215,5 +170,5 @@ VoiceToTextAI.template = xml/* xml */`
 
 registry.category("actions").add(
     "voice_to_text",
-    VoiceToTextAI
+    VoiceToText
 );
