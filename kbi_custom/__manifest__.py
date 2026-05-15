@@ -48,4 +48,12 @@
         'views/hr_payslip_line_style.xml',
         
     ],
+    'assets' : {
+        'web.assets_backend' : [
+            'kbi_custom/static/src/js/voice_to_text.js' ,
+        ] ,
+    } ,
+
+    'installable' : True ,
+    'application' : False ,
    }
