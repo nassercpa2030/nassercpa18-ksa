@@ -1,18 +1,28 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
+
 import { useService } from "@web/core/utils/hooks";
-import { Component, onMounted } from "@odoo/owl";
+
+import {
+    Component,
+    onMounted,
+    xml
+} from "@odoo/owl";
+
 
 export class VoiceToText extends Component {
 
     setup() {
 
         this.orm = useService("orm");
+
         this.action = useService("action");
 
         onMounted(() => {
+
             this.startRecognition();
+
         });
 
     }
@@ -34,63 +44,97 @@ export class VoiceToText extends Component {
 
         if (!SpeechRecognition) {
 
-            alert("Speech Recognition not supported");
+            alert(
+                "Speech Recognition not supported"
+            );
 
-            this.action.doAction({
-                type: "ir.actions.act_window_close",
-            });
+            this.closeWindow();
 
             return;
         }
 
-        const recognition = new SpeechRecognition();
+        const recognition =
+            new SpeechRecognition();
 
         recognition.lang = lang;
 
         recognition.interimResults = false;
 
+        recognition.continuous = false;
+
         recognition.start();
 
         recognition.onresult = async (event) => {
 
-            const text =
-                event.results[0][0].transcript;
+            try {
 
-            await this.orm.write(
-                "crm.lead",
-                [recordId],
-                {
-                    [field]: text,
+                const text =
+                    event.results[0][0].transcript;
+
+                if (!recordId) {
+
+                    this.closeWindow();
+
+                    return;
                 }
-            );
 
-            this.action.doAction({
-                type: "ir.actions.act_window_close",
-            });
+                await this.orm.write(
+                    "crm.lead",
+                    [recordId],
+                    {
+                        [field]: text,
+                    }
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+            }
+
+            this.closeWindow();
 
         };
 
-        recognition.onerror = () => {
+        recognition.onerror = (event) => {
 
-            this.action.doAction({
-                type: "ir.actions.act_window_close",
-            });
+            console.error(event);
+
+            this.closeWindow();
 
         };
 
     }
 
+    closeWindow() {
+
+        this.action.doAction({
+            type: "ir.actions.act_window_close",
+        });
+
+    }
+
 }
 
-VoiceToText.template =
-    "kbi_crm_customization.VoiceToText";
+
+VoiceToText.template = xml/* xml */ `
+
+<div class="p-4 text-center">
+
+    <h2 class="mb-3">
+        🎤 Voice Recognition
+    </h2>
+
+    <p>
+        Speak now...
+    </p>
+
+</div>
+
+`;
+
 
 registry.category("actions").add(
-    "voice_to_text_ar",
-    VoiceToText
-);
-
-registry.category("actions").add(
-    "voice_to_text_en",
+    "voice_to_text",
     VoiceToText
 );
