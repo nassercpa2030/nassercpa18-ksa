@@ -6,7 +6,7 @@ import { useService } from "@web/core/utils/hooks";
 
 import {
     Component,
-    onMounted,
+    useState,
     xml
 } from "@odoo/owl";
 
@@ -19,24 +19,19 @@ export class VoiceToText extends Component {
 
         this.action = useService("action");
 
-        onMounted(() => {
+        this.state = useState({
 
-            this.startRecognition();
+            recording: false,
+
+            text: "",
 
         });
 
+        this.recognition = null;
+
     }
 
-    async startRecognition() {
-
-        const recordId =
-            this.props.action.context.active_id;
-
-        const lang =
-            this.props.action.params?.lang || "en-US";
-
-        const field =
-            this.props.action.params?.field || "description";
+    startRecording() {
 
         const SpeechRecognition =
             window.SpeechRecognition ||
@@ -48,65 +43,92 @@ export class VoiceToText extends Component {
                 "Speech Recognition not supported"
             );
 
-            this.closeWindow();
-
             return;
         }
 
-        const recognition =
+        const lang =
+            this.props.action.params?.lang || "en-US";
+
+        this.state.text = "";
+
+        this.recognition =
             new SpeechRecognition();
 
-        recognition.lang = lang;
+        this.recognition.lang = lang;
 
-        recognition.interimResults = false;
+        this.recognition.continuous = true;
 
-        recognition.continuous = false;
+        this.recognition.interimResults = true;
 
-        recognition.start();
+        this.state.recording = true;
 
-        recognition.onresult = async (event) => {
+        this.recognition.onresult = (event) => {
 
-            try {
+            let finalText = "";
 
-                const text =
-                    event.results[0][0].transcript;
+            for (
+                let i = 0;
+                i < event.results.length;
+                i++
+            ) {
 
-                if (!recordId) {
-
-                    this.closeWindow();
-
-                    return;
-                }
-
-                await this.orm.write(
-                    "crm.lead",
-                    [recordId],
-                    {
-                        [field]: text,
-                    }
-                );
-
-            } catch (error) {
-
-                console.error(error);
+                finalText +=
+                    event.results[i][0].transcript + " ";
 
             }
 
-            this.closeWindow();
+            this.state.text = finalText;
 
         };
 
-        recognition.onerror = (event) => {
+        this.recognition.onerror = (event) => {
 
             console.error(event);
 
-            this.closeWindow();
+            this.state.recording = false;
 
         };
 
+        this.recognition.start();
+
     }
 
-    closeWindow() {
+    async stopRecording() {
+
+        if (this.recognition) {
+
+            this.recognition.stop();
+
+        }
+
+        this.state.recording = false;
+
+        const recordId =
+            this.props.action.context.active_id;
+
+        const field =
+            this.props.action.params?.field || "description";
+
+        const existing =
+            await this.orm.read(
+                "crm.lead",
+                [recordId],
+                [field]
+            );
+
+        const oldText =
+            existing[0][field] || "";
+
+        const newText =
+            oldText + "\n" + this.state.text;
+
+        await this.orm.write(
+            "crm.lead",
+            [recordId],
+            {
+                [field]: newText,
+            }
+        );
 
         this.action.doAction({
             type: "ir.actions.act_window_close",
@@ -121,13 +143,44 @@ VoiceToText.template = xml/* xml */ `
 
 <div class="p-4 text-center">
 
-    <h2 class="mb-3">
-        🎤 Voice Recognition
+    <h2 class="mb-4">
+        🎤 Voice To Text
     </h2>
 
-    <p>
-        Speak now...
-    </p>
+    <div class="mb-3">
+
+        <textarea
+            t-model="state.text"
+            class="form-control"
+            rows="8"
+            readonly="readonly"
+        />
+
+    </div>
+
+    <div>
+
+        <button
+            t-if="!state.recording"
+            t-on-click="startRecording"
+            class="btn btn-primary me-2"
+        >
+
+            ▶ Start Recording
+
+        </button>
+
+        <button
+            t-if="state.recording"
+            t-on-click="stopRecording"
+            class="btn btn-danger"
+        >
+
+            ■ Stop Recording
+
+        </button>
+
+    </div>
 
 </div>
 
