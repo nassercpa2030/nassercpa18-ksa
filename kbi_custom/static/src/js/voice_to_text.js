@@ -4,50 +4,93 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { Component, onMounted } from "@odoo/owl";
 
-class VoiceToText extends Component {
+export class VoiceToText extends Component {
+
     setup() {
+
         this.orm = useService("orm");
         this.action = useService("action");
+
+        onMounted(() => {
+            this.startRecognition();
+        });
+
     }
 
-    mounted() {
-        this.recordId = this.props.context?.active_id;
-        const lang = this.props.action.params?.lang || "en-US";
-        const field = this.props.action.params?.field || "description";
+    async startRecognition() {
+
+        const recordId =
+            this.props.action.context.active_id;
+
+        const lang =
+            this.props.action.params?.lang || "en-US";
+
+        const field =
+            this.props.action.params?.field || "description";
 
         const SpeechRecognition =
-            window.SpeechRecognition || window.webkitSpeechRecognition;
+            window.SpeechRecognition ||
+            window.webkitSpeechRecognition;
 
         if (!SpeechRecognition) {
-            alert("Speech Recognition not supported in this browser");
+
+            alert("Speech Recognition not supported");
+
+            this.action.doAction({
+                type: "ir.actions.act_window_close",
+            });
+
             return;
         }
 
         const recognition = new SpeechRecognition();
+
         recognition.lang = lang;
+
         recognition.interimResults = false;
 
         recognition.start();
 
         recognition.onresult = async (event) => {
-            const text = event.results[0][0].transcript;
 
-            if (!this.recordId) return;
+            const text =
+                event.results[0][0].transcript;
 
-            await this.orm.write("crm.lead", [this.recordId], {
-                [field]: text,
+            await this.orm.write(
+                "crm.lead",
+                [recordId],
+                {
+                    [field]: text,
+                }
+            );
+
+            this.action.doAction({
+                type: "ir.actions.act_window_close",
             });
 
-            this.action.doAction({ type: "ir.actions.act_window_close" });
         };
 
         recognition.onerror = () => {
-            this.action.doAction({ type: "ir.actions.act_window_close" });
+
+            this.action.doAction({
+                type: "ir.actions.act_window_close",
+            });
+
         };
+
     }
+
 }
 
-VoiceToText.template = "web.ClientAction";
+VoiceToText.template =
+    "kbi_crm_customization.VoiceToText";
 
-registry.category("actions").add("voice_to_text_ar", VoiceToText);
-registry.category("actions").add("voice_to_text_en", VoiceToText);
+registry.category("actions").add(
+    "voice_to_text_ar",
+    VoiceToText
+);
+
+registry.category("actions").add(
+    "voice_to_text_en",
+    VoiceToText
+);
