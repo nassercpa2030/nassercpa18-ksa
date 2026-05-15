@@ -72,7 +72,7 @@ class CrmLead(models.Model):
     isic_description= fields.Char(string="ISIC Description",store=True)
     isic_group=fields.Char(string="ISIC Group",store=True)
     isic_group_code=fields.Char(string="ISIC Group Code",store=True)
-    cr_type_arabic= fields.Char(string="CR Type (AR)",store=True)# نوع الشركة 
+    cr_type_arabic= fields.Char(string="CR Type (AR)",store=True)# نوع الشركة
     main_cr_number=fields.Char(string="Main CR Number", store=True)#id of main company
     capital=fields.Float(string="Capital",store=True)#إجمالي العائد
     city_modified=fields.Char(string="City Modified",store=True)
@@ -108,10 +108,10 @@ class CrmLead(models.Model):
         ('aa', 'AA'),
         ('a', 'A'),
         ('bbb', 'BBB'),
-         ('bb', 'BB'),
-         ('b', 'B'),
-         ('cc', 'CC'),
-         ('c', 'C'),
+        ('bb', 'BB'),
+        ('b', 'B'),
+        ('cc', 'CC'),
+        ('c', 'C'),
     ], string="customer_classification",store=True)
     classification_key= fields.Selection([
         ('aaa', 'AAA --> تم التحويل'),
@@ -149,45 +149,71 @@ class CrmLead(models.Model):
     number_700 = fields.Char ( '700 Nubmer' , related='partner_id.number_700' , readonly=False )
     stage_history_ids = fields.One2many(comodel_name='crm.stage.history', inverse_name='crm_lead_id')
 
-    def action_voice_note_ar(self):
-        return {
-        "type": "ir.actions.client",
-        "tag": "voice_to_text_ar",
-        "params": {"lang": "ar-SA", "field": "description"}}
+    def action_voice_note_ar(self) :
 
-    def action_voice_note_en(self):
+        self.ensure_one ()
+
         return {
-        "type": "ir.actions.client",
-        "tag": "voice_to_text_en",
-        "params": {"lang": "en-US", "field": "description"}}
-        
+            "type" : "ir.actions.client" ,
+
+            "tag" : "voice_to_text" ,
+
+            "context" : {
+                "active_id" : self.id ,
+            } ,
+
+            "params" : {
+                "lang" : "ar-SA" ,
+                "field" : "description" ,
+            }
+        }
+
+    def action_voice_note_en(self) :
+
+        self.ensure_one ()
+
+        return {
+            "type" : "ir.actions.client" ,
+
+            "tag" : "voice_to_text" ,
+
+            "context" : {
+                "active_id" : self.id ,
+            } ,
+
+            "params" : {
+                "lang" : "en-US" ,
+                "field" : "description" ,
+            }
+        }
+
     @api.onchange ( 'sale_person' )
     def _get_sale_team_from_saleperson(self) :
         for rec in self :
             if rec.sale_person :
                 rec.sale_team = rec.sale_person.department_id
-                
+
     @api.constrains ( 'number_700' )
     def _check700_number(self) :
         pattern = r'^7\d*$'
         for rec in self :
             if rec.number_700 and not re.match ( pattern , rec.number_700 ) :
                 raise ValidationError ( "You must enter numbers only and start with 7" )
- 
+
     @api.depends('classification_key')
     def _compute_classification_key_code(self):
-      for record in self:
-        record.classification_key_code = record.classification_key or ''   
-          
+        for record in self:
+            record.classification_key_code = record.classification_key or ''
+
     @api.depends('name')
     def _compute_name_clean(self):
         for rec in self :
             if rec.name :
-                 rec.name_clean = rec.name.replace("'s opportunity", "")
+                rec.name_clean = rec.name.replace("'s opportunity", "")
             else :
-                 rec.name_clean = ''
-                
-        
+                rec.name_clean = ''
+
+
     def _compute_is_readonly(self):
         for rec in self:
             if rec.quotation_count > 0 or rec.quotation_count or rec.sale_order_count:
