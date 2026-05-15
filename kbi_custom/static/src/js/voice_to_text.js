@@ -204,7 +204,7 @@ VoiceToTextAI.template = xml/* xml */`
             t-on-click="stopRecording"
             class="btn btn-danger"
         >
-            ■ Stop & AI Save
+            ■ Stop &amp; AI Save
         </button>
 
     </div>
