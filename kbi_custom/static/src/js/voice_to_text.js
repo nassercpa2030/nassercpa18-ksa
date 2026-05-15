@@ -17,6 +17,11 @@ export class VoiceToText extends Component {
         });
 
         this.recognition = null;
+
+        // 👇 مهم: رجوع ذكي
+        this.returnUrl = this.props.action.params?.returnUrl;
+        this.recordId = this.props.action.context?.active_id;
+        this.field = this.props.action.params?.field || "description";
     }
 
     startRecording() {
@@ -66,7 +71,7 @@ export class VoiceToText extends Component {
             this.stopRecording();
         };
 
-        // لو المايك وقف يرجعه يشتغل تاني (مهم جداً)
+        // 🔥 مهم جداً: إعادة تشغيل لو وقف
         this.recognition.onend = () => {
             if (this.state.recording) {
                 this.recognition.start();
@@ -84,45 +89,36 @@ export class VoiceToText extends Component {
 
         this.state.recording = false;
 
-        const recordId =
-            this.props.action.context.active_id;
-
-        const field =
-            this.props.action.params?.field || "description";
-
-        const text =
-            (this.state.text || "").trim();
+        const text = (this.state.text || "").trim();
 
         console.log("🧠 FINAL TEXT:", text);
-        console.log("📌 RECORD ID:", recordId);
+        console.log("📌 RECORD ID:", this.recordId);
 
-        // لو مفيش نص أو سجل
-        if (!recordId || !text) {
+        // لو مفيش بيانات نرجع مباشرة
+        if (!this.recordId || !text) {
             this.goBack();
             return;
         }
 
-        // قراءة القيمة القديمة
+        // قراءة النص القديم
         const existing = await this.orm.read(
             "crm.lead",
-            [recordId],
-            [field]
+            [this.recordId],
+            [this.field]
         );
 
-        const oldText =
-            existing?.[0]?.[field] || "";
+        const oldText = existing?.[0]?.[this.field] || "";
 
-        const newText =
-            oldText
-                ? oldText + "\n" + text
-                : text;
+        const newText = oldText
+            ? oldText + "\n" + text
+            : text;
 
         // حفظ في CRM
         await this.orm.write(
             "crm.lead",
-            [recordId],
+            [this.recordId],
             {
-                [field]: newText,
+                [this.field]: newText,
             }
         );
 
@@ -130,9 +126,13 @@ export class VoiceToText extends Component {
     }
 
     goBack() {
-        this.action.doAction({
-            type: "ir.actions.act_window_close",
-        });
+        // 🧠 لو عندك returnUrl ارجع له
+        if (this.returnUrl) {
+            window.location.href = this.returnUrl;
+        } else {
+            // fallback
+            window.history.back();
+        }
     }
 }
 
