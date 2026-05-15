@@ -7,13 +7,13 @@ import { Component, useState, xml } from "@odoo/owl";
 export class VoiceToText extends Component {
 
     setup() {
-
         this.orm = useService("orm");
         this.action = useService("action");
 
         this.state = useState({
             recording: false,
             text: "",
+            finalText: "",
         });
 
         this.recognition = null;
@@ -35,17 +35,16 @@ export class VoiceToText extends Component {
 
         this.recognition = new SpeechRecognition();
 
-        // 🔥 Google-like settings
         this.recognition.lang = lang;
         this.recognition.continuous = true;
         this.recognition.interimResults = true;
 
         this.state.recording = true;
         this.state.text = "";
+        this.state.finalText = "";
 
         this.recognition.onresult = (event) => {
 
-            let finalText = "";
             let interimText = "";
 
             for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -53,18 +52,25 @@ export class VoiceToText extends Component {
                 const transcript = event.results[i][0].transcript;
 
                 if (event.results[i].isFinal) {
-                    finalText += transcript + " ";
+                    this.state.finalText += transcript + " ";
                 } else {
                     interimText += transcript;
                 }
             }
 
             this.state.text =
-                (finalText + interimText).trim();
+                (this.state.finalText + interimText).trim();
         };
 
         this.recognition.onerror = () => {
             this.stopRecording();
+        };
+
+        // لو المايك وقف يرجعه يشتغل تاني (مهم جداً)
+        this.recognition.onend = () => {
+            if (this.state.recording) {
+                this.recognition.start();
+            }
         };
 
         this.recognition.start();
@@ -90,14 +96,13 @@ export class VoiceToText extends Component {
         console.log("🧠 FINAL TEXT:", text);
         console.log("📌 RECORD ID:", recordId);
 
+        // لو مفيش نص أو سجل
         if (!recordId || !text) {
-            this.action.doAction({
-                type: "ir.actions.act_window_close",
-            });
+            this.goBack();
             return;
         }
 
-        // 📥 read old value
+        // قراءة القيمة القديمة
         const existing = await this.orm.read(
             "crm.lead",
             [recordId],
@@ -112,7 +117,7 @@ export class VoiceToText extends Component {
                 ? oldText + "\n" + text
                 : text;
 
-        // 💾 write to crm.lead.description
+        // حفظ في CRM
         await this.orm.write(
             "crm.lead",
             [recordId],
@@ -121,6 +126,10 @@ export class VoiceToText extends Component {
             }
         );
 
+        this.goBack();
+    }
+
+    goBack() {
         this.action.doAction({
             type: "ir.actions.act_window_close",
         });
@@ -157,9 +166,16 @@ VoiceToText.template = xml/* xml */`
         <button
             t-if="state.recording"
             t-on-click="stopRecording"
-            class="btn btn-danger"
+            class="btn btn-danger me-2"
         >
             ■ Stop &amp; Save
+        </button>
+
+        <button
+            t-on-click="goBack"
+            class="btn btn-secondary"
+        >
+            ← Back
         </button>
 
     </div>
