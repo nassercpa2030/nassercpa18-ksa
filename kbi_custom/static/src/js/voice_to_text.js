@@ -2,15 +2,18 @@
 
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
+import { Component, onMounted } from "@odoo/owl";
 
-const VoiceToText = {
+class VoiceToText extends Component {
     setup() {
         this.orm = useService("orm");
-    },
+        this.action = useService("action");
+    }
 
-    async start(env, action) {
-        const lang = action.params.lang || "en-US";
-        const field = action.params.field || "description";
+    mounted() {
+        this.recordId = this.props.context?.active_id;
+        const lang = this.props.action.params?.lang || "en-US";
+        const field = this.props.action.params?.field || "description";
 
         const SpeechRecognition =
             window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -29,23 +32,22 @@ const VoiceToText = {
         recognition.onresult = async (event) => {
             const text = event.results[0][0].transcript;
 
-            const recordId = env.services.action.currentController?.props?.resId;
+            if (!this.recordId) return;
 
-            if (!recordId) {
-                alert("No active record found");
-                return;
-            }
-
-            await this.orm.write("crm.lead", [recordId], {
+            await this.orm.write("crm.lead", [this.recordId], {
                 [field]: text,
             });
+
+            this.action.doAction({ type: "ir.actions.act_window_close" });
         };
 
-        recognition.onerror = (err) => {
-            console.error(err);
+        recognition.onerror = () => {
+            this.action.doAction({ type: "ir.actions.act_window_close" });
         };
-    },
-};
+    }
+}
+
+VoiceToText.template = "web.ClientAction";
 
 registry.category("actions").add("voice_to_text_ar", VoiceToText);
 registry.category("actions").add("voice_to_text_en", VoiceToText);
