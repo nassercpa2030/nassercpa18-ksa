@@ -159,7 +159,7 @@ VoiceToText.template = xml/* xml */`
             t-on-click="stopRecording"
             class="btn btn-danger"
         >
-            ■ Stop & Save
+            ■ Stop &amp; Save
         </button>
 
     </div>
