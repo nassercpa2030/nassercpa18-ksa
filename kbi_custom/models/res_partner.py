@@ -198,6 +198,7 @@ _logger = logging.getLogger ( __name__ )
 
 class HrPayslip ( models.Model ) :
     _inherit = 'hr.payslip'
+    
 
     def action_payslip_done(self) :
         result = super ().action_payslip_done ()
@@ -208,10 +209,8 @@ class HrPayslip ( models.Model ) :
             if not employee :
                 continue
 
-            employee_partner = False
-
-            if employee.related_partners_count > 0 :
-                employee_partner = employee.related_partner_ids[:1]
+            if employee.related_partners_count > 0 and employee.related_partner_id :
+                employee_partner = employee.related_partner_id
             else :
                 employee_partner = self.env['res.partner'].create ( {
                     'name' : employee.name ,
