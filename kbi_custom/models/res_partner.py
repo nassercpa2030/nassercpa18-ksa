@@ -29,8 +29,8 @@ class ResCity ( models.Model ) :
 class ResCity ( models.Model ) :
     _inherit = 'res.users'
 
-    analytic_plan_ids = fields.Many2many(
-        'account.analytic.plan',
+    analytic_plan_ids = fields.Many2many (
+        'account.analytic.plan' ,
         string='Allowed Analytic Plans'
     )
     analytic_account_ids = fields.Many2many (
@@ -202,39 +202,78 @@ class HrPayslip ( models.Model ) :
     def action_payslip_done(self) :
         result = super ().action_payslip_done ()
 
-        messages = []  # لتجميع الرسائل لكل slip
-
         for slip in self :
             employee = slip.employee_id
+
             if not employee :
                 continue
 
-            # جلب partner الموظف أو إنشاء واحد جديد إذا لم يكن موجود
-            employee_partner = getattr ( employee , 'user_id' , False ) and getattr ( employee.user_id , 'partner_id' ,
-                                                                                      False )
-            if not employee_partner :
+            employee_partner = False
+
+            if employee.related_partners_count > 0 :
+                employee_partner = employee.related_partner_ids[:1]
+            else :
                 employee_partner = self.env['res.partner'].create ( {
                     'name' : employee.name ,
-                    'email' : getattr ( employee , 'work_email' , False ) ,
-                    'phone' : getattr ( employee , 'work_phone' , False ) ,
+                    'email' : employee.work_email ,
+                    'phone' : employee.work_phone ,
                     'is_company' : False ,
                 } )
 
-            # جلب القيود المرتبطة بالرواتب
             move = slip.move_id
-            if move :
-                # جلب الحساب التحليلي من الموظف
-                analytic_account_id = getattr ( employee , 'analytic_account_id' , False )
 
-                # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
-                analytic_vals = {analytic_account_id.id : 100} if analytic_account_id else {}
+            if move :
+                analytic_account_id = employee.analytic_account_id
+
+                analytic_vals = (
+                    {analytic_account_id.id : 100}
+                    if analytic_account_id
+                    else {}
+                )
 
                 for line in move.line_ids :
                     line.analytic_account_id = analytic_account_id
                     line.analytic_distribution = analytic_vals
-                    line.partner_id = employee_partner
+                    line.partner_id = employee_partner.id
 
         return result
+
+    # def action_payslip_done(self) :
+    #     result = super ().action_payslip_done ()
+    #
+    #     messages = []  # لتجميع الرسائل لكل slip
+    #
+    #     for slip in self :
+    #         employee = slip.employee_id
+    #         if not employee :
+    #             continue
+    #
+    #         # جلب partner الموظف أو إنشاء واحد جديد إذا لم يكن موجود
+    #         employee_partner = getattr ( employee , 'user_id' , False ) and getattr ( employee.user_id , 'partner_id' ,
+    #                                                                                   False )
+    #         if not employee_partner :
+    #             employee_partner = self.env['res.partner'].create ( {
+    #                 'name' : employee.name ,
+    #                 'email' : getattr ( employee , 'work_email' , False ) ,
+    #                 'phone' : getattr ( employee , 'work_phone' , False ) ,
+    #                 'is_company' : False ,
+    #             } )
+    #
+    #         # جلب القيود المرتبطة بالرواتب
+    #         move = slip.move_id
+    #         if move :
+    #             # جلب الحساب التحليلي من الموظف
+    #             analytic_account_id = getattr ( employee , 'analytic_account_id' , False )
+    #
+    #             # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
+    #             analytic_vals = {analytic_account_id.id : 100} if analytic_account_id else {}
+    #
+    #             for line in move.line_ids :
+    #                 line.analytic_account_id = analytic_account_id
+    #                 line.analytic_distribution = analytic_vals
+    #                 line.partner_id = employee_partner
+    #
+    #     return result
 
 
 # ---------------- EMPLOYEE Contract -----------------
@@ -341,14 +380,14 @@ class ResPartner ( models.Model ) :
     key_information = fields.Boolean ( string="المعلومات الرئيسية" , default=False ,
                                        help="عند تفعيل هذا الحقل يتم عرض المعلومات الرئيسية الخاصة بجهة الاتصال الحالية." )
     call_information = fields.Boolean ( string="معلومات الإتصال " , default=False ,
-                                       help="عند تفعيل هذا الحقل يتم عرض معلومات الإتصال الخاصة بجهة الاتصال الحالية." )
+                                        help="عند تفعيل هذا الحقل يتم عرض معلومات الإتصال الخاصة بجهة الاتصال الحالية." )
     history_information = fields.Boolean ( string=" عقود  العميل " , default=False ,
-                                       help="عند تفعيل هذا الحقل يتم عرض معلومات العقود الخاصة بجهة الاتصال الحالية." )
+                                           help="عند تفعيل هذا الحقل يتم عرض معلومات العقود الخاصة بجهة الاتصال الحالية." )
     additional_information = fields.Boolean ( string="المعلومات الفرعية" , default=True ,
                                               help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية." )
 
     zip = fields.Char ( string="الرمز البريدي" , size=5 , readonly=False )
-    district2=fields.Char(string="الحي",size=10,readonly=False)
+    district2 = fields.Char ( string="الحي" , size=10 , readonly=False )
     identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
     additional_no = fields.Char ( string="الرقم الإضافي" , size=4 , readonly=False )
 
@@ -358,7 +397,7 @@ class ResPartner ( models.Model ) :
 
     nationality = fields.Char ( "Nationality" )
     email = fields.Char ( "Main Email" , required=True , store=True )
-    another_email = fields.Char ( "Another Email"  , store=True )
+    another_email = fields.Char ( "Another Email" , store=True )
     real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
     nationality = fields.Char ( "Nationality" )
@@ -367,7 +406,7 @@ class ResPartner ( models.Model ) :
     is_broker = fields.Boolean ( string='Broker' )
     ref = fields.Char ( string=_ ( "1 Audit No" ) , store=True , index=True )
     name_english = fields.Char ( string="English name" , readonly=False , store=True )
-    partner_vat_placeholder = fields.Char ( string="Vat Number", related="vat", readonly=False )
+    partner_vat_placeholder = fields.Char ( string="Vat Number" , related="vat" , readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
     identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
     manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' ,
@@ -401,10 +440,10 @@ class ResPartner ( models.Model ) :
 
             if rec.street :
                 parts.append ( rec.street )
-                
+
             if rec.district2 :
                 parts.append ( rec.district2 )
-                
+
             if rec.city :
                 parts.append ( rec.city )
 
@@ -469,11 +508,11 @@ class ResPartner ( models.Model ) :
         for rec in self :
             name = rec.name or ''
 
-            #if rec.vat  or :
-                #name += f' | VAT: {rec.vat}'
+            # if rec.vat  or :
+            # name += f' | VAT: {rec.vat}'
 
-            #if rec.identification_number :
-                #name += f' | ID: {rec.identification_number}'
+            # if rec.identification_number :
+            # name += f' | ID: {rec.identification_number}'
 
             res.append ( (rec.id , name) )
 
@@ -493,7 +532,6 @@ class ResPartner ( models.Model ) :
                       ] + args
 
         return self.search ( domain , limit=limit ).name_get ()
-
 
     @api.onchange ( 'name' )
     def _onchange_name_lock(self) :
