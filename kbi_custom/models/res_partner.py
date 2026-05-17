@@ -200,8 +200,8 @@ class HrPayslip ( models.Model ) :
     _inherit = 'hr.payslip'
      
     basic_wage=fields.Monetary(string="(Basic)الراتـب الأسـاسـي ",related='contract_id.monthly_yearly_costs',readonly=False,store=False)
-    gross_wage=fields.Monetary(String="(Gross)الراتـب الشـامل",compute='_compute_gross_salary',readonly=False,store=False)
-    net_wage=fields.Monetary(String="(Net)صــافي الراتـب",compute='_compute_gross_salary',readonly=False,store=False)
+    gross_wage=fields.Monetary(string="(Gross)الراتـب الشـامل",compute='_compute_gross_salary',readonly=False,store=False)
+    net_wage=fields.Monetary(string="(Net)صــافي الراتـب",compute='_compute_gross_salary',readonly=False,store=False)
     #contract.l10n_sa_housing_allowance بدل السكن 
     #contract.l10n_sa_transportation_allowance بدل المواصلات
     #contract.l10n_sa_other_allowances بدلات أخري
@@ -211,7 +211,7 @@ class HrPayslip ( models.Model ) :
              #basic = sum(rec.line_ids.filtered(lambda l: l.code == 'BASIC').mapped('total'))
              #allowance = sum(rec.line_ids.filtered(lambda l: l.code == 'ALW').mapped('total'))
              loan = sum(rec.input_line_ids.filtered(lambda l: l.code == 'LOAN').mapped('amount'))
-             rec.gross_wage = rec.basic_wage + rec.contract.l10n_sa_housing_allowance + rec.contract.l10n_sa_transportation_allowance+rec.contract.l10n_sa_other_allowances
+             rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance+rec.contract_id.l10n_sa_other_allowances
              rec.net_wage = rec.gross_wage - loan
 
 
