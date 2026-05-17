@@ -202,9 +202,9 @@ class HrPayslip ( models.Model ) :
     basic_wage=fields.Monetary(string="(Basic)الراتـب الأسـاسـي ",related='contract_id.monthly_yearly_costs',readonly=False,store=False)
     gross_wage=fields.Monetary(string="(Gross)الراتـب الشـامل",compute='_compute_gross_salary',readonly=False,store=False)
     net_wage=fields.Monetary(string="(Net)صــافي الراتـب",compute='_compute_gross_salary',readonly=False,store=False)
-    housing=fields.Monetary(string="بدل الســـكن",related=contract_id.l10n_sa_housing_allowance,readonly=False,store=False)
-    transportation=fields.Monetary(string="بدل المواصــلات",related=contract_id.l10n_sa_transportation_allowance,readonly=False,store=False)
-    other_allowance=fields.Monetary(string="بدلات أخــري",related=contract_id.l10n_sa_other_allowances,readonly=False,store=False)
+    housing=fields.Monetary(string="بدل الســـكن",related='contract_id.l10n_sa_housing_allowance')
+    transportation=fields.Monetary(string="بدل المواصــلات",related='contract_id.l10n_sa_transportation_allowance')
+    other_allowance=fields.Monetary(string="بدلات أخــري",related='contract_id.l10n_sa_other_allowances')
     
     #contract.l10n_sa_housing_allowance بدل السكن 
     #contract.l10n_sa_transportation_allowance بدل المواصلات
