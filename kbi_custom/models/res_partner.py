@@ -205,6 +205,8 @@ class HrPayslip ( models.Model ) :
     housing=fields.Monetary(string="بدل الســـكن",compute='_compute_gross_salary',readonly=False,store=False)
     transportation=fields.Monetary(string="بدل المواصــلات",compute='_compute_gross_salary',readonly=False,store=False)
     other_allowance=fields.Monetary(string="بدلات أخــري",compute='_compute_gross_salary',readonly=False,store=False)
+    loan=fields.Monetary(string="إستقطــاع ســلفة",compute='_compute_gross_salary',readonly=False,store=False)
+    gosi=fields.Monetary(string="خصم حصـة التـأمينات",compute='_compute_gross_salary',readonly=False,store=False)
     
     #contract.l10n_sa_housing_allowance بدل السكن 
     #contract.l10n_sa_transportation_allowance بدل المواصلات
@@ -218,8 +220,12 @@ class HrPayslip ( models.Model ) :
              #basic = sum(rec.line_ids.filtered(lambda l: l.code == 'BASIC').mapped('total'))
              #allowance = sum(rec.line_ids.filtered(lambda l: l.code == 'ALW').mapped('total'))
              loan = sum(rec.input_line_ids.filtered(lambda l: l.code == 'LOAN').mapped('amount'))
+             rec.loan=loan
+             rate = 0.1025 if rec.contract_id.x_gosi_225 else 0.0975
              rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance+rec.contract_id.l10n_sa_other_allowances
+             rec.gosi = rec.gross_wage * -rate
              rec.net_wage = rec.gross_wage - loan
+             
 
 
     
