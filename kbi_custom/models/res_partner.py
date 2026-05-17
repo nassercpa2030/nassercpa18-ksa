@@ -199,7 +199,7 @@ _logger = logging.getLogger ( __name__ )
 class HrPayslip ( models.Model ) :
     _inherit = 'hr.payslip'
      
-    basic_wage=sum(rec.line_ids.filtered(lambda l: l.salary_rule_id.code == 'BASIC').mapped('total'))
+    basic_wage=fields.Monetary(string="(Basic)الراتـب الأسـاسـي ",compute='_compute_gross_salary',readonly=False,store=False)
     #fields.Monetary(string="(Basic)الراتـب الأسـاسـي ",related='contract_id.monthly_yearly_costs',readonly=False,store=False)
     gross_wage=fields.Monetary(string="(Gross)الراتـب الشـامل",compute='_compute_gross_salary',readonly=False,store=False)
     net_wage=fields.Monetary(string="(Net)صــافي الراتـب",compute='_compute_gross_salary',readonly=False,store=False)
@@ -211,6 +211,7 @@ class HrPayslip ( models.Model ) :
          for rec in self :
              #basic = sum(rec.line_ids.filtered(lambda l: l.code == 'BASIC').mapped('total'))
              #allowance = sum(rec.line_ids.filtered(lambda l: l.code == 'ALW').mapped('total'))
+             rec.basic_wage =sum(rec.line_ids.filtered(lambda l: l.salary_rule_id.code == 'BASIC').mapped('total'))
              loan = sum(rec.input_line_ids.filtered(lambda l: l.code == 'LOAN').mapped('amount'))
              rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance+rec.contract_id.l10n_sa_other_allowances
              rec.net_wage = rec.gross_wage - loan
