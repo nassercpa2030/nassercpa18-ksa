@@ -199,7 +199,7 @@ _logger = logging.getLogger ( __name__ )
 class HrPayslip ( models.Model ) :
     _inherit = 'hr.payslip'
      
-    basic_wage=fields.Monetary(string="الراتب الأساسي ",related='contract_id.monthly_yearly_costs',readonly=False)
+    basic_wage=fields.Monetary(string="الراتب الأساسي ",related='contract_id.monthly_yearly_costs',readonly=False,store=False)
     def action_payslip_done(self) :
         result = super ().action_payslip_done ()
 
