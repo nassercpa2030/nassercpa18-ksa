@@ -208,9 +208,10 @@ class HrPayslip ( models.Model ) :
     #@api.depends('basic_wage','contract.l10n_sa_housing_allowance','contract.l10n_sa_transportation_allowance','contract.l10n_sa_other_allowances')
     def _compute_gross_salary(self):
          for rec in self :
-             categories = rec._get_line_values_by_code()  # أو حسب setup عندك
-             rec.gross_wage = sum(float(categories.get(code, 0.0)) for code in ['BASIC', 'ALW'])
+             basic = sum(rec.line_ids.filtered(lambda l: l.code == 'BASIC').mapped('total'))
+             allowance = sum(rec.line_ids.filtered(lambda l: l.code == 'ALW').mapped('total'))
              loan = sum(rec.input_line_ids.filtered(lambda l: l.code == 'LOAN').mapped('amount'))
+             rec.gross_wage = basic + allowance
              rec.net_wage = rec.gross_wage - loan
 
 
