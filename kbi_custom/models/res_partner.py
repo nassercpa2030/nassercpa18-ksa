@@ -199,7 +199,22 @@ _logger = logging.getLogger ( __name__ )
 class HrPayslip ( models.Model ) :
     _inherit = 'hr.payslip'
      
-    basic_wage=fields.Monetary(string="الراتب الأساسي ",related='contract_id.monthly_yearly_costs',readonly=False,store=False)
+    basic_wage=fields.Monetary(string="(Basic)الراتـب الأسـاسـي ",related='contract_id.monthly_yearly_costs',readonly=False,store=False)
+    gross_wage=fields.Monetary(String="(Gross)الراتـب الشـامل",compute='_compute_gross_salary',readonly=False,store=False)
+    net_wage=fields.Monetary(String="(Net)صــافي الراتـب",compute='_compute_gross_salary',readonly=False,store=False)
+    #contract.l10n_sa_housing_allowance بدل السكن 
+    #contract.l10n_sa_transportation_allowance بدل المواصلات
+    #contract.l10n_sa_other_allowances بدلات أخري
+    #@api.depends('basic_wage','contract.l10n_sa_housing_allowance','contract.l10n_sa_transportation_allowance','contract.l10n_sa_other_allowances')
+    def _compute_gross_salary(self):
+         for rec in self :
+             categories = rec._get_line_values_by_code()  # أو حسب setup عندك
+             rec.gross_wage = sum(float(categories.get(code, 0.0)) for code in ['BASIC', 'ALW'])
+             loan = sum(rec.input_line_ids.filtered(lambda l: l.code == 'LOAN').mapped('amount'))
+             rec.net_wage = rec.gross_wage - loan
+
+
+    
     def action_payslip_done(self) :
         result = super ().action_payslip_done ()
 
