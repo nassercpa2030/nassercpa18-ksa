@@ -202,9 +202,9 @@ class HrPayslip ( models.Model ) :
     basic_wage=fields.Monetary(string="(Basic)الراتـب الأسـاسـي ",related='contract_id.monthly_yearly_costs',readonly=False,store=False)
     gross_wage=fields.Monetary(string="(Gross)الراتـب الشـامل",compute='_compute_gross_salary',readonly=False,store=False)
     net_wage=fields.Monetary(string="(Net)صــافي الراتـب",compute='_compute_gross_salary',readonly=False,store=False)
-    housing=fields.Monetary(string="بدل الســـكن",related='contract_id.l10n_sa_housing_allowance')
-    transportation=fields.Monetary(string="بدل المواصــلات",related='contract_id.l10n_sa_transportation_allowance')
-    other_allowance=fields.Monetary(string="بدلات أخــري",related='contract_id.l10n_sa_other_allowances')
+    housing=fields.Monetary(string="بدل الســـكن",compute='_compute_gross_salary',readonly=False,store=False)
+    transportation=fields.Monetary(string="بدل المواصــلات",compute='_compute_gross_salary',readonly=False,store=False')
+    other_allowance=fields.Monetary(string="بدلات أخــري",compute='_compute_gross_salary',readonly=False,store=False)
     
     #contract.l10n_sa_housing_allowance بدل السكن 
     #contract.l10n_sa_transportation_allowance بدل المواصلات
@@ -212,6 +212,9 @@ class HrPayslip ( models.Model ) :
     #@api.depends('basic_wage','contract.l10n_sa_housing_allowance','contract.l10n_sa_transportation_allowance','contract.l10n_sa_other_allowances')
     def _compute_gross_salary(self):
          for rec in self :
+             rec.housing = rec.contract_id.l10n_sa_housing_allowance
+             rec.transportation = rec.contract_id.l10n_sa_transportation_allowance
+             rec.other_allowance = rec.contract_id.l10n_sa_other_allowances
              #basic = sum(rec.line_ids.filtered(lambda l: l.code == 'BASIC').mapped('total'))
              #allowance = sum(rec.line_ids.filtered(lambda l: l.code == 'ALW').mapped('total'))
              loan = sum(rec.input_line_ids.filtered(lambda l: l.code == 'LOAN').mapped('amount'))
