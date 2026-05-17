@@ -199,7 +199,8 @@ _logger = logging.getLogger ( __name__ )
 class HrPayslip ( models.Model ) :
     _inherit = 'hr.payslip'
      
-    basic_wage=fields.Monetary(string="(Basic)الراتـب الأسـاسـي ",related='contract_id.monthly_yearly_costs',readonly=False,store=False)
+    basic_wage=sum(rec.line_ids.filtered(lambda l: l.salary_rule_id.code == 'BASIC').mapped('total'))
+    #fields.Monetary(string="(Basic)الراتـب الأسـاسـي ",related='contract_id.monthly_yearly_costs',readonly=False,store=False)
     gross_wage=fields.Monetary(string="(Gross)الراتـب الشـامل",compute='_compute_gross_salary',readonly=False,store=False)
     net_wage=fields.Monetary(string="(Net)صــافي الراتـب",compute='_compute_gross_salary',readonly=False,store=False)
     #contract.l10n_sa_housing_allowance بدل السكن 
