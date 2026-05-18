@@ -327,9 +327,7 @@ class SalaryAttachements(models.Model):
             )
 
             for slip in paid_slips:
-                loan_lines = slip.line_ids.filtered(
-                    lambda l: 'LOAN' in (l.salary_rule_id.code or '')
-                )
+                loan_lines = slip.line_ids.loan
 
                 amount += abs(sum(loan_lines.mapped('total')))
 
