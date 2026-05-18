@@ -312,11 +312,16 @@ class SalaryAttachements( models.Model ) :
     
     @api.depends('payslip_ids.line_ids.total')
     def _compute_loan_remaing_paid(self) :
-         amount = 0
-         for slip in rec.payslip_ids.filtered(lambda p: p.state == 'paid' ):
-              loan_line = slip.line_ids.filtered( lambda l: 'LOAN' in (l.salary_rule_id.code or ''))
-              amount += abs(sum(loan_line.mapped('total')))
-              slip.paid_amount = amount
+        for rec in self :
+            amount = 0
+            for slip in rec.payslip_ids.filtered(lambda p: p.state == 'paid' ):
+                loan_line = slip.line_ids.filtered( lambda l: 'LOAN' in (l.salary_rule_id.code or ''))
+                amount += abs(sum(loan_line.mapped('total')))
+                
+            slip.paid_amount = amount
+              
+         
+         
         
 # ---------------- EMPLOYEE Contract -----------------
 class Recruiter ( models.Model ) :
