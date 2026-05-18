@@ -306,7 +306,18 @@ class HrPayslip ( models.Model ) :
     #
     #     return result
 
-
+class SalaryAttachements( models.Model ) :
+    _inherit = 'hr.salary.attachment'
+    paid_amount =fields.Monetary("المبــلغ المـدفوع",compute="_compute_loan_remaing_paid",help="المبالغ  المدفوعة من  السلفة المحسوبة علي الموظف",readonly=False)
+    
+    @api.depends('payslip_ids.line_ids.total')
+    def _compute_loan_remaing_paid(self) :
+         amount = 0
+         for slip in rec.payslip_ids.filtered(lambda p: p.state == 'paid' ):
+              loan_line = slip.line_ids.filtered( lambda l: 'LOAN' in (l.salary_rule_id.code or ''))
+              amount += abs(sum(loan_line.mapped('total')))
+              rec.paid_amount = amount
+        
 # ---------------- EMPLOYEE Contract -----------------
 class Recruiter ( models.Model ) :
     _inherit = 'hr.contract'
