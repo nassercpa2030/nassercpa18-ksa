@@ -316,7 +316,7 @@ class SalaryAttachements( models.Model ) :
          for slip in rec.payslip_ids.filtered(lambda p: p.state == 'paid' ):
               loan_line = slip.line_ids.filtered( lambda l: 'LOAN' in (l.salary_rule_id.code or ''))
               amount += abs(sum(loan_line.mapped('total')))
-              rec.paid_amount = amount
+              slip.paid_amount = amount
         
 # ---------------- EMPLOYEE Contract -----------------
 class Recruiter ( models.Model ) :
