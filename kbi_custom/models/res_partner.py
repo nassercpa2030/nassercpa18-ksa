@@ -198,40 +198,42 @@ _logger = logging.getLogger ( __name__ )
 
 class HrPayslip ( models.Model ) :
     _inherit = 'hr.payslip'
-     
-    basic_wage=fields.Monetary(string="(Basic)الراتـب الأسـاسـي ",related='contract_id.monthly_yearly_costs',readonly=False,store=False)
-    gross_wage=fields.Monetary(string="(Gross)الراتـب الشـامل",compute='_compute_gross_salary',readonly=False,store=False)
-    net_wage=fields.Monetary(string="(Net)صــافي الراتـب",compute='_compute_gross_salary',readonly=False,store=False)
-    housing=fields.Monetary(string="بدل الســـكن",compute='_compute_gross_salary',readonly=False,store=False)
-    transportation=fields.Monetary(string="بدل المواصــلات",compute='_compute_gross_salary',readonly=False,store=False)
-    other_allowance=fields.Monetary(string="بدلات أخــري",compute='_compute_gross_salary',readonly=False,store=False)
-    loan=fields.Monetary(string="إستقطــاع ســلفة",compute='_compute_gross_salary',readonly=False,store=False)
-    gosi=fields.Monetary(string="خصم حصـة التـأمينات",compute='_compute_gross_salary',readonly=False,store=False)
-    
-    #contract.l10n_sa_housing_allowance بدل السكن 
-    #contract.l10n_sa_transportation_allowance بدل المواصلات
-    #contract.l10n_sa_other_allowances بدلات أخري
-    #@api.depends('basic_wage','contract.l10n_sa_housing_allowance','contract.l10n_sa_transportation_allowance','contract.l10n_sa_other_allowances')
-    def _compute_gross_salary(self):
-         for rec in self :
-             rec.housing = rec.contract_id.l10n_sa_housing_allowance
-             rec.transportation = rec.contract_id.l10n_sa_transportation_allowance
-             rec.other_allowance = rec.contract_id.l10n_sa_other_allowances
-             #basic = sum(rec.line_ids.filtered(lambda l: l.code == 'BASIC').mapped('total'))
-             #allowance = sum(rec.line_ids.filtered(lambda l: l.code == 'ALW').mapped('total'))
-             loan = sum(rec.input_line_ids.filtered(lambda l: l.code == 'LOAN').mapped('amount'))
-             rec.loan=loan
-             rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance+rec.contract_id.l10n_sa_other_allowances
-             rec.net_wage = rec.gross_wage - loan
-             if rec.employee_id.country_id.code == 'SA' and not rec.contract_id.x_gosi_employee_exempt:
+
+    basic_wage = fields.Monetary ( string="(Basic)الراتـب الأسـاسـي " , related='contract_id.monthly_yearly_costs' ,
+                                   readonly=False , store=False )
+    gross_wage = fields.Monetary ( string="(Gross)الراتـب الشـامل" , compute='_compute_gross_salary' , readonly=False ,
+                                   store=False )
+    net_wage = fields.Monetary ( string="(Net)صــافي الراتـب" , compute='_compute_gross_salary' , readonly=False ,
+                                 store=False )
+    housing = fields.Monetary ( string="بدل الســـكن" , compute='_compute_gross_salary' , readonly=False , store=False )
+    transportation = fields.Monetary ( string="بدل المواصــلات" , compute='_compute_gross_salary' , readonly=False ,
+                                       store=False )
+    other_allowance = fields.Monetary ( string="بدلات أخــري" , compute='_compute_gross_salary' , readonly=False ,
+                                        store=False )
+    loan = fields.Monetary ( string="إستقطــاع ســلفة" , compute='_compute_gross_salary' , readonly=False ,
+                             store=False )
+    gosi = fields.Monetary ( string="خصم حصـة التـأمينات" , compute='_compute_gross_salary' , readonly=False ,
+                             store=False )
+
+    # contract.l10n_sa_housing_allowance بدل السكن
+    # contract.l10n_sa_transportation_allowance بدل المواصلات
+    # contract.l10n_sa_other_allowances بدلات أخري
+    # @api.depends('basic_wage','contract.l10n_sa_housing_allowance','contract.l10n_sa_transportation_allowance','contract.l10n_sa_other_allowances')
+    def _compute_gross_salary(self) :
+        for rec in self :
+            rec.housing = rec.contract_id.l10n_sa_housing_allowance
+            rec.transportation = rec.contract_id.l10n_sa_transportation_allowance
+            rec.other_allowance = rec.contract_id.l10n_sa_other_allowances
+            # basic = sum(rec.line_ids.filtered(lambda l: l.code == 'BASIC').mapped('total'))
+            # allowance = sum(rec.line_ids.filtered(lambda l: l.code == 'ALW').mapped('total'))
+            loan = sum ( rec.input_line_ids.filtered ( lambda l : l.code == 'LOAN' ).mapped ( 'amount' ) )
+            rec.loan = loan
+            rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance + rec.contract_id.l10n_sa_other_allowances
+            rec.net_wage = rec.gross_wage - loan
+            if rec.employee_id.country_id.code == 'SA' and not rec.contract_id.x_gosi_employee_exempt :
                 rate = 0.1025 if rec.contract_id.x_gosi_225 else 0.0975
                 rec.gosi = rec.gross_wage * -rate
-                 
-             
-             
 
-
-    
     def action_payslip_done(self) :
         result = super ().action_payslip_done ()
 
@@ -306,23 +308,34 @@ class HrPayslip ( models.Model ) :
     #
     #     return result
 
-class SalaryAttachements( models.Model ) :
+
+class SalaryAttachements(models.Model):
     _inherit = 'hr.salary.attachment'
-    paid_amount =fields.Monetary("المبــلغ المـدفوع",compute="_compute_loan_remaing_paid",help="المبالغ  المدفوعة من  السلفة المحسوبة علي الموظف",readonly=False)
-    
-    @api.depends('payslip_ids.line_ids.total')
-    def _compute_loan_remaing_paid(self) :
-        for rec in self :
+
+    paid_amount = fields.Monetary(
+        string="المبــلغ المـدفوع",
+        compute="_compute_loan_remaing_paid",
+        readonly=False)
+
+    @api.depends('payslip_ids.state', 'payslip_ids.line_ids.total')
+    def _compute_loan_remaing_paid(self):
+        for rec in self:
             amount = 0
-            for slip in rec.payslip_ids.filtered(lambda p: p.state == 'paid' ):
-                loan_line = slip.line_ids.filtered( lambda l: 'LOAN' in (l.salary_rule_id.code or ''))
-                amount += abs(sum(loan_line.mapped('total')))
-                
-            slip.paid_amount = amount
-              
-         
-         
-        
+
+            paid_slips = rec.payslip_ids.filtered(
+                lambda p: p.state == 'paid'
+            )
+
+            for slip in paid_slips:
+                loan_lines = slip.line_ids.filtered(
+                    lambda l: 'LOAN' in (l.salary_rule_id.code or '')
+                )
+
+                amount += abs(sum(loan_lines.mapped('total')))
+
+            rec.paid_amount = amount
+
+
 # ---------------- EMPLOYEE Contract -----------------
 class Recruiter ( models.Model ) :
     _inherit = 'hr.contract'
@@ -483,21 +496,21 @@ class ResPartner ( models.Model ) :
             parts = []
 
             if rec.building_no :
-                parts.append (str(rec.l10n_sa_edi_building_number ))
+                parts.append ( str ( rec.l10n_sa_edi_building_number ) )
 
             if rec.street :
-                parts.append ( str(rec.street ))
+                parts.append ( str ( rec.street ) )
 
             if rec.district2 :
-                parts.append ( str(rec.district2 ))
+                parts.append ( str ( rec.district2 ) )
 
             if rec.city :
-                parts.append ( str(rec.city ))
+                parts.append ( str ( rec.city ) )
 
             if rec.zip and rec.additional_no :
                 parts.append ( f"{rec.zip}-{rec.additional_no}" )
             elif rec.zip :
-                parts.append ( str(rec.zip) )
+                parts.append ( str ( rec.zip ) )
 
             rec.national_address = "، ".join ( parts )
 
