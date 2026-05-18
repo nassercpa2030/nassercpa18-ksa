@@ -467,21 +467,21 @@ class ResPartner ( models.Model ) :
             parts = []
 
             if rec.building_no :
-                parts.append ( (str(rec.l10n_sa_edi_building_number ))
+                parts.append (str(rec.l10n_sa_edi_building_number ))
 
             if rec.street :
-                parts.append ( (str(rec.street ))
+                parts.append ( str(rec.street ))
 
             if rec.district2 :
-                parts.append ( (str(rec.district2 ))
+                parts.append ( str(rec.district2 ))
 
             if rec.city :
-                parts.append ( (str(rec.city ))
+                parts.append ( str(rec.city ))
 
             if rec.zip and rec.additional_no :
                 parts.append ( f"{rec.zip}-{rec.additional_no}" )
             elif rec.zip :
-                parts.append ( (str(rec.zip) )
+                parts.append ( str(rec.zip) )
 
             rec.national_address = "، ".join ( parts )
 
