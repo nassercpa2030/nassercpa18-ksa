@@ -317,7 +317,7 @@ class SalaryAttachements(models.Model):
         compute="_compute_loan_remaing_paid",
         readonly=False)
     
-    remaning_amount = fields.Monetary(string="المبــلغ الـمتبقــي",compute="_compute_loan_remaing_paid",readonly=False) 
+    remaining_amount = fields.Monetary(string="المبــلغ الـمتبقــي",compute="_compute_loan_remaing_paid",readonly=False) 
 
     @api.depends('payslip_ids.state', 'payslip_ids.line_ids.total')
     def _compute_loan_remaing_paid(self):
