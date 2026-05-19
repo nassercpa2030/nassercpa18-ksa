@@ -1070,8 +1070,7 @@ class SaleOrder2 ( models.Model ) :
     #                                        readonly=False , index=True , searchable=True )
     final_close_entry = fields.Char ( string="قيد الايراد" , compute='_compute_final_close_entry_date' ,
                                       readonly=False , index=True , searchable=True )
-    close_entry_date = fields.Date ( string="تاريخ قيد الايراد"  , rcompute='_compute_final_close_entry_date' ,
-    #                                  readonly=False , index=True , searchable=True )
+    close_entry_date = fields.Date ( string="تاريخ قيد الايراد"  , rcompute='_compute_final_close_entry_date' ,readonly=False , index=True , searchable=True )
     close_entry_year = fields.Integer ( string="Close Entry Year" , store=True , readonly=False , searchable=True )
     validity_date = fields.Date ( string='Validity Date' ,
                                   default=fields.Date.today () + datetime.timedelta ( days=30 ) )
