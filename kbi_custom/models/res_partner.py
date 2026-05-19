@@ -316,6 +316,8 @@ class SalaryAttachements(models.Model):
         string="المبــلغ المـدفوع",
         compute="_compute_loan_remaing_paid",
         readonly=False)
+    
+    remaning_amount = fields.Monetary(string="المبــلغ الـمتبقــي",compute="_compute_loan_remaing_paid",readonly=False) 
 
     @api.depends('payslip_ids.state', 'payslip_ids.line_ids.total')
     def _compute_loan_remaing_paid(self):
@@ -325,10 +327,15 @@ class SalaryAttachements(models.Model):
             paid_slips = rec.payslip_ids.filtered(
                 lambda p: p.state == 'paid'
             )
+            not_paid_slips = rec.payslip_ids.filtered(
+                lambda p: p.state not in ['paid','cancel']
+            )
 
             amount = sum(paid_slips.mapped('loan'))
+            not_paid_amount= sum(not_paid_slips.mapped('loan'))
 
             rec.paid_amount = amount
+            rec.remaning_amount = not_paid_amount
 
 
 # ---------------- EMPLOYEE Contract -----------------
