@@ -211,12 +211,9 @@ class SaleOrder ( models.Model ) :
     ###########################
     multi_years = fields.Boolean ( string="Multi_Years" )
     multi_years_no = fields.Integer ( sring="Multi Years No" )
-    mulit_year1 = fields.Integer ( string="الخدمة الأولي" , readonly=False )
-    mulit_year2 = fields.Integer ( string="الخدمة الثانية " , readonly=False )
-    mulit_year3 = fields.Integer ( string="الخدمة الثالثة" , readonly=False )
-    mulit_year_1 = fields.Integer ( string="Year1" , readonly=False )
-    mulit_year_2 = fields.Integer ( string="Year2" , readonly=False )
-    mulit_year_3 = fields.Integer ( string="Year3" , readonly=False )
+    mulit_year1 = fields.Integer ( string="Year1" , readonly=False )
+    mulit_year2 = fields.Integer ( string="Year2" , readonly=False )
+    mulit_year3 = fields.Integer ( string="Year3" , readonly=False )
     taxed_price1 = fields.Integer ( string="Taxed Price1" , readonly=False , compute="compute_taxed_price" ,
                                     store=True )
     taxed_price2 = fields.Integer ( string="Taxed Price2" , readonly=False , compute="compute_taxed_price" ,
