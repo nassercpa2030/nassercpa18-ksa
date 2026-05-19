@@ -1062,9 +1062,9 @@ class SaleOrder2 ( models.Model ) :
     price1 = fields.Float ( string="Untaxed Price1" , readonly=False , deFault=False )
     price2 = fields.Float ( string="Untaxed Price2" , readonly=False , deFault=False )
     price3 = fields.Float ( string="Untaxed Price3" , readonly=False , deFault=False )
-    year1 = fields.Char ( string="Year_1" , readonly=False , deFault=False )
-    year2 = fields.Char ( string="Year_2" , readonly=False , deFault=False )
-    year3 = fields.Char ( string="Year_3" , readonly=False , deFault=False )
+    year1 = fields.Char ( string="Description_1" , readonly=False , deFault=False )
+    year2 = fields.Char ( string="Description_2" , readonly=False , deFault=False )
+    year3 = fields.Char ( string="Description_3" , readonly=False , deFault=False )
     uuid = fields.Char ( string='UUID' )
 
     final_close_entry = fields.Char ( string="قيد الايراد" , compute='_compute_final_close_entry_date' ,
