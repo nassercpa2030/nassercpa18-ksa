@@ -228,11 +228,14 @@ class HrPayslip ( models.Model ) :
             # allowance = sum(rec.line_ids.filtered(lambda l: l.code == 'ALW').mapped('total'))
             loan = sum ( rec.input_line_ids.filtered ( lambda l : l.code == 'LOAN' ).mapped ( 'amount' ) )
             rec.loan = loan
-            rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance + rec.contract_id.l10n_sa_other_allowances
-            rec.net_wage = rec.gross_wage - loan
+        
             if rec.employee_id.country_id.code == 'SA' and not rec.contract_id.x_gosi_employee_exempt :
                 rate = 0.1025 if rec.contract_id.x_gosi_225 else 0.0975
                 rec.gosi = rec.gross_wage * -rate
+                
+            rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance + rec.contract_id.l10n_sa_other_allowances+ rec.gosi
+            rec.net_wage = rec.gross_wage - loan
+                
 
     def action_payslip_done(self) :
         result = super ().action_payslip_done ()
