@@ -65,7 +65,7 @@ class SaleOrder ( models.Model ) :
     archived_sale = fields.Boolean ( 'Archived' , readonly=False , required=False , default=False )
     amount_tax = fields.Float ( "Taxes" , readonly=False , required=False )
     audit_date = fields.Date ( string='Audit Date' , readonly=False , required=True , store=True )
-    # close_entry_date = fields.Date (string="Close Entry Date" ,compute="calc_close_date",store=True, readonly=True ,searchable=True)
+    close_entry_date = fields.Date (string="Close Entry Date" ,compute="calc_close_date",store=True, readonly=True ,searchable=True)
     # close_entry_year = fields.Integer ( string="Close Entry Year" ,compute="calc_close_date",store=True, readonly=False,searchable=True )
 
     date = fields.Datetime ( string='Date' )
@@ -290,18 +290,18 @@ class SaleOrder ( models.Model ) :
         # ترجع الـ report action عشان أودو يفتح PDF
         return report.report_action ( self )
 
-    # def calc_close_date(self) :
-    #     for rec in self :
-    #         move = self.env['account.move'].search (
-    #             [('sale_order_id_finance' , '=' , rec.id) , ('journal_id' , '=' , 165) , ('state' , '=' , 'posted') ,
-    #              ('date' , '!=' , False)] , limit=1 )
-    #         rec.close_entry_date = move.date if move else False
+    def calc_close_date(self) :
+        for rec in self :
+            move = self.env['account.move'].search (
+                [('sale_order_id_finance' , '=' , rec.id) , ('journal_id' , '=' , 165) , ('state' , '=' , 'posted') ,
+                 ('date' , '!=' , False)] , limit=1 )
+            rec.close_entry_date = move.date if move else False
     #         if rec.close_entry_date :
     #             rec.close_entry_year = rec.close_entry_date.year
     #             print ( 'DEBUG: Sale Order ID:' , rec.id , 'Move ID:' , move.id , 'Move Name:' , move.name )
     #         else :
     #             rec.close_entry_year = False
-    #             print ( 'DEBUG: Sale Order ID:' , rec.id , 'No move found with journal 165' )
+    # #             print ( 'DEBUG: Sale Order ID:' , rec.id , 'No move found with journal 165' )
 
     def action_set_project_stage_20(self) :
         stage = self.env['project.project.stage'].browse ( 20 )
@@ -1091,8 +1091,8 @@ class SaleOrder2 ( models.Model ) :
 
     final_close_entry = fields.Char ( string="قيد الايراد" , compute='_compute_final_close_entry_date' ,
                                       readonly=False , index=True , searchable=True )
-    close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , rcompute='_compute_final_close_entry_date' ,
-                                     readonly=False )
+    # close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , rcompute='_compute_final_close_entry_date' ,
+    #                                  readonly=False )
     final_close_entry_date = fields.Date ( string=" تاريخ قيد الايراد" , compute='_compute_final_close_entry_date' ,
                                            index=True , searchable=True , store=True )
     close_entry_year = fields.Integer ( string="Close Entry Year" , store=True , readonly=False , searchable=True )
@@ -1117,7 +1117,7 @@ class SaleOrder2 ( models.Model ) :
             ] , order='date asc' , limit=1 )
 
             if move :
-                order.close_entry_date = move.date
+                # order.close_entry_date = move.date
                 order.final_close_entry_date = move.date
                 order.final_close_entry = move.name
 
