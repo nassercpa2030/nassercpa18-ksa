@@ -353,18 +353,17 @@ class SaleOrder ( models.Model ) :
 
             rec.project_name = "- ".join ( parts )
 
-
-    #@api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
-    #def get_project_name(self) :
-        #for rec in self :
-            # if not rec.project_name and rec.auto_contract_name:
-            # if rec.product_public_name and rec.account_year:
-            # rec.project_name = f"{rec.product_public_name} {rec.account_year}"
-            #if rec.auto_contract_name :
-                #if not rec.product_public_name or not rec.account_year :
-                    #rec.project_name = ""
-                #else :
-                    #rec.project_name = f"{rec.product_public_name} {rec.account_year}"
+    # @api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
+    # def get_project_name(self) :
+    # for rec in self :
+    # if not rec.project_name and rec.auto_contract_name:
+    # if rec.product_public_name and rec.account_year:
+    # rec.project_name = f"{rec.product_public_name} {rec.account_year}"
+    # if rec.auto_contract_name :
+    # if not rec.product_public_name or not rec.account_year :
+    # rec.project_name = ""
+    # else :
+    # rec.project_name = f"{rec.product_public_name} {rec.account_year}"
 
     # @api.depends("x_studio_contract_service")
     # def get_audit_date (self):
@@ -372,25 +371,25 @@ class SaleOrder ( models.Model ) :
     #   if rec.x_studio_contract_service :
     #      if x_studio_contract_service.id in []
 
-    #def action_get_crm_lead(self):
-       # self.ensure_one() # for insuring that it is one lead
-        # lead = self.opportunity_id
+    # def action_get_crm_lead(self):
+    # self.ensure_one() # for insuring that it is one lead
+    # lead = self.opportunity_id
 
-        #leads = self.env['crm.lead'].search([
-            #('partner_id', '=', self.partner_id.id)
-        #])# for getting lead of saleorder
-        # then
+    # leads = self.env['crm.lead'].search([
+    # ('partner_id', '=', self.partner_id.id)
+    # ])# for getting lead of saleorder
+    # then
 
-        #return {
-         #   'type': 'ir.actions.act_window',
-          #  'name': 'CRM Lead ',
-           # 'res_model': 'crm.lead',
-            #'view_mode':'form',
-            #'list,form',
-            #'domain': lead.id,
-            #[('id', 'in', leads.ids)],
-            #'target': 'new',
-        #}
+    # return {
+    #   'type': 'ir.actions.act_window',
+    #  'name': 'CRM Lead ',
+    # 'res_model': 'crm.lead',
+    # 'view_mode':'form',
+    # 'list,form',
+    # 'domain': lead.id,
+    # [('id', 'in', leads.ids)],
+    # 'target': 'new',
+    # }
     def action_get_crm_lead(self) :
         self.ensure_one ()
 
@@ -407,7 +406,6 @@ class SaleOrder ( models.Model ) :
             'res_id' : lead.id ,
             'target' : 'new' ,
         }
-    
 
     @api.depends ( 'review_manager_id' )
     def _compute_ass_visible(self) :
@@ -584,7 +582,7 @@ class SaleOrder ( models.Model ) :
 
     uuid = fields.Char ( string='UUID' , readonly=True )
     opportunity_id = fields.Many2one ( 'crm.lead' , string='Opportunity' )
-    #project_name = fields.Char ( string='Project Name' )
+    # project_name = fields.Char ( string='Project Name' )
     partner_id = fields.Many2one ( 'res.partner' , string='Partner' )
     user_id = fields.Many2one ( 'res.users' , string='Responsible' )
 
@@ -668,8 +666,32 @@ class SaleOrder ( models.Model ) :
         return res
 
     def write(self , vals) :
+        # this field for  saving last archive signiture value
+        old_archive = {
+            rec.id : rec.archive_signiture
+            for rec in self
+        }
 
         res = super ().write ( vals )
+        
+        if 'archive_signiture' in vals :
+
+            for sale_order in self :
+                if (
+                        not old_archive[sale_order.id]
+                        and sale_order.archive_signiture
+                ) :
+                    wizard = self.env['close.entry.wizard'].with_context (
+                        active_id=sale_order.id ,
+                        active_model='sale.order'
+                    ).create ( {
+                        'sale_order_id' : sale_order.id ,
+                        'journal_entry_date' : fields.Date.context_today ( self ) ,
+                    } )
+
+                    wizard.close_entry ()
+
+
         # self._get_mobile()
         # إعادة معالجة الملفات فقط إذا تم رفع جديد
         if 'upload_file' in vals and vals['upload_file'] :
@@ -1069,9 +1091,10 @@ class SaleOrder2 ( models.Model ) :
 
     final_close_entry = fields.Char ( string="قيد الايراد" , compute='_compute_final_close_entry_date' ,
                                       readonly=False , index=True , searchable=True )
-    close_entry_date = fields.Date ( string="تاريخ قيد الايراد"  , rcompute='_compute_final_close_entry_date' ,readonly=False  )
+    close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , rcompute='_compute_final_close_entry_date' ,
+                                     readonly=False )
     final_close_entry_date = fields.Date ( string=" تاريخ قيد الايراد" , compute='_compute_final_close_entry_date' ,
-                                            index=True , searchable=True ,store=True)
+                                           index=True , searchable=True , store=True )
     close_entry_year = fields.Integer ( string="Close Entry Year" , store=True , readonly=False , searchable=True )
     validity_date = fields.Date ( string='Validity Date' ,
                                   default=fields.Date.today () + datetime.timedelta ( days=30 ) )
@@ -1095,7 +1118,7 @@ class SaleOrder2 ( models.Model ) :
 
             if move :
                 order.close_entry_date = move.date
-                order.final_close_entry_date=move.date
+                order.final_close_entry_date = move.date
                 order.final_close_entry = move.name
 
     # @api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
