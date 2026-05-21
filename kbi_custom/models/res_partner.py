@@ -321,6 +321,7 @@ class SalaryAttachements(models.Model):
         readonly=False)
     
     remaining_amount = fields.Monetary(string="المبــلغ الـمتبقــي",compute="_compute_loan_remaing_paid",readonly=False) 
+    other_deduction = fields.Monetary(string="خصــومـات أخـــري",compute="_compute_loan_remaing_paid",readonly=False) 
 
     @api.depends('payslip_ids.state', 'payslip_ids.line_ids.total')
     def _compute_loan_remaing_paid(self):
@@ -335,10 +336,12 @@ class SalaryAttachements(models.Model):
             # )
 
             amount = sum(paid_slips.mapped('loan'))
+            othdeductions = sum(paid_slips.mapped('DEDUCTION'))
             # not_paid_amount= sum(not_paid_slips.mapped('loan'))
 
             rec.paid_amount = amount
-            remaining= rec.total_amount-amount
+            rec.other_deduction=othdeductions
+            remaining= rec.total_amount-amount -othdeductions
             rec.remaining_amount = max(remaining, 0)
 
 
