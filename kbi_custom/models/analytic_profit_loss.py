@@ -6,7 +6,7 @@ from odoo import api, fields, models, _
 
 
 class KbitAnalyticWizard(models.Model):
-    _inherit = 'kbi.analytic.profit.loss.wizard'
+    _name = 'kbi.analytic.profit.loss.wizard'
 
     show_analytic_totals = fields.Boolean(
         string='عــرض المجــموعــات  الموزعة',
