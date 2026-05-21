@@ -214,6 +214,7 @@ class HrPayslip ( models.Model ) :
                              store=False )
     gosi = fields.Monetary ( string="خصم حصـة التـأمينات" , compute='_compute_gross_salary' , readonly=False ,
                              store=False )
+    other_deduction = fields.Monetary(string="خصــومـات أخـــري",compute="_compute_gross_salary",readonly=False,store=False) 
 
     # contract.l10n_sa_housing_allowance بدل السكن
     # contract.l10n_sa_transportation_allowance بدل المواصلات
@@ -227,6 +228,8 @@ class HrPayslip ( models.Model ) :
             # basic = sum(rec.line_ids.filtered(lambda l: l.code == 'BASIC').mapped('total'))
             # allowance = sum(rec.line_ids.filtered(lambda l: l.code == 'ALW').mapped('total'))
             loan = sum ( rec.input_line_ids.filtered ( lambda l : l.code == 'LOAN' ).mapped ( 'amount' ) )
+            othdeductions = sum(rec.input_line_ids.filtered ( lambda l : l.code == 'DEDUCTION' ).mapped ('amount'))
+            rec.other_deduction=othdeductions
             rec.loan = loan
             rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance + rec.contract_id.l10n_sa_other_allowances
         
@@ -234,7 +237,7 @@ class HrPayslip ( models.Model ) :
                 rate = 0.1025 if rec.contract_id.x_gosi_225 else 0.0975
                 rec.gosi = rec.gross_wage * -rate
                 
-            rec.net_wage = rec.gross_wage - loan + rec.gosi
+            rec.net_wage = rec.gross_wage - loan + rec.gosi -othdeductions
                 
 
     def action_payslip_done(self) :
@@ -321,7 +324,7 @@ class SalaryAttachements(models.Model):
         readonly=False)
     
     remaining_amount = fields.Monetary(string="المبــلغ الـمتبقــي",compute="_compute_loan_remaing_paid",readonly=False) 
-    other_deduction = fields.Monetary(string="خصــومـات أخـــري",compute="_compute_loan_remaing_paid",readonly=False) 
+ 
 
     @api.depends('payslip_ids.state', 'payslip_ids.line_ids.total')
     def _compute_loan_remaing_paid(self):
@@ -336,12 +339,12 @@ class SalaryAttachements(models.Model):
             # )
 
             amount = sum(paid_slips.mapped('loan'))
-            othdeductions = sum(paid_slips.mapped('DEDUCTION'))
+           
             # not_paid_amount= sum(not_paid_slips.mapped('loan'))
 
             rec.paid_amount = amount
-            rec.other_deduction=othdeductions
-            remaining= rec.total_amount-amount -othdeductions
+           
+            remaining= rec.total_amount-amount 
             rec.remaining_amount = max(remaining, 0)
 
 
