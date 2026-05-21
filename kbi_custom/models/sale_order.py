@@ -52,7 +52,7 @@ class SaleOrder ( models.Model ) :
 
     customer_English_name_refrence = fields.Char ( 'customer_English_name_refrence' , readonly=False , store=True )
     close_entry_date_refrence = fields.Date ( string="close_entry_date_refrence" , readonly=False , required=False ,
-                                              store=True )
+                                              store=False )
     invoice_status_refrence = fields.Char ( 'invoice_status_refrence' , readonly=False , required=False , store=True )
     journal_entry_count_finance = fields.Integer ( string='عدد قيود الإغلاق' , store=True , index=True )
     project_budget_refrence = fields.Float ( 'project_budget_refrence' , store=True , readonly=False )
@@ -65,7 +65,7 @@ class SaleOrder ( models.Model ) :
     archived_sale = fields.Boolean ( 'Archived' , readonly=False , required=False , default=False )
     amount_tax = fields.Float ( "Taxes" , readonly=False , required=False )
     audit_date = fields.Date ( string='Audit Date' , readonly=False , required=True , store=True )
-    close_entry_date = fields.Date (string="Close Entry Date" ,compute="calc_close_date",store=True, readonly=True ,searchable=True)
+    close_entry_date = fields.Date (string="Close Entry Date" ,compute="calc_close_date",store=False, readonly=True ,searchable=True)
     # close_entry_year = fields.Integer ( string="Close Entry Year" ,compute="calc_close_date",store=True, readonly=False,searchable=True )
 
     date = fields.Datetime ( string='Date' )
