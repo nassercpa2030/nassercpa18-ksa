@@ -229,7 +229,7 @@ class HrPayslip ( models.Model ) :
             # allowance = sum(rec.line_ids.filtered(lambda l: l.code == 'ALW').mapped('total'))
             loan = sum ( rec.input_line_ids.filtered ( lambda l : l.code == 'LOAN' ).mapped ( 'amount' ) )
             othdeductions = sum(rec.input_line_ids.filtered ( lambda l : l.code == 'DEDUCTION' ).mapped ('amount'))
-            rec.other_deduction=othdeductions
+            rec.other_deduction= -othdeductions
             rec.loan = loan
             rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance + rec.contract_id.l10n_sa_other_allowances
             base = rec._get_contract_wage()+ rec.contract_id.l10n_sa_housing_allowance+ rec.contract_id.l10n_sa_transportation_allowance
@@ -237,7 +237,7 @@ class HrPayslip ( models.Model ) :
                 rate = 0.1025 if rec.contract_id.x_gosi_225 else 0.0975
                 rec.gosi = base * -rate
                 
-            rec.net_wage = rec.gross_wage - loan + rec.gosi -othdeductions
+            rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction 
                 
 
     def action_payslip_done(self) :
