@@ -1263,6 +1263,16 @@ class AnalyticDistributuion ( models.Model ) :
                 rec.pub_loc903_perc_103_distribution_amount = 0.0
                 
 
+class KBIAnalyticProfitLossWizard(models.TransientModel):
+    _name = 'kbi.analytic.profit.loss.wizard'
+    _description = 'Analytic Profit and Loss Wizard'
+
+
+    show_analytic_totals = fields.Boolean(
+        string='عرض المجموعات الموزعة',
+        default=False,
+    )
+
 
 class AccountPaymentSale ( models.Model ) :
     _name = 'account.payment.sale'
