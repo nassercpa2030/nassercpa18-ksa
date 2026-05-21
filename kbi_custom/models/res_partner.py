@@ -330,15 +330,15 @@ class SalaryAttachements(models.Model):
             paid_slips = rec.payslip_ids.filtered(
                 lambda p: p.state == 'paid'
             )
-            not_paid_slips = rec.payslip_ids.filtered(
-                lambda p: p.state not in ['paid','cancel']
-            )
+            # not_paid_slips = rec.payslip_ids.filtered(
+            #     lambda p: p.state not in ['paid','cancel']
+            # )
 
             amount = sum(paid_slips.mapped('loan'))
-            not_paid_amount= sum(not_paid_slips.mapped('loan'))
+            # not_paid_amount= sum(not_paid_slips.mapped('loan'))
 
             rec.paid_amount = amount
-            rec.remaining_amount = not_paid_amount
+            rec.remaining_amount = rec.total_amount-rec.paid_amount
 
 
 # ---------------- EMPLOYEE Contract -----------------
