@@ -338,7 +338,8 @@ class SalaryAttachements(models.Model):
             # not_paid_amount= sum(not_paid_slips.mapped('loan'))
 
             rec.paid_amount = amount
-            rec.remaining_amount = rec.total_amount-rec.paid_amount
+            remaining= rec.total_amount-amount
+            rec.remaining_amount = max(remaining, 0)
 
 
 # ---------------- EMPLOYEE Contract -----------------
