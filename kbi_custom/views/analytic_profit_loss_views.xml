@@ -20,6 +20,7 @@
                                 <!-- <field name="analytic_account_ids" invisible="1"/>-->
                                 <field name="analytic_plan_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True,}"   groups="base.group_system"/> 
                                 <field name="show_details"  groups="base.group_system,104__team.shaker"/>
+                                <field name="show_analytic_totals"  widget="boolean-toggle" groups="base.group_system,104__team.shaker"/>
                             </group>
                         </group>
                             <div class="alert alert-info" role="alert">
