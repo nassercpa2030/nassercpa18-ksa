@@ -9,6 +9,7 @@ import qrcode
 from odoo import models , fields , api , _
 from odoo.exceptions import ValidationError
 from odoo.exceptions import UserError
+from deep_translator import GoogleTranslator
 
 
 # from odoo.tools.populate import compute
@@ -228,6 +229,7 @@ class SaleOrder ( models.Model ) :
     customer_english_name = fields.Char ( string="Customer_English_Name" , related="partner_id.name_english" ,
                                           store=True , readonly=False )
 
+    project_name_en = fields.Char ( string="Project Name (EN)" )
     project_ids = fields.Many2many ( 'project.project' , 'sale_order_project_rel' , 'sale_order_id' , 'project_id' ,
                                      string='Projects' )
     project_count = fields.Integer (
@@ -340,6 +342,17 @@ class SaleOrder ( models.Model ) :
             # else :
             # rec.product_public_name = False
 
+    def action_translate_project_name(self) :
+        for rec in self :
+            if rec.project_name :
+                try :
+                    rec.project_name_en = GoogleTranslator (
+                        source='auto' ,
+                        target='en'
+                    ).translate ( rec.project_name )
+                except Exception :
+                    rec.project_name_en = rec.project_name
+
     @api.depends ( 'product_public_name' , 'account_year' , 'auto_contract_name' )
     def get_project_name(self) :
         for rec in self :
@@ -353,43 +366,6 @@ class SaleOrder ( models.Model ) :
 
             rec.project_name = "- ".join ( parts )
 
-    # @api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
-    # def get_project_name(self) :
-    # for rec in self :
-    # if not rec.project_name and rec.auto_contract_name:
-    # if rec.product_public_name and rec.account_year:
-    # rec.project_name = f"{rec.product_public_name} {rec.account_year}"
-    # if rec.auto_contract_name :
-    # if not rec.product_public_name or not rec.account_year :
-    # rec.project_name = ""
-    # else :
-    # rec.project_name = f"{rec.product_public_name} {rec.account_year}"
-
-    # @api.depends("x_studio_contract_service")
-    # def get_audit_date (self):
-    #   for rec in self :
-    #   if rec.x_studio_contract_service :
-    #      if x_studio_contract_service.id in []
-
-    # def action_get_crm_lead(self):
-    # self.ensure_one() # for insuring that it is one lead
-    # lead = self.opportunity_id
-
-    # leads = self.env['crm.lead'].search([
-    # ('partner_id', '=', self.partner_id.id)
-    # ])# for getting lead of saleorder
-    # then
-
-    # return {
-    #   'type': 'ir.actions.act_window',
-    #  'name': 'CRM Lead ',
-    # 'res_model': 'crm.lead',
-    # 'view_mode':'form',
-    # 'list,form',
-    # 'domain': lead.id,
-    # [('id', 'in', leads.ids)],
-    # 'target': 'new',
-    # }
     def action_get_crm_lead(self) :
         self.ensure_one ()
 
@@ -642,7 +618,6 @@ class SaleOrder ( models.Model ) :
 
     @api.model
     def create(self , vals) :
-
         res = super ().create ( vals )
         # res._get_mobile()
         if res.upload_file :
@@ -673,7 +648,7 @@ class SaleOrder ( models.Model ) :
         }
 
         res = super ().write ( vals )
-        
+
         if 'archive_signiture' in vals :
 
             for sale_order in self :
@@ -690,7 +665,6 @@ class SaleOrder ( models.Model ) :
                     } )
 
                     wizard.close_entry ()
-
 
         # self._get_mobile()
         # إعادة معالجة الملفات فقط إذا تم رفع جديد
@@ -1027,6 +1001,49 @@ class SaleOrder ( models.Model ) :
             ] ,
             'context' : {'create' : False} ,
         }
+
+
+
+
+
+# @api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
+# def get_project_name(self) :
+# for rec in self :
+# if not rec.project_name and rec.auto_contract_name:
+# if rec.product_public_name and rec.account_year:
+# rec.project_name = f"{rec.product_public_name} {rec.account_year}"
+# if rec.auto_contract_name :
+# if not rec.product_public_name or not rec.account_year :
+# rec.project_name = ""
+# else :
+# rec.project_name = f"{rec.product_public_name} {rec.account_year}"
+
+# @api.depends("x_studio_contract_service")
+# def get_audit_date (self):
+#   for rec in self :
+#   if rec.x_studio_contract_service :
+#      if x_studio_contract_service.id in []
+
+# def action_get_crm_lead(self):
+# self.ensure_one() # for insuring that it is one lead
+# lead = self.opportunity_id
+
+# leads = self.env['crm.lead'].search([
+# ('partner_id', '=', self.partner_id.id)
+# ])# for getting lead of saleorder
+# then
+
+# return {
+#   'type': 'ir.actions.act_window',
+#  'name': 'CRM Lead ',
+# 'res_model': 'crm.lead',
+# 'view_mode':'form',
+# 'list,form',
+# 'domain': lead.id,
+# [('id', 'in', leads.ids)],
+# 'target': 'new',
+# }
+
 
 
 class SaleOrder2 ( models.Model ) :
