@@ -155,7 +155,7 @@
 
                                     <tr>
                                         <td><strong>الرقــم الأرضــي</strong></td>
-                                        <td style="text-align:center;"><strong><span t-esc="o.partner_id.leadline or '-'"/></strong></td>
+                                        <td style="text-align:center;" dir="ltr"><strong><span t-esc="o.partner_id.leadline or '-'"/></strong></td>
                                         <td style="text-align:left;"><strong>Landline Number</strong></td>
                                     </tr>
                                     <tr>
@@ -170,7 +170,7 @@
                                     </tr>
                                     <tr>
                                         <td><strong>رقــم الــموبايــل</strong></td>
-                                        <td style="text-align:center;"><strong><span t-esc="o.partner_id.mobile or '-'"/></strong></td>
+                                        <td style="text-align:center;" dir="ltr"><strong><span t-esc="o.partner_id.mobile or '-'"/></strong></td>
                                         <td style="text-align:left;"><strong>Mobile number</strong></td>
                                     </tr>
                                      <tr>
