@@ -468,6 +468,7 @@ class ResPartner ( models.Model ) :
         compute="_compute_national_address" , readonly=False )
 
     nationality = fields.Char ( "Nationality" )
+    leadline = fields.Char ( "الرقم الأرضي" , required=True , store=True )
     email = fields.Char ( "Main Email" , required=True , store=True )
     another_email = fields.Char ( "Another Email" , store=True )
     real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
