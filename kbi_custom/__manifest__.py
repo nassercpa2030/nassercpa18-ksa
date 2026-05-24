@@ -45,6 +45,7 @@
         'views/external_layout_batch_bill.xml',
         'views/report_customer_invoice_report2.xml',
         'views/report_customer_project_report.xml',
+        'views/quality_customer_report.xml',
         'views/hr_payslip_line_style.xml',
         
     ],
