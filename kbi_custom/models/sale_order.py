@@ -282,6 +282,15 @@ class SaleOrder ( models.Model ) :
                     }
 
     ##########print method##########
+    def action_print_customer_history(self) :
+        # إحنا هنا بنجيب التقرير بالـ ID مباشرة
+        report = self.env['ir.actions.report'].browse ( 1645 )
+        if not report :
+            # لو التقرير مش موجود، ممكن نعمل raise أو نرجع التقرير الافتراضي
+            raise ValueError ( "Report with ID 1645 not found!" )
+        # ترجع الـ report action عشان أودو يفتح PDF
+        return report.report_action ( self )
+        
 
     def action_print_project_history(self) :
         # إحنا هنا بنجيب التقرير بالـ ID مباشرة
