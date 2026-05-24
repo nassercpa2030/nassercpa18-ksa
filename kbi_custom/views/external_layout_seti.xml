@@ -182,7 +182,7 @@
                 <span t-esc="o.partner_id.email"/>
             </strong><br/>
                   <strong>phone:
-                <span t-esc="o.partner_id.phone"/>
+                <span t-esc="o.partner_id.mobile"/>
             </strong><br/>
                          
         </t>
