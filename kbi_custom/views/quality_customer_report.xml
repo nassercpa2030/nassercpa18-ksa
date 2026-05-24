@@ -175,12 +175,12 @@
                                     </tr>
                                      <tr>
                                         <td><strong>أســـم مــديــر المــجــمــوعــة</strong></td>
-                                        <td style="text-align:center;"><strong><span t-esc="o.user_id or '-'"/></strong></td>
+                                        <td style="text-align:center;"><strong><span t-esc="o.user_id.name or '-'"/></strong></td>
                                         <td style="text-align:left;"><strong>Group Manager Name</strong></td>
                                     </tr>
                                      <tr>
                                         <td><strong>رقــم الــمجــموعـــة</strong></td>
-                                        <td style="text-align:center;"><strong><span t-esc="o.team_id or '-'"/></strong></td>
+                                        <td style="text-align:center;"><strong><span t-esc="o.team_id.name or '-'"/></strong></td>
                                         <td style="text-align:left;"><strong>Group Number</strong></td>
                                     </tr>
 
