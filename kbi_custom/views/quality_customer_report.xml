@@ -145,12 +145,13 @@
                                     <tr>
                                         <td><strong>الرقـــم  الــموحــد</strong></td>
                                         <td style="text-align:center;"><strong><span t-esc="o.partner_id.number_700 or '-'"/></strong></td>
-                                        <td style="text-align:left;"><strong>Tax Number</strong></td>
+                                         <td style="text-align:left;"><strong>Unified(700)Number</strong></td>
+                                       
                                     </tr>
                                     <tr>
                                         <td><strong>الرقـــم الـضــريبي</strong></td>
                                         <td style="text-align:center;"><strong><span t-esc="o.partner_id.partner_vat_placeholder or '-'"/></strong></td>
-                                        <td style="text-align:left;"><strong>Unified(700)Number</strong></td>
+                                        <td style="text-align:left;"><strong>Tax Number</strong></td>
                                     </tr>
 
                                     <tr>
