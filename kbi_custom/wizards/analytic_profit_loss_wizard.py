@@ -10,6 +10,17 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
 
     date_from = fields.Date(string='Date From', required=True)
     date_to = fields.Date(string='Date To', required=True)
+    group_code = fields.Selection(
+    [
+        ('', ' '),
+        ('101', 'مجموعة 101'),
+        ('103', 'مجموعة 103'),
+        ('104', 'مجموعة 104'),
+        ('110', 'مجموعة 110'),
+        ('111', 'مجموعة 111'),
+        ('200', 'مجموعة 200'),
+    ],
+    string='المجموعة المطلوب التوزيع عليها')
     company_id = fields.Many2one(
         'res.company',
         string='Company',
@@ -29,6 +40,107 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
     default=lambda self: self.env.user.analytic_plan_ids,
     readonly=False,
     help='اختر الخطة/الخطط التحليلية كاملة. سيقوم التقرير بإظهار كل الحسابات التحليلية الواقعة تحت الخطط المختارة حسب صلاحيات المستخدم.')
+    user_id = fields.Many2one( 'res.users', string='User',required=True,default=lambda self: self.env.user)
+
+    # =========================
+    # ===== المالية =====
+    # =========================
+    finance923_perc_101 = fields.Float(related='user_id.finance923_perc_101',store=True,readonly=False)
+    finance923_perc_104 = fields.Float(related='user_id.finance923_perc_104',store=True,readonly=False)
+    finance923_perc_110 = fields.Float(related='user_id.finance923_perc_110',store=True, readonly=False)
+    finance923_perc_111 = fields.Float(related='user_id.finance923_perc_111',store=True, readonly=False)
+    finance923_perc_200 = fields.Float(related='user_id.finance923_perc_200',store=True, readonly=False)
+    finance923_perc_103 = fields.Float(related='user_id.finance923_perc_103',store=True, readonly=False)
+
+    # =========================
+    # ===== الجودة =====
+    # =========================
+    quality901_perc_101 = fields.Float(related='user_id.quality901_perc_101', readonly=False)
+    quality901_perc_104 = fields.Float(related='user_id.quality901_perc_104', readonly=False)
+    quality901_perc_110 = fields.Float(related='user_id.quality901_perc_110', readonly=False)
+    quality901_perc_111 = fields.Float(related='user_id.quality901_perc_111', readonly=False)
+    quality901_perc_200 = fields.Float(related='user_id.quality901_perc_200', readonly=False)
+    quality901_perc_103 = fields.Float(related='user_id.quality901_perc_103', readonly=False)
+
+    # =========================
+    # ===== الدعم التشغيلي =====
+    # =========================
+    oper_supp902_perc_101 = fields.Float(related='user_id.oper_supp902_perc_101', readonly=False)
+    oper_supp902_perc_104 = fields.Float(related='user_id.oper_supp902_perc_104', readonly=False)
+    oper_supp902_perc_110 = fields.Float(related='user_id.oper_supp902_perc_110', readonly=False)
+    oper_supp902_perc_111 = fields.Float(related='user_id.oper_supp902_perc_111', readonly=False)
+    oper_supp902_perc_200 = fields.Float(related='user_id.oper_supp902_perc_200', readonly=False)
+    oper_supp902_perc_103 = fields.Float(related='user_id.oper_supp902_perc_103', readonly=False)
+
+    # =========================
+    # ===== التسويق عام =====
+    # =========================
+    sale_gen911_perc_101 = fields.Float(related='user_id.sale_gen911_perc_101', readonly=False)
+    sale_gen911_perc_104 = fields.Float(related='user_id.sale_gen911_perc_104', readonly=False)
+    sale_gen911_perc_110 = fields.Float(related='user_id.sale_gen911_perc_110', readonly=False)
+    sale_gen911_perc_111 = fields.Float(related='user_id.sale_gen911_perc_111', readonly=False)
+    sale_gen911_perc_200 = fields.Float(related='user_id.sale_gen911_perc_200', readonly=False)
+    sale_gen911_perc_103 = fields.Float(related='user_id.sale_gen911_perc_103', readonly=False)
+
+    # =========================
+    # ===== المستلزمات المكتبية =====
+    # =========================
+    office_supp_perc_101 = fields.Float(related='user_id.office_supp_perc_101', readonly=False)
+    office_supp_perc_104 = fields.Float(related='user_id.office_supp_perc_104', readonly=False)
+    office_supp_perc_110 = fields.Float(related='user_id.office_supp_perc_110', readonly=False)
+    office_supp_perc_111 = fields.Float(related='user_id.office_supp_perc_111', readonly=False)
+    office_supp_perc_200 = fields.Float(related='user_id.office_supp_perc_200', readonly=False)
+    office_supp_perc_103 = fields.Float(related='user_id.office_supp_perc_103', readonly=False)
+
+    # =========================
+    # ===== الشئون الإدارية =====
+    # =========================
+    manage_921_perc_101 = fields.Float(related='user_id.manage_921_perc_101', readonly=False)
+    manage_921_perc_104 = fields.Float(related='user_id.manage_921_perc_104', readonly=False)
+    manage_921_perc_110 = fields.Float(related='user_id.manage_921_perc_110', readonly=False)
+    manage_921_perc_111 = fields.Float(related='user_id.manage_921_perc_111', readonly=False)
+    manage_921_perc_200 = fields.Float(related='user_id.manage_921_perc_200', readonly=False)
+    manage_921_perc_103 = fields.Float(related='user_id.manage_921_perc_103', readonly=False)
+
+    # =========================
+    # ===== الدعم التقني =====
+    # =========================
+    it_922_perc_101 = fields.Float(related='user_id.it_922_perc_101', readonly=False)
+    it_922_perc_104 = fields.Float(related='user_id.it_922_perc_104', readonly=False)
+    it_922_perc_110 = fields.Float(related='user_id.it_922_perc_110', readonly=False)
+    it_922_perc_111 = fields.Float(related='user_id.it_922_perc_111', readonly=False)
+    it_922_perc_200 = fields.Float(related='user_id.it_922_perc_200', readonly=False)
+    it_922_perc_103 = fields.Float(related='user_id.it_922_perc_103', readonly=False)
+
+    # =========================
+    # ===== المباني والمرافق =====
+    # =========================
+    build_facil950_perc_101 = fields.Float(related='user_id.build_facil950_perc_101', readonly=False)
+    build_facil950_perc_104 = fields.Float(related='user_id.build_facil950_perc_104', readonly=False)
+    build_facil950_perc_110 = fields.Float(related='user_id.build_facil950_perc_110', readonly=False)
+    build_facil950_perc_111 = fields.Float(related='user_id.build_facil950_perc_111', readonly=False)
+    build_facil950_perc_200 = fields.Float(related='user_id.build_facil950_perc_200', readonly=False)
+    build_facil950_perc_103 = fields.Float(related='user_id.build_facil950_perc_103', readonly=False)
+
+    # =========================
+    # ===== القهوة والضيافة والنضافة =====
+    # =========================
+    coff_clean_ryd_perc_101 = fields.Float(related='user_id.coff_clean_ryd_perc_101', readonly=False)
+    coff_clean_ryd_perc_104 = fields.Float(related='user_id.coff_clean_ryd_perc_104', readonly=False)
+    coff_clean_ryd_perc_110 = fields.Float(related='user_id.coff_clean_ryd_perc_110', readonly=False)
+    coff_clean_ryd_perc_111 = fields.Float(related='user_id.coff_clean_ryd_perc_111', readonly=False)
+    coff_clean_ryd_perc_200 = fields.Float(related='user_id.coff_clean_ryd_perc_200', readonly=False)
+    coff_clean_ryd_perc_103 = fields.Float(related='user_id.coff_clean_ryd_perc_103', readonly=False)
+
+    # =========================
+    # ===== التوطين العام =====
+    # =========================
+    pub_loc903_perc_101 = fields.Float(related='user_id.pub_loc903_perc_101', readonly=False)
+    pub_loc903_perc_104 = fields.Float(related='user_id.pub_loc903_perc_104', readonly=False)
+    pub_loc903_perc_110 = fields.Float(related='user_id.pub_loc903_perc_110', readonly=False)
+    pub_loc903_perc_111 = fields.Float(related='user_id.pub_loc903_perc_111', readonly=False)
+    pub_loc903_perc_200 = fields.Float(related='user_id.pub_loc903_perc_200', readonly=False)
+    pub_loc903_perc_103 = fields.Float(related='user_id.pub_loc903_perc_103', readonly=False)
     # analytic_plan_ids = fields.Many2many(
     #     'account.analytic.plan',
     #     'kbi_analytic_pl_wizard_plan_rel',
@@ -55,7 +167,10 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         readonly=True,
     )
 
+    level = fields.Selection( [('level1', 'مستوي المجموعات التحليلية (المستوي 1)'),('level2', 'مستـوي الحسـابات(المستوي 2)'),],string="مستوي التقرير",default='level2',)
+    level1 = fields.Boolean(string='تقــرير بمســتوي الــمجموعــات التــحليليــة ', default=False)
     show_details = fields.Boolean(string='Show Journal Item Details', default=False)
+    show_divided = fields.Boolean(string='عــرض المــجــمـــوعـات المــوزعـــة', default=False)
     line_ids = fields.One2many(
         'kbi.analytic.profit.loss.line',
         'wizard_id',
