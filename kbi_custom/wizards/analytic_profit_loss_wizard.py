@@ -36,7 +36,7 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
     analytic_plan_ids = fields.Many2many(
     'account.analytic.plan',
     string='Analytic Plans',
-    required=True,
+    #required=True,
     default=lambda self: self.env.user.analytic_plan_ids,
     readonly=False,
     help='اختر الخطة/الخطط التحليلية كاملة. سيقوم التقرير بإظهار كل الحسابات التحليلية الواقعة تحت الخطط المختارة حسب صلاحيات المستخدم.')
@@ -45,102 +45,102 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
     # =========================
     # ===== المالية =====
     # =========================
-    finance923_perc_101 = fields.Float(related='user_id.finance923_perc_101',store=True,readonly=False)
-    finance923_perc_104 = fields.Float(related='user_id.finance923_perc_104',store=True,readonly=False)
-    finance923_perc_110 = fields.Float(related='user_id.finance923_perc_110',store=True, readonly=False)
-    finance923_perc_111 = fields.Float(related='user_id.finance923_perc_111',store=True, readonly=False)
-    finance923_perc_200 = fields.Float(related='user_id.finance923_perc_200',store=True, readonly=False)
-    finance923_perc_103 = fields.Float(related='user_id.finance923_perc_103',store=True, readonly=False)
+    finance923_perc_101 = fields.Float(related='user_id.finance923_perc_101',store=True,readonly=True)
+    finance923_perc_104 = fields.Float(related='user_id.finance923_perc_104',store=True,readonly=True)
+    finance923_perc_110 = fields.Float(related='user_id.finance923_perc_110',store=True, readonly=True)
+    finance923_perc_111 = fields.Float(related='user_id.finance923_perc_111',store=True, readonly=True)
+    finance923_perc_200 = fields.Float(related='user_id.finance923_perc_200',store=True, readonly=True)
+    finance923_perc_103 = fields.Float(related='user_id.finance923_perc_103',store=True, readonly=True)
 
     # =========================
     # ===== الجودة =====
     # =========================
-    quality901_perc_101 = fields.Float(related='user_id.quality901_perc_101', readonly=False)
-    quality901_perc_104 = fields.Float(related='user_id.quality901_perc_104', readonly=False)
-    quality901_perc_110 = fields.Float(related='user_id.quality901_perc_110', readonly=False)
-    quality901_perc_111 = fields.Float(related='user_id.quality901_perc_111', readonly=False)
-    quality901_perc_200 = fields.Float(related='user_id.quality901_perc_200', readonly=False)
-    quality901_perc_103 = fields.Float(related='user_id.quality901_perc_103', readonly=False)
+    quality901_perc_101 = fields.Float(related='user_id.quality901_perc_101', readonly=True)
+    quality901_perc_104 = fields.Float(related='user_id.quality901_perc_104', readonly=True)
+    quality901_perc_110 = fields.Float(related='user_id.quality901_perc_110', readonly=True)
+    quality901_perc_111 = fields.Float(related='user_id.quality901_perc_111', readonly=True)
+    quality901_perc_200 = fields.Float(related='user_id.quality901_perc_200', readonly=True)
+    quality901_perc_103 = fields.Float(related='user_id.quality901_perc_103', readonly=True)
 
     # =========================
     # ===== الدعم التشغيلي =====
     # =========================
-    oper_supp902_perc_101 = fields.Float(related='user_id.oper_supp902_perc_101', readonly=False)
-    oper_supp902_perc_104 = fields.Float(related='user_id.oper_supp902_perc_104', readonly=False)
-    oper_supp902_perc_110 = fields.Float(related='user_id.oper_supp902_perc_110', readonly=False)
-    oper_supp902_perc_111 = fields.Float(related='user_id.oper_supp902_perc_111', readonly=False)
-    oper_supp902_perc_200 = fields.Float(related='user_id.oper_supp902_perc_200', readonly=False)
-    oper_supp902_perc_103 = fields.Float(related='user_id.oper_supp902_perc_103', readonly=False)
+    oper_supp902_perc_101 = fields.Float(related='user_id.oper_supp902_perc_101', readonly=True)
+    oper_supp902_perc_104 = fields.Float(related='user_id.oper_supp902_perc_104', readonly=True)
+    oper_supp902_perc_110 = fields.Float(related='user_id.oper_supp902_perc_110', readonly=True)
+    oper_supp902_perc_111 = fields.Float(related='user_id.oper_supp902_perc_111', readonly=True)
+    oper_supp902_perc_200 = fields.Float(related='user_id.oper_supp902_perc_200', readonly=True)
+    oper_supp902_perc_103 = fields.Float(related='user_id.oper_supp902_perc_103', readonly=True)
 
     # =========================
     # ===== التسويق عام =====
     # =========================
-    sale_gen911_perc_101 = fields.Float(related='user_id.sale_gen911_perc_101', readonly=False)
-    sale_gen911_perc_104 = fields.Float(related='user_id.sale_gen911_perc_104', readonly=False)
-    sale_gen911_perc_110 = fields.Float(related='user_id.sale_gen911_perc_110', readonly=False)
-    sale_gen911_perc_111 = fields.Float(related='user_id.sale_gen911_perc_111', readonly=False)
-    sale_gen911_perc_200 = fields.Float(related='user_id.sale_gen911_perc_200', readonly=False)
-    sale_gen911_perc_103 = fields.Float(related='user_id.sale_gen911_perc_103', readonly=False)
+    sale_gen911_perc_101 = fields.Float(related='user_id.sale_gen911_perc_101', readonly=True)
+    sale_gen911_perc_104 = fields.Float(related='user_id.sale_gen911_perc_104', readonly=True)
+    sale_gen911_perc_110 = fields.Float(related='user_id.sale_gen911_perc_110', readonly=True)
+    sale_gen911_perc_111 = fields.Float(related='user_id.sale_gen911_perc_111', readonly=True)
+    sale_gen911_perc_200 = fields.Float(related='user_id.sale_gen911_perc_200', readonly=True)
+    sale_gen911_perc_103 = fields.Float(related='user_id.sale_gen911_perc_103', readonly=True)
 
     # =========================
     # ===== المستلزمات المكتبية =====
     # =========================
-    office_supp_perc_101 = fields.Float(related='user_id.office_supp_perc_101', readonly=False)
-    office_supp_perc_104 = fields.Float(related='user_id.office_supp_perc_104', readonly=False)
-    office_supp_perc_110 = fields.Float(related='user_id.office_supp_perc_110', readonly=False)
-    office_supp_perc_111 = fields.Float(related='user_id.office_supp_perc_111', readonly=False)
-    office_supp_perc_200 = fields.Float(related='user_id.office_supp_perc_200', readonly=False)
-    office_supp_perc_103 = fields.Float(related='user_id.office_supp_perc_103', readonly=False)
+    office_supp_perc_101 = fields.Float(related='user_id.office_supp_perc_101', readonly=True)
+    office_supp_perc_104 = fields.Float(related='user_id.office_supp_perc_104', readonly=True)
+    office_supp_perc_110 = fields.Float(related='user_id.office_supp_perc_110', readonly=True)
+    office_supp_perc_111 = fields.Float(related='user_id.office_supp_perc_111', readonly=True)
+    office_supp_perc_200 = fields.Float(related='user_id.office_supp_perc_200', readonly=True)
+    office_supp_perc_103 = fields.Float(related='user_id.office_supp_perc_103', readonly=True)
 
     # =========================
     # ===== الشئون الإدارية =====
     # =========================
-    manage_921_perc_101 = fields.Float(related='user_id.manage_921_perc_101', readonly=False)
-    manage_921_perc_104 = fields.Float(related='user_id.manage_921_perc_104', readonly=False)
-    manage_921_perc_110 = fields.Float(related='user_id.manage_921_perc_110', readonly=False)
-    manage_921_perc_111 = fields.Float(related='user_id.manage_921_perc_111', readonly=False)
-    manage_921_perc_200 = fields.Float(related='user_id.manage_921_perc_200', readonly=False)
-    manage_921_perc_103 = fields.Float(related='user_id.manage_921_perc_103', readonly=False)
+    manage_921_perc_101 = fields.Float(related='user_id.manage_921_perc_101', readonly=True)
+    manage_921_perc_104 = fields.Float(related='user_id.manage_921_perc_104', readonly=True)
+    manage_921_perc_110 = fields.Float(related='user_id.manage_921_perc_110', readonly=True)
+    manage_921_perc_111 = fields.Float(related='user_id.manage_921_perc_111', readonly=True)
+    manage_921_perc_200 = fields.Float(related='user_id.manage_921_perc_200', readonly=True)
+    manage_921_perc_103 = fields.Float(related='user_id.manage_921_perc_103', readonly=True)
 
     # =========================
     # ===== الدعم التقني =====
     # =========================
-    it_922_perc_101 = fields.Float(related='user_id.it_922_perc_101', readonly=False)
-    it_922_perc_104 = fields.Float(related='user_id.it_922_perc_104', readonly=False)
-    it_922_perc_110 = fields.Float(related='user_id.it_922_perc_110', readonly=False)
-    it_922_perc_111 = fields.Float(related='user_id.it_922_perc_111', readonly=False)
-    it_922_perc_200 = fields.Float(related='user_id.it_922_perc_200', readonly=False)
-    it_922_perc_103 = fields.Float(related='user_id.it_922_perc_103', readonly=False)
+    it_922_perc_101 = fields.Float(related='user_id.it_922_perc_101', readonly=True)
+    it_922_perc_104 = fields.Float(related='user_id.it_922_perc_104', readonly=True)
+    it_922_perc_110 = fields.Float(related='user_id.it_922_perc_110', readonly=True)
+    it_922_perc_111 = fields.Float(related='user_id.it_922_perc_111', readonly=True)
+    it_922_perc_200 = fields.Float(related='user_id.it_922_perc_200', readonly=True)
+    it_922_perc_103 = fields.Float(related='user_id.it_922_perc_103', readonly=True)
 
     # =========================
     # ===== المباني والمرافق =====
     # =========================
-    build_facil950_perc_101 = fields.Float(related='user_id.build_facil950_perc_101', readonly=False)
-    build_facil950_perc_104 = fields.Float(related='user_id.build_facil950_perc_104', readonly=False)
-    build_facil950_perc_110 = fields.Float(related='user_id.build_facil950_perc_110', readonly=False)
-    build_facil950_perc_111 = fields.Float(related='user_id.build_facil950_perc_111', readonly=False)
-    build_facil950_perc_200 = fields.Float(related='user_id.build_facil950_perc_200', readonly=False)
-    build_facil950_perc_103 = fields.Float(related='user_id.build_facil950_perc_103', readonly=False)
+    build_facil950_perc_101 = fields.Float(related='user_id.build_facil950_perc_101', readonly=True)
+    build_facil950_perc_104 = fields.Float(related='user_id.build_facil950_perc_104', readonly=True)
+    build_facil950_perc_110 = fields.Float(related='user_id.build_facil950_perc_110', readonly=True)
+    build_facil950_perc_111 = fields.Float(related='user_id.build_facil950_perc_111', readonly=True)
+    build_facil950_perc_200 = fields.Float(related='user_id.build_facil950_perc_200', readonly=True)
+    build_facil950_perc_103 = fields.Float(related='user_id.build_facil950_perc_103', readonly=True)
 
     # =========================
     # ===== القهوة والضيافة والنضافة =====
     # =========================
-    coff_clean_ryd_perc_101 = fields.Float(related='user_id.coff_clean_ryd_perc_101', readonly=False)
-    coff_clean_ryd_perc_104 = fields.Float(related='user_id.coff_clean_ryd_perc_104', readonly=False)
-    coff_clean_ryd_perc_110 = fields.Float(related='user_id.coff_clean_ryd_perc_110', readonly=False)
-    coff_clean_ryd_perc_111 = fields.Float(related='user_id.coff_clean_ryd_perc_111', readonly=False)
-    coff_clean_ryd_perc_200 = fields.Float(related='user_id.coff_clean_ryd_perc_200', readonly=False)
-    coff_clean_ryd_perc_103 = fields.Float(related='user_id.coff_clean_ryd_perc_103', readonly=False)
+    coff_clean_ryd_perc_101 = fields.Float(related='user_id.coff_clean_ryd_perc_101', readonly=True)
+    coff_clean_ryd_perc_104 = fields.Float(related='user_id.coff_clean_ryd_perc_104', readonly=True)
+    coff_clean_ryd_perc_110 = fields.Float(related='user_id.coff_clean_ryd_perc_110', readonly=True)
+    coff_clean_ryd_perc_111 = fields.Float(related='user_id.coff_clean_ryd_perc_111', readonly=True)
+    coff_clean_ryd_perc_200 = fields.Float(related='user_id.coff_clean_ryd_perc_200', readonly=True)
+    coff_clean_ryd_perc_103 = fields.Float(related='user_id.coff_clean_ryd_perc_103', readonly=True)
 
     # =========================
     # ===== التوطين العام =====
     # =========================
-    pub_loc903_perc_101 = fields.Float(related='user_id.pub_loc903_perc_101', readonly=False)
-    pub_loc903_perc_104 = fields.Float(related='user_id.pub_loc903_perc_104', readonly=False)
-    pub_loc903_perc_110 = fields.Float(related='user_id.pub_loc903_perc_110', readonly=False)
-    pub_loc903_perc_111 = fields.Float(related='user_id.pub_loc903_perc_111', readonly=False)
-    pub_loc903_perc_200 = fields.Float(related='user_id.pub_loc903_perc_200', readonly=False)
-    pub_loc903_perc_103 = fields.Float(related='user_id.pub_loc903_perc_103', readonly=False)
+    pub_loc903_perc_101 = fields.Float(related='user_id.pub_loc903_perc_101', readonly=True)
+    pub_loc903_perc_104 = fields.Float(related='user_id.pub_loc903_perc_104', readonly=True)
+    pub_loc903_perc_110 = fields.Float(related='user_id.pub_loc903_perc_110', readonly=True)
+    pub_loc903_perc_111 = fields.Float(related='user_id.pub_loc903_perc_111', readonly=True)
+    pub_loc903_perc_200 = fields.Float(related='user_id.pub_loc903_perc_200', readonly=True)
+    pub_loc903_perc_103 = fields.Float(related='user_id.pub_loc903_perc_103', readonly=True)
     # analytic_plan_ids = fields.Many2many(
     #     'account.analytic.plan',
     #     'kbi_analytic_pl_wizard_plan_rel',
