@@ -12,7 +12,68 @@
                             <group>
                                 <field name="date_from"/>
                                 <field name="date_to"/>
-                                <field name="company_id" groups="base.group_multi_company"/>
+                                <!-- <field name="company_id" groups="base.group_multi_company"/> -->
+                                <field name="user_id" invisible="group_code == ''"/>
+                                <field name="finance923_perc_101"   invisible="group_code != '101'"/>
+                                <field name="finance923_perc_104"   invisible="group_code != '104'"/>
+                                 <field name="finance923_perc_110"   invisible="group_code != '110'"/>
+                                 <field name="finance923_perc_111"   invisible="group_code != '111'"/>
+                                 <field name="finance923_perc_200"   invisible="group_code != '200'"/>
+                                 <field name="finance923_perc_103"   invisible="group_code != '103'"/>
+                                 <field name="quality901_perc_101"   invisible="group_code != '101'"/>
+                                <field name="quality901_perc_104"   invisible="group_code != '104'"/>
+                                <field name="quality901_perc_110"   invisible="group_code != '110'"/>
+                                <field name="quality901_perc_111"   invisible="group_code != '111'"/>
+                                <field name="quality901_perc_200"    invisible="group_code != '200'"/>
+                                <field name="quality901_perc_103"   invisible="group_code != '103'"/>
+                                <field name="oper_supp902_perc_101" invisible="group_code != '101'"/>
+                                <field name="oper_supp902_perc_104" invisible="group_code != '104'"/>
+                                 <field name="oper_supp902_perc_110" invisible="group_code != '110'"/>
+                                 <field name="oper_supp902_perc_111" invisible="group_code != '111'"/>
+                                 <field name="oper_supp902_perc_200" invisible="group_code != '200'"/>
+                                 <field name="oper_supp902_perc_103" invisible="group_code != '103'"/>
+                                 <field name="sale_gen911_perc_101" invisible="group_code != '101'"/>
+                                <field name="sale_gen911_perc_104" invisible="group_code != '104'"/>
+                                <field name="sale_gen911_perc_110" invisible="group_code != '110'"/>
+                                <field name="sale_gen911_perc_111" invisible="group_code != '111'"/>
+                                <field name="sale_gen911_perc_200" invisible="group_code != '200'"/>
+                                <field name="sale_gen911_perc_103" invisible="group_code != '103'"/>
+                                <field name="office_supp_perc_101" invisible="group_code != '101'"/>
+                                <field name="office_supp_perc_104" invisible="group_code != '104'"/>
+                                <field name="office_supp_perc_110" invisible="group_code != '110'"/>
+                                <field name="office_supp_perc_111" invisible="group_code != '111'"/>
+                                <field name="office_supp_perc_200" invisible="group_code != '200'"/>
+                                <field name="office_supp_perc_103" invisible="group_code != '103'"/>
+                                <field name="manage_921_perc_101" invisible="group_code != '101'"/>
+                                 <field name="manage_921_perc_104" invisible="group_code != '104'"/>
+                                 <field name="manage_921_perc_110" invisible="group_code != '110'"/>
+                                 <field name="manage_921_perc_111" invisible="group_code != '111'"/>
+                                 <field name="manage_921_perc_200" invisible="group_code != '200'"/>
+                                 <field name="manage_921_perc_103" invisible="group_code != '103'"/>
+                                 <field name="it_922_perc_101" invisible="group_code != '101'"/>
+                                 <field name="it_922_perc_104" invisible="group_code != '104'"/>
+                                 <field name="it_922_perc_110" invisible="group_code != '110'"/>
+                                 <field name="it_922_perc_111" invisible="group_code != '111'"/>
+                                 <field name="it_922_perc_200" invisible="group_code != '200'"/>
+                                 <field name="it_922_perc_103" invisible="group_code != '103'"/>
+                                <field name="build_facil950_perc_101" invisible="group_code != '101'"/>
+                                 <field name="build_facil950_perc_104" invisible="group_code != '104'"/>
+                                 <field name="build_facil950_perc_110" invisible="group_code != '110'"/>
+                                 <field name="build_facil950_perc_111" invisible="group_code != '111'"/>
+                                 <field name="build_facil950_perc_200" invisible="group_code != '200'"/>
+                                 <field name="build_facil950_perc_103" invisible="group_code != '103'"/>
+                                <field name="coff_clean_ryd_perc_101" invisible="group_code != '101'"/>
+                                <field name="coff_clean_ryd_perc_104" invisible="group_code != '104'"/>
+                                <field name="coff_clean_ryd_perc_110" invisible="group_code != '110'"/>
+                                <field name="coff_clean_ryd_perc_111" invisible="group_code != '111'"/>
+                                <field name="coff_clean_ryd_perc_200" invisible="group_code != '200'"/>
+                                <field name="coff_clean_ryd_perc_103" invisible="group_code != '103'"/>
+                                <field name="pub_loc903_perc_101" invisible="group_code != '101'"/>
+                                 <field name="pub_loc903_perc_104" invisible="group_code != '104'"/>
+                                 <field name="pub_loc903_perc_110" invisible="group_code != '110'"/>
+                                 <field name="pub_loc903_perc_111" invisible="group_code != '111'"/>
+                                 <field name="pub_loc903_perc_200" invisible="group_code != '200'"/>
+                                <field name="pub_loc903_perc_103" invisible="group_code != '103'"/>
                             </group>
                             <group>
                                 <field name="allowed_analytic_plan_ids" invisible="1"/>
@@ -20,6 +81,33 @@
                                 <!-- <field name="analytic_account_ids" invisible="1"/>-->
                                 <field name="analytic_plan_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True,}"   groups="base.group_system"/> 
                                 <field name="show_details"  groups="base.group_system,104__team.shaker"/>
+                                <!-- <field name="show_divided"  widget="boolean-toggle" groups="base.group_system,104__team.shaker"/> -->
+                       
+                                 <field name="level" string="مستوي التقرير" style="background-color:#fff3e0; padding:6px; border-radius:6px; margin-bottom:5px;"/>
+                              
+                                    <field name="show_divided" widget="boolean_toggle" style="background-color:#d1ecf1; padding:6px; border-radius:6px;"/>
+                             
+                          
+                               <field name="group_code" string="المجموعة المطلوب التوزيع عليها" style="background-color:#f8d7da; padding:6px; border-radius:6px;"
+                                   decoration-success="group_code == '101'"
+       decoration-info="group_code == '103'"
+       decoration-primary="group_code == '104'"
+       decoration-warning="group_code == '110'"
+       decoration-muted="group_code == '111'"
+       decoration-danger="group_code == '200'"
+       decoration-bf="group_code != False " groups="base.group_system,104__team.shaker"/>
+                               
+                              
+                              <!-- <field name="group_code"
+       decoration-success="group_code == '101'"
+       decoration-info="group_code == '103'"
+       decoration-primary="group_code == '104'"
+       decoration-warning="group_code == '110'"
+       decoration-muted="group_code == '111'"
+       decoration-danger="group_code == '200'"
+       decoration-bf="group_code != False " groups="base.group_system,104__team.shaker"/> -->
+
+                                <!-- <field name="level"  groups="base.group_system,104__team.shaker"/> -->
                             </group>
                         </group>
                             <div class="alert alert-info" role="alert">
