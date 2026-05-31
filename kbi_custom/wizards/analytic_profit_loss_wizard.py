@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-
 import io
 import base64
 import xlsxwriter
@@ -16,7 +14,6 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
     date_to = fields.Date(string='Date To', required=True)
     group_code = fields.Selection(
     [
-        ('', ' '),
         ('101', 'مجموعة 101'),
         ('103', 'مجموعة 103'),
         ('104', 'مجموعة 104'),
@@ -269,122 +266,156 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         return self.env.ref('kbi_custom.action_report_kbi_analytic_profit_loss_pdf').report_action(self)
 
     # =========================
-    # EXCEL EXPORT (FIXED + GROUPING STYLE)
+    # EXCEL EXPORT (QWEB MATCHED)
     # =========================
-    def action_print_excel_report(self):
-        self.ensure_one()
+    def action_print_excel_report(self) :
+        self.ensure_one ()
 
-        self._validate_before_report()
-        self.env['kbi.analytic.profit.loss.service'].generate_lines(self)
+        self._validate_before_report ()
+        self.env['kbi.analytic.profit.loss.service'].generate_lines ( self )
 
-        output = io.BytesIO()
-        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-        sheet = workbook.add_worksheet('Analytic P&L')
+        output = io.BytesIO ()
+        workbook = xlsxwriter.Workbook ( output , {'in_memory' : True} )
+        sheet = workbook.add_worksheet ( 'Analytic P&L' )
 
         # =========================
         # FORMATS
         # =========================
-        header = workbook.add_format({'bold': True, 'bg_color': '#D9E1F2', 'border': 1})
-        plan_fmt = workbook.add_format({'bold': True, 'bg_color': '#C6E0B4', 'border': 1})
-        account_fmt = workbook.add_format({'bold': True, 'bg_color': '#F8CBAD', 'border': 1})
-        detail_fmt = workbook.add_format({'border': 1})
-        money = workbook.add_format({'num_format': '#,##0.00', 'border': 1})
+        header = workbook.add_format ( {
+            'bold' : True ,
+            'bg_color' : '#D9E1F2' ,
+            'border' : 1 ,
+            'align' : 'center'
+        } )
+
+        plan_fmt = workbook.add_format ( {
+            'bold' : True ,
+            'bg_color' : '#D9F0F3' ,
+            'border' : 1 ,
+            'text_wrap' : True
+        } )
+
+        account_fmt = workbook.add_format ( {
+            'bold' : True ,
+            'bg_color' : '#FFF7DF' ,
+            'border' : 1 ,
+            'text_wrap' : True
+        } )
+
+        detail_fmt = workbook.add_format ( {
+            'border' : 1 ,
+            'text_wrap' : True
+        } )
+
+        money = workbook.add_format ( {
+            'num_format' : '#,##0.00' ,
+            'border' : 1
+        } )
 
         # =========================
-        # HEADER
+        # HEADER (QWEB STYLE)
         # =========================
         row = 0
-        sheet.write_row(row, 0, [
-            'Level',
-            'Plan',
-            'Account',
-            'Name',
-            'Income',
-            'Expense',
-            'Net'
-        ], header)
+        sheet.write_row ( row , 0 , [
+            'البيان' ,
+            'التاريخ' ,
+            'النسبة' ,
+            'الإيرادات' ,
+            'المصروفات' ,
+            'الصافي'
+        ] , header )
 
-        row += 2
+        row += 1
 
         # =========================
         # LINES
         # =========================
-        lines = self.line_ids.sorted(lambda l: (l.sequence, l.id))
+        lines = self.line_ids.sorted ( lambda l : (l.sequence , l.id) )
 
-        for line in lines:
+        # column widths
+        sheet.set_column ( 0 , 0 , 80 )
+        sheet.set_column ( 1 , 1 , 15 )
+        sheet.set_column ( 2 , 2 , 12 )
+        sheet.set_column ( 3 , 5 , 18 )
 
-            plan_name = line.analytic_plan_id.name if line.analytic_plan_id else ''
-            account_code = line.account_id.code if line.account_id else ''
-            account_name = line.account_id.name if line.account_id else ''
-
-            income = line.income_amount or 0.0
-            expense = line.expense_amount or 0.0
-            net = line.net_amount or 0.0
+        for line in lines :
 
             # =========================
-            # PLAN
+            # FORMAT BY LEVEL
             # =========================
-            if line.line_type == 'plan':
-
-                sheet.write(row, 0, 'PLAN', plan_fmt)
-                sheet.write(row, 1, plan_name, plan_fmt)
-                sheet.write(row, 2, '', plan_fmt)
-                sheet.write(row, 3, line.name or '', plan_fmt)
-                sheet.write(row, 4, income, money)
-                sheet.write(row, 5, expense, money)
-                sheet.write(row, 6, net, money)
-
-                row += 1
-                continue
+            if line.level == 1 :
+                fmt = plan_fmt
+            elif line.level == 2 :
+                fmt = account_fmt
+            else :
+                fmt = detail_fmt
 
             # =========================
-            # ACCOUNT
+            # DESCRIPTION (LIKE QWEB)
             # =========================
-            if line.line_type == 'account':
+            description = line.name or ''
 
-                sheet.write(row, 0, 'ACCOUNT', account_fmt)
-                sheet.write(row, 1, plan_name, account_fmt)
-                sheet.write(row, 2, f"{account_code} - {account_name}", account_fmt)
-                sheet.write(row, 3, line.name or '', account_fmt)
-                sheet.write(row, 4, income, money)
-                sheet.write(row, 5, expense, money)
-                sheet.write(row, 6, net, money)
+            if line.line_type == 'plan' :
+                description = f"الخطة: {line.name or ''}"
 
-                row += 1
-                continue
+            elif line.line_type == 'account' :
+                description = f"الحساب: {line.name or ''}"
+
+            else :
+                # detail
+                if line.move_id :
+                    description += (
+                        "\nالقيد: "
+                        f"{line.move_id.name or ''}"
+                    )
 
             # =========================
-            # DETAIL
+            # DATE
             # =========================
-            if line.line_type == 'detail':
+            date_value = ''
+            if line.date :
+                try :
+                    date_value = line.date.strftime ( '%m/%d/%Y' )
+                except Exception :
+                    date_value = str ( line.date )
 
-                sheet.write(row, 0, 'DETAIL', detail_fmt)
-                sheet.write(row, 1, plan_name, detail_fmt)
-                sheet.write(row, 2, f"{account_code} - {account_name}", detail_fmt)
-                sheet.write(row, 3, line.name or '', detail_fmt)
-                sheet.write(row, 4, income, money)
-                sheet.write(row, 5, expense, money)
-                sheet.write(row, 6, net, money)
+            # =========================
+            # PERCENTAGE
+            # =========================
+            percentage_value = ''
+            if line.percentage :
+                percentage_value = f"{line.percentage:.2f}%"
 
-                row += 1
+            # =========================
+            # WRITE ROW
+            # =========================
+            sheet.write ( row , 0 , description , fmt )
+            sheet.write ( row , 1 , date_value , fmt )
+            sheet.write ( row , 2 , percentage_value , fmt )
+
+            sheet.write_number ( row , 3 , line.income_amount or 0.0 , money )
+            sheet.write_number ( row , 4 , line.expense_amount or 0.0 , money )
+            sheet.write_number ( row , 5 , line.net_amount or 0.0 , money )
+
+            row += 1
 
         # =========================
         # CLOSE FILE
         # =========================
-        workbook.close()
-        output.seek(0)
+        workbook.close ()
+        output.seek ( 0 )
 
-        attachment = self.env['ir.attachment'].create({
-            'name': 'Analytic_Report.xlsx',
-            'type': 'binary',
-            'datas': base64.b64encode(output.read()),
-            'res_model': 'kbi.analytic.profit.loss.wizard',
-            'res_id': self.id,
-            'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        })
+        attachment = self.env['ir.attachment'].create ( {
+            'name' : 'Analytic_Report.xlsx' ,
+            'type' : 'binary' ,
+            'datas' : base64.b64encode ( output.read () ) ,
+            'res_model' : 'kbi.analytic.profit.loss.wizard' ,
+            'res_id' : self.id ,
+            'mimetype' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        } )
 
         return {
-            'type': 'ir.actions.act_url',
-            'url': f'/web/content/{attachment.id}?download=true',
-            'target': 'self',
+            'type' : 'ir.actions.act_url' ,
+            'url' : f'/web/content/{attachment.id}?download=true' ,
+            'target' : 'self' ,
         }
