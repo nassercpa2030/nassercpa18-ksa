@@ -163,6 +163,9 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
             order='date, move_id, id'
         )
 
+        if not move_lines:
+            return Line.browse()
+
         grouped = {}
         details = defaultdict(list)
 
@@ -181,42 +184,36 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                     continue
 
                 plan = analytic.plan_id
-                if not plan:
-                    continue
 
                 if not wizard.show_divided and plan.id in self.EXTRA_PLAN_IDS:
                     continue
 
                 account = line.account_id
 
-                base = line.balance * (percentage / 100.0)
-                analytic_balance = base
+                base_balance = line.balance * percentage / 100.0
+                analytic_balance = base_balance
 
                 # =====================================================
-                # GROUP LOGIC (FINAL FIX)
+                # FIXED GROUP LOGIC (100% SAFE)
                 # =====================================================
-                group_perc = None
+                group_perc = 100.0
 
                 if wizard.show_divided:
 
-                    # CASE 1: no group_code => 100%
-                    if not wizard.group_code:
-                        if plan.id in self.EXTRA_PLAN_IDS:
-                            group_perc = 100.0
-
-                    # CASE 2: group_code selected
+                    if wizard.group_code:
+                        plan_map = self.GROUP_PERCENT_MAP.get(plan.id)
+                        if plan_map:
+                            field = plan_map.get(str(wizard.group_code))
+                            if field:
+                                group_perc = getattr(wizard, field, 0.0) or 100.0
                     else:
-                        plan_map = self.GROUP_PERCENT_MAP.get(plan.id, {})
-                        field = plan_map.get(str(wizard.group_code))
-                        if field:
-                            group_perc = getattr(wizard, field, 0.0) or 0.0
+                        group_perc = 100.0
 
-                if group_perc is not None:
-                    analytic_balance *= (group_perc / 100.0)
+                analytic_balance *= (group_perc / 100.0)
 
                 income, expense, net = self._income_expense(account_type, analytic_balance)
 
-                plan_key = plan.id
+                plan_key = plan.id or 0
                 account_key = account.id
 
                 grouped.setdefault(plan_key, {
@@ -233,7 +230,7 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                 bucket['expense'] += expense
                 bucket['net'] += net
 
-                acc = bucket['accounts'].setdefault(account_key, {
+                acc_bucket = bucket['accounts'].setdefault(account_key, {
                     'account': account,
                     'income': 0.0,
                     'expense': 0.0,
@@ -242,10 +239,10 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                     'company': company,
                 })
 
-                acc['income'] += income
-                acc['expense'] += expense
-                acc['net'] += net
-                acc['analytic_balance'] += analytic_balance
+                acc_bucket['income'] += income
+                acc_bucket['expense'] += expense
+                acc_bucket['net'] += net
+                acc_bucket['analytic_balance'] += analytic_balance
 
                 details[(plan_key, account_key)].append({
                     'move_line': line,
@@ -272,8 +269,8 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
             plan = bucket['plan']
 
             suffix = ''
-            if wizard.show_divided and wizard.group_code:
-                suffix = f" + Group {wizard.group_code}"
+            if wizard.show_divided:
+                suffix = f" + Group {wizard.group_code or '100%'}"
 
             vals.append({
                 'wizard_id': wizard.id,
@@ -281,8 +278,8 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                 'level': 1,
                 'line_type': 'plan',
                 'company_id': wizard.company_id.id,
-                'analytic_plan_id': plan.id,
-                'name': (plan.name or '') + suffix,
+                'analytic_plan_id': plan.id or False,
+                'name': (plan.name or _('No Plan')) + suffix,
                 'income_amount': bucket['income'],
                 'expense_amount': bucket['expense'],
                 'net_amount': bucket['net'],
@@ -300,7 +297,7 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                     'level': 2,
                     'line_type': 'account',
                     'company_id': acc['company'].id,
-                    'analytic_plan_id': plan.id,
+                    'analytic_plan_id': plan.id or False,
                     'account_id': acc['account'].id,
                     'account_code': acc['account'].code,
                     'account_name': acc['account'].name,
@@ -314,6 +311,7 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                 seq += 10
 
                 if wizard.show_details:
+
                     for d in details[(plan_key, acc_key)]:
 
                         ml = d['move_line']
@@ -324,13 +322,15 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                             'level': 3,
                             'line_type': 'detail',
                             'company_id': d['company'].id,
-                            'analytic_plan_id': plan.id,
+                            'analytic_plan_id': plan.id or False,
                             'account_id': acc['account'].id,
                             'move_id': ml.move_id.id,
                             'move_line_id': ml.id,
                             'journal_id': ml.journal_id.id,
                             'partner_id': ml.partner_id.id,
                             'date': ml.date,
+                            'account_code': acc['account'].code,
+                            'account_name': acc['account'].name,
                             'name': ml.name or ml.move_id.name,
                             'percentage': d['percentage'],
                             'original_balance': ml.balance,
