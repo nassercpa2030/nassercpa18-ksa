@@ -13,6 +13,7 @@ class HrPayrollStructure ( models.Model ) :
         string='Type' ,
         required=False
     )
+    name =fields.Char(string="name",required=False)
 
 
 class ResCity ( models.Model ) :
