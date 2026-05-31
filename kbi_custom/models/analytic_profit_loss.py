@@ -18,7 +18,7 @@ class AccountMoveLine(models.Model):
 
         for raw_key, percentage in distribution.items():
 
-            if not raw_key:
+            if raw_key in (False, None, ''):
                 continue
 
             try:
@@ -26,7 +26,7 @@ class AccountMoveLine(models.Model):
             except (TypeError, ValueError):
                 continue
 
-            if percentage_float <= 0:
+            if not percentage_float:
                 continue
 
             for analytic_id in str(raw_key).split(','):
@@ -36,7 +36,7 @@ class AccountMoveLine(models.Model):
 
                 try:
                     result.append((int(analytic_id), percentage_float))
-                except Exception:
+                except (TypeError, ValueError):
                     continue
 
         return result
@@ -121,27 +121,35 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
     }
 
     # =====================================================
-    def _income_expense(self, account_type, value):
-        if account_type in ('income', 'income_other'):
-            return -value, 0.0, -value
-        return 0.0, value, -value
-
+    # HELPERS
     # =====================================================
-    def _domain(self, date_from, date_to, company_id):
+    @api.model
+    def _income_expense(self, account_type, analytic_balance):
+        if account_type in ('income', 'income_other'):
+            return -analytic_balance, 0.0, -analytic_balance
+        return 0.0, analytic_balance, -analytic_balance
+
+    @api.model
+    def _domain(self, date_from=False, date_to=False, company_id=False):
         domain = [
             ('move_id.state', '=', 'posted'),
             ('account_id.account_type', 'in', list(self.PROFIT_LOSS_ACCOUNT_TYPES)),
             ('analytic_distribution', '!=', False),
         ]
+
         if date_from:
             domain.append(('date', '>=', date_from))
         if date_to:
             domain.append(('date', '<=', date_to))
         if company_id:
             domain.append(('company_id', '=', company_id))
+
         return domain
 
     # =====================================================
+    # MAIN ENGINE (FIXED)
+    # =====================================================
+    @api.model
     def generate_lines(self, wizard):
 
         Line = self.env['kbi.analytic.profit.loss.line']
@@ -154,24 +162,19 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
 
         move_lines = MoveLine.search(
             self._domain(wizard.date_from, wizard.date_to, wizard.company_id.id),
-            order='date, id'
+            order='date, move_id, id'
         )
 
         grouped = {}
         details = defaultdict(list)
 
-        total_income = total_expense = total_net = 0.0
-
-        # =====================================================
-        # BUILD DATA
-        # =====================================================
         for line in move_lines:
 
             parts = line._kbi_extract_analytic_distribution_parts()
             if not parts:
                 continue
 
-            for analytic_id, percent in parts:
+            for analytic_id, percentage in parts:
 
                 if allowed_ids and analytic_id not in allowed_ids:
                     continue
@@ -187,22 +190,27 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                 if not wizard.show_divided and plan.id in self.EXTRA_PLAN_IDS:
                     continue
 
-                value = line.balance * (percent / 100.0)
+                account = line.account_id
 
-                if wizard.show_divided and wizard.group_code:
-                    map_ = self.GROUP_PERCENT_MAP.get(plan.id, {})
-                    field = map_.get(str(wizard.group_code))
-                    if field:
-                        value *= (getattr(wizard, field, 0.0) or 0.0) / 100.0
+                base = line.balance * percentage / 100.0
+                balance = base
 
-                income, expense, net = self._income_expense(line.account_id.account_type, value)
+                # ================= GROUP FIX =================
+                if wizard.show_divided:
+                    group_perc = 100.0
 
-                total_income += income
-                total_expense += expense
-                total_net += net
+                    if wizard.group_code:
+                        plan_map = self.GROUP_PERCENT_MAP.get(plan.id)
+                        if plan_map:
+                            field = plan_map.get(str(wizard.group_code))
+                            group_perc = getattr(wizard, field, 0.0) or 100.0
+
+                    balance *= (group_perc / 100.0)
+
+                income, expense, net = self._income_expense(account.account_type, balance)
 
                 pkey = plan.id
-                akey = line.account_id.id
+                akey = account.id
 
                 grouped.setdefault(pkey, {
                     'plan': plan,
@@ -212,47 +220,48 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                     'accounts': {}
                 })
 
-                g = grouped[pkey]
+                bucket = grouped[pkey]
 
-                g['income'] += income
-                g['expense'] += expense
-                g['net'] += net
+                bucket['income'] += income
+                bucket['expense'] += expense
+                bucket['net'] += net
 
-                g['accounts'].setdefault(akey, {
-                    'account': line.account_id,
+                bucket['accounts'].setdefault(akey, {
+                    'account': account,
                     'income': 0.0,
                     'expense': 0.0,
                     'net': 0.0,
-                    'analytic_balance': 0.0,
+                    'balance': 0.0,
                     'company': line.company_id,
                 })
 
-                a = g['accounts'][akey]
+                acc = bucket['accounts'][akey]
 
-                a['income'] += income
-                a['expense'] += expense
-                a['net'] += net
-                a['analytic_balance'] += value
+                acc['income'] += income
+                acc['expense'] += expense
+                acc['net'] += net
+                acc['balance'] += balance
 
                 details[(pkey, akey)].append({
                     'line': line,
-                    'percent': percent,
-                    'value': value,
+                    'percentage': percentage,
+                    'balance': balance,
                     'income': income,
                     'expense': expense,
                     'net': net,
+                    'company': line.company_id,
                 })
 
-        # =====================================================
-        # BUILD LINES
-        # =====================================================
         vals = []
         seq = 10
 
-        for pkey in grouped:
+        if not grouped:
+            return Line.browse()
 
-            g = grouped[pkey]
-            plan = g['plan']
+        for pkey in sorted(grouped):
+
+            bucket = grouped[pkey]
+            plan = bucket['plan']
 
             vals.append({
                 'wizard_id': wizard.id,
@@ -262,30 +271,31 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                 'company_id': wizard.company_id.id,
                 'analytic_plan_id': plan.id,
                 'name': plan.name,
-                'income_amount': g['income'],
-                'expense_amount': g['expense'],
-                'net_amount': g['net'],
+                'income_amount': bucket['income'],
+                'expense_amount': bucket['expense'],
+                'net_amount': bucket['net'],
             })
 
             seq += 10
 
-            for akey in g['accounts']:
+            for akey in bucket['accounts']:
 
-                a = g['accounts'][akey]
+                acc = bucket['accounts'][akey]
 
                 vals.append({
                     'wizard_id': wizard.id,
                     'sequence': seq,
                     'level': 2,
                     'line_type': 'account',
-                    'company_id': a['company'].id,
+                    'company_id': acc['company'].id,
                     'analytic_plan_id': plan.id,
-                    'account_id': a['account'].id,
-                    'name': f"{a['account'].code} - {a['account'].name}",
-                    'income_amount': a['income'],
-                    'expense_amount': a['expense'],
-                    'net_amount': a['net'],
-                    'analytic_balance': a['analytic_balance'],
+                    'account_id': acc['account'].id,
+                    'account_code': acc['account'].code,
+                    'account_name': acc['account'].name,
+                    'name': f"{acc['account'].code or ''} - {acc['account'].name or ''}",
+                    'income_amount': acc['income'],
+                    'expense_amount': acc['expense'],
+                    'net_amount': acc['net'],
                 })
 
                 seq += 10
@@ -299,18 +309,18 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                             'sequence': seq,
                             'level': 3,
                             'line_type': 'detail',
-                            'company_id': l.company_id.id,
+                            'company_id': d['company'].id,
                             'analytic_plan_id': plan.id,
-                            'account_id': l.account_id.id,
+                            'account_id': acc['account'].id,
                             'move_id': l.move_id.id,
                             'move_line_id': l.id,
                             'journal_id': l.journal_id.id,
                             'partner_id': l.partner_id.id,
                             'date': l.date,
-                            'name': l.name,
-                            'percentage': d['percent'],
+                            'name': l.name or l.move_id.name,
+                            'percentage': d['percentage'],
                             'original_balance': l.balance,
-                            'analytic_balance': d['value'],
+                            'analytic_balance': d['balance'],
                             'income_amount': d['income'],
                             'expense_amount': d['expense'],
                             'net_amount': d['net'],
@@ -318,4 +328,4 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
 
                         seq += 10
 
-        return Line.create(vals) if vals else Line.browse()
+        return Line.create(vals)
