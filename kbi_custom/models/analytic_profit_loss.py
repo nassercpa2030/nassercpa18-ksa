@@ -30,9 +30,7 @@ class AccountMoveLine(models.Model):
                 continue
 
             for analytic_id in str(raw_key).split(','):
-
                 analytic_id = analytic_id.strip()
-
                 if not analytic_id:
                     continue
 
@@ -110,89 +108,19 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
     EXTRA_PLAN_IDS = [91, 92, 93, 95, 97, 98, 99, 100, 101, 104]
 
     # =====================================================
-    # GROUP MAP (NEW)
+    # GROUP MAP
     # =====================================================
     GROUP_PERCENT_MAP = {
-        91: {
-            '101': 'quality901_perc_101',
-            '103': 'quality901_perc_103',
-            '104': 'quality901_perc_104',
-            '110': 'quality901_perc_110',
-            '111': 'quality901_perc_111',
-            '200': 'quality901_perc_200',
-        },
-        92: {
-            '101': 'oper_supp902_perc_101',
-            '103': 'oper_supp902_perc_103',
-            '104': 'oper_supp902_perc_104',
-            '110': 'oper_supp902_perc_110',
-            '111': 'oper_supp902_perc_111',
-            '200': 'oper_supp902_perc_200',
-        },
-        93: {
-            '101': 'pub_loc903_perc_101',
-            '103': 'pub_loc903_perc_103',
-            '104': 'pub_loc903_perc_104',
-            '110': 'pub_loc903_perc_110',
-            '111': 'pub_loc903_perc_111',
-            '200': 'pub_loc903_perc_200',
-        },
-        95: {
-            '101': 'sale_gen911_perc_101',
-            '103': 'sale_gen911_perc_103',
-            '104': 'sale_gen911_perc_104',
-            '110': 'sale_gen911_perc_110',
-            '111': 'sale_gen911_perc_111',
-            '200': 'sale_gen911_perc_200',
-        },
-        97: {
-            '101': 'manage_921_perc_101',
-            '103': 'manage_921_perc_103',
-            '104': 'manage_921_perc_104',
-            '110': 'manage_921_perc_110',
-            '111': 'manage_921_perc_111',
-            '200': 'manage_921_perc_200',
-        },
-        98: {
-            '101': 'finance923_perc_101',
-            '103': 'finance923_perc_103',
-            '104': 'finance923_perc_104',
-            '110': 'finance923_perc_110',
-            '111': 'finance923_perc_111',
-            '200': 'finance923_perc_200',
-        },
-        99: {
-            '101': 'it_922_perc_101',
-            '103': 'it_922_perc_103',
-            '104': 'it_922_perc_104',
-            '110': 'it_922_perc_110',
-            '111': 'it_922_perc_111',
-            '200': 'it_922_perc_200',
-        },
-        100: {
-            '101': 'office_supp_perc_101',
-            '103': 'office_supp_perc_103',
-            '104': 'office_supp_perc_104',
-            '110': 'office_supp_perc_110',
-            '111': 'office_supp_perc_111',
-            '200': 'office_supp_perc_200',
-        },
-        101: {
-            '101': 'build_facil950_perc_101',
-            '103': 'build_facil950_perc_103',
-            '104': 'build_facil950_perc_104',
-            '110': 'build_facil950_perc_110',
-            '111': 'build_facil950_perc_111',
-            '200': 'build_facil950_perc_200',
-        },
-        104: {
-            '101': 'coff_clean_ryd_perc_101',
-            '103': 'coff_clean_ryd_perc_103',
-            '104': 'coff_clean_ryd_perc_104',
-            '110': 'coff_clean_ryd_perc_110',
-            '111': 'coff_clean_ryd_perc_111',
-            '200': 'coff_clean_ryd_perc_200',
-        },
+        91: {'101': 'quality901_perc_101','103': 'quality901_perc_103','104': 'quality901_perc_104','110': 'quality901_perc_110','111': 'quality901_perc_111','200': 'quality901_perc_200'},
+        92: {'101': 'oper_supp902_perc_101','103': 'oper_supp902_perc_103','104': 'oper_supp902_perc_104','110': 'oper_supp902_perc_110','111': 'oper_supp902_perc_111','200': 'oper_supp902_perc_200'},
+        93: {'101': 'pub_loc903_perc_101','103': 'pub_loc903_perc_103','104': 'pub_loc903_perc_104','110': 'pub_loc903_perc_110','111': 'pub_loc903_perc_111','200': 'pub_loc903_perc_200'},
+        95: {'101': 'sale_gen911_perc_101','103': 'sale_gen911_perc_103','104': 'sale_gen911_perc_104','110': 'sale_gen911_perc_110','111': 'sale_gen911_perc_111','200': 'sale_gen911_perc_200'},
+        97: {'101': 'manage_921_perc_101','103': 'manage_921_perc_103','104': 'manage_921_perc_104','110': 'manage_921_perc_110','111': 'manage_921_perc_111','200': 'manage_921_perc_200'},
+        98: {'101': 'finance923_perc_101','103': 'finance923_perc_103','104': 'finance923_perc_104','110': 'finance923_perc_110','111': 'finance923_perc_111','200': 'finance923_perc_200'},
+        99: {'101': 'it_922_perc_101','103': 'it_922_perc_103','104': 'it_922_perc_104','110': 'it_922_perc_110','111': 'it_922_perc_111','200': 'it_922_perc_200'},
+        100: {'101': 'office_supp_perc_101','103': 'office_supp_perc_103','104': 'office_supp_perc_104','110': 'office_supp_perc_110','111': 'office_supp_perc_111','200': 'office_supp_perc_200'},
+        101: {'101': 'build_facil950_perc_101','103': 'build_facil950_perc_103','104': 'build_facil950_perc_104','110': 'build_facil950_perc_110','111': 'build_facil950_perc_111','200': 'build_facil950_perc_200'},
+        104: {'101': 'coff_clean_ryd_perc_101','103': 'coff_clean_ryd_perc_103','104': 'coff_clean_ryd_perc_104','110': 'coff_clean_ryd_perc_110','111': 'coff_clean_ryd_perc_111','200': 'coff_clean_ryd_perc_200'},
     }
 
     # =====================================================
@@ -201,13 +129,8 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
     @api.model
     def _income_expense(self, account_type, analytic_balance):
         if account_type in ('income', 'income_other'):
-            income = -analytic_balance
-            expense = 0.0
-        else:
-            income = 0.0
-            expense = analytic_balance
-
-        return income, expense, income - expense
+            return -analytic_balance, 0.0, -analytic_balance
+        return 0.0, analytic_balance, -analytic_balance
 
     @api.model
     def _domain(self, date_from=False, date_to=False, company_id=False):
@@ -241,13 +164,14 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
         allowed_accounts = wizard._get_effective_analytic_accounts()
         allowed_ids = set(allowed_accounts.ids)
 
-        domain = self._domain(
-            date_from=wizard.date_from,
-            date_to=wizard.date_to,
-            company_id=wizard.company_id.id,
+        move_lines = MoveLine.search(
+            self._domain(
+                wizard.date_from,
+                wizard.date_to,
+                wizard.company_id.id
+            ),
+            order='date, move_id, id'
         )
-
-        move_lines = MoveLine.search(domain, order='date, move_id, id')
 
         grouped = {}
         details = defaultdict(list)
@@ -277,24 +201,21 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                 analytic_balance = base_balance
 
                 # =====================================================
-                # APPLY GROUP SPLIT (NEW LOGIC)
+                # GROUP SPLIT (SAFE FIXED)
                 # =====================================================
-                group_perc = 0.0
+                group_perc = None
 
-                if wizard.show_divided:
-                    plan_map = self.GROUP_PERCENT_MAP.get(plan.id, {})
-                    field_name = plan_map.get(wizard.group_code)
+                if wizard.show_divided and wizard.group_code:
+                    plan_map = self.GROUP_PERCENT_MAP.get(plan.id)
+                    if plan_map:
+                        field = plan_map.get(str(wizard.group_code))
+                        if field:
+                            group_perc = getattr(wizard, field, None)
 
-                    if field_name:
-                        group_perc = getattr(wizard, field_name, 0.0)
+                if group_perc:
+                    analytic_balance *= (group_perc / 100.0)
 
-                    if group_perc:
-                        analytic_balance = analytic_balance * (group_perc / 100.0)
-
-                income, expense, net = self._income_expense(
-                    account_type,
-                    analytic_balance
-                )
+                income, expense, net = self._income_expense(account_type, analytic_balance)
 
                 plan_key = plan.id or 0
                 account_key = account.id
@@ -308,14 +229,14 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                         'accounts': {}
                     }
 
-                plan_bucket = grouped[plan_key]
+                bucket = grouped[plan_key]
 
-                plan_bucket['income'] += income
-                plan_bucket['expense'] += expense
-                plan_bucket['net'] += net
+                bucket['income'] += income
+                bucket['expense'] += expense
+                bucket['net'] += net
 
-                if account_key not in plan_bucket['accounts']:
-                    plan_bucket['accounts'][account_key] = {
+                if account_key not in bucket['accounts']:
+                    bucket['accounts'][account_key] = {
                         'account': account,
                         'income': 0.0,
                         'expense': 0.0,
@@ -324,7 +245,7 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                         'company': company,
                     }
 
-                acc = plan_bucket['accounts'][account_key]
+                acc = bucket['accounts'][account_key]
 
                 acc['income'] += income
                 acc['expense'] += expense
@@ -344,19 +265,23 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
         vals = []
         seq = 10
 
-        selected_plan_ids = wizard.analytic_plan_ids.ids or []
+        selected_plans = wizard.analytic_plan_ids.ids or []
 
-        def _sort_plan(k):
-            plan = grouped[k]['plan']
-            return (
-                0 if plan.id in selected_plan_ids else 1,
-                plan.name or _('No Plan')
-            )
+        def sort_plan(k):
+            p = grouped[k]['plan']
+            return (0 if p.id in selected_plans else 1, p.name or '')
 
-        for plan_key in sorted(grouped, key=_sort_plan):
+        for plan_key in sorted(grouped, key=sort_plan):
 
-            plan_bucket = grouped[plan_key]
-            plan = plan_bucket['plan']
+            bucket = grouped[plan_key]
+            plan = bucket['plan']
+
+            # =====================================================
+            # PLAN NAME FIX (+ GROUP CODE)
+            # =====================================================
+            suffix = ''
+            if wizard.show_divided and wizard.group_code:
+                suffix = f" + Group {wizard.group_code}"
 
             vals.append({
                 'wizard_id': wizard.id,
@@ -365,16 +290,17 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                 'line_type': 'plan',
                 'company_id': wizard.company_id.id,
                 'analytic_plan_id': plan.id or False,
-                'name': plan.name or _('No Plan'),
-                'income_amount': plan_bucket['income'],
-                'expense_amount': plan_bucket['expense'],
-                'net_amount': plan_bucket['net'],
+                'name': (plan.name or _('No Plan')) + suffix,
+                'income_amount': bucket['income'],
+                'expense_amount': bucket['expense'],
+                'net_amount': bucket['net'],
             })
 
             seq += 10
 
-            for acc_key in sorted(plan_bucket['accounts']):
-                acc = plan_bucket['accounts'][acc_key]
+            for acc_key in sorted(bucket['accounts']):
+
+                acc = bucket['accounts'][acc_key]
 
                 vals.append({
                     'wizard_id': wizard.id,
@@ -397,16 +323,16 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
 
                 if wizard.show_details:
 
-                    for detail in details[(plan_key, acc_key)]:
+                    for d in details[(plan_key, acc_key)]:
 
-                        ml = detail['move_line']
+                        ml = d['move_line']
 
                         vals.append({
                             'wizard_id': wizard.id,
                             'sequence': seq,
                             'level': 3,
                             'line_type': 'detail',
-                            'company_id': detail['company'].id,
+                            'company_id': d['company'].id,
                             'analytic_plan_id': plan.id or False,
                             'account_id': acc['account'].id,
                             'move_id': ml.move_id.id,
@@ -417,17 +343,14 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                             'account_code': acc['account'].code,
                             'account_name': acc['account'].name,
                             'name': ml.name or ml.move_id.name,
-                            'percentage': detail['percentage'],
+                            'percentage': d['percentage'],
                             'original_balance': ml.balance,
-                            'analytic_balance': detail['analytic_balance'],
-                            'income_amount': detail['income'],
-                            'expense_amount': detail['expense'],
-                            'net_amount': detail['net'],
+                            'analytic_balance': d['analytic_balance'],
+                            'income_amount': d['income'],
+                            'expense_amount': d['expense'],
+                            'net_amount': d['net'],
                         })
 
                         seq += 10
 
-        if vals:
-            return Line.create(vals)
-
-        return Line.browse()
+        return Line.create(vals) if vals else Line.browse()
