@@ -18,7 +18,7 @@ class AccountMoveLine(models.Model):
 
         for raw_key, percentage in distribution.items():
 
-            if raw_key in (False, None, ''):
+            if not raw_key:
                 continue
 
             try:
@@ -43,7 +43,7 @@ class AccountMoveLine(models.Model):
 
 
 # =========================================================
-# LINE MODEL (UNCHANGED STRUCTURE)
+# LINE MODEL
 # =========================================================
 class KBIAnalyticProfitLossLine(models.TransientModel):
     _name = 'kbi.analytic.profit.loss.line'
@@ -91,55 +91,57 @@ class KBIAnalyticProfitLossLine(models.TransientModel):
 
 
 # =========================================================
-# SERVICE (FIXED FINAL VERSION)
+# SERVICE
 # =========================================================
 class KBIAnalyticProfitLossService(models.AbstractModel):
     _name = 'kbi.analytic.profit.loss.service'
+    _description = 'KBI Analytic Profit and Loss Service'
+
+    PROFIT_LOSS_ACCOUNT_TYPES = (
+        'income',
+        'income_other',
+        'expense',
+        'expense_depreciation',
+        'expense_direct_cost',
+    )
 
     EXTRA_PLAN_IDS = [91, 92, 93, 95, 97, 98, 99, 100, 101, 104]
 
     GROUP_PERCENT_MAP = {
-        91: {'101': 'p101', '103': 'p103'},
-        92: {'101': 'p101', '103': 'p103'},
-        93: {'101': 'p101', '103': 'p103'},
-        95: {'101': 'p101', '103': 'p103'},
-        97: {'101': 'p101', '103': 'p103'},
-        98: {'101': 'p101', '103': 'p103'},
-        99: {'101': 'p101', '103': 'p103'},
-        100: {'101': 'p101', '103': 'p103'},
-        101: {'101': 'p101', '103': 'p103'},
-        104: {'101': 'p101', '103': 'p103'},
+        91: {'101': 'quality901_perc_101','103': 'quality901_perc_103','104': 'quality901_perc_104','110': 'quality901_perc_110','111': 'quality901_perc_111','200': 'quality901_perc_200'},
+        92: {'101': 'oper_supp902_perc_101','103': 'oper_supp902_perc_103','104': 'oper_supp902_perc_104','110': 'oper_supp902_perc_110','111': 'oper_supp902_perc_111','200': 'oper_supp902_perc_200'},
+        93: {'101': 'pub_loc903_perc_101','103': 'pub_loc903_perc_103','104': 'pub_loc903_perc_104','110': 'pub_loc903_perc_110','111': 'pub_loc903_perc_111','200': 'pub_loc903_perc_200'},
+        95: {'101': 'sale_gen911_perc_101','103': 'sale_gen911_perc_103','104': 'sale_gen911_perc_104','110': 'sale_gen911_perc_110','111': 'sale_gen911_perc_111','200': 'sale_gen911_perc_200'},
+        97: {'101': 'manage_921_perc_101','103': 'manage_921_perc_103','104': 'manage_921_perc_104','110': 'manage_921_perc_110','111': 'manage_921_perc_111','200': 'manage_921_perc_200'},
+        98: {'101': 'finance923_perc_101','103': 'finance923_perc_103','104': 'finance923_perc_104','110': 'finance923_perc_110','111': 'finance923_perc_111','200': 'finance923_perc_200'},
+        99: {'101': 'it_922_perc_101','103': 'it_922_perc_103','104': 'it_922_perc_104','110': 'it_922_perc_110','111': 'it_922_perc_111','200': 'it_922_perc_200'},
+        100: {'101': 'office_supp_perc_101','103': 'office_supp_perc_103','104': 'office_supp_perc_104','110': 'office_supp_perc_110','111': 'office_supp_perc_111','200': 'office_supp_perc_200'},
+        101: {'101': 'build_facil950_perc_101','103': 'build_facil950_perc_103','104': 'build_facil950_perc_104','110': 'build_facil950_perc_110','111': 'build_facil950_perc_111','200': 'build_facil950_perc_200'},
+        104: {'101': 'coff_clean_ryd_perc_101','103': 'coff_clean_ryd_perc_103','104': 'coff_clean_ryd_perc_104','110': 'coff_clean_ryd_perc_110','111': 'coff_clean_ryd_perc_111','200': 'coff_clean_ryd_perc_200'},
     }
 
-    def _income_expense(self, account_type, amount):
+    # =====================================================
+    def _income_expense(self, account_type, value):
         if account_type in ('income', 'income_other'):
-            return -amount, 0.0, -amount
-        return 0.0, amount, -amount
+            return -value, 0.0, -value
+        return 0.0, value, -value
 
-    def _apply_group(self, wizard, plan_id, value):
-        """
-        FIX:
-        - لو group_code فاضي + show_divided → 100%
-        - لو group_code موجود → apply %
-        """
-        if not wizard.show_divided:
-            return value
+    # =====================================================
+    def _domain(self, date_from, date_to, company_id):
+        domain = [
+            ('move_id.state', '=', 'posted'),
+            ('account_id.account_type', 'in', list(self.PROFIT_LOSS_ACCOUNT_TYPES)),
+            ('analytic_distribution', '!=', False),
+        ]
+        if date_from:
+            domain.append(('date', '>=', date_from))
+        if date_to:
+            domain.append(('date', '<=', date_to))
+        if company_id:
+            domain.append(('company_id', '=', company_id))
+        return domain
 
-        # default = 100%
-        if not wizard.group_code:
-            return value
-
-        map_plan = self.GROUP_PERCENT_MAP.get(plan_id)
-        if not map_plan:
-            return value
-
-        field = map_plan.get(str(wizard.group_code))
-        if not field:
-            return value
-
-        percent = getattr(wizard, field, 100.0) or 100.0
-        return value * (percent / 100.0)
-
+    # =====================================================
     def generate_lines(self, wizard):
 
         Line = self.env['kbi.analytic.profit.loss.line']
@@ -148,107 +150,172 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
 
         Line.search([('wizard_id', '=', wizard.id)]).unlink()
 
-        move_lines = MoveLine.search([
-            ('move_id.state', '=', 'posted'),
-            ('analytic_distribution', '!=', False),
-        ])
+        allowed_ids = set(wizard._get_effective_analytic_accounts().ids)
+
+        move_lines = MoveLine.search(
+            self._domain(wizard.date_from, wizard.date_to, wizard.company_id.id),
+            order='date, id'
+        )
 
         grouped = {}
+        details = defaultdict(list)
 
+        total_income = total_expense = total_net = 0.0
+
+        # =====================================================
+        # BUILD DATA
+        # =====================================================
         for line in move_lines:
 
-            for analytic_id, pct in line._kbi_extract_analytic_distribution_parts():
+            parts = line._kbi_extract_analytic_distribution_parts()
+            if not parts:
+                continue
+
+            for analytic_id, percent in parts:
+
+                if allowed_ids and analytic_id not in allowed_ids:
+                    continue
 
                 analytic = Analytic.browse(analytic_id)
                 if not analytic.exists():
                     continue
 
                 plan = analytic.plan_id
-                account = line.account_id
+                if not plan:
+                    continue
 
-                base = line.balance * (pct / 100.0)
-                base = self._apply_group(wizard, plan.id, base)
+                if not wizard.show_divided and plan.id in self.EXTRA_PLAN_IDS:
+                    continue
 
-                income, expense, net = self._income_expense(account.account_type, base)
+                value = line.balance * (percent / 100.0)
 
-                if plan.id not in grouped:
-                    grouped[plan.id] = {
-                        'plan': plan,
-                        'income': 0.0,
-                        'expense': 0.0,
-                        'net': 0.0,
-                        'accounts': {}
-                    }
+                if wizard.show_divided and wizard.group_code:
+                    map_ = self.GROUP_PERCENT_MAP.get(plan.id, {})
+                    field = map_.get(str(wizard.group_code))
+                    if field:
+                        value *= (getattr(wizard, field, 0.0) or 0.0) / 100.0
 
-                g = grouped[plan.id]
+                income, expense, net = self._income_expense(line.account_id.account_type, value)
+
+                total_income += income
+                total_expense += expense
+                total_net += net
+
+                pkey = plan.id
+                akey = line.account_id.id
+
+                grouped.setdefault(pkey, {
+                    'plan': plan,
+                    'income': 0.0,
+                    'expense': 0.0,
+                    'net': 0.0,
+                    'accounts': {}
+                })
+
+                g = grouped[pkey]
+
                 g['income'] += income
                 g['expense'] += expense
                 g['net'] += net
 
-                if account.id not in g['accounts']:
-                    g['accounts'][account.id] = {
-                        'account': account,
-                        'income': 0.0,
-                        'expense': 0.0,
-                        'net': 0.0,
-                    }
+                g['accounts'].setdefault(akey, {
+                    'account': line.account_id,
+                    'income': 0.0,
+                    'expense': 0.0,
+                    'net': 0.0,
+                    'analytic_balance': 0.0,
+                    'company': line.company_id,
+                })
 
-                a = g['accounts'][account.id]
+                a = g['accounts'][akey]
+
                 a['income'] += income
                 a['expense'] += expense
                 a['net'] += net
+                a['analytic_balance'] += value
 
+                details[(pkey, akey)].append({
+                    'line': line,
+                    'percent': percent,
+                    'value': value,
+                    'income': income,
+                    'expense': expense,
+                    'net': net,
+                })
+
+        # =====================================================
+        # BUILD LINES
+        # =====================================================
         vals = []
         seq = 10
 
-        if not grouped:
-            return Line.browse()
+        for pkey in grouped:
 
-        for plan_id, data in grouped.items():
+            g = grouped[pkey]
+            plan = g['plan']
 
-            # PLAN LEVEL
             vals.append({
                 'wizard_id': wizard.id,
                 'sequence': seq,
                 'level': 1,
                 'line_type': 'plan',
-                'name': data['plan'].name,
-                'income_amount': data['income'],
-                'expense_amount': data['expense'],
-                'net_amount': data['net'],
+                'company_id': wizard.company_id.id,
+                'analytic_plan_id': plan.id,
+                'name': plan.name,
+                'income_amount': g['income'],
+                'expense_amount': g['expense'],
+                'net_amount': g['net'],
             })
 
             seq += 10
 
-            # ACCOUNT LEVEL
-            for acc_id, acc in data['accounts'].items():
+            for akey in g['accounts']:
+
+                a = g['accounts'][akey]
 
                 vals.append({
                     'wizard_id': wizard.id,
                     'sequence': seq,
                     'level': 2,
                     'line_type': 'account',
-                    'account_id': acc['account'].id,
-                    'name': acc['account'].display_name,
-                    'income_amount': acc['income'],
-                    'expense_amount': acc['expense'],
-                    'net_amount': acc['net'],
+                    'company_id': a['company'].id,
+                    'analytic_plan_id': plan.id,
+                    'account_id': a['account'].id,
+                    'name': f"{a['account'].code} - {a['account'].name}",
+                    'income_amount': a['income'],
+                    'expense_amount': a['expense'],
+                    'net_amount': a['net'],
+                    'analytic_balance': a['analytic_balance'],
                 })
 
                 seq += 10
 
-            # ALWAYS FORCE DETAIL LEVEL SAFE (prevents "empty report")
-            vals.append({
-                'wizard_id': wizard.id,
-                'sequence': seq,
-                'level': 3,
-                'line_type': 'detail',
-                'name': '---',
-                'income_amount': 0.0,
-                'expense_amount': 0.0,
-                'net_amount': 0.0,
-            })
+                if wizard.show_details:
+                    for d in details[(pkey, akey)]:
+                        l = d['line']
 
-            seq += 10
+                        vals.append({
+                            'wizard_id': wizard.id,
+                            'sequence': seq,
+                            'level': 3,
+                            'line_type': 'detail',
+                            'company_id': l.company_id.id,
+                            'analytic_plan_id': plan.id,
+                            'account_id': l.account_id.id,
+                            'move_id': l.move_id.id,
+                            'move_line_id': l.id,
+                            'journal_id': l.journal_id.id,
+                            'partner_id': l.partner_id.id,
+                            'date': l.date,
+                            'name': l.name,
+                            'percentage': d['percent'],
+                            'original_balance': l.balance,
+                            'analytic_balance': d['value'],
+                            'income_amount': d['income'],
+                            'expense_amount': d['expense'],
+                            'net_amount': d['net'],
+                        })
 
-        return Line.create(vals)
+                        seq += 10
+
+        return Line.create(vals) if vals else Line.browse()
