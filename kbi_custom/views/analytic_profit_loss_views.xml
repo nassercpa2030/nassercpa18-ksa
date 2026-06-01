@@ -100,9 +100,9 @@
        decoration-muted="group_code == '111'"
        decoration-danger="group_code == '200'"
        decoration-bf="group_code != False " groups="base.group_system,104__team.shaker"/>
-                         <button name="action_preview_divided_qweb" type="object" string="طباعة QWeb" class="btn-primary kbi_divided_btn"/>
-                        <button name="action_print_divided_excel" type="object" string="طباعة Excel" class="btn-success kbi_divided_btn" icon="fa-file-excel-o"/>
-                        <button name="action_print_divided_pdf" type="object" string="طباعة PDF" class="btn-secondary kbi_divided_btn"/>
+                         <button name="action_preview_divided_qweb" type="object" string="طباعة QWeb"  invisible="not group_code" class="btn-primary kbi_divided_btn" icon="fa-file-text-o"/>
+                        <button name="action_print_divided_excel" type="object" string="طباعة Excel"  invisible="not group_code" lass="btn-success kbi_divided_btn" icon="fa-file-excel-o"/>
+                        <button name="action_print_divided_pdf" type="object" string="طباعة PDF" invisible="not group_code"  class="btn-secondary kbi_divided_btn" icon="fa-file-pdf-o"/>
                       </group>
                               
                               <!-- <field name="group_code"
