@@ -520,16 +520,16 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
             'total_expense' : total_expense ,
             'total_net' : total_net ,
         }
-    
+
     ### QWEB####
     def action_preview_qweb_report(self) :
         self.ensure_one ()
 
-        data = self._compute_analytic_profit_loss ()
+        self.report_data = self._compute_analytic_profit_loss ()
 
         return self.env.ref (
             'kbi_custom.action_report_kbi_analytic_profit_loss_html'
-        ).report_action ( self , data={'lines' : data} )
+        ).report_action ( self )
 
     ### PDF####
     def action_print_pdf_report(self) :
@@ -538,7 +538,7 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         data = self._compute_analytic_profit_loss ()
 
         return self.env.ref (
-            'kbi_custom.action_kbi_analytic_profit_loss_pdf'
+            'kbi_custom.action_report_kbi_analytic_profit_loss_pdf'
         ).report_action ( self , data={'lines' : data} )
 
     #####EXCEL #######
@@ -547,15 +547,22 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
 
         data = self._compute_analytic_profit_loss ()
 
-        output = io.BytesIO ()
-        workbook = xlsxwriter.Workbook ( output , {'in_memory' : True} )
-        sheet = workbook.add_worksheet ( 'Analytic P&L' )
+        import io
+        import base64
+        import xlsxwriter
 
+        output = io.BytesIO ()
+        workbook = xlsxwriter.Workbook ( output )
+        sheet = workbook.add_worksheet ( "Profit Loss" )
+
+        # ---------------------------
+        # FORMATS
+        # ---------------------------
         header = workbook.add_format ( {
             'bold' : True ,
-            'border' : 1 ,
+            'align' : 'center' ,
             'bg_color' : '#D9E1F2' ,
-            'align' : 'center'
+            'border' : 1
         } )
 
         money = workbook.add_format ( {
@@ -563,29 +570,91 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
             'border' : 1
         } )
 
-        # Header
-        sheet.write_row ( 0 , 0 , ['Group ID' , 'Income' , 'Expense' , 'Net'] , header )
+        red_money = workbook.add_format ( {
+            'num_format' : '#,##0.00' ,
+            'font_color' : 'red' ,
+            'border' : 1
+        } )
 
+        text = workbook.add_format ( {
+            'border' : 1
+        } )
+
+        # ---------------------------
+        # HEADER
+        # ---------------------------
+        sheet.write ( 0 , 0 , "البيان / Name" , header )
+        sheet.write ( 0 , 1 , "الإيراد / Income" , header )
+        sheet.write ( 0 , 2 , "المصروف / Expense" , header )
+        sheet.write ( 0 , 3 , "الصافي / Net" , header )
+
+        # ---------------------------
+        # DATA
+        # ---------------------------
         row = 1
+        lines = data.get ( 'lines' , [] )
 
-        # Data
-        for group_id , vals in data.items () :
-            sheet.write ( row , 0 , group_id )
-            sheet.write_number ( row , 1 , vals['income'] or 0.0 , money )
-            sheet.write_number ( row , 2 , vals['expense'] or 0.0 , money )
-            sheet.write_number ( row , 3 , vals['net'] or 0.0 , money )
+        for vals in lines :
+
+            if not isinstance ( vals , dict ) :
+                continue
+
+            sheet.write ( row , 0 , vals.get ( 'name' , '' ) , text )
+
+            sheet.write_number (
+                row , 1 ,
+                vals.get ( 'income' , 0.0 ) or 0.0 ,
+                money
+            )
+
+            sheet.write_number (
+                row , 2 ,
+                -abs ( vals.get ( 'expense' , 0.0 ) or 0.0 ) ,
+                red_money
+            )
+
+            sheet.write_number (
+                row , 3 ,
+                vals.get ( 'net' , 0.0 ) or 0.0 ,
+                money
+            )
+
             row += 1
 
+        # ---------------------------
+        # TOTALS
+        # ---------------------------
+        sheet.write ( row + 1 , 0 , "الإجمالي" , header )
+
+        sheet.write_formula (
+            row + 1 , 1 ,
+            f"=SUM(B2:B{row})" ,
+            money
+        )
+
+        sheet.write_formula (
+            row + 1 , 2 ,
+            f"=SUM(C2:C{row})" ,
+            red_money
+        )
+
+        sheet.write_formula (
+            row + 1 , 3 ,
+            f"=SUM(D2:D{row})" ,
+            money
+        )
+
         workbook.close ()
+
         output.seek ( 0 )
+        file_data = base64.b64encode ( output.read () )
 
         attachment = self.env['ir.attachment'].create ( {
-            'name' : 'Analytic_PnL.xlsx' ,
+            'name' : 'Profit_Loss_Report.xlsx' ,
             'type' : 'binary' ,
-            'datas' : base64.b64encode ( output.read () ) ,
-            'res_model' : 'kbi.analytic.profit.loss.wizard' ,
+            'datas' : file_data ,
+            'res_model' : self._name ,
             'res_id' : self.id ,
-            'mimetype' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         } )
 
         return {
