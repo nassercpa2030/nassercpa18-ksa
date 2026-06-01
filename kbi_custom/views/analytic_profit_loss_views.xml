@@ -87,12 +87,8 @@
                               
                                     <field name="show_divided" widget="boolean_toggle" style="background-color:#d1ecf1; padding:6px; border-radius:6px;" groups="base.group_system,104__team.shaker"/>
                              
-                      <group class="kbi_divided_buttons_group">
-
-                          <div class="kbi_divided_title">
-                                📊 تقارير المجموعات الموزعة
-                          </div>
-                                                  <field name="group_code" string="المجموعة المطلوب التوزيع عليها" style="background-color:#f8d7da; padding:6px; border-radius:6px;"
+                      <group class="kbi_divided_buttons_group" text="📊 تقارير المجموعات الموزعة">
+<field name="group_code" string="المجموعة المطلوب التوزيع عليها" style="background-color:#f8d7da; padding:6px; border-radius:6px;"
                                    decoration-success="group_code == '101'"
        decoration-info="group_code == '103'"
        decoration-primary="group_code == '104'"
@@ -100,9 +96,11 @@
        decoration-muted="group_code == '111'"
        decoration-danger="group_code == '200'"
        decoration-bf="group_code != False " groups="base.group_system,104__team.shaker"/>
+                          <group class="kbi_divided_title">                              
                          <button name="action_preview_divided_qweb" type="object" string="طباعة QWeb"  invisible="not group_code" class="btn-primary kbi_divided_btn" icon="fa-file-text-o"/>
                         <button name="action_print_divided_excel" type="object" string="طباعة Excel"  invisible="not group_code" lass="btn-success kbi_divided_btn" icon="fa-file-excel-o"/>
                         <button name="action_print_divided_pdf" type="object" string="طباعة PDF" invisible="not group_code"  class="btn-secondary kbi_divided_btn" icon="fa-file-pdf-o"/>
+                          </group>
                       </group>
                               
                               <!-- <field name="group_code"
