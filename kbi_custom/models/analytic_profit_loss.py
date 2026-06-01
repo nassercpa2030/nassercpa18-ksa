@@ -137,6 +137,107 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
 
     EXTRA_PLAN_IDS = [91, 92, 93, 95, 97, 98, 99, 100, 101,104]
 
+    ## function of creating divided values for each  analytic plan from (101,103,104,110,200)
+
+    @api.model
+    def generate_divided_lines(self , wizard) :
+
+        Line = self.env['kbi.analytic.profit.loss.line']
+
+        GROUP_PERCENT_MAP = {
+            91 : {'101' : 'quality901_perc_101' , '103' : 'quality901_perc_103' , '104' : 'quality901_perc_104' ,
+                  '110' : 'quality901_perc_110' , '111' : 'quality901_perc_111' , '200' : 'quality901_perc_200'} ,
+            92 : {'101' : 'oper_supp902_perc_101' , '103' : 'oper_supp902_perc_103' , '104' : 'oper_supp902_perc_104' ,
+                  '110' : 'oper_supp902_perc_110' , '111' : 'oper_supp902_perc_111' , '200' : 'oper_supp902_perc_200'} ,
+            93 : {'101' : 'pub_loc903_perc_101' , '103' : 'pub_loc903_perc_103' , '104' : 'pub_loc903_perc_104' ,
+                  '110' : 'pub_loc903_perc_110' , '111' : 'pub_loc903_perc_111' , '200' : 'pub_loc903_perc_200'} ,
+            95 : {'101' : 'sale_gen911_perc_101' , '103' : 'sale_gen911_perc_103' , '104' : 'sale_gen911_perc_104' ,
+                  '110' : 'sale_gen911_perc_110' , '111' : 'sale_gen911_perc_111' , '200' : 'sale_gen911_perc_200'} ,
+            97 : {'101' : 'manage_921_perc_101' , '103' : 'manage_921_perc_103' , '104' : 'manage_921_perc_104' ,
+                  '110' : 'manage_921_perc_110' , '111' : 'manage_921_perc_111' , '200' : 'manage_921_perc_200'} ,
+            98 : {'101' : 'finance923_perc_101' , '103' : 'finance923_perc_103' , '104' : 'finance923_perc_104' ,
+                  '110' : 'finance923_perc_110' , '111' : 'finance923_perc_111' , '200' : 'finance923_perc_200'} ,
+            99 : {'101' : 'it_922_perc_101' , '103' : 'it_922_perc_103' , '104' : 'it_922_perc_104' ,
+                  '110' : 'it_922_perc_110' , '111' : 'it_922_perc_111' , '200' : 'it_922_perc_200'} ,
+            100 : {'101' : 'office_supp_perc_101' , '103' : 'office_supp_perc_103' , '104' : 'office_supp_perc_104' ,
+                   '110' : 'office_supp_perc_110' , '111' : 'office_supp_perc_111' , '200' : 'office_supp_perc_200'} ,
+            101 : {'101' : 'build_facil950_perc_101' , '103' : 'build_facil950_perc_103' ,
+                   '104' : 'build_facil950_perc_104' , '110' : 'build_facil950_perc_110' ,
+                   '111' : 'build_facil950_perc_111' , '200' : 'build_facil950_perc_200'} ,
+            104 : {'101' : 'coff_clean_ryd_perc_101' , '103' : 'coff_clean_ryd_perc_103' ,
+                   '104' : 'coff_clean_ryd_perc_104' , '110' : 'coff_clean_ryd_perc_110' ,
+                   '111' : 'coff_clean_ryd_perc_111' , '200' : 'coff_clean_ryd_perc_200'} ,
+        }
+
+        Line.search ( [
+            ('wizard_id' , '=' , wizard.id)
+        ] ).unlink ()
+
+        old_level = wizard.level
+        old_show_divided = wizard.show_divided
+
+        wizard.level = 'level1'
+        wizard.show_divided = True
+
+        self.generate_lines ( wizard )
+
+        plan_lines = Line.search ( [
+            ('wizard_id' , '=' , wizard.id) ,
+            ('line_type' , '=' , 'plan')
+        ] , order='sequence,id' )
+
+        vals = []
+        seq = 10
+
+        for plan_line in plan_lines :
+
+            plan_id = plan_line.analytic_plan_id.id
+
+            percent_field = (
+                GROUP_PERCENT_MAP
+                .get ( plan_id , {} )
+                .get ( wizard.group_code )
+            )
+
+            if not percent_field :
+                continue
+
+            percentage = getattr (
+                wizard ,
+                percent_field ,
+                0.0
+            )
+
+            distributed_amount = (
+                    plan_line.net_amount
+                    * percentage
+                    / 100.0
+            )
+
+            vals.append ( {
+                'wizard_id' : wizard.id ,
+                'sequence' : seq ,
+                'level' : 1 ,
+                'line_type' : 'plan' ,
+                'company_id' : wizard.company_id.id ,
+                'analytic_plan_id' : plan_id ,
+                'name' : plan_line.name ,
+                'percentage' : percentage ,
+                'income_amount' : 0.0 ,
+                'expense_amount' : 0.0 ,
+                'net_amount' : distributed_amount ,
+            } )
+
+            seq += 10
+
+        Line.search ( [
+            ('wizard_id' , '=' , wizard.id)
+        ] ).unlink ()
+
+        wizard.level = old_level
+        wizard.show_divided = old_show_divided
+
+        return Line.create ( vals )
     # =====================================================
     # HELPERS
     # =====================================================
