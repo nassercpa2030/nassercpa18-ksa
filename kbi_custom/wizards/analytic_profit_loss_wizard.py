@@ -467,20 +467,18 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
                 if not account_ids :
                     continue
 
-                applied_percent = percent / len ( account_ids )
-
+                # ✔️ FIX: بدون تقسيم خاطئ
                 for acc_id in account_ids :
 
-                    if acc_id not in account_cache :
-                        account_cache[acc_id] = self.env['account.analytic.account'].browse ( acc_id )
-
-                    account = account_cache[acc_id]
+                    account = account_cache.setdefault (
+                        acc_id ,
+                        self.env['account.analytic.account'].browse ( acc_id )
+                    )
 
                     if not account.exists () :
                         continue
 
                     plan_id = account.plan_id.id
-
                     if plan_id not in percent_map :
                         continue
 
@@ -492,9 +490,13 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
                         100.0
                     )
 
-                    base_value = line.balance * (applied_percent / 100.0)
+                    # ✔️ FIX 1: استخدام debit / credit بدل balance
+                    income_base = line.credit * (percent / 100.0)
+                    expense_base = line.debit * (percent / 100.0)
 
-                    final_value = base_value * group_percent / 100.0
+                    # ✔️ FIX 2: تطبيق نسبة المجموعة
+                    final_income = income_base * group_percent / 100.0
+                    final_expense = expense_base * group_percent / 100.0
 
                     if plan_id not in result :
                         result[plan_id] = {
@@ -504,15 +506,13 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
                             'net' : 0.0 ,
                         }
 
-                    if final_value >= 0 :
-                        result[plan_id]['income'] += final_value
-                        total_income += final_value
-                    else :
-                        result[plan_id]['expense'] += abs ( final_value )
-                        total_expense += abs ( final_value )
+                    result[plan_id]['income'] += final_income
+                    result[plan_id]['expense'] += final_expense
+                    result[plan_id]['net'] += (final_income - final_expense)
 
-                    result[plan_id]['net'] += final_value
-                    total_net += final_value
+                    total_income += final_income
+                    total_expense += final_expense
+                    total_net += (final_income - final_expense)
 
         return {
             'lines' : list ( result.values () ) ,
@@ -520,16 +520,15 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
             'total_expense' : total_expense ,
             'total_net' : total_net ,
         }
-
     ### QWEB####
     def action_preview_qweb_report_divided(self) :
         self.ensure_one ()
 
-        self.report_data = self._compute_analytic_profit_loss ()
+        data = self._compute_analytic_profit_loss ()
 
         return self.env.ref (
             'kbi_custom.action_report_kbi_analytic_profit_loss_html'
-        ).report_action ( self )
+        ).report_action ( self , data={'lines' : data} )
 
     ### PDF####
     def action_print_pdf_report_divided(self) :
@@ -551,9 +550,6 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         workbook = xlsxwriter.Workbook ( output )
         sheet = workbook.add_worksheet ( "Profit Loss" )
 
-        # ---------------------------
-        # FORMATS
-        # ---------------------------
         header = workbook.add_format ( {
             'bold' : True ,
             'align' : 'center' ,
@@ -572,21 +568,14 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
             'border' : 1
         } )
 
-        text = workbook.add_format ( {
-            'border' : 1
-        } )
+        text = workbook.add_format ( {'border' : 1} )
 
-        # ---------------------------
         # HEADER
-        # ---------------------------
         sheet.write ( 0 , 0 , "البيان / Name" , header )
         sheet.write ( 0 , 1 , "الإيراد / Income" , header )
         sheet.write ( 0 , 2 , "المصروف / Expense" , header )
         sheet.write ( 0 , 3 , "الصافي / Net" , header )
 
-        # ---------------------------
-        # DATA
-        # ---------------------------
         row = 1
         lines = data.get ( 'lines' , [] )
 
@@ -595,54 +584,35 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
             if not isinstance ( vals , dict ) :
                 continue
 
+            income = float ( vals.get ( 'income' ) or 0.0 )
+            expense = float ( vals.get ( 'expense' ) or 0.0 )
+            net = float ( vals.get ( 'net' ) or 0.0 )
+
             sheet.write ( row , 0 , vals.get ( 'name' , '' ) , text )
+            sheet.write_number ( row , 1 , income , money )
 
-            sheet.write_number (
-                row , 1 ,
-                vals.get ( 'income' , 0.0 ) or 0.0 ,
-                money
-            )
+            # نخلي المصروف سالب للعرض فقط
+            sheet.write_number ( row , 2 , -expense , red_money )
 
-            sheet.write_number (
-                row , 2 ,
-                -abs ( vals.get ( 'expense' , 0.0 ) or 0.0 ) ,
-                red_money
-            )
-
-            sheet.write_number (
-                row , 3 ,
-                vals.get ( 'net' , 0.0 ) or 0.0 ,
-                money
-            )
+            sheet.write_number ( row , 3 , net , money )
 
             row += 1
 
-        # ---------------------------
-        # TOTALS
-        # ---------------------------
+        # =========================
+        # TOTALS (FIXED)
+        # =========================
+        total_income = sum ( float ( l.get ( 'income' ) or 0.0 ) for l in lines if isinstance ( l , dict ) )
+        total_expense = sum ( float ( l.get ( 'expense' ) or 0.0 ) for l in lines if isinstance ( l , dict ) )
+        total_net = sum ( float ( l.get ( 'net' ) or 0.0 ) for l in lines if isinstance ( l , dict ) )
+
         sheet.write ( row + 1 , 0 , "الإجمالي" , header )
-
-        sheet.write_formula (
-            row + 1 , 1 ,
-            f"=SUM(B2:B{row})" ,
-            money
-        )
-
-        sheet.write_formula (
-            row + 1 , 2 ,
-            f"=SUM(C2:C{row})" ,
-            red_money
-        )
-
-        sheet.write_formula (
-            row + 1 , 3 ,
-            f"=SUM(D2:D{row})" ,
-            money
-        )
+        sheet.write_number ( row + 1 , 1 , total_income , money )
+        sheet.write_number ( row + 1 , 2 , -total_expense , red_money )
+        sheet.write_number ( row + 1 , 3 , total_net , money )
 
         workbook.close ()
-
         output.seek ( 0 )
+
         file_data = base64.b64encode ( output.read () )
 
         attachment = self.env['ir.attachment'].create ( {
