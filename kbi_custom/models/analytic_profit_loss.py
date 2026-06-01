@@ -4,7 +4,6 @@ from collections import defaultdict
 
 from odoo import api, fields, models, _
 
-
 # =========================================================
 # ACCOUNT MOVE LINE EXTENSION
 # =========================================================
@@ -136,7 +135,7 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
     )
 
     EXTRA_PLAN_IDS = [91, 92, 93, 95, 97, 98, 99, 100, 101,104]
-    
+
     ##### FUNCTIONS OF DIVIDED PLANS ###########
     @api.model
     def _get_group_percent_field(self , plan_id , group_code) :
@@ -179,32 +178,17 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
         ] )
 
         return sum ( lines.mapped ( 'net_amount' ) )
-
-
-
+    
 
     @api.model
     def generate_group_distribution(self , wizard) :
 
         Line = self.env['kbi.analytic.profit.loss.line']
+
+        # تنظيف القديم
         Line.search ( [('wizard_id' , '=' , wizard.id)] ).unlink ()
 
-        allowed_plans = [
-            91 , 92 , 93 , 95 , 97 , 98 , 99 , 100 , 101 , 104
-        ]
-
-        GROUP_PERCENT_MAP = {
-            91 : {'101' : 'quality901_perc_101'} ,
-            92 : {'101' : 'oper_supp902_perc_101'} ,
-            93 : {'101' : 'pub_loc903_perc_101'} ,
-            95 : {'101' : 'sale_gen911_perc_101'} ,
-            97 : {'101' : 'manage_921_perc_101'} ,
-            98 : {'101' : 'finance923_perc_101'} ,
-            99 : {'101' : 'it_922_perc_101'} ,
-            100 : {'101' : 'office_supp_perc_101'} ,
-            101 : {'101' : 'build_facil950_perc_101'} ,
-            104 : {'101' : 'coff_clean_ryd_perc_101'} ,
-        }
+        allowed_plans = [91 , 92 , 93 , 95 , 97 , 98 , 99 , 100 , 101 , 104]
 
         vals = []
         seq = 10
@@ -215,14 +199,16 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
             if not plan.exists () :
                 continue
 
-            percent_field = GROUP_PERCENT_MAP.get ( plan_id , {} ).get ( wizard.group_code )
+            # 👇 أهم سطر: نجيب اسم الفيلد حسب group_code
+            percent_field = self._get_group_percent_field ( plan_id , wizard.group_code )
 
             if not percent_field :
                 continue
 
+            # 👇 نجيب نسبة الـ wizard dynamically
             percent = getattr ( wizard , percent_field , 0.0 )
 
-            # 👇 المهم هنا: بنجيب total من existing normal report lines
+            # 👇 نجيب إجمالي الـ plan من خطوط التقرير
             base_lines = Line.search ( [
                 ('wizard_id' , '=' , wizard.id) ,
                 ('analytic_plan_id' , '=' , plan_id) ,
@@ -247,7 +233,8 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
             seq += 10
 
         return Line.create ( vals )
-
+    
+    
     # =====================================================
     # HELPERS
     # =====================================================
