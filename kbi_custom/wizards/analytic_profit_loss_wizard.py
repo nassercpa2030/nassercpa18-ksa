@@ -430,9 +430,6 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
             ('parent_state' , '=' , 'posted') ,
         ] )
 
-        # -----------------------------
-        # mapping ثابت بدون group_code
-        # -----------------------------
         percent_map = {
             91 : 'quality901_perc' ,
             92 : 'oper_supp902_perc' ,
@@ -454,33 +451,47 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
 
             for raw_id , percent in line.analytic_distribution.items () :
 
-                analytic_id = int ( raw_id )
+                # -----------------------------
+                # FIX: handle multi IDs safely
+                # -----------------------------
+                raw_ids = str ( raw_id ).split ( ',' )
+                raw_ids = [i.strip () for i in raw_ids if i.strip ()]
 
-                if analytic_id not in percent_map :
+                if not raw_ids :
                     continue
 
-                base_value = line.balance * (percent / 100.0)
+                # distribute percent across IDs (safe approach)
+                split_percent = percent / len ( raw_ids )
 
-                # field_name = f"{percent_map[analytic_id]}_101"  # ثابت (بدون group_code)
-                field_name = f"{percent_map[analytic_id]}_{self.group_code}"
+                for single_id in raw_ids :
+                    try :
+                        analytic_id = int ( single_id )
+                    except ValueError :
+                        continue
 
-                group_percent = getattr ( self , field_name , 100.0 )
+                    if analytic_id not in percent_map :
+                        continue
 
-                final_value = base_value * group_percent / 100.0
+                    base_value = line.balance * (split_percent / 100.0)
 
-                if analytic_id not in result :
-                    result[analytic_id] = {
-                        'income' : 0.0 ,
-                        'expense' : 0.0 ,
-                        'net' : 0.0 ,
-                    }
+                    field_name = f"{percent_map[analytic_id]}_{self.group_code}"
+                    group_percent = getattr ( self , field_name , 100.0 )
 
-                if final_value > 0 :
-                    result[analytic_id]['income'] += final_value
-                else :
-                    result[analytic_id]['expense'] += abs ( final_value )
+                    final_value = base_value * group_percent / 100.0
 
-                result[analytic_id]['net'] += final_value
+                    if analytic_id not in result :
+                        result[analytic_id] = {
+                            'income' : 0.0 ,
+                            'expense' : 0.0 ,
+                            'net' : 0.0 ,
+                        }
+
+                    if final_value > 0 :
+                        result[analytic_id]['income'] += final_value
+                    else :
+                        result[analytic_id]['expense'] += abs ( final_value )
+
+                    result[analytic_id]['net'] += final_value
 
         return result
 
