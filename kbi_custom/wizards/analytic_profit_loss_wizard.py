@@ -424,12 +424,9 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
     def _compute_analytic_profit_loss(self) :
         self.ensure_one ()
 
-        lines = self.env['account.move.line'].search ( [
-            ('date' , '>=' , self.date_from) ,
-            ('date' , '<=' , self.date_to) ,
-            ('parent_state' , '=' , 'posted') ,
-        ] )
-
+        # -------------------------------------------------
+        # 1) CACHE percent_map (performance)
+        # -------------------------------------------------
         percent_map = {
             91 : 'quality901_perc' ,
             92 : 'oper_supp902_perc' ,
@@ -438,63 +435,92 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
             97 : 'manage_921_perc' ,
             98 : 'finance923_perc' ,
             99 : 'it_922_perc' ,
-           # 100 : 'office_supp_perc' ,
             101 : 'build_facil950_perc' ,
-            #104 : 'coff_clean_ryd_perc' ,
         }
+
+        group_code = self.group_code  # cache attribute access
+
+        # -------------------------------------------------
+        # 2) FETCH ONLY REQUIRED DATA (optimization)
+        # -------------------------------------------------
+        lines = self.env['account.move.line'].search ( [
+            ('date' , '>=' , self.date_from) ,
+            ('date' , '<=' , self.date_to) ,
+            ('parent_state' , '=' , 'posted') ,
+            ('analytic_distribution' , '!=' , False) ,
+        ] )
 
         result = {}
 
+        # -------------------------------------------------
+        # 3) MAIN LOOP
+        # -------------------------------------------------
         for line in lines :
-            if not line.analytic_distribution :
+
+            distribution = line.analytic_distribution
+
+            if not distribution :
                 continue
 
-            for raw_id , percent in line.analytic_distribution.items () :
+            # -------------------------------------------------
+            # 4) NORMALIZATION STEP
+            #    convert any format → unified dict:
+            #    {analytic_id: percent}
+            # -------------------------------------------------
+            normalized = {}
 
-                # -----------------------------
-                # FIX: handle multi IDs safely
-                # -----------------------------
-                raw_ids = str ( raw_id ).split ( ',' )
-                raw_ids = [i.strip () for i in raw_ids if i.strip ()]
+            for raw_id , percent in distribution.items () :
 
-                if not raw_ids :
+                # CASE 1: Odoo native (int or string int)
+                if isinstance ( raw_id , (int , float) ) or str ( raw_id ).isdigit () :
+                    try :
+                        normalized[int ( raw_id )] = normalized.get ( int ( raw_id ) , 0 ) + percent
+                    except :
+                        continue
+
+                # CASE 2: broken format "8867,8795"
+                elif isinstance ( raw_id , str ) and ',' in raw_id :
+                    ids = [i.strip () for i in raw_id.split ( ',' ) if i.strip ().isdigit ()]
+
+                    if not ids :
+                        continue
+
+                    split_percent = percent / len ( ids )
+
+                    for i in ids :
+                        normalized[int ( i )] = normalized.get ( int ( i ) , 0 ) + split_percent
+
+            # -------------------------------------------------
+            # 5) CALCULATION (no double counting)
+            # -------------------------------------------------
+            for analytic_id , percent in normalized.items () :
+
+                if analytic_id not in percent_map :
                     continue
 
-                # distribute percent across IDs (safe approach)
-                split_percent = percent / len ( raw_ids )
+                base_value = line.balance * (percent / 100.0)
 
-                for single_id in raw_ids :
-                    try :
-                        analytic_id = int ( single_id )
-                    except ValueError :
-                        continue
+                field_name = f"{percent_map[analytic_id]}_{group_code}"
+                group_percent = getattr ( self , field_name , 100.0 )
 
-                    if analytic_id not in percent_map :
-                        continue
+                final_value = base_value * group_percent / 100.0
 
-                    base_value = line.balance * (split_percent / 100.0)
+                if analytic_id not in result :
+                    result[analytic_id] = {
+                        'income' : 0.0 ,
+                        'expense' : 0.0 ,
+                        'net' : 0.0 ,
+                    }
 
-                    field_name = f"{percent_map[analytic_id]}_{self.group_code}"
-                    group_percent = getattr ( self , field_name , 100.0 )
+                if final_value > 0 :
+                    result[analytic_id]['income'] += final_value
+                else :
+                    result[analytic_id]['expense'] += abs ( final_value )
 
-                    final_value = base_value * group_percent / 100.0
-
-                    if analytic_id not in result :
-                        result[analytic_id] = {
-                            'income' : 0.0 ,
-                            'expense' : 0.0 ,
-                            'net' : 0.0 ,
-                        }
-
-                    if final_value > 0 :
-                        result[analytic_id]['income'] += final_value
-                    else :
-                        result[analytic_id]['expense'] += abs ( final_value )
-
-                    result[analytic_id]['net'] += final_value
+                result[analytic_id]['net'] += final_value
 
         return result
-
+    
     ### QWEB####
     def action_preview_qweb_report(self) :
         self.ensure_one ()
