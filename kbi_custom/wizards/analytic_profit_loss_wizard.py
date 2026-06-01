@@ -421,33 +421,138 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         }
 
     ##### print divided functions as QWEB-PDF-EXCEL ############
-    ### QWEB####
-    def action_preview_divided_qweb(self) :
+    def _compute_analytic_profit_loss(self) :
         self.ensure_one ()
 
-        self.env['kbi.analytic.profit.loss.service'].generate_group_distribution ( self )
+        lines = self.env['account.move.line'].search ( [
+            ('date' , '>=' , self.date_from) ,
+            ('date' , '<=' , self.date_to) ,
+            ('parent_state' , '=' , 'posted') ,
+        ] )
+
+        # -----------------------------
+        # mapping ثابت بدون group_code
+        # -----------------------------
+        percent_map = {
+            91 : 'quality901_perc' ,
+            92 : 'oper_supp902_perc' ,
+            93 : 'pub_loc903_perc' ,
+            95 : 'sale_gen911_perc' ,
+            97 : 'manage_921_perc' ,
+            98 : 'finance923_perc' ,
+            99 : 'it_922_perc' ,
+            100 : 'office_supp_perc' ,
+            101 : 'build_facil950_perc' ,
+            104 : 'coff_clean_ryd_perc' ,
+        }
+
+        result = {}
+
+        for line in lines :
+            if not line.analytic_distribution :
+                continue
+
+            for raw_id , percent in line.analytic_distribution.items () :
+
+                analytic_id = int ( raw_id )
+
+                if analytic_id not in percent_map :
+                    continue
+
+                base_value = line.balance * (percent / 100.0)
+
+                # field_name = f"{percent_map[analytic_id]}_101"  # ثابت (بدون group_code)
+                field_name = f"{percent_map[analytic_id]}_{self.group_code}"
+
+                group_percent = getattr ( self , field_name , 100.0 )
+
+                final_value = base_value * group_percent / 100.0
+
+                if analytic_id not in result :
+                    result[analytic_id] = {
+                        'income' : 0.0 ,
+                        'expense' : 0.0 ,
+                        'net' : 0.0 ,
+                    }
+
+                if final_value > 0 :
+                    result[analytic_id]['income'] += final_value
+                else :
+                    result[analytic_id]['expense'] += abs ( final_value )
+
+                result[analytic_id]['net'] += final_value
+
+        return result
+
+    ### QWEB####
+    def action_preview_qweb_report(self) :
+        self.ensure_one ()
+
+        data = self._compute_analytic_profit_loss ()
 
         return self.env.ref (
             'kbi_custom.action_report_kbi_analytic_profit_loss_html'
-        ).report_action ( self )
+        ).report_action ( self , data={'lines' : data} )
 
     ### PDF####
-    def action_print_divided_pdf(self) :
+    def action_print_pdf_report(self) :
         self.ensure_one ()
 
-        self.env['kbi.analytic.profit.loss.service'].generate_group_distribution ( self )
+        data = self._compute_analytic_profit_loss ()
 
         return self.env.ref (
-            'kbi_custom.action_report_kbi_analytic_profit_loss_pdf'
-        ).report_action ( self )
+            'kbi_custom.action_kbi_analytic_profit_loss_pdf'
+        ).report_action ( self , data={'lines' : data} )
 
     #####EXCEL #######
-    def action_print_divided_excel(self) :
+    def action_print_excel_report(self) :
         self.ensure_one ()
 
-        self.env['kbi.analytic.profit.loss.service'].generate_group_distribution ( self )
+        data = self._compute_analytic_profit_loss ()
 
-        return self.action_print_excel_report ()
+        output = io.BytesIO ()
+        workbook = xlsxwriter.Workbook ( output , {'in_memory' : True} )
+        sheet = workbook.add_worksheet ( 'Analytic P&L' )
 
+        header = workbook.add_format ( {
+            'bold' : True ,
+            'border' : 1 ,
+            'bg_color' : '#D9E1F2' ,
+            'align' : 'center'
+        } )
 
+        money = workbook.add_format ( {
+            'num_format' : '#,##0.00' ,
+            'border' : 1
+        } )
 
+        # Header
+        sheet.write_row ( 0 , 0 , ['Group ID' , 'Income' , 'Expense' , 'Net'] , header )
+
+        row = 1
+
+        # Data
+        for group_id , vals in data.items () :
+            sheet.write ( row , 0 , group_id )
+            sheet.write_number ( row , 1 , vals['income'] or 0.0 , money )
+            sheet.write_number ( row , 2 , vals['expense'] or 0.0 , money )
+            sheet.write_number ( row , 3 , vals['net'] or 0.0 , money )
+            row += 1
+
+        workbook.close ()
+        output.seek ( 0 )
+
+        attachment = self.env['ir.attachment'].create ( {
+            'name' : 'Analytic_PnL.xlsx' ,
+            'type' : 'binary' ,
+            'datas' : base64.b64encode ( output.read () ) ,
+            'res_model' : 'kbi.analytic.profit.loss.wizard' ,
+            'res_id' : self.id ,
+            'mimetype' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        } )
+
+        return {
+            'type' : 'ir.actions.act_url' ,
+            'url' : f'/web/content/{attachment.id}?download=true' ,
+            'target' : 'self' ,
+        }
