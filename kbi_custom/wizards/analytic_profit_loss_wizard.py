@@ -438,9 +438,9 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
             97 : 'manage_921_perc' ,
             98 : 'finance923_perc' ,
             99 : 'it_922_perc' ,
-            100 : 'office_supp_perc' ,
+           # 100 : 'office_supp_perc' ,
             101 : 'build_facil950_perc' ,
-            104 : 'coff_clean_ryd_perc' ,
+            #104 : 'coff_clean_ryd_perc' ,
         }
 
         result = {}
