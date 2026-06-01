@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+
 from collections import defaultdict
+
 from odoo import api, fields, models, _
+
 
 # =========================================================
 # ACCOUNT MOVE LINE EXTENSION
@@ -133,6 +136,117 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
     )
 
     EXTRA_PLAN_IDS = [91, 92, 93, 95, 97, 98, 99, 100, 101,104]
+    
+    ##### FUNCTIONS OF DIVIDED PLANS ###########
+    @api.model
+    def _get_group_percent_field(self , plan_id , group_code) :
+
+        GROUP_PERCENT_MAP = {
+            91 : {'101' : 'quality901_perc_101' , '103' : 'quality901_perc_103' , '104' : 'quality901_perc_104' ,
+                  '110' : 'quality901_perc_110' , '111' : 'quality901_perc_111' , '200' : 'quality901_perc_200'} ,
+            92 : {'101' : 'oper_supp902_perc_101' , '103' : 'oper_supp902_perc_103' , '104' : 'oper_supp902_perc_104' ,
+                  '110' : 'oper_supp902_perc_110' , '111' : 'oper_supp902_perc_111' , '200' : 'oper_supp902_perc_200'} ,
+            93 : {'101' : 'pub_loc903_perc_101' , '103' : 'pub_loc903_perc_103' , '104' : 'pub_loc903_perc_104' ,
+                  '110' : 'pub_loc903_perc_110' , '111' : 'pub_loc903_perc_111' , '200' : 'pub_loc903_perc_200'} ,
+            95 : {'101' : 'sale_gen911_perc_101' , '103' : 'sale_gen911_perc_103' , '104' : 'sale_gen911_perc_104' ,
+                  '110' : 'sale_gen911_perc_110' , '111' : 'sale_gen911_perc_111' , '200' : 'sale_gen911_perc_200'} ,
+            97 : {'101' : 'manage_921_perc_101' , '103' : 'manage_921_perc_103' , '104' : 'manage_921_perc_104' ,
+                  '110' : 'manage_921_perc_110' , '111' : 'manage_921_perc_111' , '200' : 'manage_921_perc_200'} ,
+            98 : {'101' : 'finance923_perc_101' , '103' : 'finance923_perc_103' , '104' : 'finance923_perc_104' ,
+                  '110' : 'finance923_perc_110' , '111' : 'finance923_perc_111' , '200' : 'finance923_perc_200'} ,
+            99 : {'101' : 'it_922_perc_101' , '103' : 'it_922_perc_103' , '104' : 'it_922_perc_104' ,
+                  '110' : 'it_922_perc_110' , '111' : 'it_922_perc_111' , '200' : 'it_922_perc_200'} ,
+            100 : {'101' : 'office_supp_perc_101' , '103' : 'office_supp_perc_103' , '104' : 'office_supp_perc_104' ,
+                   '110' : 'office_supp_perc_110' , '111' : 'office_supp_perc_111' , '200' : 'office_supp_perc_200'} ,
+            101 : {'101' : 'build_facil950_perc_101' , '103' : 'build_facil950_perc_103' ,
+                   '104' : 'build_facil950_perc_104' , '110' : 'build_facil950_perc_110' ,
+                   '111' : 'build_facil950_perc_111' , '200' : 'build_facil950_perc_200'} ,
+            104 : {'101' : 'coff_clean_ryd_perc_101' , '103' : 'coff_clean_ryd_perc_103' ,
+                   '104' : 'coff_clean_ryd_perc_104' , '110' : 'coff_clean_ryd_perc_110' ,
+                   '111' : 'coff_clean_ryd_perc_111' , '200' : 'coff_clean_ryd_perc_200'} ,
+        }
+
+        return GROUP_PERCENT_MAP.get ( plan_id , {} ).get ( group_code )
+
+
+    @api.model
+    def _get_plan_net_total(self , wizard , plan_id) :
+
+        lines = self.env['kbi.analytic.profit.loss.line'].search ( [
+            ('wizard_id' , '=' , wizard.id) ,
+            ('analytic_plan_id' , '=' , plan_id) ,
+            ('line_type' , '=' , 'plan')
+        ] )
+
+        return sum ( lines.mapped ( 'net_amount' ) )
+
+
+
+
+    @api.model
+    def generate_group_distribution(self , wizard) :
+
+        Line = self.env['kbi.analytic.profit.loss.line']
+        Line.search ( [('wizard_id' , '=' , wizard.id)] ).unlink ()
+
+        allowed_plans = [
+            91 , 92 , 93 , 95 , 97 , 98 , 99 , 100 , 101 , 104
+        ]
+
+        GROUP_PERCENT_MAP = {
+            91 : {'101' : 'quality901_perc_101'} ,
+            92 : {'101' : 'oper_supp902_perc_101'} ,
+            93 : {'101' : 'pub_loc903_perc_101'} ,
+            95 : {'101' : 'sale_gen911_perc_101'} ,
+            97 : {'101' : 'manage_921_perc_101'} ,
+            98 : {'101' : 'finance923_perc_101'} ,
+            99 : {'101' : 'it_922_perc_101'} ,
+            100 : {'101' : 'office_supp_perc_101'} ,
+            101 : {'101' : 'build_facil950_perc_101'} ,
+            104 : {'101' : 'coff_clean_ryd_perc_101'} ,
+        }
+
+        vals = []
+        seq = 10
+
+        for plan_id in allowed_plans :
+
+            plan = self.env['account.analytic.plan'].browse ( plan_id )
+            if not plan.exists () :
+                continue
+
+            percent_field = GROUP_PERCENT_MAP.get ( plan_id , {} ).get ( wizard.group_code )
+
+            if not percent_field :
+                continue
+
+            percent = getattr ( wizard , percent_field , 0.0 )
+
+            # 👇 المهم هنا: بنجيب total من existing normal report lines
+            base_lines = Line.search ( [
+                ('wizard_id' , '=' , wizard.id) ,
+                ('analytic_plan_id' , '=' , plan_id) ,
+                ('line_type' , '=' , 'plan') ,
+            ] )
+
+            total = sum ( base_lines.mapped ( 'net_amount' ) )
+
+            amount = total * percent / 100.0
+
+            vals.append ( {
+                'wizard_id' : wizard.id ,
+                'sequence' : seq ,
+                'level' : 1 ,
+                'line_type' : 'plan' ,
+                'analytic_plan_id' : plan.id ,
+                'name' : f"{plan.name} - توزيع {wizard.group_code}" ,
+                'percentage' : percent ,
+                'net_amount' : amount ,
+            } )
+
+            seq += 10
+
+        return Line.create ( vals )
 
     # =====================================================
     # HELPERS
@@ -526,99 +640,4 @@ class KBIAnalyticProfitLossQWebReport(models.AbstractModel):
             'docs': wizards,
             'docs_data': docs_data,
         }
-
-    ##### FUNCTIONS OF DIVIDED PLANS ###########
-    @api.model
-    def _get_group_percent_field(self , plan_id , group_code) :
-
-        GROUP_PERCENT_MAP = {
-            91 : {'101' : 'quality901_perc_101' , '103' : 'quality901_perc_103' , '104' : 'quality901_perc_104' ,
-                  '110' : 'quality901_perc_110' , '111' : 'quality901_perc_111' , '200' : 'quality901_perc_200'} ,
-            92 : {'101' : 'oper_supp902_perc_101' , '103' : 'oper_supp902_perc_103' , '104' : 'oper_supp902_perc_104' ,
-                  '110' : 'oper_supp902_perc_110' , '111' : 'oper_supp902_perc_111' , '200' : 'oper_supp902_perc_200'} ,
-            93 : {'101' : 'pub_loc903_perc_101' , '103' : 'pub_loc903_perc_103' , '104' : 'pub_loc903_perc_104' ,
-                  '110' : 'pub_loc903_perc_110' , '111' : 'pub_loc903_perc_111' , '200' : 'pub_loc903_perc_200'} ,
-            95 : {'101' : 'sale_gen911_perc_101' , '103' : 'sale_gen911_perc_103' , '104' : 'sale_gen911_perc_104' ,
-                  '110' : 'sale_gen911_perc_110' , '111' : 'sale_gen911_perc_111' , '200' : 'sale_gen911_perc_200'} ,
-            97 : {'101' : 'manage_921_perc_101' , '103' : 'manage_921_perc_103' , '104' : 'manage_921_perc_104' ,
-                  '110' : 'manage_921_perc_110' , '111' : 'manage_921_perc_111' , '200' : 'manage_921_perc_200'} ,
-            98 : {'101' : 'finance923_perc_101' , '103' : 'finance923_perc_103' , '104' : 'finance923_perc_104' ,
-                  '110' : 'finance923_perc_110' , '111' : 'finance923_perc_111' , '200' : 'finance923_perc_200'} ,
-            99 : {'101' : 'it_922_perc_101' , '103' : 'it_922_perc_103' , '104' : 'it_922_perc_104' ,
-                  '110' : 'it_922_perc_110' , '111' : 'it_922_perc_111' , '200' : 'it_922_perc_200'} ,
-            100 : {'101' : 'office_supp_perc_101' , '103' : 'office_supp_perc_103' , '104' : 'office_supp_perc_104' ,
-                   '110' : 'office_supp_perc_110' , '111' : 'office_supp_perc_111' , '200' : 'office_supp_perc_200'} ,
-            101 : {'101' : 'build_facil950_perc_101' , '103' : 'build_facil950_perc_103' ,
-                   '104' : 'build_facil950_perc_104' , '110' : 'build_facil950_perc_110' ,
-                   '111' : 'build_facil950_perc_111' , '200' : 'build_facil950_perc_200'} ,
-            104 : {'101' : 'coff_clean_ryd_perc_101' , '103' : 'coff_clean_ryd_perc_103' ,
-                   '104' : 'coff_clean_ryd_perc_104' , '110' : 'coff_clean_ryd_perc_110' ,
-                   '111' : 'coff_clean_ryd_perc_111' , '200' : 'coff_clean_ryd_perc_200'} ,
-        }
-
-        return GROUP_PERCENT_MAP.get ( plan_id , {} ).get ( group_code )
-
-
-    @api.model
-    def _get_plan_net_total(self , wizard , plan_id) :
-
-        lines = self.env['kbi.analytic.profit.loss.line'].search ( [
-            ('wizard_id' , '=' , wizard.id) ,
-            ('analytic_plan_id' , '=' , plan_id) ,
-            ('line_type' , '=' , 'plan')
-        ] )
-
-        return sum ( lines.mapped ( 'net_amount' ) )
-    
-    
-    @api.model
-    def generate_group_distribution(self , wizard) :
-
-        Line = self.env['kbi.analytic.profit.loss.line']
-        Line.search ( [('wizard_id' , '=' , wizard.id)] ).unlink ()
-
-        allowed_plans = [
-            91 , 92 , 93 , 95 , 97 , 98 , 99 , 100 , 101 , 104
-        ]
-
-        vals = []
-        seq = 10
-
-        for plan_id in allowed_plans :
-
-            plan = self.env['account.analytic.plan'].browse ( plan_id )
-            if not plan.exists () :
-                continue
-
-            # لازم تكون lines الأساسية موجودة
-            plan_total = self._get_plan_net_total ( wizard , plan_id )
-
-            percent_field = self._get_group_percent_field (
-                plan_id ,
-                wizard.group_code
-            )
-
-            if not percent_field :
-                continue
-
-            percent = getattr ( wizard , percent_field , 0.0 )
-
-            amount = plan_total * percent / 100.0
-
-            vals.append ( {
-                'wizard_id' : wizard.id ,
-                'sequence' : seq ,
-                'level' : 1 ,
-                'line_type' : 'plan' ,
-                'analytic_plan_id' : plan.id ,
-                'name' : f"{plan.name} - توزيع {wizard.group_code}" ,
-                'income_amount' : 0.0 ,
-                'expense_amount' : 0.0 ,
-                'net_amount' : amount ,
-                'percentage' : percent ,
-            } )
-
-            seq += 10
-
-        return Line.create ( vals )
 
