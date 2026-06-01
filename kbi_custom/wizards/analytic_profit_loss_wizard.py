@@ -436,6 +436,8 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
             104 : ('coff_clean_ryd_perc' , 'القهوة والضيافة والنظافة') ,
         }
 
+        group_suffix = self.group_code  # 👈 المهم هنا
+
         lines = self.env['account.move.line'].search ( [
             ('date' , '>=' , self.date_from) ,
             ('date' , '<=' , self.date_to) ,
@@ -445,13 +447,13 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
 
         result = {}
 
-        group_suffix = self.group_code or '101'
-
         for line in lines :
 
             distribution = line.analytic_distribution or {}
             if not distribution :
                 continue
+
+            total_dist = sum ( distribution.values () ) or 1.0
 
             for raw_key , percent in distribution.items () :
 
@@ -474,19 +476,26 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
 
                     field_name , arabic_name = percent_map[plan_id]
 
-                    # =====================================================
-                    # ✅ FIXED FORMULA ONLY
-                    # =====================================================
-                    plan_percent = (percent or 0.0) / 100.0
+                    # =========================
+                    # normalize distribution
+                    # =========================
+                    normalized = percent / total_dist
 
+                    # =========================
+                    # base value
+                    # =========================
+                    value = line.balance * normalized
+
+                    # =========================
+                    # get group % dynamically (SELECTED ONLY)
+                    # =========================
                     group_percent = getattr (
                         self ,
                         f"{field_name}_{group_suffix}" ,
                         0.0
                     ) / 100.0
 
-                    base_value = line.balance * plan_percent
-                    final_value = base_value * group_percent
+                    final_value = value * group_percent
 
                     if plan_id not in result :
                         result[plan_id] = {
@@ -496,35 +505,19 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
                             'net' : 0.0 ,
                         }
 
-                    result[plan_id]['net'] += final_value
-
                     if final_value >= 0 :
                         result[plan_id]['income'] += final_value
                     else :
                         result[plan_id]['expense'] += abs ( final_value )
 
+        # =========================
+        # FINAL CALCULATION
+        # =========================
+        for plan_id in result :
+            vals = result[plan_id]
+            vals['net'] = vals['income'] - vals['expense']
+
         return {'lines' : list ( result.values () )}
-
-        ### QWEB####
-
-    def action_preview_qweb_report_divided(self) :
-        self.ensure_one ()
-
-        data = self._compute_analytic_profit_loss ()
-
-        return self.env.ref (
-            'kbi_custom.action_report_kbi_analytic_profit_loss_html'
-        ).report_action ( self , data={'lines' : data['lines']} )
-
-    ### PDF####
-    def action_print_pdf_report_divided(self) :
-        self.ensure_one ()
-
-        data = self._compute_analytic_profit_loss ()
-
-        return self.env.ref (
-            'kbi_custom.action_report_kbi_analytic_profit_loss_pdf'
-        ).report_action ( self , data={'lines' : data['lines']} )
 
     #####EXCEL #######
     def action_print_excel_report_divided(self) :
