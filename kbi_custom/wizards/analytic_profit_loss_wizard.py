@@ -425,16 +425,15 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         self.ensure_one ()
 
         percent_map = {
-            91 : 'quality901_perc' ,
-            92 : 'oper_supp902_perc' ,
-            93 : 'pub_loc903_perc' ,
-            95 : 'sale_gen911_perc' ,
-            97 : 'manage_921_perc' ,
-            98 : 'finance923_perc' ,
-            99 : 'it_922_perc' ,
-            100 : 'office_supp_perc' ,
-            101 : 'build_facil950_perc' ,
-            104 : 'coff_clean_ryd_perc' ,
+            91 : ('quality901_perc' , 'إدارة الجودة -901') ,
+            92 : ('oper_supp902_perc' , 'الدعم التشغيلي -902') ,
+            93 : ('pub_loc903_perc' , 'التوطين العام -903') ,
+            95 : ('sale_gen911_perc' , 'إدارة التسويق (عام) -911') ,
+            97 : ('manage_921_perc' , 'الشئون الإدارية -921') ,
+            98 : ('finance923_perc' , 'الإدارة المالية -923') ,
+            99 : ('it_922_perc' , 'إدارة التقنية والدعم الفني -922') ,
+            101 : ('build_facil950_perc' , 'المباني والمرافق -950') ,
+            104 : ('coff_clean_ryd_perc' , 'القهوة والضيافة والنظافة') ,
         }
 
         lines = self.env['account.move.line'].search ( [
@@ -445,8 +444,12 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         ] )
 
         result = {}
-
         account_cache = {}
+
+        total_income = 0.0
+        total_expense = 0.0
+        total_net = 0.0
+
         group_code = self.group_code
 
         for line in lines :
@@ -464,15 +467,14 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
                 if not account_ids :
                     continue
 
-                distributed_percent = percent / len ( account_ids )
+                applied_percent = percent / len ( account_ids )
 
-                for account_id in account_ids :
+                for acc_id in account_ids :
 
-                    account = account_cache.get ( account_id )
+                    if acc_id not in account_cache :
+                        account_cache[acc_id] = self.env['account.analytic.account'].browse ( acc_id )
 
-                    if account is None :
-                        account = self.env['account.analytic.account'].browse ( account_id )
-                        account_cache[account_id] = account
+                    account = account_cache[acc_id]
 
                     if not account.exists () :
                         continue
@@ -482,40 +484,43 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
                     if plan_id not in percent_map :
                         continue
 
-                    field_name = f"{percent_map[plan_id]}_{group_code}"
+                    field_name , arabic_name = percent_map[plan_id]
 
                     group_percent = getattr (
                         self ,
-                        field_name ,
+                        f"{field_name}_{group_code}" ,
                         100.0
                     )
 
-                    base_value = (
-                            line.balance *
-                            (distributed_percent / 100.0)
-                    )
+                    base_value = line.balance * (applied_percent / 100.0)
 
-                    final_value = (
-                            base_value *
-                            group_percent / 100.0
-                    )
+                    final_value = base_value * group_percent / 100.0
 
                     if plan_id not in result :
                         result[plan_id] = {
+                            'name' : arabic_name ,
                             'income' : 0.0 ,
                             'expense' : 0.0 ,
                             'net' : 0.0 ,
                         }
 
-                    if final_value > 0 :
+                    if final_value >= 0 :
                         result[plan_id]['income'] += final_value
+                        total_income += final_value
                     else :
                         result[plan_id]['expense'] += abs ( final_value )
+                        total_expense += abs ( final_value )
 
                     result[plan_id]['net'] += final_value
+                    total_net += final_value
 
-        return result
-
+        return {
+            'lines' : list ( result.values () ) ,
+            'total_income' : total_income ,
+            'total_expense' : total_expense ,
+            'total_net' : total_net ,
+        }
+    
     ### QWEB####
     def action_preview_qweb_report(self) :
         self.ensure_one ()
