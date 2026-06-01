@@ -97,9 +97,9 @@
                       <group class="kbi_divided_buttons_group" text="📊 تقارير المجموعات الموزعة" invisible="not group_code" style="background-color:#d4edda;">
 
                           <group class="kbi_divided_title">                              
-                         <button name="action_preview_divided_qweb" type="object" string="طباعة QWeb"   class="btn-primary kbi_divided_btn" icon="fa-file-text-o"/>
-                        <button name="action_print_divided_excel" type="object" string="طباعة Excel"   lass="btn-success kbi_divided_btn" icon="fa-file-excel-o"/>
-                        <button name="action_print_divided_pdf" type="object" string="طباعة PDF"   class="btn-secondary kbi_divided_btn" icon="fa-file-pdf-o"/>
+                          <button name="action_preview_qweb_report" type="object" string="طباعة QWeb"   class="btn-primary kbi_divided_btn" icon="fa-file-text-o"/>
+                        <button name="action_print_excel_report" type="object" string="طباعة Excel"   lass="btn-success kbi_divided_btn" icon="fa-file-excel-o"/>
+                        <button name="action_print_pdf_report" type="object" string="طباعة PDF"   class="btn-secondary kbi_divided_btn" icon="fa-file-pdf-o"/> 
                           </group>
                       </group>
                               
