@@ -265,6 +265,49 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         self.env['kbi.analytic.profit.loss.service'].generate_lines(self)
         return self.env.ref('kbi_custom.action_report_kbi_analytic_profit_loss_pdf').report_action(self)
 
+    ### print divided  reports of groups 101,103,104,200,110
+    ## print divided report pdf
+    def action_print_divided_pdf(self) :
+        self.ensure_one ()
+
+        if not self.group_code :
+            raise UserError ( _ ( 'Please select Group Code' ) )
+
+        self.env[
+            'kbi.analytic.profit.loss.service'
+        ].generate_divided_lines ( self )
+
+        return self.env.ref (
+            'kbi_custom.action_report_kbi_analytic_profit_loss_pdf'
+        ).report_action ( self )
+
+    ## print divided report qweb
+    def action_preview_divided_qweb(self) :
+        self.ensure_one ()
+
+        if not self.group_code :
+            raise UserError ( _ ( 'Please select Group Code' ) )
+
+        self.env[
+            'kbi.analytic.profit.loss.service'
+        ].generate_divided_lines ( self )
+
+        return self.env.ref (
+            'kbi_custom.action_report_kbi_analytic_profit_loss_html'
+        ).report_action ( self )
+
+    ## print divided report excel
+    def action_print_divided_excel(self) :
+        self.ensure_one ()
+
+        if not self.group_code :
+            raise UserError ( _ ( 'Please select Group Code' ) )
+
+        self.env[
+            'kbi.analytic.profit.loss.service'
+        ].generate_divided_lines ( self )
+
+        return self.action_print_excel_report ()
     # =========================
     # EXCEL EXPORT (QWEB MATCHED)
     # =========================
