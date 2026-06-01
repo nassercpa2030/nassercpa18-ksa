@@ -445,22 +445,20 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
 
         result = {}
 
+        group_suffix = self.group_code or '101'
+
         for line in lines :
 
             distribution = line.analytic_distribution or {}
-
-            # ✅ Odoo 16 SAFE check
             if not distribution :
                 continue
 
             for raw_key , percent in distribution.items () :
 
-                # Odoo 16 format: "12,15" or "12"
                 account_ids = [
                     int ( x ) for x in str ( raw_key ).split ( ',' )
                     if x.strip ().isdigit ()
                 ]
-
                 if not account_ids :
                     continue
 
@@ -471,20 +469,24 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
                         continue
 
                     plan_id = account.plan_id.id
-
                     if plan_id not in percent_map :
                         continue
 
                     field_name , arabic_name = percent_map[plan_id]
 
+                    # =====================================================
+                    # ✅ FIXED FORMULA ONLY
+                    # =====================================================
+                    plan_percent = (percent or 0.0) / 100.0
+
                     group_percent = getattr (
                         self ,
-                        f"{field_name}_{self.group_code}" ,
-                        100.0
-                    ) or 0.0
+                        f"{field_name}_{group_suffix}" ,
+                        0.0
+                    ) / 100.0
 
-                    base_value = line.balance * (percent / 100.0)
-                    final_value = base_value * (group_percent / 100.0)
+                    base_value = line.balance * plan_percent
+                    final_value = base_value * group_percent
 
                     if plan_id not in result :
                         result[plan_id] = {
@@ -494,7 +496,6 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
                             'net' : 0.0 ,
                         }
 
-                    # 🔥 Unified logic (NO income/expense confusion)
                     result[plan_id]['net'] += final_value
 
                     if final_value >= 0 :
@@ -502,9 +503,8 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
                     else :
                         result[plan_id]['expense'] += abs ( final_value )
 
-        return {
-            'lines' : list ( result.values () )
-        }
+        return {'lines' : list ( result.values () )}
+
         ### QWEB####
 
     def action_preview_qweb_report_divided(self) :
@@ -557,7 +557,6 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
 
         text = workbook.add_format ( {'border' : 1} )
 
-        # HEADER
         sheet.write ( 0 , 0 , "البيان" , header )
         sheet.write ( 0 , 1 , "الإيراد" , header )
         sheet.write ( 0 , 2 , "المصروف" , header )
@@ -585,7 +584,6 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
 
             row += 1
 
-        # TOTALS (FIXED)
         sheet.write ( row + 1 , 0 , "الإجمالي" , header )
         sheet.write_number ( row + 1 , 1 , total_income , money )
         sheet.write_number ( row + 1 , 2 , -total_expense , red_money )
