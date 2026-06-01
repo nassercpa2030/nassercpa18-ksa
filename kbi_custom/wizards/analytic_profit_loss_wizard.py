@@ -522,7 +522,7 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         }
 
     ### QWEB####
-    def action_preview_qweb_report(self) :
+    def action_preview_qweb_report_divided(self) :
         self.ensure_one ()
 
         self.report_data = self._compute_analytic_profit_loss ()
@@ -532,7 +532,7 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         ).report_action ( self )
 
     ### PDF####
-    def action_print_pdf_report(self) :
+    def action_print_pdf_report_divided(self) :
         self.ensure_one ()
 
         data = self._compute_analytic_profit_loss ()
@@ -542,14 +542,10 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
         ).report_action ( self , data={'lines' : data} )
 
     #####EXCEL #######
-    def action_print_excel_report(self) :
+    def action_print_excel_report_divided(self) :
         self.ensure_one ()
 
         data = self._compute_analytic_profit_loss ()
-
-        import io
-        import base64
-        import xlsxwriter
 
         output = io.BytesIO ()
         workbook = xlsxwriter.Workbook ( output )
