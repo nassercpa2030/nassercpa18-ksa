@@ -169,22 +169,32 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                    '111' : 'coff_clean_ryd_perc_111' , '200' : 'coff_clean_ryd_perc_200'} ,
         }
 
-        Line.search ( [
-            ('wizard_id' , '=' , wizard.id)
-        ] ).unlink ()
+        EXTRA_PLAN_IDS = list ( GROUP_PERCENT_MAP.keys () )
+
+        # =====================================================
+        # CLEAN ONCE ONLY
+        # =====================================================
+        Line.search ( [('wizard_id' , '=' , wizard.id)] ).unlink ()
 
         old_level = wizard.level
         old_show_divided = wizard.show_divided
 
+        # =====================================================
+        # FORCE LEVEL 1 ONLY
+        # =====================================================
         wizard.level = 'level1'
         wizard.show_divided = True
 
+        # =====================================================
+        # BUILD BASE DATA (LEVEL1 ONLY)
+        # =====================================================
         self.generate_lines ( wizard )
 
         plan_lines = Line.search ( [
             ('wizard_id' , '=' , wizard.id) ,
-            ('line_type' , '=' , 'plan')
-        ] , order='sequence,id' )
+            ('line_type' , '=' , 'plan') ,
+            ('analytic_plan_id' , 'in' , EXTRA_PLAN_IDS)  # 🔥 أهم سطر
+        ] )
 
         vals = []
         seq = 10
@@ -193,27 +203,17 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
 
             plan_id = plan_line.analytic_plan_id.id
 
-            percent_field = (
-                GROUP_PERCENT_MAP
-                .get ( plan_id , {} )
-                .get ( wizard.group_code )
-            )
+            percent_field = GROUP_PERCENT_MAP.get ( plan_id , {} ).get ( wizard.group_code )
 
             if not percent_field :
                 continue
 
-            percentage = getattr (
-                wizard ,
-                percent_field ,
-                0.0
-            )
+            percentage = getattr ( wizard , percent_field , 0.0 )
 
-            distributed_amount = (
-                    plan_line.net_amount
-                    * percentage
-                    / 100.0
-            )
+            # 🔥 توزيع صحيح
+            distributed_amount = plan_line.net_amount * (percentage / 100.0)
 
+            # ❌ مفيش expenses split هنا (Level1 فقط)
             vals.append ( {
                 'wizard_id' : wizard.id ,
                 'sequence' : seq ,
@@ -223,17 +223,16 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                 'analytic_plan_id' : plan_id ,
                 'name' : plan_line.name ,
                 'percentage' : percentage ,
-                'income_amount' : 0.0 ,
+                'income_amount' : distributed_amount if plan_line.income_amount else 0.0 ,
                 'expense_amount' : 0.0 ,
                 'net_amount' : distributed_amount ,
             } )
 
             seq += 10
 
-        Line.search ( [
-            ('wizard_id' , '=' , wizard.id)
-        ] ).unlink ()
-
+        # =====================================================
+        # RESTORE STATE
+        # =====================================================
         wizard.level = old_level
         wizard.show_divided = old_show_divided
 
