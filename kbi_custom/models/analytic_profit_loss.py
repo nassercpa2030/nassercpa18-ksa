@@ -138,7 +138,7 @@ class KBIAnalyticProfitLossService ( models.AbstractModel ) :
         return domain
 
     # =====================================================
-    # MAIN ENGINE (FINAL FIXED)
+    # MAIN ENGINE (FINAL SCALE FIXED)
     # =====================================================
     @api.model
     def generate_lines(self , wizard) :
@@ -183,7 +183,7 @@ class KBIAnalyticProfitLossService ( models.AbstractModel ) :
             raise UserError ( "لازم تختار Show Divided قبل استخدام Group Code" )
 
         # =========================
-        # PROCESS LINES
+        # CONTROLLED PLANS ONLY
         # =========================
         controlled_plans = {
             91 , 92 , 93 , 95 , 97 , 98 , 99 , 100 , 101 , 104
@@ -193,6 +193,10 @@ class KBIAnalyticProfitLossService ( models.AbstractModel ) :
 
             account_type = line.account_id.account_type
             company = line.company_id or wizard.company_id
+
+            # ❌ IMPORTANT FIX:
+            # لا نستخدم analytic percentage في القيمة الأساسية
+            base_balance = line.balance
 
             for analytic_id , percentage in line._kbi_extract_analytic_distribution_parts () :
 
@@ -211,14 +215,13 @@ class KBIAnalyticProfitLossService ( models.AbstractModel ) :
                 account = line.account_id
 
                 # =========================
-                # BASE VALUE (ROOT ONLY)
+                # GROUP CODE LOGIC (FIXED SCALE ISSUE)
                 # =========================
-                base_balance = line.balance
-
-                # =========================
-                # GROUP CODE LOGIC (ONLY CONTROLLED PLANS)
-                # =========================
-                if group_code and wizard.show_divided and plan.id in controlled_plans :
+                if (
+                        group_code
+                        and wizard.show_divided
+                        and plan.id in controlled_plans
+                ) :
 
                     percent_field_map = {
                         91 : f'quality901_perc_{group_code}' ,
@@ -237,9 +240,11 @@ class KBIAnalyticProfitLossService ( models.AbstractModel ) :
 
                     percent_value = getattr ( wizard , field_name , 0.0 ) or 0.0
 
+                    # ✔ FIX: no double percentage, apply once only
                     final_balance = base_balance * percent_value / 100.0
 
                 else :
+                    # ✔ default: untouched value
                     final_balance = base_balance
 
                 # =========================
@@ -382,7 +387,7 @@ class KBIAnalyticProfitLossService ( models.AbstractModel ) :
                         seq += 10
 
         return Line.create ( vals ) if vals else Line.browse ()
-
+    
 # =========================================================
 # REPORT
 # =========================================================
