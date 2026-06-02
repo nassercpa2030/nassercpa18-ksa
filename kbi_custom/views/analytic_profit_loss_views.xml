@@ -92,11 +92,9 @@
 
     <div class="p-2 text-center"
          style="flex:1; background:#ffffff;">
-        <label class="fw-bold" for="empty_all_plans">إزالة جميع الخطط التحليلية</label>
         <div class="mt-1">
-            <field name="empty_all_plans"
-                   widget="boolean_toggle"
-                   groups="base.group_system,104__team.shaker"/>
+               <button name="_onchange_all_plans" type="object" string="إزالة جميع الخطط التحليلية" class="btn-primary" icon="fa-edit" groups="base.group_system,104__team.shaker"/>
+
         </div>
     </div>
 
