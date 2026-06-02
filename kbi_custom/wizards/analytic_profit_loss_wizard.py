@@ -153,24 +153,27 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
     def action_empty_plans(self) :
         self.ensure_one ()
 
-        self.write ( {
-            'analytic_plan_ids' : [(5 , 0 , 0)] ,  # clear M2M correctly
-            'date_from' : date ( 2025 , 10 , 1 ) ,
-            'date_to' : date ( 2026 , 9 , 30 ) ,
-            'show_divided' : True ,
-        } )
+        # clear M2M safely in wizard context
+        self.analytic_plan_ids = [(5 , 0 , 0)]
+
+        # normal fields
+        self.date_from = date ( 2025 , 10 , 1 )
+        self.date_to = date ( 2026 , 9 , 30 )
+        self.show_divided = True
+
+        # force UI sync without reload
+        self.env.invalidate_all ()
 
         return {
             'type' : 'ir.actions.client' ,
             'tag' : 'display_notification' ,
             'params' : {
-                'title' : 'تم بنجاح' ,
-                'message' : 'تم إلغاء جميع الخطط التحليلية' ,
+                'title' : 'Done' ,
+                'message' : 'Plans cleared successfully' ,
                 'type' : 'success' ,
                 'sticky' : False ,
             }
         }
-
     # =========================
     # ===== EXISTING METHODS (UNCHANGED) =====
     # =========================
