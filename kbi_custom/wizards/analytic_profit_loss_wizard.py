@@ -193,16 +193,38 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
 
     @api.model
     def default_get(self , fields_list) :
-        values = super ().default_get ( fields_list )
-        Plan = self.env['account.analytic.plan']
-        if self.env.user.has_group ( 'base.group_system' ) :
-            allowed_plans = Plan.search ( [] )
-        else :
-            allowed_plans = self.env.user.analytic_account_ids.mapped ( 'plan_id' )
+        res = super ().default_get ( fields_list )
 
-        if 'analytic_plan_ids' in fields_list and allowed_plans :
-            values['analytic_plan_ids'] = [(6 , 0 , allowed_plans.ids)]
-        return values
+        Plan = self.env['account.analytic.plan']
+
+        # =========================
+        # DATE DEFAULT (SAFE)
+        # =========================
+        if 'date_from' in fields_list and not res.get ( 'date_from' ) :
+            res['date_from'] = fields.Date.to_date ( '2025-10-01' )
+
+        if 'date_to' in fields_list and not res.get ( 'date_to' ) :
+            res['date_to'] = fields.Date.to_date ( '2026-09-30' )
+
+        # =========================
+        # ANALYTIC PLANS DEFAULT
+        # =========================
+        if 'analytic_plan_ids' in fields_list :
+
+            if self.env.user.has_group ( 'base.group_system' ) :
+                allowed_plans = Plan.search ( [] )
+            else :
+                allowed_plans = self.env.user.analytic_plan_ids
+
+            # fallback
+            if not allowed_plans :
+                allowed_plans = Plan.search ( [
+                    ('id' , 'in' , [82 , 83 , 84 , 85 , 87 , 88 , 89])
+                ] )
+
+            res['analytic_plan_ids'] = [(6 , 0 , allowed_plans.ids)]
+
+        return res
 
     @api.constrains ( 'date_from' , 'date_to' )
     def _check_dates(self) :
