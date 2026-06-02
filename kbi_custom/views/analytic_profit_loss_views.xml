@@ -114,8 +114,8 @@
        decoration-muted="group_code == '111'"
        decoration-danger="group_code == '200'"
        decoration-bf="group_code != False " groups="base.group_system,104__team.shaker"/>
-                            <group style="background-color:#d1ecf1; padding:6px; border-radius:6px;" groups="base.group_system,104__team.shaker"> <button name="action_preview_dvided_qweb_report" type="object" string="طباعة الخطة + الخطط الموزعة " class="btn-primary" invisible="not group_code" icon="fa-file-text-o" groups="base.group_system,104__team.shaker"/>
-</group>
+                            <div style="background-color:#d1ecf1; padding:6px; border-radius:6px;" groups="base.group_system,104__team.shaker"> <button name="action_preview_dvided_qweb_report" type="object" string="طباعة الخطة + الخطط الموزعة " class="btn-primary" invisible="not group_code" icon="fa-file-text-o" groups="base.group_system,104__team.shaker"/>
+</div>
                                
           
                               <!-- <field name="group_code"
