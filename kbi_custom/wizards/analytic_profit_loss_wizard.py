@@ -13,7 +13,7 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
 
     date_from = fields.Date ( string='Date From' ,  default=lambda self: date(2025, 10, 01),
                               required=True )
-    date_to = fields.Date ( string='Date To' ,  default=lambda self: date(2026, 9, 30), ,
+    date_to = fields.Date ( string='Date To' ,  default=lambda self: date(2026, 9, 30) ,
                             required=True )
     group_code = fields.Selection (
         [
