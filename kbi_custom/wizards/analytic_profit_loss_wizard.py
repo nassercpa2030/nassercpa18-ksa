@@ -324,22 +324,19 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
     def action_preview_dvided_original_qweb_report(self) :
         self.ensure_one ()
 
+        # =========================
+        # FORCE FLAG FIRST
+        # =========================
         self.show_divided = True
+
         self._validate_before_report ()
 
-        # =========================
-        # KEEP USER SELECTION
-        # =========================
-        selected_plan_ids = set ( self.analytic_plan_ids.ids )
-
-        # =========================
-        # GENERATE REPORT
-        # =========================
         self.env['kbi.analytic.profit.loss.service'].generate_lines ( self )
 
         return self.env.ref (
             'kbi_custom.action_report_kbi_analytic_profit_loss_html'
         ).report_action ( self )
+        
 
 
 
