@@ -182,9 +182,6 @@ class KBIAnalyticProfitLossService ( models.AbstractModel ) :
         if group_code and not wizard.show_divided :
             raise UserError ( "لازم تختار Show Divided قبل استخدام Group Code" )
 
-        # =========================
-        # CONTROLLED PLANS ONLY
-        # =========================
         controlled_plans = {
             91 , 92 , 93 , 95 , 97 , 98 , 99 , 100 , 101 , 104
         }
@@ -194,8 +191,6 @@ class KBIAnalyticProfitLossService ( models.AbstractModel ) :
             account_type = line.account_id.account_type
             company = line.company_id or wizard.company_id
 
-            # ❌ IMPORTANT FIX:
-            # لا نستخدم analytic percentage في القيمة الأساسية
             base_balance = line.balance
 
             for analytic_id , percentage in line._kbi_extract_analytic_distribution_parts () :
@@ -215,14 +210,15 @@ class KBIAnalyticProfitLossService ( models.AbstractModel ) :
                 account = line.account_id
 
                 # =========================
-                # GROUP CODE LOGIC (FIXED SCALE ISSUE)
+                # SCALE NORMALIZATION FIX
                 # =========================
-                if (
-                        group_code
-                        and wizard.show_divided
-                        and plan.id in controlled_plans
-                ) :
+                percent_value = getattr (
+                    wizard ,
+                    (f"{plan._table_name if False else ''}") , 0.0
+                ) or 0.0  # fallback safety
 
+                # الصحيح الحقيقي: field lookup
+                if group_code and plan.id in controlled_plans :
                     percent_field_map = {
                         91 : f'quality901_perc_{group_code}' ,
                         92 : f'oper_supp902_perc_{group_code}' ,
@@ -231,21 +227,24 @@ class KBIAnalyticProfitLossService ( models.AbstractModel ) :
                         97 : f'manage_921_perc_{group_code}' ,
                         98 : f'finance923_perc_{group_code}' ,
                         99 : f'it_922_perc_{group_code}' ,
-                        101 : f'build_facil950_perc_{group_code}' ,
                         100 : f'office_supp_perc_{group_code}' ,
+                        101 : f'build_facil950_perc_{group_code}' ,
                         104 : f'coff_clean_ryd_perc_{group_code}' ,
                     }
 
                     field_name = percent_field_map.get ( plan.id )
-
                     percent_value = getattr ( wizard , field_name , 0.0 ) or 0.0
 
-                    # ✔ FIX: no double percentage, apply once only
-                    final_balance = base_balance * percent_value / 100.0
+                # =========================
+                # 🔥 NORMALIZE SCALE (KEY FIX)
+                # =========================
+                if percent_value > 1 :
+                    percent_value = percent_value / 100.0
 
-                else :
-                    # ✔ default: untouched value
-                    final_balance = base_balance
+                # =========================
+                # FINAL CALCULATION (FIXED)
+                # =========================
+                final_balance = base_balance * percent_value
 
                 # =========================
                 # INCOME / EXPENSE
@@ -386,8 +385,7 @@ class KBIAnalyticProfitLossService ( models.AbstractModel ) :
 
                         seq += 10
 
-        return Line.create ( vals ) if vals else Line.browse ()
-    
+        return Line.create ( vals ) if vals else Line.browse ()    
 # =========================================================
 # REPORT
 # =========================================================
