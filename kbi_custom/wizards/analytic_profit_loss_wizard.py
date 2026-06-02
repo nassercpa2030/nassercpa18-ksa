@@ -37,7 +37,7 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
     analytic_plan_ids = fields.Many2many(
     'account.analytic.plan',
     string='Analytic Plans',
-    required=True,
+    #required=True,
     default=lambda self: self.env.user.analytic_plan_ids,
     readonly=False,
     help='اختر الخطة/الخطط التحليلية كاملة. سيقوم التقرير بإظهار كل الحسابات التحليلية الواقعة تحت الخطط المختارة حسب صلاحيات المستخدم.')
