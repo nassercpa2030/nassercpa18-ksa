@@ -83,7 +83,7 @@
 
     <div class="p-2 border-end"
          style="flex:4; background:#f8f9fa;">
-        <label class="fw-bold">الخطط التحليلية</label>
+        <label class="fw-bold" for="analytic_plan_ids">الخطط التحليلية</label>
         <field name="analytic_plan_ids"
                widget="many2many_tags"
                options="{'no_create': True, 'no_open': True}"
@@ -92,7 +92,7 @@
 
     <div class="p-2 text-center"
          style="flex:1; background:#ffffff;">
-        <label class="fw-bold">إزالة جميع الخطط التحليلية</label>
+        <label class="fw-bold" for="empty_all_plans">إزالة جميع الخطط التحليلية</label>
         <div class="mt-1">
             <field name="empty_all_plans"
                    widget="boolean_toggle"
