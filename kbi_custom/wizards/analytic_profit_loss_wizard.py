@@ -3,6 +3,7 @@ from odoo import api , fields , models , _
 from odoo.exceptions import UserError
 import io
 import base64
+from datetime import date
 import xlsxwriter
 
 
@@ -151,8 +152,8 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
 
     def action_empty_plans(self) :
         self.analytic_plan_ids = False
-        self.date_from = lambda self : fields.Date.to_date ( '2025-10-01' )
-        self.date_to = lambda self : fields.Date.to_date ( '2026-09-30' )
+        self.date_from = date(2025, 10, 1)
+        self.date_to = date(2026, 9, 30)
         self.show_divided = True
 
     # =========================
