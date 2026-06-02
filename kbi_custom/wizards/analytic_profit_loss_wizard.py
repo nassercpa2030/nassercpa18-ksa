@@ -10,8 +10,10 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
     _name = 'kbi.analytic.profit.loss.wizard'
     _description = 'KBI Analytic Profit and Loss Wizard'
 
-    date_from = fields.Date ( string='Date From' ,  default=lambda self: fields.Date.to_date('2025-10-01'),required=True )
-    date_to = fields.Date ( string='Date To' ,  default=lambda self: fields.Date.to_date('2026-09-30'),required=True )
+    date_from = fields.Date ( string='Date From' , default=lambda self : fields.Date.to_date ( '2025-10-01' ) ,
+                              required=True )
+    date_to = fields.Date ( string='Date To' , default=lambda self : fields.Date.to_date ( '2026-09-30' ) ,
+                            required=True )
     group_code = fields.Selection (
         [
             ('101' , 'مجموعة 101') ,
@@ -147,13 +149,11 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
         readonly=True ,
     )
 
-    
-     def action_empty_plans(self) :
+    def action_empty_plans(self) :
         self.analytic_plan_ids = False
-        self.date_from = lambda self: fields.Date.to_date('2025-10-01')
-        self.date_to = lambda self: fields.Date.to_date('2026-09-30')
+        self.date_from = lambda self : fields.Date.to_date ( '2025-10-01' )
+        self.date_to = lambda self : fields.Date.to_date ( '2026-09-30' )
         self.show_divided = True
-            
 
     # =========================
     # ===== EXISTING METHODS (UNCHANGED) =====
@@ -233,7 +233,6 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
     def _check_dates(self) :
         for wizard in self :
             if wizard.date_from and wizard.date_to and wizard.date_from > wizard.date_to :
-                
                 raise UserError ( _ ( 'Date From must be before or equal to Date To. { برجــاء ضبط التاريخ } ' ) )
 
     @api.constrains ( 'analytic_plan_ids' )
@@ -479,3 +478,6 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
             'url' : f'/web/content/{attachment.id}?download=true' ,
             'target' : 'self' ,
         }
+
+
+
