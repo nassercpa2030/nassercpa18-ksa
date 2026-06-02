@@ -227,9 +227,9 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                         95 : f'sale_gen911_perc_{group_code}' ,
                         97 : f'manage_921_perc_{group_code}' ,
                         98 : f'finance923_perc_{group_code}' ,
-                        99 : f'quality901_perc_{group_code}' ,
-                        100 : f'build_facil950_perc_{group_code}' ,
-                        101 : f'office_supp_perc_{group_code}' ,
+                        99 : f'it_922_perc_{group_code}' ,
+                        101 : f'build_facil950_perc_{group_code}' ,
+                        100 : f'office_supp_perc_{group_code}' ,
                         104 : f'coff_clean_ryd_perc_{group_code}' ,
                     }
 
