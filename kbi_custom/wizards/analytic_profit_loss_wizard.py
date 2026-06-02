@@ -336,7 +336,14 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
         return self.env.ref (
             'kbi_custom.action_report_kbi_analytic_profit_loss_html'
         ).report_action ( self )
-        
+
+
+    @api.onchange ( 'group_code' )
+    def _onchange_group_code(self) :
+        if self.group_code :
+            self.show_divided = True
+        else :
+            self.show_divided = False
 
 
 
