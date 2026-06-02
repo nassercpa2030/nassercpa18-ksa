@@ -104,7 +104,7 @@ class KBIAnalyticProfitLossService ( models.AbstractModel ) :
         'expense_direct_cost' ,
     )
 
-    EXTRA_PLAN_IDS = [91 , 92 , 93 , 95 , 97 , 98 , 99 , 100 , 101 , 104]
+    EXTRA_PLAN_IDS = [81 ,91 , 92 , 93 , 95 , 97 , 98 , 99 , 100 , 101 , 104]
 
     # =====================================================
     @api.model
@@ -188,7 +188,7 @@ class KBIAnalyticProfitLossService ( models.AbstractModel ) :
         # CONTROLLED PLANS
         # =========================
         controlled_plans = {
-            91 , 92 , 93 , 95 , 97 , 98 , 99 , 100 , 101 , 104
+            81 ,91 , 92 , 93 , 95 , 97 , 98 , 99 , 100 , 101 , 104
         }
 
         for line in move_lines :
