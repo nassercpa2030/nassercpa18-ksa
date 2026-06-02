@@ -11,9 +11,11 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
     _name = 'kbi.analytic.profit.loss.wizard'
     _description = 'KBI Analytic Profit and Loss Wizard'
 
-    date_from = fields.Date ( string='Date From' ,  default=lambda self: fields.Date.to_string(fields.Date.context_today(self).replace(month=9, day=30)),
+    date_from = fields.Date ( string='Date From' , default=lambda self : fields.Date.to_string (
+        fields.Date.context_today ( self ).replace ( month=9 , day=30 ) ) ,
                               required=True )
-    date_to = fields.Date ( string='Date To' ,  default=lambda self: fields.Date.to_string(fields.Date.context_today(self).replace(year=2026, month=9, day=30)),
+    date_to = fields.Date ( string='Date To' , default=lambda self : fields.Date.to_string (
+        fields.Date.context_today ( self ).replace ( year=2026 , month=9 , day=30 ) ) ,
                             required=True )
     group_code = fields.Selection (
         [
@@ -46,7 +48,7 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
         string='Analytic Plans' ,
         domain=[('id' , 'in' , [82 , 83 , 84 , 85 , 87 , 88 , 89])] ,
         # required=True,
-        default=lambda self: self._default_analytic_plans(),
+        default=lambda self : self._default_analytic_plans () ,
         readonly=False ,
         help='اختر الخطة/الخطط التحليلية كاملة. سيقوم التقرير بإظهار كل الحسابات التحليلية الواقعة تحت الخطط المختارة حسب صلاحيات المستخدم.' )
     user_id = fields.Many2one ( 'res.users' , string='User' , required=True , default=lambda self : self.env.user )
@@ -161,6 +163,7 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
             ] )
 
         return self.env.user.analytic_plan_ids
+
     # =========================
     # ===== EXISTING METHODS (UNCHANGED) =====
     # =========================
@@ -318,6 +321,42 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
             'target' : 'current' ,
         }
 
+    def action_preview_dvided_original_qweb_report(self) :
+        self.ensure_one ()
+
+        self._validate_before_report ()
+
+        # =====================================
+        # MAP group_code -> analytic_plan_id
+        # =====================================
+        group_map = {
+            101 : 82 ,
+            103 : 84 ,
+            104 : 85 ,
+            110 : 87 ,
+            111 : 88 ,
+            200 : 89 ,
+        }
+
+        plan_id = group_map.get ( self.group_code )
+
+        # مسح كل القيم الأول
+        self.analytic_plan_ids = [(5 , 0 , 0)]
+
+        # تعيين القيمة حسب group_code لو موجودة
+        if plan_id :
+            self.analytic_plan_ids = [(6 , 0 , [plan_id])]
+
+        self.show_divided = True
+
+        # generate report
+        self.env['kbi.analytic.profit.loss.service'].generate_lines ( self )
+
+        return self.env.ref (
+            'kbi_custom.action_report_kbi_analytic_profit_loss_html'
+        ).report_action ( self )
+
+
     def action_preview_dvided_qweb_report(self) :
         self.ensure_one ()
 
@@ -335,7 +374,6 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
         return self.env.ref (
             'kbi_custom.action_report_kbi_analytic_profit_loss_html'
         ).report_action ( self )
-    
 
     def action_preview_qweb_report(self) :
         self.ensure_one ()
