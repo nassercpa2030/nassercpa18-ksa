@@ -105,7 +105,7 @@
                        
                                  <field name="level" string="مستوي التقرير" style="background-color:#fff3e0; padding:6px; border-radius:6px; margin-bottom:5px;" groups="base.group_system,104__team.shaker"/>
                               
-                                    <!-- <field name="show_divided" widget="boolean_toggle" style="background-color:#d1ecf1; padding:6px; border-radius:6px;" groups="base.group_system,104__team.shaker"/> -->
+                                    <field name="show_divided" widget="boolean_toggle" style="background-color:#d1ecf1; padding:6px; border-radius:6px;" groups="base.group_system,104__team.shaker"/>
                              <field name="group_code" string=" 📊المجموعة المطلوب التوزيع عليها" style="background-color:#f8d7da; padding:6px; border-radius:6px;"
                                    decoration-success="group_code == '101'"
        decoration-info="group_code == '103'"
