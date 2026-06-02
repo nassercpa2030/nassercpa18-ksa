@@ -141,109 +141,125 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
     # MAIN ENGINE (UPDATED)
     # =====================================================
     @api.model
-    def generate_lines(self, wizard):
+    def generate_lines(self , wizard) :
 
         Line = self.env['kbi.analytic.profit.loss.line']
         MoveLine = self.env['account.move.line']
         Analytic = self.env['account.analytic.account']
 
-        Line.search([('wizard_id', '=', wizard.id)]).unlink()
+        Line.search ( [('wizard_id' , '=' , wizard.id)] ).unlink ()
 
-        allowed_accounts = wizard._get_effective_analytic_accounts()
-        allowed_ids = set(allowed_accounts.ids)
+        allowed_accounts = wizard._get_effective_analytic_accounts ()
+        allowed_ids = set ( allowed_accounts.ids )
 
-        if wizard.show_divided:
-            extra_plans = self.env['account.analytic.plan'].search([
-                ('id', 'in', self.EXTRA_PLAN_IDS)
-            ])
+        # =========================
+        # SHOW DIVIDED EXTENSION
+        # =========================
+        if wizard.show_divided :
+            extra_plans = self.env['account.analytic.plan'].search ( [
+                ('id' , 'in' , self.EXTRA_PLAN_IDS)
+            ] )
 
-            extra_accounts = self.env['account.analytic.account'].search([
-                ('plan_id', 'in', extra_plans.ids)
-            ])
+            extra_accounts = self.env['account.analytic.account'].search ( [
+                ('plan_id' , 'in' , extra_plans.ids)
+            ] )
 
-            allowed_ids |= set(extra_accounts.ids)
+            allowed_ids |= set ( extra_accounts.ids )
 
-        domain = self._domain(
-            date_from=wizard.date_from,
-            date_to=wizard.date_to,
-            company_id=wizard.company_id.id,
+        domain = self._domain (
+            date_from=wizard.date_from ,
+            date_to=wizard.date_to ,
+            company_id=wizard.company_id.id ,
         )
 
-        move_lines = MoveLine.search(domain, order='date, move_id, id')
+        move_lines = MoveLine.search ( domain , order='date, move_id, id' )
 
         grouped = {}
-        details = defaultdict(list)
+        details = defaultdict ( list )
 
-        for line in move_lines:
+        # =========================
+        # GROUP CODE (SAFE MODE)
+        # =========================
+        group_code = (wizard.group_code or '').strip ()
+
+        if group_code and not wizard.show_divided :
+            raise UserError ( "لازم تختار Show Divided قبل استخدام Group Code" )
+
+        # =========================
+        # PROCESS LINES
+        # =========================
+        for line in move_lines :
 
             account_type = line.account_id.account_type
             company = line.company_id or wizard.company_id
 
-            for analytic_id, percentage in line._kbi_extract_analytic_distribution_parts():
+            for analytic_id , percentage in line._kbi_extract_analytic_distribution_parts () :
 
-                if allowed_ids and analytic_id not in allowed_ids:
+                if allowed_ids and analytic_id not in allowed_ids :
                     continue
 
-                analytic = Analytic.browse(analytic_id)
-                if not analytic.exists():
+                analytic = Analytic.browse ( analytic_id )
+                if not analytic.exists () :
                     continue
 
                 plan = analytic.plan_id
 
-                if not wizard.show_divided and plan.id in self.EXTRA_PLAN_IDS:
+                if not wizard.show_divided and plan.id in self.EXTRA_PLAN_IDS :
                     continue
 
                 account = line.account_id
 
-                original_analytic_balance = line.balance * percentage / 100.0
-                analytic_balance = original_analytic_balance
+                # =========================
+                # BASE VALUE (IMMUTABLE)
+                # =========================
+                base_balance = line.balance * percentage / 100.0
+                final_balance = base_balance
 
                 # =========================
-                # GROUP CODE LOGIC
+                # GROUP CODE LOGIC (SAFE)
                 # =========================
-                group_code = str(getattr(wizard, 'group_code', '') or '').strip()
+                if group_code and wizard.show_divided :
 
-                if group_code and not wizard.show_divided:
-                    raise UserError("من فضلك اختر Show Divided قبل استخدام Group Code")
-
-                if group_code and wizard.show_divided:
-
-                    distribution_map = {
-                        91: f'quality901_perc_{group_code}',
-                        92: f'oper_supp902_perc_{group_code}',
-                        93: f'pub_loc903_perc_{group_code}',
-                        95: f'sale_gen911_perc_{group_code}',
-                        97: f'manage_921_perc_{group_code}',
-                        98: f'finance923_perc_{group_code}',
-                        99: f'quality901_perc_{group_code}',
-                        100: f'build_facil950_perc_{group_code}',
-                        101: f'office_supp_perc_{group_code}',
-                        104: f'coff_clean_ryd_perc_{group_code}',
+                    percent_field_map = {
+                        91 : f'quality901_perc_{group_code}' ,
+                        92 : f'oper_supp902_perc_{group_code}' ,
+                        93 : f'pub_loc903_perc_{group_code}' ,
+                        95 : f'sale_gen911_perc_{group_code}' ,
+                        97 : f'manage_921_perc_{group_code}' ,
+                        98 : f'finance923_perc_{group_code}' ,
+                        99 : f'quality901_perc_{group_code}' ,
+                        100 : f'build_facil950_perc_{group_code}' ,
+                        101 : f'office_supp_perc_{group_code}' ,
+                        104 : f'coff_clean_ryd_perc_{group_code}' ,
                     }
 
-                    field_name = distribution_map.get(plan.id)
+                    field_name = percent_field_map.get ( plan.id )
 
-                    if field_name and hasattr(wizard, field_name):
+                    if field_name :
 
-                        percent_value = float(getattr(wizard, field_name) or 0.0)
+                        percent_value = getattr ( wizard , field_name , 0.0 ) or 0.0
 
-                        analytic_balance = original_analytic_balance * percent_value / 100.0
+                        if percent_value > 0 :
+                            final_balance = base_balance * percent_value / 100.0
 
-                income, expense, net = self._income_expense(
-                    account_type,
-                    analytic_balance
+                # =========================
+                # INCOME / EXPENSE CALC
+                # =========================
+                income , expense , net = self._income_expense (
+                    account_type ,
+                    final_balance
                 )
 
                 plan_key = plan.id or 0
                 account_key = account.id
 
-                if plan_key not in grouped:
+                if plan_key not in grouped :
                     grouped[plan_key] = {
-                        'plan': plan,
-                        'income': 0.0,
-                        'expense': 0.0,
-                        'net': 0.0,
-                        'accounts': {}
+                        'plan' : plan ,
+                        'income' : 0.0 ,
+                        'expense' : 0.0 ,
+                        'net' : 0.0 ,
+                        'accounts' : {}
                     }
 
                 plan_bucket = grouped[plan_key]
@@ -252,14 +268,14 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                 plan_bucket['expense'] += expense
                 plan_bucket['net'] += net
 
-                if account_key not in plan_bucket['accounts']:
+                if account_key not in plan_bucket['accounts'] :
                     plan_bucket['accounts'][account_key] = {
-                        'account': account,
-                        'income': 0.0,
-                        'expense': 0.0,
-                        'net': 0.0,
-                        'analytic_balance': 0.0,
-                        'company': company,
+                        'account' : account ,
+                        'income' : 0.0 ,
+                        'expense' : 0.0 ,
+                        'net' : 0.0 ,
+                        'analytic_balance' : 0.0 ,
+                        'company' : company ,
                     }
 
                 acc = plan_bucket['accounts'][account_key]
@@ -267,100 +283,105 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                 acc['income'] += income
                 acc['expense'] += expense
                 acc['net'] += net
-                acc['analytic_balance'] += analytic_balance
+                acc['analytic_balance'] += final_balance
 
-                details[(plan_key, account_key)].append({
-                    'move_line': line,
-                    'company': company,
-                    'percentage': percentage,
-                    'analytic_balance': analytic_balance,
-                    'income': income,
-                    'expense': expense,
-                    'net': net,
-                })
+                details[(plan_key , account_key)].append ( {
+                    'move_line' : line ,
+                    'company' : company ,
+                    'percentage' : percentage ,
+                    'analytic_balance' : final_balance ,
+                    'income' : income ,
+                    'expense' : expense ,
+                    'net' : net ,
+                } )
 
+        # =========================
+        # BUILD RESULT LINES
+        # =========================
         vals = []
         seq = 10
 
         selected_plan_ids = wizard.analytic_plan_ids.ids or []
 
-        def _sort_plan(k):
+        def _sort_plan(k) :
             plan = grouped[k]['plan']
-            return (0 if plan.id in selected_plan_ids else 1, plan.name or '')
+            return (0 if plan.id in selected_plan_ids else 1 , plan.name or '')
 
-        for plan_key in sorted(grouped, key=_sort_plan):
+        for plan_key in sorted ( grouped , key=_sort_plan ) :
 
             plan_bucket = grouped[plan_key]
             plan = plan_bucket['plan']
 
-            vals.append({
-                'wizard_id': wizard.id,
-                'sequence': seq,
-                'level': 1,
-                'line_type': 'plan',
-                'company_id': wizard.company_id.id,
-                'analytic_plan_id': plan.id or False,
-                'name': plan.name or _('No Plan'),
-                'income_amount': plan_bucket['income'],
-                'expense_amount': plan_bucket['expense'],
-                'net_amount': plan_bucket['net'],
-            })
+            vals.append ( {
+                'wizard_id' : wizard.id ,
+                'sequence' : seq ,
+                'level' : 1 ,
+                'line_type' : 'plan' ,
+                'company_id' : wizard.company_id.id ,
+                'analytic_plan_id' : plan.id or False ,
+                'name' : plan.name or _ ( 'No Plan' ) ,
+                'income_amount' : plan_bucket['income'] ,
+                'expense_amount' : plan_bucket['expense'] ,
+                'net_amount' : plan_bucket['net'] ,
+            } )
 
             seq += 10
 
-            for acc_key in plan_bucket['accounts']:
+            for acc_key in plan_bucket['accounts'] :
 
                 acc = plan_bucket['accounts'][acc_key]
 
-                vals.append({
-                    'wizard_id': wizard.id,
-                    'sequence': seq,
-                    'level': 2,
-                    'line_type': 'account',
-                    'company_id': acc['company'].id,
-                    'analytic_plan_id': plan.id or False,
-                    'account_id': acc['account'].id,
-                    'account_code': acc['account'].code,
-                    'account_name': acc['account'].name,
-                    'name': '%s - %s' % (acc['account'].code or '', acc['account'].name or ''),
-                    'analytic_balance': acc['analytic_balance'],
-                    'income_amount': acc['income'],
-                    'expense_amount': acc['expense'],
-                    'net_amount': acc['net'],
-                })
+                vals.append ( {
+                    'wizard_id' : wizard.id ,
+                    'sequence' : seq ,
+                    'level' : 2 ,
+                    'line_type' : 'account' ,
+                    'company_id' : acc['company'].id ,
+                    'analytic_plan_id' : plan.id or False ,
+                    'account_id' : acc['account'].id ,
+                    'account_code' : acc['account'].code ,
+                    'account_name' : acc['account'].name ,
+                    'name' : '%s - %s' % (
+                        acc['account'].code or '' ,
+                        acc['account'].name or ''
+                    ) ,
+                    'analytic_balance' : acc['analytic_balance'] ,
+                    'income_amount' : acc['income'] ,
+                    'expense_amount' : acc['expense'] ,
+                    'net_amount' : acc['net'] ,
+                } )
 
                 seq += 10
 
-                if wizard.show_details:
-                    for detail in details[(plan_key, acc_key)]:
-
+                if wizard.show_details :
+                    for detail in details[(plan_key , acc_key)] :
                         ml = detail['move_line']
 
-                        vals.append({
-                            'wizard_id': wizard.id,
-                            'sequence': seq,
-                            'level': 3,
-                            'line_type': 'detail',
-                            'company_id': detail['company'].id,
-                            'analytic_plan_id': plan.id or False,
-                            'account_id': acc['account'].id,
-                            'move_id': ml.move_id.id,
-                            'move_line_id': ml.id,
-                            'journal_id': ml.journal_id.id,
-                            'partner_id': ml.partner_id.id,
-                            'date': ml.date,
-                            'name': ml.name or ml.move_id.name,
-                            'percentage': detail['percentage'],
-                            'original_balance': ml.balance,
-                            'analytic_balance': detail['analytic_balance'],
-                            'income_amount': detail['income'],
-                            'expense_amount': detail['expense'],
-                            'net_amount': detail['net'],
-                        })
+                        vals.append ( {
+                            'wizard_id' : wizard.id ,
+                            'sequence' : seq ,
+                            'level' : 3 ,
+                            'line_type' : 'detail' ,
+                            'company_id' : detail['company'].id ,
+                            'analytic_plan_id' : plan.id or False ,
+                            'account_id' : acc['account'].id ,
+                            'move_id' : ml.move_id.id ,
+                            'move_line_id' : ml.id ,
+                            'journal_id' : ml.journal_id.id ,
+                            'partner_id' : ml.partner_id.id ,
+                            'date' : ml.date ,
+                            'name' : ml.name or ml.move_id.name ,
+                            'percentage' : detail['percentage'] ,
+                            'original_balance' : ml.balance ,
+                            'analytic_balance' : detail['analytic_balance'] ,
+                            'income_amount' : detail['income'] ,
+                            'expense_amount' : detail['expense'] ,
+                            'net_amount' : detail['net'] ,
+                        } )
 
                         seq += 10
 
-        return Line.create(vals) if vals else Line.browse()
+        return Line.create ( vals ) if vals else Line.browse ()
 
 
 # =========================================================
