@@ -397,6 +397,7 @@ class KBIAnalyticProfitLossQWebReport(models.AbstractModel):
 
         service = self.env['kbi.analytic.profit.loss.service']
 
+        # Generate lines once
         for wiz in wizards:
             service.generate_lines(wiz)
 
@@ -405,9 +406,19 @@ class KBIAnalyticProfitLossQWebReport(models.AbstractModel):
         docs_data = []
 
         for wiz in wizards:
+
             lines = lines_model.search([
                 ('wizard_id', '=', wiz.id)
             ], order='sequence, id')
+
+            # =========================
+            # LEVEL FILTER (FIX)
+            # =========================
+            if wiz.level == 'level1':
+                lines = lines.filtered(lambda l: l.line_type == 'plan')
+
+            elif wiz.level == 'level2':
+                lines = lines.filtered(lambda l: l.line_type in ('plan', 'account'))
 
             plan_lines = lines.filtered(lambda l: l.line_type == 'plan')
 
