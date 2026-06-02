@@ -213,40 +213,40 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
         for wizard in self :
             wizard.analytic_account_ids = wizard.allowed_analytic_account_ids
 
-    @api.model
-    def default_get(self , fields_list) :
-        res = super ().default_get ( fields_list )
+    # @api.model
+    # def default_get(self , fields_list) :
+    #     res = super ().default_get ( fields_list )
 
-        Plan = self.env['account.analytic.plan']
+    #     Plan = self.env['account.analytic.plan']
 
-        # =========================
-        # DATE DEFAULT (SAFE)
-        # =========================
-        if 'date_from' in fields_list and not res.get ( 'date_from' ) :
-            res['date_from'] = fields.Date.to_date ( '2025-10-01' )
+    #     # =========================
+    #     # DATE DEFAULT (SAFE)
+    #     # =========================
+    #     if 'date_from' in fields_list and not res.get ( 'date_from' ) :
+    #         res['date_from'] = fields.Date.to_date ( '2025-10-01' )
 
-        if 'date_to' in fields_list and not res.get ( 'date_to' ) :
-            res['date_to'] = fields.Date.to_date ( '2026-09-30' )
+    #     if 'date_to' in fields_list and not res.get ( 'date_to' ) :
+    #         res['date_to'] = fields.Date.to_date ( '2026-09-30' )
 
-        # =========================
-        # ANALYTIC PLANS DEFAULT
-        # =========================
-        if 'analytic_plan_ids' in fields_list :
+    #     # =========================
+    #     # ANALYTIC PLANS DEFAULT
+    #     # =========================
+    #     if 'analytic_plan_ids' in fields_list :
 
-            if self.env.user.has_group ( 'base.group_system' ) :
-                allowed_plans = Plan.search ( [] )
-            else :
-                allowed_plans = self.env.user.analytic_plan_ids
+    #         if self.env.user.has_group ( 'base.group_system' ) :
+    #             allowed_plans = Plan.search ( [] )
+    #         else :
+    #             allowed_plans = self.env.user.analytic_plan_ids
 
-            # fallback
-            if not allowed_plans :
-                allowed_plans = Plan.search ( [
-                    ('id' , 'in' , [82 , 83 , 84 , 85 , 87 , 88 , 89])
-                ] )
+    #         # fallback
+    #         if not allowed_plans :
+    #             allowed_plans = Plan.search ( [
+    #                 ('id' , 'in' , [82 , 83 , 84 , 85 , 87 , 88 , 89])
+    #             ] )
 
-            res['analytic_plan_ids'] = [(6 , 0 , allowed_plans.ids)]
+    #         res['analytic_plan_ids'] = [(6 , 0 , allowed_plans.ids)]
 
-        return res
+    #     return res
 
     @api.constrains ( 'date_from' , 'date_to' )
     def _check_dates(self) :
