@@ -46,7 +46,7 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
         string='Analytic Plans' ,
         domain=[('id' , 'in' , [82 , 83 , 84 , 85 , 87 , 88 , 89])] ,
         # required=True,
-        default=lambda self : self.env.user.analytic_plan_ids ,
+        default=lambda self: self._default_analytic_plans(),
         readonly=False ,
         help='اختر الخطة/الخطط التحليلية كاملة. سيقوم التقرير بإظهار كل الحسابات التحليلية الواقعة تحت الخطط المختارة حسب صلاحيات المستخدم.' )
     user_id = fields.Many2one ( 'res.users' , string='User' , required=True , default=lambda self : self.env.user )
@@ -150,30 +150,17 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
         readonly=True ,
     )
 
-    def action_empty_plans(self) :
-        self.ensure_one ()
+    @api.model
+    def _default_analytic_plans(self) :
+        if (
+                self.env.user.has_group ( 'base.group_system' )
+                or self.env.user.has_group ( '104__team.shaker' )
+        ) :
+            return self.env['account.analytic.plan'].search ( [
+                ('id' , 'in' , [82 , 83 , 84 , 85 , 87 , 88 , 89])
+            ] )
 
-        # clear M2M safely in wizard context
-        self.analytic_plan_ids = [(5 , 0 , 0)]
-
-        # normal fields
-        self.date_from = date ( 2025 , 10 , 1 )
-        self.date_to = date ( 2026 , 9 , 30 )
-        self.show_divided = True
-
-        # force UI sync without reload
-        self.env.invalidate_all ()
-
-        return {
-            'type' : 'ir.actions.client' ,
-            'tag' : 'display_notification' ,
-            'params' : {
-                'title' : 'Done' ,
-                'message' : 'Plans cleared successfully' ,
-                'type' : 'success' ,
-                'sticky' : False ,
-            }
-        }
+        return self.env.user.analytic_plan_ids
     # =========================
     # ===== EXISTING METHODS (UNCHANGED) =====
     # =========================
