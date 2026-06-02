@@ -218,20 +218,29 @@ class KBIAnalyticProfitLossWizard(models.TransientModel):
             return Analytic.search([('plan_id', 'in', self.analytic_plan_ids.ids)])
 
         return self.env.user.analytic_account_ids.filtered(lambda account: account.plan_id in self.analytic_plan_ids)
+ 
+    def _validate_before_report(self) :
+        self.ensure_one ()
 
-    def _validate_before_report(self):
-        self.ensure_one()
+        # =========================
+        # SAFE FALLBACK: no selection
+        # =========================
+        if not self.analytic_plan_ids :
+            # بدل ما نوقف التقرير، نعتبر إننا هنشتغل على كل المتاح
+            self.analytic_plan_ids = self.env['account.analytic.plan'].search ( [] )
 
-        if not self.analytic_plan_ids:
-            raise UserError(_('Please select at least one analytic plan.'))
+        self._check_analytic_plan_access ()
 
-        self._check_analytic_plan_access()
+        effective_accounts = self._get_effective_analytic_accounts ()
 
-        effective_accounts = self._get_effective_analytic_accounts()
-        if not effective_accounts:
-            raise UserError(_('No analytic accounts were found under the selected analytic plans for your user.'))
+        if not effective_accounts :
+            raise UserError ( _ (
+                'No analytic accounts were found under the selected analytic plans for your user.'
+            ) )
 
         return effective_accounts
+    
+     ###########################
 
     def action_generate_report(self):
         self.ensure_one()
