@@ -320,19 +320,22 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
 
     def action_preview_dvided_qweb_report(self) :
         self.ensure_one ()
+
         self._validate_before_report ()
 
-        allowed_plans = [91 , 92 , 93 , 95 , 97 , 98 , 99 , 100 , 101 , 104]
+        # =====================================
+        # FORCE SETTINGS BEFORE REPORT
+        # =====================================
+        self.analytic_plan_ids = [(5 , 0 , 0)]  # يمسح كل القيم (False في Odoo)
+        self.show_divided = True
 
-        self.env['kbi.analytic.profit.loss.service'].generate_lines (
-            self ,
-            allowed_plan_ids=allowed_plans
-        )
+        # generate report
+        self.env['kbi.analytic.profit.loss.service'].generate_lines ( self )
 
         return self.env.ref (
             'kbi_custom.action_report_kbi_analytic_profit_loss_html'
         ).report_action ( self )
-
+    
 
     def action_preview_qweb_report(self) :
         self.ensure_one ()
