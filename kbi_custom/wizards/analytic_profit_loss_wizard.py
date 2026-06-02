@@ -148,7 +148,7 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
     )
 
     
-    def _onchange_all_plans(self) :
+     def action_empty_plans(self) :
         self.analytic_plan_ids = False
         self.date_from = lambda self: fields.Date.to_date('2025-10-01')
         self.date_to = lambda self: fields.Date.to_date('2026-09-30')
