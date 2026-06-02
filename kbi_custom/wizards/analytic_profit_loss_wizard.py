@@ -143,7 +143,8 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
         string="مستوي التقرير" , default='level2' , )
     level1 = fields.Boolean ( string='تقــرير بمســتوي الــمجموعــات التــحليليــة ' , default=False )
     show_details = fields.Boolean ( string='Show Journal Item Details' , default=False )
-    show_divided = fields.Boolean ( string='عــرض المــجــمـــوعـات المــوزعـــة' , default=False )
+    show_divided = fields.Boolean ( string='عــرض المــجــمـــوعـات المــوزعـــة' ,compute='_compute_show_divided',store=True )
+
 
     line_ids = fields.One2many (
         'kbi.analytic.profit.loss.line' ,
@@ -321,14 +322,10 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
             'target' : 'current' ,
         }
 
-
-
-    @api.onchange ( 'group_code' )
-    def _onchange_group_code(self) :
-        if self.group_code :
-            self.show_divided = True
-        else :
-            self.show_divided = False
+    @api.depends ( 'group_code' )
+    def _compute_show_divided(self) :
+        for rec in self :
+            rec.show_divided = bool ( rec.group_code )
 
 
 
