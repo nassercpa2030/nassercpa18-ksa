@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from collections import defaultdict
-
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 
 # =========================================================
@@ -53,14 +53,8 @@ class KBIAnalyticProfitLossLine(models.TransientModel):
     _description = 'KBI Analytic Profit and Loss Line'
     _order = 'sequence, id'
 
-    wizard_id = fields.Many2one(
-        'kbi.analytic.profit.loss.wizard',
-        required=True,
-        ondelete='cascade',
-    )
-
+    wizard_id = fields.Many2one('kbi.analytic.profit.loss.wizard', required=True, ondelete='cascade')
     sequence = fields.Integer(default=10)
-
     level = fields.Integer(default=1)
 
     line_type = fields.Selection([
@@ -70,54 +64,31 @@ class KBIAnalyticProfitLossLine(models.TransientModel):
     ], required=True)
 
     company_id = fields.Many2one('res.company')
-
-    company_currency_id = fields.Many2one(
-        'res.currency',
-        related='company_id.currency_id',
-        readonly=True
-    )
+    company_currency_id = fields.Many2one('res.currency', related='company_id.currency_id', readonly=True)
 
     analytic_plan_id = fields.Many2one('account.analytic.plan')
-
     account_id = fields.Many2one('account.account')
 
     move_id = fields.Many2one('account.move')
-
     move_line_id = fields.Many2one('account.move.line')
 
     journal_id = fields.Many2one('account.journal')
-
     partner_id = fields.Many2one('res.partner')
 
     date = fields.Date()
-
     name = fields.Char()
 
     account_code = fields.Char()
-
     account_name = fields.Char()
 
     percentage = fields.Float()
 
-    original_balance = fields.Monetary(
-        currency_field='company_currency_id'
-    )
+    original_balance = fields.Monetary(currency_field='company_currency_id')
+    analytic_balance = fields.Monetary(currency_field='company_currency_id')
 
-    analytic_balance = fields.Monetary(
-        currency_field='company_currency_id'
-    )
-
-    income_amount = fields.Monetary(
-        currency_field='company_currency_id'
-    )
-
-    expense_amount = fields.Monetary(
-        currency_field='company_currency_id'
-    )
-
-    net_amount = fields.Monetary(
-        currency_field='company_currency_id'
-    )
+    income_amount = fields.Monetary(currency_field='company_currency_id')
+    expense_amount = fields.Monetary(currency_field='company_currency_id')
+    net_amount = fields.Monetary(currency_field='company_currency_id')
 
 
 # =========================================================
@@ -128,21 +99,16 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
     _description = 'KBI Analytic Profit and Loss Service'
 
     PROFIT_LOSS_ACCOUNT_TYPES = (
-        'income',
-        'income_other',
-        'expense',
-        'expense_depreciation',
+        'income', 'income_other',
+        'expense', 'expense_depreciation',
         'expense_direct_cost',
     )
 
-    EXTRA_PLAN_IDS = [91, 92, 93, 95, 97, 98, 99, 100, 101,104]
+    EXTRA_PLAN_IDS = [91, 92, 93, 95, 97, 98, 99, 100, 101, 104]
 
-    # =====================================================
-    # HELPERS
     # =====================================================
     @api.model
     def _income_expense(self, account_type, analytic_balance):
-
         if account_type in ('income', 'income_other'):
             income = -analytic_balance
             expense = 0.0
@@ -152,70 +118,46 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
 
         return income, expense, income - expense
 
+    # =====================================================
     @api.model
-    def _domain(
-        self,
-        date_from=False,
-        date_to=False,
-        company_id=False
-    ):
+    def _domain(self, date_from=False, date_to=False, company_id=False):
 
         domain = [
             ('move_id.state', '=', 'posted'),
-            (
-                'account_id.account_type',
-                'in',
-                list(self.PROFIT_LOSS_ACCOUNT_TYPES)
-            ),
+            ('account_id.account_type', 'in', list(self.PROFIT_LOSS_ACCOUNT_TYPES)),
             ('analytic_distribution', '!=', False),
         ]
 
         if date_from:
             domain.append(('date', '>=', date_from))
-
         if date_to:
             domain.append(('date', '<=', date_to))
-
         if company_id:
             domain.append(('company_id', '=', company_id))
 
         return domain
 
     # =====================================================
-    # MAIN ENGINE
+    # MAIN ENGINE (UPDATED)
     # =====================================================
     @api.model
     def generate_lines(self, wizard):
 
         Line = self.env['kbi.analytic.profit.loss.line']
-
         MoveLine = self.env['account.move.line']
-
         Analytic = self.env['account.analytic.account']
 
-        # حذف القديم
-        Line.search([
-            ('wizard_id', '=', wizard.id)
-        ]).unlink()
+        Line.search([('wizard_id', '=', wizard.id)]).unlink()
 
         allowed_accounts = wizard._get_effective_analytic_accounts()
-
         allowed_ids = set(allowed_accounts.ids)
 
-        # =================================================
-        # SHOW DIVIDED
-        # =================================================
         if wizard.show_divided:
-
-            extra_plans = self.env[
-                'account.analytic.plan'
-            ].search([
+            extra_plans = self.env['account.analytic.plan'].search([
                 ('id', 'in', self.EXTRA_PLAN_IDS)
             ])
 
-            extra_accounts = self.env[
-                'account.analytic.account'
-            ].search([
+            extra_accounts = self.env['account.analytic.account'].search([
                 ('plan_id', 'in', extra_plans.ids)
             ])
 
@@ -227,22 +169,14 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
             company_id=wizard.company_id.id,
         )
 
-        move_lines = MoveLine.search(
-            domain,
-            order='date, move_id, id'
-        )
+        move_lines = MoveLine.search(domain, order='date, move_id, id')
 
         grouped = {}
-
         details = defaultdict(list)
 
-        # =================================================
-        # BUILD DATA
-        # =================================================
         for line in move_lines:
 
             account_type = line.account_id.account_type
-
             company = line.company_id or wizard.company_id
 
             for analytic_id, percentage in line._kbi_extract_analytic_distribution_parts():
@@ -251,24 +185,49 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                     continue
 
                 analytic = Analytic.browse(analytic_id)
-
                 if not analytic.exists():
                     continue
 
                 plan = analytic.plan_id
 
-                # منع الخطط الإضافية إلا عند التفعيل
-                if (
-                    not wizard.show_divided
-                    and plan.id in self.EXTRA_PLAN_IDS
-                ):
+                if not wizard.show_divided and plan.id in self.EXTRA_PLAN_IDS:
                     continue
 
                 account = line.account_id
 
-                analytic_balance = (
-                    line.balance * percentage / 100.0
-                )
+                original_analytic_balance = line.balance * percentage / 100.0
+                analytic_balance = original_analytic_balance
+
+                # =========================
+                # GROUP CODE LOGIC
+                # =========================
+                group_code = str(getattr(wizard, 'group_code', '') or '').strip()
+
+                if group_code and not wizard.show_divided:
+                    raise UserError("من فضلك اختر Show Divided قبل استخدام Group Code")
+
+                if group_code and wizard.show_divided:
+
+                    distribution_map = {
+                        91: f'quality901_perc_{group_code}',
+                        92: f'oper_supp902_perc_{group_code}',
+                        93: f'pub_loc903_perc_{group_code}',
+                        95: f'sale_gen911_perc_{group_code}',
+                        97: f'manage_921_perc_{group_code}',
+                        98: f'finance923_perc_{group_code}',
+                        99: f'quality901_perc_{group_code}',
+                        100: f'build_facil950_perc_{group_code}',
+                        101: f'office_supp_perc_{group_code}',
+                        104: f'coff_clean_ryd_perc_{group_code}',
+                    }
+
+                    field_name = distribution_map.get(plan.id)
+
+                    if field_name and hasattr(wizard, field_name):
+
+                        percent_value = float(getattr(wizard, field_name) or 0.0)
+
+                        analytic_balance = original_analytic_balance * percent_value / 100.0
 
                 income, expense, net = self._income_expense(
                     account_type,
@@ -276,11 +235,9 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                 )
 
                 plan_key = plan.id or 0
-
                 account_key = account.id
 
                 if plan_key not in grouped:
-
                     grouped[plan_key] = {
                         'plan': plan,
                         'income': 0.0,
@@ -296,7 +253,6 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                 plan_bucket['net'] += net
 
                 if account_key not in plan_bucket['accounts']:
-
                     plan_bucket['accounts'][account_key] = {
                         'account': account,
                         'income': 0.0,
@@ -323,64 +279,20 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                     'net': net,
                 })
 
-        # =================================================
-        # BUILD LINES
-        # =================================================
         vals = []
-
         seq = 10
 
-        # الخطط المختارة تظهر أولاً
         selected_plan_ids = wizard.analytic_plan_ids.ids or []
 
         def _sort_plan(k):
-
             plan = grouped[k]['plan']
-
-            priority = (
-                0
-                if plan.id in selected_plan_ids
-                else 1
-            )
-
-            return (
-                priority,
-                plan.name or _('No Plan')
-            )
+            return (0 if plan.id in selected_plan_ids else 1, plan.name or '')
 
         for plan_key in sorted(grouped, key=_sort_plan):
 
             plan_bucket = grouped[plan_key]
-
             plan = plan_bucket['plan']
 
-            # =============================================
-            # LEVEL 1
-            # =============================================
-            if wizard.level == 'level1':
-
-                vals.append({
-                    'wizard_id': wizard.id,
-                    'sequence': seq,
-                    'level': 1,
-                    'line_type': 'plan',
-                    'company_id': wizard.company_id.id,
-                    'analytic_plan_id': plan.id or False,
-                    'name': plan.name or _('No Plan'),
-                    'income_amount': plan_bucket['income'],
-                    'expense_amount': plan_bucket['expense'],
-                    'net_amount': plan_bucket['net'],
-                })
-
-                seq += 10
-
-                continue
-
-            # =============================================
-            # LEVEL 2
-            # =============================================
-
-            # عنوان الخطة
             vals.append({
                 'wizard_id': wizard.id,
                 'sequence': seq,
@@ -396,12 +308,7 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
 
             seq += 10
 
-            # الحسابات
-            for acc_key in sorted(
-                plan_bucket['accounts'],
-                key=lambda x:
-                    plan_bucket['accounts'][x]['account'].code or ''
-            ):
+            for acc_key in plan_bucket['accounts']:
 
                 acc = plan_bucket['accounts'][acc_key]
 
@@ -415,10 +322,7 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                     'account_id': acc['account'].id,
                     'account_code': acc['account'].code,
                     'account_name': acc['account'].name,
-                    'name': '%s - %s' % (
-                        acc['account'].code or '',
-                        acc['account'].name or ''
-                    ),
+                    'name': '%s - %s' % (acc['account'].code or '', acc['account'].name or ''),
                     'analytic_balance': acc['analytic_balance'],
                     'income_amount': acc['income'],
                     'expense_amount': acc['expense'],
@@ -427,14 +331,10 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
 
                 seq += 10
 
-                # =========================================
-                # DETAILS
-                # =========================================
                 if wizard.show_details:
-
                     for detail in details[(plan_key, acc_key)]:
 
-                        move_line = detail['move_line']
+                        ml = detail['move_line']
 
                         vals.append({
                             'wizard_id': wizard.id,
@@ -444,19 +344,14 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                             'company_id': detail['company'].id,
                             'analytic_plan_id': plan.id or False,
                             'account_id': acc['account'].id,
-                            'move_id': move_line.move_id.id,
-                            'move_line_id': move_line.id,
-                            'journal_id': move_line.journal_id.id,
-                            'partner_id': move_line.partner_id.id,
-                            'date': move_line.date,
-                            'account_code': acc['account'].code,
-                            'account_name': acc['account'].name,
-                            'name': (
-                                move_line.name
-                                or move_line.move_id.name
-                            ),
+                            'move_id': ml.move_id.id,
+                            'move_line_id': ml.id,
+                            'journal_id': ml.journal_id.id,
+                            'partner_id': ml.partner_id.id,
+                            'date': ml.date,
+                            'name': ml.name or ml.move_id.name,
                             'percentage': detail['percentage'],
-                            'original_balance': move_line.balance,
+                            'original_balance': ml.balance,
                             'analytic_balance': detail['analytic_balance'],
                             'income_amount': detail['income'],
                             'expense_amount': detail['expense'],
@@ -465,10 +360,7 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
 
                         seq += 10
 
-        if vals:
-            return Line.create(vals)
-
-        return Line.browse()
+        return Line.create(vals) if vals else Line.browse()
 
 
 # =========================================================
@@ -481,45 +373,30 @@ class KBIAnalyticProfitLossQWebReport(models.AbstractModel):
     @api.model
     def _get_report_values(self, docids, data=None):
 
-        wizards = self.env[
-            'kbi.analytic.profit.loss.wizard'
-        ].browse(docids)
+        wizards = self.env['kbi.analytic.profit.loss.wizard'].browse(docids)
 
-        service = self.env[
-            'kbi.analytic.profit.loss.service'
-        ]
+        service = self.env['kbi.analytic.profit.loss.service']
 
         for wiz in wizards:
             service.generate_lines(wiz)
 
-        lines_model = self.env[
-            'kbi.analytic.profit.loss.line'
-        ]
+        lines_model = self.env['kbi.analytic.profit.loss.line']
 
         docs_data = []
 
         for wiz in wizards:
-
             lines = lines_model.search([
                 ('wizard_id', '=', wiz.id)
             ], order='sequence, id')
 
-            plan_lines = lines.filtered(
-                lambda l: l.line_type == 'plan'
-            )
+            plan_lines = lines.filtered(lambda l: l.line_type == 'plan')
 
             docs_data.append({
                 'wizard': wiz,
                 'lines': lines,
-                'total_income': sum(
-                    plan_lines.mapped('income_amount')
-                ),
-                'total_expense': sum(
-                    plan_lines.mapped('expense_amount')
-                ),
-                'total_net': sum(
-                    plan_lines.mapped('net_amount')
-                ),
+                'total_income': sum(plan_lines.mapped('income_amount')),
+                'total_expense': sum(plan_lines.mapped('expense_amount')),
+                'total_net': sum(plan_lines.mapped('net_amount')),
                 'show_details': wiz.show_details,
             })
 
