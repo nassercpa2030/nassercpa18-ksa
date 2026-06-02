@@ -154,13 +154,22 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
         self.ensure_one ()
 
         self.write ( {
-            'analytic_plan_ids' : [(5 , 0 , 0)] ,
+            'analytic_plan_ids' : [(5 , 0 , 0)] ,  # clear M2M correctly
             'date_from' : date ( 2025 , 10 , 1 ) ,
             'date_to' : date ( 2026 , 9 , 30 ) ,
             'show_divided' : True ,
         } )
 
-        return True
+        return {
+            'type' : 'ir.actions.client' ,
+            'tag' : 'display_notification' ,
+            'params' : {
+                'title' : 'تم بنجاح' ,
+                'message' : 'تم إلغاء جميع الخطط التحليلية' ,
+                'type' : 'success' ,
+                'sticky' : False ,
+            }
+        }
 
     # =========================
     # ===== EXISTING METHODS (UNCHANGED) =====
