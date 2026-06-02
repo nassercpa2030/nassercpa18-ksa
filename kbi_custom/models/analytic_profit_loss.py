@@ -138,7 +138,7 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
         return domain
 
     # =====================================================
-    # MAIN ENGINE (UPDATED)
+    # MAIN ENGINE (FIXED)
     # =====================================================
     @api.model
     def generate_lines(self , wizard) :
@@ -177,9 +177,6 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
         grouped = {}
         details = defaultdict ( list )
 
-        # =========================
-        # GROUP CODE (SAFE MODE)
-        # =========================
         group_code = (wizard.group_code or '').strip ()
 
         if group_code and not wizard.show_divided :
@@ -210,13 +207,12 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                 account = line.account_id
 
                 # =========================
-                # BASE VALUE (IMMUTABLE)
+                # BASE VALUE (FIXED ROOT CAUSE)
                 # =========================
-                base_balance = line.balance * percentage / 100.0
-                final_balance = base_balance
+                base_balance = line.balance
 
                 # =========================
-                # GROUP CODE LOGIC (SAFE)
+                # GROUP CODE LOGIC (FIXED ZERO ISSUE)
                 # =========================
                 if group_code and wizard.show_divided :
 
@@ -235,12 +231,15 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
 
                     field_name = percent_field_map.get ( plan.id )
 
+                    percent_value = 0.0
                     if field_name :
-
                         percent_value = getattr ( wizard , field_name , 0.0 ) or 0.0
 
-                        if percent_value > 0 :
-                            final_balance = base_balance * percent_value / 100.0
+                    # ✔ FINAL FIX: 0 = real zero, no skipping
+                    final_balance = base_balance * percent_value / 100.0
+
+                else :
+                    final_balance = base_balance
 
                 # =========================
                 # INCOME / EXPENSE CALC
@@ -382,7 +381,7 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
                         seq += 10
 
         return Line.create ( vals ) if vals else Line.browse ()
-
+    
 # =========================================================
 # REPORT
 # =========================================================
