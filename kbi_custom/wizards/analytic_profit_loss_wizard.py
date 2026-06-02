@@ -321,21 +321,6 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
             'target' : 'current' ,
         }
 
-    def action_preview_dvided_original_qweb_report(self) :
-        self.ensure_one ()
-
-        # =========================
-        # FORCE FLAG FIRST
-        # =========================
-        self.show_divided = True
-
-        self._validate_before_report ()
-
-        self.env['kbi.analytic.profit.loss.service'].generate_lines ( self )
-
-        return self.env.ref (
-            'kbi_custom.action_report_kbi_analytic_profit_loss_html'
-        ).report_action ( self )
 
 
     @api.onchange ( 'group_code' )
