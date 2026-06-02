@@ -11,7 +11,7 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
     _name = 'kbi.analytic.profit.loss.wizard'
     _description = 'KBI Analytic Profit and Loss Wizard'
 
-    date_from = fields.Date ( string='Date From' ,  default=lambda self: date(2025, 10, 01),
+    date_from = fields.Date ( string='Date From' ,  default=lambda self: date(2025, 10, 1),
                               required=True )
     date_to = fields.Date ( string='Date To' ,  default=lambda self: date(2026, 9, 30) ,
                             required=True )
