@@ -383,7 +383,6 @@ class KBIAnalyticProfitLossService(models.AbstractModel):
 
         return Line.create ( vals ) if vals else Line.browse ()
 
-
 # =========================================================
 # REPORT
 # =========================================================
