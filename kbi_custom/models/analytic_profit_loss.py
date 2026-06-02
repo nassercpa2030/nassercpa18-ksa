@@ -129,9 +129,11 @@ class KBIAnalyticProfitLossService ( models.AbstractModel ) :
         ]
 
         if date_from :
-            domain.append ( ('date' , '>=' , date_from) )
+            domain.append ( ('date' , '>=' , fields.Date.to_string ( date_from )) )
+
         if date_to :
-            domain.append ( ('date' , '<=' , date_to) )
+            domain.append ( ('date' , '<=' , fields.Date.to_string ( date_to )) )
+
         if company_id :
             domain.append ( ('company_id' , '=' , company_id) )
 
