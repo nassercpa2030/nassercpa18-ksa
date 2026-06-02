@@ -221,6 +221,7 @@ class KBIAnalyticProfitLossService ( models.AbstractModel ) :
                 if use_group_code and plan.id in controlled_plans :
 
                     percent_field_map = {
+                        81 : f'quality901_perc_{group_code}' ,
                         91 : f'quality901_perc_{group_code}' ,
                         92 : f'oper_supp902_perc_{group_code}' ,
                         93 : f'pub_loc903_perc_{group_code}' ,
