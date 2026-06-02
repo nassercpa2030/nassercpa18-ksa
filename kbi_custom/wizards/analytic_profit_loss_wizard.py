@@ -152,8 +152,8 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
 
     def action_empty_plans(self) :
         self.analytic_plan_ids = False
-        self.date_from = date(2025, 10, 1)
-        self.date_to = date(2026, 9, 30)
+        # self.date_from = date(2025, 10, 1)
+        # self.date_to = date(2026, 9, 30)
         self.show_divided = True
 
     # =========================
