@@ -100,8 +100,8 @@
 
 </div>
                                 
-                                <field name="show_details" style="background-color:#d1ecf1; padding:6px; border-radius:6px;" groups="base.group_system,104__team.shaker"/>
-                                <!-- <field name="show_divided"  widget="boolean-toggle" groups="base.group_system,104__team.shaker"/> -->
+                                <field name="show_details"  widget="boolean_toggle" style="background-color:#d1ecf1; padding:6px; border-radius:6px;" string="عــرض تفاصيـل القــيود" groups="base.group_system,104__team.shaker"/>
+                                <!-- <field name="show_divided"   widget="boolean-toggle" groups="base.group_system,104__team.shaker"/> -->
                        
                                  <field name="level" string="مستوي التقرير" style="background-color:#fff3e0; padding:6px; border-radius:6px; margin-bottom:5px;" groups="base.group_system,104__team.shaker"/>
                               
