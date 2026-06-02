@@ -147,10 +147,13 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
         readonly=True ,
     )
 
-    @api.onchange ( 'empty_all_plans' )
+    
     def _onchange_all_plans(self) :
-        if self.empty_all_plans :
-            self.analytic_plan_ids = [(5 , 0 , 0)]
+        self.analytic_plan_ids = False
+        self.date_from = lambda self: fields.Date.to_date('2025-10-01')
+        self.date_to = lambda self: fields.Date.to_date('2026-09-30')
+        self.show_divided = True
+            
 
     # =========================
     # ===== EXISTING METHODS (UNCHANGED) =====
@@ -230,7 +233,8 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
     def _check_dates(self) :
         for wizard in self :
             if wizard.date_from and wizard.date_to and wizard.date_from > wizard.date_to :
-                raise UserError ( _ ( 'Date From must be before or equal to Date To.' ) )
+                
+                raise UserError ( _ ( 'Date From must be before or equal to Date To. { برجــاء ضبط التاريخ } ' ) )
 
     @api.constrains ( 'analytic_plan_ids' )
     def _check_analytic_plan_access(self) :
