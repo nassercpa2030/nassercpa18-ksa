@@ -338,15 +338,19 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
             200 : 89 ,
         }
 
-        plan_ids = []
+        plan_ids = list ( self.analytic_plan_ids.ids )  # 👈 keep user selection
 
-        # خذ القيمة مباشرة
+        # =========================
+        # ADDITION (NOT REPLACE)
+        # =========================
         if self.group_code :
             plan_id = group_map.get ( self.group_code )
-            if plan_id :
+            if plan_id and plan_id not in plan_ids :
                 plan_ids.append ( plan_id )
 
-        # مسح + تعيين في خطوة واحدة (أفضل)
+        # =========================
+        # SET FINAL VALUE
+        # =========================
         self.analytic_plan_ids = [(6 , 0 , plan_ids)] if plan_ids else [(5 , 0 , 0)]
 
         self.show_divided = True
@@ -357,8 +361,7 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
         return self.env.ref (
             'kbi_custom.action_report_kbi_analytic_profit_loss_html'
         ).report_action ( self )
-    
-    
+
 
     def action_preview_dvided_qweb_report(self) :
         self.ensure_one ()
