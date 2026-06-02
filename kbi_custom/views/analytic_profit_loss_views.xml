@@ -93,7 +93,7 @@
     <div class="p-2 text-center"
          style="flex:1; background:#ffffff;">
         <div class="mt-1">
-               <button name="_onchange_all_plans" type="object" string="إزالة جميع الخطط التحليلية" class="btn-primary" icon="fa-edit" groups="base.group_system,104__team.shaker"/>
+               <button name="action_empty_plans" type="object" string="إزالة جميع الخطط التحليلية" class="btn-primary" icon="fa-edit" groups="base.group_system,104__team.shaker"/>
 
         </div>
     </div>
