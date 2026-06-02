@@ -154,13 +154,13 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
         self.ensure_one ()
 
         self.write ( {
-            'analytic_plan_ids' : [(5 , 0 , 0)] ,  # مسح M2M صح
+            'analytic_plan_ids' : [(5 , 0 , 0)] ,
             'date_from' : date ( 2025 , 10 , 1 ) ,
             'date_to' : date ( 2026 , 9 , 30 ) ,
             'show_divided' : True ,
         } )
 
-        return {'type' : 'ir.actions.client' , 'tag' : 'reload'}
+        return True
 
     # =========================
     # ===== EXISTING METHODS (UNCHANGED) =====
