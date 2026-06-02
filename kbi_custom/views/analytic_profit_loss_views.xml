@@ -79,7 +79,11 @@
                                 <field name="allowed_analytic_plan_ids" invisible="1"/>
                                 <field name="allowed_analytic_account_ids" invisible="1"/>
                                 <!-- <field name="analytic_account_ids" invisible="1"/>-->
-                                <field name="analytic_plan_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True,}"   groups="base.group_system"/> 
+                        <div class="d-flex align-items-center p-2 rounded" style="background-color:#f8f9fa; gap:12px;">
+                              <div style="flex:4;">  <field name="analytic_plan_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True}" groups="base.group_system"/></div>
+                              <div style="flex:1;"> <field name="show_divided" widget="boolean_toggle" groups="base.group_system,104__team.shaker"/></div>
+                        </div>
+                                
                                 <field name="show_details"  groups="base.group_system,104__team.shaker"/>
                                 <!-- <field name="show_divided"  widget="boolean-toggle" groups="base.group_system,104__team.shaker"/> -->
                        
