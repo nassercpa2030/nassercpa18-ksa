@@ -14,7 +14,7 @@
                                 <field name="date_to"/>
                                 <!-- <field name="company_id" groups="base.group_multi_company"/> -->
                                 <!-- <field name="user_id" invisible="not group_code"/> -->
-                               <group class="d-flex rounded overflow-hidden border" string="النســـب الموزعة" style="background-color:#d9f2ff; padding:6px; border-radius:6px;"  invisible="not group_code">
+                             <group string="النســـب الموزعة" col="4" class="rounded border" style="background-color:#d9f2ff; padding:10px; border-radius:6px;" invisible="not group_code">
                                 <field name="finance923_perc_101"   invisible="group_code != '101'"/>
                                 <field name="finance923_perc_104"   invisible="group_code != '104'"/>
                                  <field name="finance923_perc_110"   invisible="group_code != '110'"/>
