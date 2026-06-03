@@ -43,7 +43,7 @@
                                 <field name="office_supp_perc_104"  style="background-color:#d9f2ff;  border-radius:6px;" invisible="group_code != '104'"/>
                                 <field name="office_supp_perc_110"  style="background-color:#d9f2ff;  border-radius:6px;" invisible="group_code != '110'"/>
                                 <field name="office_supp_perc_111"  style="background-color:#d9f2ff;  border-radius:6px;" invisible="group_code != '111'"/>
-                                <field name="office_supp_perc_200"   style="background-color:#d9f2ff;  border-radius:6px;"invisible="group_code != '200'"/>
+                                <field name="office_supp_perc_200"   style="background-color:#d9f2ff;  border-radius:6px;" invisible="group_code != '200'"/>
                                 <field name="office_supp_perc_103"   style="background-color:#d9f2ff;  border-radius:6px;" invisible="group_code != '103'"/>
                                 <field name="manage_921_perc_101" style="background-color:#d9f2ff;  border-radius:6px;" invisible="group_code != '101'"/>
                                  <field name="manage_921_perc_104"  style="background-color:#d9f2ff;  border-radius:6px;" invisible="group_code != '104'"/>
