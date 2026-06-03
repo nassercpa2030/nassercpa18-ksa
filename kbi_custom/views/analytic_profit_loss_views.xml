@@ -87,7 +87,7 @@
 
     <div class="p-2 border-end"
          style="flex:4; background:#f8f9fa;">
-        <label class="fw-bold" for="analytic_plan_ids">📊المجموعة التحليلية المطلوب التوزيع عليها</label>
+        <label class="fw-bold" for="group_code">📊المجموعة التحليلية المطلوب التوزيع عليها</label>
  
                                      <field name="group_code" string=" 📊المجموعة المطلوب التوزيع عليها" style="background-color:#f8d7da; padding:6px; border-radius:6px;"
                                    decoration-success="group_code == '101'"
