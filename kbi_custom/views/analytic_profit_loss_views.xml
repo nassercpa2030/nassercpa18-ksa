@@ -79,15 +79,24 @@
                                 <field name="allowed_analytic_plan_ids" invisible="1"/>
                                 <field name="allowed_analytic_account_ids" invisible="1"/>
                                 <!-- <field name="analytic_account_ids" invisible="1"/>-->
-<div class="d-flex rounded overflow-hidden border">
+                                       <field name="analytic_plan_ids"
+               widget="many2many_tags"
+               options="{'no_create': True, 'no_open': True}"
+               groups="base.group_system" string="المجموعات التحليلية المباشرة"/>
+<div class="d-flex rounded overflow-hidden border" string="المبالغ  الموزعة">
 
     <div class="p-2 border-end"
          style="flex:4; background:#f8f9fa;">
-        <label class="fw-bold" for="analytic_plan_ids">الخطط التحليلية</label>
-        <field name="analytic_plan_ids"
-               widget="many2many_tags"
-               options="{'no_create': True, 'no_open': True}"
-               groups="base.group_system"/>
+        <label class="fw-bold" for="analytic_plan_ids">📊المجموعة التحليلية المطلوب التوزيع عليها</label>
+ 
+                                     <field name="group_code" string=" 📊المجموعة المطلوب التوزيع عليها" style="background-color:#f8d7da; padding:6px; border-radius:6px;"
+                                   decoration-success="group_code == '101'"
+       decoration-info="group_code == '103'"
+       decoration-primary="group_code == '104'"
+       decoration-warning="group_code == '110'"
+       decoration-muted="group_code == '111'"
+       decoration-danger="group_code == '200'"
+       decoration-bf="group_code != False " groups="base.group_system,104__team.shaker"/>
     </div>
 
     <div class="p-2 text-center"
@@ -107,14 +116,7 @@
                                  <field name="level" string="مستوي التقرير" style="background-color:#fff3e0; padding:6px; border-radius:6px; margin-bottom:5px;" groups="base.group_system,104__team.shaker"/>
                               
                                     <!-- <field name="show_divided" widget="boolean_toggle" style="background-color:#d1ecf1; padding:6px; border-radius:6px;" groups="base.group_system,104__team.shaker"/> -->
-                             <field name="group_code" string=" 📊المجموعة المطلوب التوزيع عليها" style="background-color:#f8d7da; padding:6px; border-radius:6px;"
-                                   decoration-success="group_code == '101'"
-       decoration-info="group_code == '103'"
-       decoration-primary="group_code == '104'"
-       decoration-warning="group_code == '110'"
-       decoration-muted="group_code == '111'"
-       decoration-danger="group_code == '200'"
-       decoration-bf="group_code != False " groups="base.group_system,104__team.shaker"/>
+
                             <!-- <div style="background-color:#d1ecf1; padding:6px; border-radius:6px;" groups="base.group_system,104__team.shaker"> <button name="action_preview_dvided_qweb_report" type="object" string="طباعة الخطة + الخطط الموزعة " class="btn-primary" invisible="not group_code" icon="fa-file-text-o" groups="base.group_system,104__team.shaker"/>
 </div> -->
                                
