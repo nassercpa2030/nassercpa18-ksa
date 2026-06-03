@@ -204,7 +204,11 @@
             <span t-esc="customer.partner_vat_placeholder"/>
         </strong><br/>
     </t>
-
+<t t-if="o.partner_id.parent_id">
+    <strong>عن العميــــل:
+        <span t-esc="o.partner_id.name"/>
+    </strong><br/>
+</t>
 </td>
 </tr>
 
