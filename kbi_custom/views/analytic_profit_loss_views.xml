@@ -13,7 +13,7 @@
                                 <field name="date_from"/>
                                 <field name="date_to"/>
                                 <!-- <field name="company_id" groups="base.group_multi_company"/> -->
-                                <!-- <field name="user_id" invisible="not group_code"/> -->
+                                <field name="user_id" invisible="not group_code"/>
                            
                                 <field name="finance923_perc_101" style="background-color:#d9f2ff;  border-radius:6px;"   invisible="group_code != '101'"/>
                                 <field name="finance923_perc_104"   style="background-color:#d9f2ff;  border-radius:6px;" invisible="group_code != '104'"/>
