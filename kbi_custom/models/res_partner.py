@@ -171,35 +171,35 @@ class ResCity ( models.Model ) :
         'pub_loc903_perc_101' , 'pub_loc903_perc_104' , 'pub_loc903_perc_110' ,
         'pub_loc903_perc_111' , 'pub_loc903_perc_200' , 'pub_loc903_perc_103'
     )
-    def _check_all_percentages(self) :
-        groups = {
-            "المالية" : "finance923" ,
-            "الجودة" : "quality901" ,
-            "الدعم التشغيلي" : "oper_supp902" ,
-            "التسويق عام" : "sale_gen911" ,
-            "المستلزمات المكتبية" : "office_supp" ,
-            "الشئون الإدارية" : "manage_921" ,
-            "الدعم التقني" : "it_922" ,
-            "المباني والمرافق" : "build_facil950" ,
-            "القهوة والضيافة والنضافة (الرياض)" : "coff_clean_ryd" ,
-            "التوطين العام" : "pub_loc903" ,
-        }
+    # def _check_all_percentages(self) :
+    #     groups = {
+    #         "المالية" : "finance923" ,
+    #         "الجودة" : "quality901" ,
+    #         "الدعم التشغيلي" : "oper_supp902" ,
+    #         "التسويق عام" : "sale_gen911" ,
+    #         "المستلزمات المكتبية" : "office_supp" ,
+    #         "الشئون الإدارية" : "manage_921" ,
+    #         "الدعم التقني" : "it_922" ,
+    #         "المباني والمرافق" : "build_facil950" ,
+    #         "القهوة والضيافة والنضافة (الرياض)" : "coff_clean_ryd" ,
+    #         "التوطين العام" : "pub_loc903" ,
+    #     }
 
-        codes = ['101' , '104' , '110' , '111' , '200' , '103']
+    #     codes = ['101' , '104' , '110' , '111' , '200' , '103']
 
-        for rec in self :
-            for label , prefix in groups.items () :
-                total = sum ( getattr ( rec , f"{prefix}_perc_{code}" ) or 0.0 for code in codes )
-                total = round ( total , 2 )
-                if total not in (0.0 , 100.0) :
-                    diff = total - 100
-                    diff_msg = _ ( "أكبر من 100 بنسبة %.2f%%" ) % diff if diff > 0 else _ (
-                        "أقل من 100 بنسبة %.2f%%" ) % (-diff)
-                    raise ValidationError ( _ (
-                        "خطأ في توزيع %s (%s)\n"
-                        "الإجمالي الحالي: %.2f%%\n"
-                        "(المسموح فقط: 0%% أو 100%%)"
-                    ) % (label , diff_msg , total) )
+    #     for rec in self :
+    #         for label , prefix in groups.items () :
+    #             total = sum ( getattr ( rec , f"{prefix}_perc_{code}" ) or 0.0 for code in codes )
+    #             total = round ( total , 2 )
+    #             if total not in (0.0 , 100.0) :
+    #                 diff = total - 100
+    #                 diff_msg = _ ( "أكبر من 100 بنسبة %.2f%%" ) % diff if diff > 0 else _ (
+    #                     "أقل من 100 بنسبة %.2f%%" ) % (-diff)
+    #                 raise ValidationError ( _ (
+    #                     "خطأ في توزيع %s (%s)\n"
+    #                     "الإجمالي الحالي: %.2f%%\n"
+    #                     "(المسموح فقط: 0%% أو 100%%)"
+    #                 ) % (label , diff_msg , total) )
 
 
 _logger = logging.getLogger ( __name__ )
