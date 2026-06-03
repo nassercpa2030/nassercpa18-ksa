@@ -149,28 +149,28 @@ class ResCity ( models.Model ) :
    
 
     # 🔥 Constrain واحد فقط لكل المجموعات
-    @api.constrains (
-        'finance923_perc_101' , 'finance923_perc_104' , 'finance923_perc_110' ,
-        'finance923_perc_111' , 'finance923_perc_200' , 'finance923_perc_103' ,
-        'quality901_perc_101' , 'quality901_perc_104' , 'quality901_perc_110' ,
-        'quality901_perc_111' , 'quality901_perc_200' , 'quality901_perc_103' ,
-        'oper_supp902_perc_101' , 'oper_supp902_perc_104' , 'oper_supp902_perc_110' ,
-        'oper_supp902_perc_111' , 'oper_supp902_perc_200' , 'oper_supp902_perc_103' ,
-        'sale_gen911_perc_101' , 'sale_gen911_perc_104' , 'sale_gen911_perc_110' ,
-        'sale_gen911_perc_111' , 'sale_gen911_perc_200' , 'sale_gen911_perc_103' ,
-        'office_supp_perc_101' , 'office_supp_perc_104' , 'office_supp_perc_110' ,
-        'office_supp_perc_111' , 'office_supp_perc_200' , 'office_supp_perc_103' ,
-        'manage_921_perc_101' , 'manage_921_perc_104' , 'manage_921_perc_110' ,
-        'manage_921_perc_111' , 'manage_921_perc_200' , 'manage_921_perc_103' ,
-        'it_922_perc_101' , 'it_922_perc_104' , 'it_922_perc_110' ,
-        'it_922_perc_111' , 'it_922_perc_200' , 'it_922_perc_103' ,
-        'build_facil950_perc_101' , 'build_facil950_perc_104' , 'build_facil950_perc_110' ,
-        'build_facil950_perc_111' , 'build_facil950_perc_200' , 'build_facil950_perc_103' ,
-        'coff_clean_ryd_perc_101' , 'coff_clean_ryd_perc_104' , 'coff_clean_ryd_perc_110' ,
-        'coff_clean_ryd_perc_111' , 'coff_clean_ryd_perc_200' , 'coff_clean_ryd_perc_103' ,
-        'pub_loc903_perc_101' , 'pub_loc903_perc_104' , 'pub_loc903_perc_110' ,
-        'pub_loc903_perc_111' , 'pub_loc903_perc_200' , 'pub_loc903_perc_103'
-    )
+    # @api.constrains (
+    #     'finance923_perc_101' , 'finance923_perc_104' , 'finance923_perc_110' ,
+    #     'finance923_perc_111' , 'finance923_perc_200' , 'finance923_perc_103' ,
+    #     'quality901_perc_101' , 'quality901_perc_104' , 'quality901_perc_110' ,
+    #     'quality901_perc_111' , 'quality901_perc_200' , 'quality901_perc_103' ,
+    #     'oper_supp902_perc_101' , 'oper_supp902_perc_104' , 'oper_supp902_perc_110' ,
+    #     'oper_supp902_perc_111' , 'oper_supp902_perc_200' , 'oper_supp902_perc_103' ,
+    #     'sale_gen911_perc_101' , 'sale_gen911_perc_104' , 'sale_gen911_perc_110' ,
+    #     'sale_gen911_perc_111' , 'sale_gen911_perc_200' , 'sale_gen911_perc_103' ,
+    #     'office_supp_perc_101' , 'office_supp_perc_104' , 'office_supp_perc_110' ,
+    #     'office_supp_perc_111' , 'office_supp_perc_200' , 'office_supp_perc_103' ,
+    #     'manage_921_perc_101' , 'manage_921_perc_104' , 'manage_921_perc_110' ,
+    #     'manage_921_perc_111' , 'manage_921_perc_200' , 'manage_921_perc_103' ,
+    #     'it_922_perc_101' , 'it_922_perc_104' , 'it_922_perc_110' ,
+    #     'it_922_perc_111' , 'it_922_perc_200' , 'it_922_perc_103' ,
+    #     'build_facil950_perc_101' , 'build_facil950_perc_104' , 'build_facil950_perc_110' ,
+    #     'build_facil950_perc_111' , 'build_facil950_perc_200' , 'build_facil950_perc_103' ,
+    #     'coff_clean_ryd_perc_101' , 'coff_clean_ryd_perc_104' , 'coff_clean_ryd_perc_110' ,
+    #     'coff_clean_ryd_perc_111' , 'coff_clean_ryd_perc_200' , 'coff_clean_ryd_perc_103' ,
+    #     'pub_loc903_perc_101' , 'pub_loc903_perc_104' , 'pub_loc903_perc_110' ,
+    #     'pub_loc903_perc_111' , 'pub_loc903_perc_200' , 'pub_loc903_perc_103'
+    # )
     # def _check_all_percentages(self) :
     #     groups = {
     #         "المالية" : "finance923" ,
