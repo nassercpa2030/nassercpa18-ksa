@@ -160,52 +160,52 @@
     </td> -->
 
     <!-- بيانات العميل (شمال) -->
-    <td class="client-info" style="width:40%; text-align:left; vertical-align:top;">
-        <!--strong>بيانات العميل</strong><br/><br/-->
-        <div style="text-align:center; font-weight:bold; margin-bottom:10px;">
-           <strong>العميل </strong>
-        </div>
+<t t-set="customer" t-value="o.partner_id.parent_id if o.partner_id.parent_id else o.partner_id"/>
 
-        <strong>
-            <span t-esc="o.partner_id.name"/>
+<td class="client-info" style="width:40%; text-align:left; vertical-align:top;">
+
+    <div style="text-align:center; font-weight:bold; margin-bottom:10px;">
+        <strong>العـمــيــل</strong>
+    </div>
+
+    <strong>
+        <span t-esc="customer.name"/>
+    </strong><br/>
+
+    <strong>Address:
+        <span t-if="customer.street" t-esc="customer.street"/>
+        <span t-if="customer.street2">, <span t-esc="customer.street2"/></span>
+        <span t-if="customer.city">, <span t-esc="customer.city"/></span>
+        <span t-if="customer.country_id">, <span t-esc="customer.country_id.name"/></span>
+    </strong><br/>
+
+    <t t-if="customer.email">
+        <strong>Email: <span t-esc="customer.email"/></strong><br/>
+    </t>
+
+    <t t-if="customer.mobile">
+        <strong>Phone: <span t-esc="customer.mobile"/></strong><br/>
+    </t>
+
+    <t t-if="customer.cr_number_sale">
+        <strong>Commercial Registration:
+            <span t-esc="customer.cr_number_sale"/>
         </strong><br/>
+    </t>
 
-        <!--t t-if="o.partner_id.street"-->
-            <t t-if="o.partner_id">
-            <strong>Address:
-                <span t-if="o.partner_id.street" t-esc="o.partner_id.street"/>
-                ,<span t-if="o.partner_id.street2" t-esc="o.partner_id.street2"/>
-                ,<span t-if="o.partner_id.city" t-esc="o.partner_id.city"/><br/>
-                ,<span t-if="o.partner_id.country_id.name" t-esc="o.partner_id.country_id.name"/>
-            </strong><br/>
-                  <strong>Email:
-                <span t-esc="o.partner_id.email"/>
-            </strong><br/>
-                  <strong>phone:
-                <span t-esc="o.partner_id.mobile"/>
-            </strong><br/>
-                         
-        </t>
+    <t t-if="customer.number_700">
+        <strong>Unified Number:
+            <span t-esc="customer.number_700"/>
+        </strong><br/>
+    </t>
 
-        <t t-if="o.partner_id.cr_number_sale">
-            <strong>Commercial Registration:
-                <span t-esc="o.partner_id.cr_number_sale"/>
-            </strong><br/>
-        </t>
+    <t t-if="customer.partner_vat_placeholder">
+        <strong>VAT Number:
+            <span t-esc="customer.partner_vat_placeholder"/>
+        </strong><br/>
+    </t>
 
-        <t t-if="o.partner_id.number_700">
-            <strong>Unified Number:
-                <span t-esc="o.partner_id.number_700"/>
-            </strong><br/>
-        </t>
-
-        <t t-if="o.partner_id.partner_vat_placeholder">
-            <strong>VAT Number:
-                <span t-esc="o.partner_id.partner_vat_placeholder"/>
-            </strong><br/>
-        </t>
-        
-    </td>
+</td>
 </tr>
 
             </table>
