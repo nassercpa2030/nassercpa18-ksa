@@ -122,6 +122,13 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
     pub_loc903_perc_111 = fields.Float ( related='user_id.pub_loc903_perc_111' , readonly=False )
     pub_loc903_perc_200 = fields.Float ( related='user_id.pub_loc903_perc_200' , readonly=False )
     pub_loc903_perc_103 = fields.Float ( related='user_id.pub_loc903_perc_103' , readonly=False )
+            # =====مكتب مصر =====
+    egy_nk_perc_101 = fields.Float ( related='user_id.egy_nk_perc_101 , readonly=False )
+    egy_nk_perc_104 = fields.Float ( related='user_id.egy_nk_perc_104 , readonly=False )
+    egy_nk_perc_110 = fields.Float ( related='user_id.egy_nk_perc_110 , readonly=False )
+    egy_nk_perc_111 = fields.Float ( related='user_id.egy_nk_perc_111 , readonly=False )
+    egy_nk_perc_200 = fields.Float ( related='user_id.egy_nk_perc_200 , readonly=False )
+    egy_nk_perc_103 = fields.Float ( related='user_id.egy_nk_perc_103 , readonly=False )
 
     allowed_analytic_account_ids = fields.Many2many (
         'account.analytic.account' ,
