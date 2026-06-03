@@ -139,6 +139,14 @@ class ResCity ( models.Model ) :
     pub_loc903_perc_111 = fields.Float ( string="نسبة توزيع التوطين العام علي 111" , store=True , readonly=False )
     pub_loc903_perc_200 = fields.Float ( string="نسبة توزيع التوطين العام علي 200" , store=True , readonly=False )
     pub_loc903_perc_103 = fields.Float ( string="نسبة توزيع التوطين العام علي 103" , store=True , readonly=False )
+        # =====مكتب مصر =====
+    egy_nk_perc_101 = fields.Float ( string="نسبة توزيع مكتب مصر علي 101" , store=True , readonly=False )
+    egy_nk_perc_104 = fields.Float ( string="نسبة توزيع مكتب مصر علي 104" , store=True , readonly=False )
+    egy_nk_perc_110 = fields.Float ( string="نسبة توزيع مكتب مصر علي 110" , store=True , readonly=False )
+    egy_nk_perc_111 = fields.Float ( string="نسبة توزيع مكتب مصر علي 111" , store=True , readonly=False )
+    egy_nk_perc_200 = fields.Float ( string="نسبة توزيع مكتب مصر علي 200" , store=True , readonly=False )
+    egy_nk_perc_103 = fields.Float ( string="نسبة توزيع مكتب مصر علي 103" , store=True , readonly=False )
+   
 
     # 🔥 Constrain واحد فقط لكل المجموعات
     @api.constrains (
