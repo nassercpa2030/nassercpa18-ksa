@@ -9,11 +9,12 @@
                 <form string="Analytic Profit and Loss">
                     <sheet>
                         <group string="Report Filters">
-                            <group>
+                            <group  class="d-flex rounded overflow-hidden border" string="النســـب الموزعة" style="background-color:#f8d7da; padding:6px; border-radius:6px;">
                                 <field name="date_from"/>
                                 <field name="date_to"/>
                                 <!-- <field name="company_id" groups="base.group_multi_company"/> -->
                                 <!-- <field name="user_id" invisible="not group_code"/> -->
+                               
                                 <field name="finance923_perc_101"   invisible="group_code != '101'"/>
                                 <field name="finance923_perc_104"   invisible="group_code != '104'"/>
                                  <field name="finance923_perc_110"   invisible="group_code != '110'"/>
@@ -80,6 +81,7 @@
                                  <field name="egy_nk_perc_111" invisible="group_code != '111'"/>
                                  <field name="egy_nk_perc_200" invisible="group_code != '200'"/>
                                 <field name="egy_nk_perc_103" invisible="group_code != '103'"/>
+                                    
                             </group>
                             <group>
                                 <field name="allowed_analytic_plan_ids" invisible="1"/>
