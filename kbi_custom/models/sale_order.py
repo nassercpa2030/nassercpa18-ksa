@@ -95,7 +95,10 @@ class SaleOrder ( models.Model ) :
                                           searchable=True )
     paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" , sorted=True )
     finance_signiture = fields.Boolean ( string=' توقيع المالية للختم ' , readonly=False , store=True )
-    archive_signiture = fields.Boolean ( string='توقيع الأرشيف للختم ' , default=False , readonly=False , index=True )
+    archive_signiture = fields.Boolean ( string='توقيع الأرشيف للختم (مشـروع مكـتمل) ' , default=False ,
+                                         readonly=False , index=True )
+    archive_signiture_exception = fields.Boolean ( string='توقيع الأرشيف للختم (مستثني) ' , default=False ,
+                                                   readonly=False , index=True )
     manager_signiture = fields.Boolean ( string='توقيع مدير المجموعة للختم ' , default=False , readonly=False ,
                                          index=True )
     finance_assign = fields.Binary ( string=' ملف توقيع المالية  ' , default=False ,
@@ -117,7 +120,8 @@ class SaleOrder ( models.Model ) :
     # paid_percent = fields.Float(compute='_compute_payment_count')
     amount_due = fields.Float ( compute="_compute_payment_count" , string="Amount Due" , readonly=False )
     project_budget = fields.Float ( string='Project Budget' , copy=False )
-    project_name = fields.Char ( string='Auto Project Name(AR)' , compute="get_project_name" , readonly=False , store=True )
+    project_name = fields.Char ( string='Auto Project Name(AR)' , compute="get_project_name" , readonly=False ,
+                                 store=True )
     auto_contract_name = fields.Boolean ( string="Auto Name" , readonly=False , default=True )
     product_public_name = fields.Char ( string="Product Public Name" , compute="get_pr_nam_fr_service" , store=True ,
                                         readonly=False )
@@ -291,7 +295,6 @@ class SaleOrder ( models.Model ) :
         # ترجع الـ report action عشان أودو يفتح PDF
         return report.report_action ( self )
 
-
     def action_print_project_complete(self) :
         # إحنا هنا بنجيب التقرير بالـ ID مباشرة
         report = self.env['ir.actions.report'].browse ( 1673 )
@@ -300,9 +303,6 @@ class SaleOrder ( models.Model ) :
             raise ValueError ( "Report  of completing filewith ID 1673 not found!" )
         # ترجع الـ report action عشان أودو يفتح PDF
         return report.report_action ( self )
-
-
-
 
     def action_print_project_history(self) :
         # إحنا هنا بنجيب التقرير بالـ ID مباشرة
@@ -667,10 +667,14 @@ class SaleOrder ( models.Model ) :
             rec.id : rec.archive_signiture
             for rec in self
         }
+        old_archive_exception = {
+            rec.id : rec.archive_signiture_exception
+            for rec in self
+        }
 
         res = super ().write ( vals )
 
-        if 'archive_signiture' in vals :
+        if 'archive_signiture' in vals and not 'archive_signiture_exception' in vals :
 
             for sale_order in self :
                 if (
@@ -686,6 +690,23 @@ class SaleOrder ( models.Model ) :
                     } )
 
                     wizard.close_entry ()
+
+        elif not 'archive_signiture' in vals and  'archive_signiture_exception' in vals :
+
+            for sale_order in self :
+                if (
+                        not old_archive_exception[sale_order.id]
+                        and sale_order.archive_signiture_exception
+                ) :
+                    wizard = self.env['close.entry.wizard'].with_context (
+                        active_id=sale_order.id ,
+                        active_model='sale.order'
+                    ).create ( {
+                        'sale_order_id' : sale_order.id ,
+                        'journal_entry_date' : fields.Date.context_today ( self ) ,
+                    } )
+
+                    wizard.close_entry_deffered ()
 
         # self._get_mobile()
         # إعادة معالجة الملفات فقط إذا تم رفع جديد
@@ -1024,9 +1045,6 @@ class SaleOrder ( models.Model ) :
         }
 
 
-
-
-
 # @api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
 # def get_project_name(self) :
 # for rec in self :
@@ -1064,7 +1082,6 @@ class SaleOrder ( models.Model ) :
 # [('id', 'in', leads.ids)],
 # 'target': 'new',
 # }
-
 
 
 class SaleOrder2 ( models.Model ) :
