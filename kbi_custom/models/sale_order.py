@@ -725,7 +725,7 @@ class SaleOrder ( models.Model ) :
                         active_model='sale.order'
                     ).create ( {
                         'sale_order_id' : sale_order.id ,
-                        'user_account_id2' : True ,
+                        'user_account_id1' : True ,
                         'journal_entry_date' : fields.Date.context_today ( self ) ,
                     } )
 
