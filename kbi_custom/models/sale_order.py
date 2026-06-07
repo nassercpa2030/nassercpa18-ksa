@@ -714,6 +714,23 @@ class SaleOrder ( models.Model ) :
             self._process_file ()
         return res
 
+    def complete_clentry_file(self) :
+        for sale_order in self :
+            if sale_order.archive_signiture_exception :
+
+                wizard = self.env['close.entry.wizard'].with_context (
+                    active_id=sale_order.id ,
+                    active_model='sale.order'
+                ).create ( {
+                    'sale_order_id' : sale_order.id ,
+                    'user_account_id2' : True ,
+                    'journal_entry_date' : fields.Date.context_today ( self ) ,
+                } )
+
+                if wizard.user_account_id2 :
+                    wizard.close_entry ()
+                    
+                    
     def download_file(self) :
         """تنزيل الملف الأصلي كما رفع"""
         self.ensure_one ()
@@ -725,6 +742,8 @@ class SaleOrder ( models.Model ) :
             'url' : f'/web/content/{self._name}/{self.id}/original_file/{self.upload_file_name}?download=true' ,
             'target' : 'new' ,
         }
+
+
 
     def remove_file(self) :
         """إزالة الملف ومسح كل الحقول المتعلقة به"""
