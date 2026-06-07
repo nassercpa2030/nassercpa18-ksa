@@ -99,8 +99,8 @@ class SaleOrder ( models.Model ) :
                                          readonly=False , index=True )
     archive_signiture_exception = fields.Boolean ( string='توقيع الأرشيف للختم (مستثني) ' , default=False ,
                                                    readonly=False , index=True )
-    manager_signiture = fields.Boolean ( string='توقيع مدير المجموعة للختم ' , default=False , readonly=False ,
-                                         index=True )
+    archive_signiture_exception_complete = fields.Boolean ( string=' توقيع الأرشيف بإكتمال الملف (المستثني) ' ,
+                                                            default=False , readonly=False ,index=True )
     finance_assign = fields.Binary ( string=' ملف توقيع المالية  ' , default=False ,
                                      compute="_compute_finance_archive_signature" , store=False , readonly=False )
     archive_assign = fields.Binary ( string=' ملف توقيع الأرشيف ' , default=False ,
@@ -671,6 +671,10 @@ class SaleOrder ( models.Model ) :
             rec.id : rec.archive_signiture_exception
             for rec in self
         }
+        old_archive_exception_complete = {
+            rec.id : rec.archive_signiture_exception_complete
+            for rec in self
+        }
 
         res = super ().write ( vals )
 
@@ -691,7 +695,7 @@ class SaleOrder ( models.Model ) :
 
                     wizard.close_entry ()
 
-        elif not 'archive_signiture' in vals and  'archive_signiture_exception' in vals :
+        elif not 'archive_signiture' in vals and 'archive_signiture_exception' in vals :
 
             for sale_order in self :
                 if (
@@ -708,29 +712,48 @@ class SaleOrder ( models.Model ) :
 
                     wizard.close_entry_deffered ()
 
+        elif 'archive_signiture_exception_complete' in vals :
+
+            for sale_order in self :
+                if (
+                        not old_archive_exception_complete[sale_order.id]
+                        and sale_order.archive_signiture_exception_complete
+                ) :
+                    wizard = self.env['close.entry.wizard'].with_context (
+                        active_id=sale_order.id ,
+                        
+                        active_model='sale.order'
+                    ).create ( {
+                        'sale_order_id' : sale_order.id ,
+                        'user_account_id2' : True ,
+                        'journal_entry_date' : fields.Date.context_today ( self ) ,
+                    } )
+
+                    wizard.close_entry()
+                    
+
         # self._get_mobile()
         # إعادة معالجة الملفات فقط إذا تم رفع جديد
         if 'upload_file' in vals and vals['upload_file'] :
             self._process_file ()
         return res
 
-    def complete_clentry_file(self) :
-        for sale_order in self :
-            if sale_order.archive_signiture_exception :
+    # def complete_clentry_file(self) :
+    #     for sale_order in self :
+    #         if sale_order.archive_signiture_exception_complete :
+    # 
+    #             wizard = self.env['close.entry.wizard'].with_context (
+    #                 active_id=sale_order.id ,
+    #                 active_model='sale.order'
+    #             ).create ( {
+    #                 'sale_order_id' : sale_order.id ,
+    #                 'user_account_id2' : True ,
+    #                 'journal_entry_date' : fields.Date.context_today ( self ) ,
+    #             } )
+    # 
+    #             if wizard.user_account_id2 :
+    #                 wizard.close_entry ()
 
-                wizard = self.env['close.entry.wizard'].with_context (
-                    active_id=sale_order.id ,
-                    active_model='sale.order'
-                ).create ( {
-                    'sale_order_id' : sale_order.id ,
-                    'user_account_id2' : True ,
-                    'journal_entry_date' : fields.Date.context_today ( self ) ,
-                } )
-
-                if wizard.user_account_id2 :
-                    wizard.close_entry ()
-                    
-                    
     def download_file(self) :
         """تنزيل الملف الأصلي كما رفع"""
         self.ensure_one ()
@@ -742,8 +765,6 @@ class SaleOrder ( models.Model ) :
             'url' : f'/web/content/{self._name}/{self.id}/original_file/{self.upload_file_name}?download=true' ,
             'target' : 'new' ,
         }
-
-
 
     def remove_file(self) :
         """إزالة الملف ومسح كل الحقول المتعلقة به"""
