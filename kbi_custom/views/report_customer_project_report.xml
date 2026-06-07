@@ -361,7 +361,7 @@
                                     <tr>
                                      
                                         <td style="text-align:center;"><strong> توقيع مدير المجموعة</strong></td>
-                                           <td style="text-align:center;">    <strong> توقيع الأرشيف<br/> <span t-if="o.archive_signiture or o.archive_signiture_exception_complete">[تم إستيفاء المستندات]</span> <span t-if="o.archive_signiture_exception and not o.archive_signiture">[ملــف مستثـــي غيــر مستــوفي المستــندات]</span></strong></td>
+                                           <td style="text-align:center;">    <strong> توقيع الأرشيف<br/> <span t-if="o.archive_signiture or o.archive_signiture_exception_complete">[تم إستيفاء المستندات]</span> <span t-if="o.archive_signiture_exception and not o.archive_signiture and not o.archive_signiture_exception_complete">[ملــف مستثـــي غيــر مستــوفي المستــندات]</span></strong></td>
                                         <td style="text-align:center;"><strong> توقيع مدير المالية</strong></td>
                                     </tr>
                                     <tr>
