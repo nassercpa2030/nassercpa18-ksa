@@ -99,6 +99,8 @@ class SaleOrder ( models.Model ) :
                                          readonly=False , index=True )
     archive_signiture_exception = fields.Boolean ( string='توقيع الأرشيف للختم (مستثني) ' , default=False ,
                                                    readonly=False , index=True )
+    approve_finance_exception = fields.Boolean ( string='تأكيــد المالية بتوقيع نمــوذج الإستكمال(مستثني) ' , default=False ,
+                                                   readonly=False , index=True )
     archive_signiture_exception_complete = fields.Boolean ( string=' توقيع الأرشيف بإكتمال الملف (المستثني) ' ,
                                                             default=False , readonly=False ,index=True )
     finance_assign = fields.Binary ( string=' ملف توقيع المالية  ' , default=False ,
@@ -1202,7 +1204,7 @@ class SaleOrder2 ( models.Model ) :
     def _compute_final_close_entry_date(self) :
         for order in self :
             # تنظيف الاسم من مسافات إضافية وتحويله لأحرف صغيرة
-            order_name_clean = (order.name or '').strip ().lower ()
+            order_name_clean = (order.name or '').strip()
 
             # البحث عن أول قيد مرتبط بالـ Sale Order
             move = self.env['account.move'].search ( [
