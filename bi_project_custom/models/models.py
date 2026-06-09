@@ -381,12 +381,12 @@ class SaleOrder ( models.Model ) :
     first_line_taxes = fields.Float (
         string="First Line Taxe" ,
         compute="_compute_second_line_name" ,
-        store=True
+        readonly=False
     )
     second_line_taxes = fields.Float (
         string="Second Line Taxe" ,
         compute="_compute_second_line_name" ,
-        store=True
+       readonly=False
     )
     invoice_attachements_ids = fields.Many2many ( 'ir.attachment' , 'sale_order_invoice_attachment_rel' ,
                                                   'sale_order_id' , 'attachment_id' , string='Invoice Attachments' ,
@@ -602,17 +602,14 @@ class SaleOrder ( models.Model ) :
                 order.first_line_taxed = order.order_line[0].price_total
                 order.first_line_untaxed = order.order_line[0].price_subtotal
                 order.first_line_taxes = round(order.order_line[0].price_tax, 2)
-
-            else :
-                order.first_line_name = False
-
-            if len ( order.order_line ) >= 2 :
                 order.second_line_name = order.order_line[1].product_id.name
                 # order.second_line_name = order.order_line[1].name
                 order.second_line_taxed = order.order_line[1].price_total
                 order.second_line_untaxed = order.order_line[1].price_subtotal
                 order.second_line_taxes = round(order.order_line[1].price_tax, 2)
+
             else :
+                order.first_line_name = False
                 order.second_line_name = False
 
     def _compute_journal_entry_data(self) :
