@@ -110,7 +110,7 @@
     <div class="p-2 text-center"
          style="flex:1; background:#ffffff;">
         <div class="mt-1">
-                          <button name="action_preview_dvided_qweb_report" type="object" string="طباعة الخطط الموزعة " class="btn-primary" icon="fa-share-alt" groups="base.group_system,104__team.shaker"/>
+                          <button name="action_preview_dvided_qweb_report" type="object" string="طباعة الخطط الموزعة " class="btn-primary" icon="fa-share-alt" groups="base.group_system"/>
                <!-- <button name="action_preview_dvided_qweb_report" type="object" string="طباعة الخطط الموزعة " class="btn-primary" icon="fa-sitemap" groups="base.group_system,104__team.shaker"/> -->
 
         </div>
@@ -121,7 +121,7 @@
                                 <field name="show_details"  widget="boolean_toggle" style="background-color:#d1ecf1; padding:6px; border-radius:6px;" string="عــرض تفاصيـل القــيود" groups="base.group_system,104__team.shaker"/>
                                 <!-- <field name="show_divided"   widget="boolean-toggle" groups="base.group_system,104__team.shaker"/> -->
                        
-                                 <field name="level" string="مستوي التقرير" style="background-color:#fff3e0; padding:6px; border-radius:6px; margin-bottom:5px;" groups="base.group_system,104__team.shaker"/>
+                                 <field name="level" string="مستوي التقرير" style="background-color:#fff3e0; padding:6px; border-radius:6px; margin-bottom:5px;" />
                               
                                     <!-- <field name="show_divided" widget="boolean_toggle" style="background-color:#d1ecf1; padding:6px; border-radius:6px;" groups="base.group_system,104__team.shaker"/> -->
 
@@ -264,12 +264,28 @@
             <field name="view_mode">form</field>
             <field name="target">new</field>
         </record>
+        <!-- للـ System Administrator -->
+<menuitem id="menu_kbi_analytic_profit_loss_admin"
+          name="تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة"
+          parent="account.menu_finance_reports"
+          action="action_kbi_analytic_profit_loss_wizard"
+          sequence="90"
+          groups="base.group_system"/>
 
-        <menuitem id="menu_kbi_analytic_profit_loss"
+<!-- لباقي المستخدمين -->
+<menuitem id="menu_kbi_analytic_profit_loss_user"
+          name="تقــرير الربــح والخــسارة غيــر شــامل المــبالغ المــوزعة"
+          parent="account.menu_finance_reports"
+          action="action_kbi_analytic_profit_loss_wizard"
+          sequence="91"
+    groups="stock.group_tracking_owner"/>
+        
+
+        <!-- <menuitem id="menu_kbi_analytic_profit_loss"
                   name="تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة"
                   parent="account.menu_finance_reports"
                   action="action_kbi_analytic_profit_loss_wizard"
-                  sequence="90"/>
+                  sequence="90"/> -->
 
     </data>
 </odoo>
