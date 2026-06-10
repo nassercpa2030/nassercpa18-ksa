@@ -195,23 +195,16 @@
                                     &amp;nbsp; | &amp;nbsp;
 
                                     <strong>من:</strong>
-                                    <t t-if="doc.analytic_plan_ids and len(doc.analytic_plan_ids) &gt; 0">
-                                      <span t-esc="'01/10/2025'"/>
-                                    </t>
-                                    <t t-else="">
+                                 
                                       <span t-field="doc.date_from"/>
-                                    </t>
+                                   
                                     <!-- <span t-field="doc.date_from"/> -->
 
                                     &amp;nbsp; | &amp;nbsp;
 
                                     <strong>إلى:</strong>
-                                    <t t-if="doc.analytic_plan_ids and len(doc.analytic_plan_ids) &gt; 0">
-                                      <span t-esc="'30/09/2026'"/>
-                                    </t>
-                                    <t t-else="">
+
                                       <span t-field="doc.date_to"/>
-                                    </t>
                                     
                                     <!-- <span t-field="doc.date_to"/> -->
                                     
