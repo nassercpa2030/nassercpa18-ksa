@@ -275,7 +275,7 @@
 
 <!-- للـ System Administrator -->
 <menuitem id="menu_kbi_analytic_profit_loss_admin"
-          name="تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة"
+          name="تقــاريــر الربــح والخــسارة شــامل وغيـــر شــامل المــبالغ المــوزعة"
           parent="account.menu_finance_reports"
           action="action_kbi_analytic_profit_loss_wizard_admin"
           sequence="90"
