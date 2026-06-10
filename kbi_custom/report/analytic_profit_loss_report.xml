@@ -161,7 +161,16 @@
 
                             <div class="kbi-report-card">
                                 <div class="kbi-title">
-                                    <h1>تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة</h1>
+                                    <!-- <h1>تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة</h1> -->
+                                <h1 invisible="group_code">
+                                        تقــرير الربــح والخــسارة غير شــامل المــبالغ المــوزعة
+                                </h1>
+
+                                 <h1 invisible="not group_code">
+                                      تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة
+                                  </h1>
+                                    
+                                    
                                     <div class="kbi-subtitle"><h2>Profit and Loss Report Including Allocated Amounts</h2></div>
                                 </div>
                                 <!-- FILTERS -->
