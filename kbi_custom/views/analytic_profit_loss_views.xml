@@ -257,18 +257,27 @@
                 </pivot>
             </field>
         </record>
+        <!-- Action للـ Admin -->
+<record id="action_kbi_analytic_profit_loss_wizard_admin" model="ir.actions.act_window">
+    <field name="name">تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة</field>
+    <field name="res_model">kbi.analytic.profit.loss.wizard</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+</record>
 
-        <record id="action_kbi_analytic_profit_loss_wizard" model="ir.actions.act_window">
-            <field name="name">Analytic Profit and Loss</field>
-            <field name="res_model">kbi.analytic.profit.loss.wizard</field>
-            <field name="view_mode">form</field>
-            <field name="target">new</field>
-        </record>
-        <!-- للـ System Administrator -->
+<!-- Action للمستخدم العادي -->
+<record id="action_kbi_analytic_profit_loss_wizard_user" model="ir.actions.act_window">
+    <field name="name">تقــرير الربــح والخــسارة غيــر شــامل المــبالغ المــوزعة</field>
+    <field name="res_model">kbi.analytic.profit.loss.wizard</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+</record>
+
+<!-- للـ System Administrator -->
 <menuitem id="menu_kbi_analytic_profit_loss_admin"
           name="تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة"
           parent="account.menu_finance_reports"
-          action="action_kbi_analytic_profit_loss_wizard"
+          action="action_kbi_analytic_profit_loss_wizard_admin"
           sequence="90"
           groups="base.group_system"/>
 
@@ -276,10 +285,16 @@
 <menuitem id="menu_kbi_analytic_profit_loss_user"
           name="تقــرير الربــح والخــسارة غيــر شــامل المــبالغ المــوزعة"
           parent="account.menu_finance_reports"
-          action="action_kbi_analytic_profit_loss_wizard"
+          action="action_kbi_analytic_profit_loss_wizard_user"
           sequence="91"
-    groups="stock.group_tracking_owner"/>
-        
+          groups="stock.group_tracking_owner"/>
+
+        <!-- <record id="action_kbi_analytic_profit_loss_wizard" model="ir.actions.act_window">
+            <field name="name">Analytic Profit and Loss</field>
+            <field name="res_model">kbi.analytic.profit.loss.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record> -->
 
         <!-- <menuitem id="menu_kbi_analytic_profit_loss"
                   name="تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة"
