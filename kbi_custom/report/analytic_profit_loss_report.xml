@@ -160,14 +160,14 @@
                             </style>
 
                             <div class="kbi-report-card">
-                               <t t-if="group_code in ['101','103','104','110','111','200']">
+<t t-if="group_code">
     <h1 class="kbi-title">تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة</h1>
     <div class="kbi-subtitle">
         <h2>Profit and Loss Report Including Allocated Amounts</h2>
     </div>
 </t>
 
-<t t-if="group_code not in ['101','103','104','110','111','200']">
+<t t-else="">
     <h1 class="kbi-title">تقــرير الربــح والخــسارة غير شــامل المــبالغ المــوزعة</h1>
     <div class="kbi-subtitle">
         <h2>Profit and Loss Report Excluding Allocated Amounts</h2>
