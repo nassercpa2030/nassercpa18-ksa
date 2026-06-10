@@ -172,7 +172,7 @@
     <div class="kbi-subtitle">
         <h2>Profit and Loss Report Excluding Allocated Amounts</h2>
     </div>
-    <div style="
+<div style="
     background-color: #fff3cd;
     padding: 10px 15px;
     margin-top: 10px;
@@ -181,10 +181,13 @@
     font-size: 13px;
 ">
 
-    <strong style="color: #dc3545;">ملحوظة هامة:</strong>
-    <span style="color: #000;">
+    <h2 style="color: #dc3545; margin: 0;">
+        ملحوظة هامة:
+    </h2>
+
+    <h2 style="color: #000; margin: 5px 0 0 0; font-weight: normal;">
         للحصول على المبالغ الموزعة راجع الإدارة المالية
-    </span>
+    </h2>
 
 </div>
 </t>
