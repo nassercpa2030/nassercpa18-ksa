@@ -160,19 +160,19 @@
                             </style>
 
                             <div class="kbi-report-card">
-                                <div invisible="group_code in ['101','103','104','110','111','200']">
-    <h1 class="kbi-title" >تقــرير الربــح والخــسارة غير شــامل المــبالغ المــوزعة</h1>
-    <div class="kbi-subtitle">
-        <h2>Profit and Loss Report Excluding Allocated Amounts</h2>
-    </div>
-</div>
-
-<div invisible="group_code not in ['101','103','104','110','111','200']">
+                               <t t-if="group_code in ['101','103','104','110','111','200']">
     <h1 class="kbi-title">تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة</h1>
     <div class="kbi-subtitle">
         <h2>Profit and Loss Report Including Allocated Amounts</h2>
     </div>
-</div>
+</t>
+
+<t t-if="group_code not in ['101','103','104','110','111','200']">
+    <h1 class="kbi-title">تقــرير الربــح والخــسارة غير شــامل المــبالغ المــوزعة</h1>
+    <div class="kbi-subtitle">
+        <h2>Profit and Loss Report Excluding Allocated Amounts</h2>
+    </div>
+</t>
                                 <!-- <div class="kbi-title">
                                     <h1>تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة</h1> 
                             <h1 invisible="group_code != False and group_code != ''">
