@@ -687,6 +687,7 @@ class SaleOrder ( models.Model ) :
                         not old_archive[sale_order.id]
                         and sale_order.archive_signiture
                 ) :
+                    sale_order.project_ids.stage_id = 24
                     wizard = self.env['close.entry.wizard'].with_context (
                         active_id=sale_order.id ,
                         active_model='sale.order'
