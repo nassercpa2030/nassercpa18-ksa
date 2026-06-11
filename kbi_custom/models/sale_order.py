@@ -134,7 +134,7 @@ class SaleOrder ( models.Model ) :
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
                                             domain="[('plan_id', '=', project_type_id)]" ,
                                             compute='_compute_analytic_account_id' , readonly=False , store=True )
-    analytic_account_id_assigned = fields.Many2one ( 'account.analytic.plan',related='review_manager_id.analytic_plan',store=False)
+    # analytic_account_id_assigned = fields.Many2one ( 'account.analytic.plan',related='review_manager_id.analytic_plan',store=False)
     approve_uid = fields.Many2one ( 'res.users' , string='Approve User' , )
     approve_date = fields.Datetime ( string='Approve Date' )
     reject_reason = fields.Text ( string='Reject Reason' )
@@ -1043,17 +1043,16 @@ class SaleOrder ( models.Model ) :
     # rec.analytic_account_id = False
     # else :
     # rec.analytic_account_id = False
-    # def _compute_analytic_account_id_assigned(self):
-    #     for rec in self :
-    #         if rec.review_manager_id and rec.review_manager_id.plan_id :
-    #            name_base = account.analytic_account_id.name
-
-    #            assigned_account = self.env['account.analytic.account'].search ( [('name' , 'ilike' , name_base) ,
-    #            ('plan_id' , '=' , rec.review_manager_id.plan_id) ,] , limit=1 )
-
-    #            rec.analytic_account_id_assigned = assigned_account.id
-    #         else:
-    #             rec.analytic_account_id_assigned = False
+    analytic_account_id_assigned = fields.Many2one ('account.analytic.account',string=" Assigned Analytic Account" ,compute='_compute_analytic_account_id_assigned', readonly=False , store=True)
+    def _compute_analytic_account_id_assigned(self):
+        for rec in self :
+            if rec.review_manager_id and rec.review_manager_id.plan_id :
+               name_base = account.analytic_account_id.name
+               assigned_account = self.env['account.analytic.account'].search ( [('name' , 'ilike' , name_base) ,
+               ('plan_id' , '=' , rec.review_manager_id.analytic_plan) ,] , limit=1 )
+               rec.analytic_account_id_assigned = assigned_account.id
+            else:
+                rec.analytic_account_id_assigned = False
 
 
 
