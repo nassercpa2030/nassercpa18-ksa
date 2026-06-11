@@ -1049,33 +1049,22 @@ class SaleOrder ( models.Model ) :
         compute='_compute_analytic_account_id_assigned' ,
         store=True ,
         readonly=False ,
-        domain="[('plan_id', '=', review_manager_id.analytic_plan)]" ,
     )
 
-    @api.depends (
-        'analytic_account_id' ,
-        'review_manager_id' ,
-        'review_manager_id.analytic_plan' ,
-    )
-    def _compute_analytic_account_id_assigned(self) :
-        Analytic = self.env['account.analytic.account']
+    @api.onchange ( 'review_manager_id' )
+    def _onchange_review_manager_id(self) :
+        domain = []
 
-        for rec in self :
-            rec.analytic_account_id_assigned = False
+        if self.review_manager_id and self.review_manager_id.analytic_plan :
+            domain = [
+                ('plan_id' , '=' , self.review_manager_id.analytic_plan.id)
+            ]
 
-            if (
-                    rec.analytic_account_id
-                    and rec.review_manager_id
-                    and rec.review_manager_id.analytic_plan
-            ) :
-                rec.analytic_account_id_assigned = Analytic.search (
-                    [
-                        ('plan_id' , '=' , rec.review_manager_id.analytic_plan.id) ,
-                        ('name' , '=' , rec.analytic_account_id.name) ,
-                    ] ,
-                    limit=1 ,
-                )
-
+        return {
+            'domain' : {
+                'analytic_account_id_assigned' : domain
+            }
+        }
 
     # @api.depends ( 'project_type_id' , 'order_line' , 'review_manager_id' )
     # @api.onchange ( 'project_type_id' , 'order_line' , 'review_manager_id' )
