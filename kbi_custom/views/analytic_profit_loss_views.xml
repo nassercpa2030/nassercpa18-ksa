@@ -104,7 +104,7 @@
        decoration-warning="group_code == '110'"
        decoration-muted="group_code == '111'"
        decoration-danger="group_code == '200'"
-       decoration-bf="group_code != False " groups="base.group_system,104__team.shaker"/>
+       decoration-bf="group_code != False " groups="base.group_system"/>
     </div>
 
     <div class="p-2 text-center"
