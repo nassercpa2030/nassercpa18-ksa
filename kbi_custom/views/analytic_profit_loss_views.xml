@@ -10,8 +10,8 @@
                     <sheet>
                         <group string="Report Filters">
                             <group  >
-                                <field name="date_from"/>
-                                <field name="date_to"/>
+                              <field name="date_from" default="2025-10-01"/>
+                              <field name="date_to" default="2026-09-30"/>
                                 <!-- <field name="company_id" groups="base.group_multi_company"/> -->
                                 <field name="user_id"  invisible="1"/>
                            
