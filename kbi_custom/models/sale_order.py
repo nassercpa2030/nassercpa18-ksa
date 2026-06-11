@@ -134,7 +134,7 @@ class SaleOrder ( models.Model ) :
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
                                             domain="[('plan_id', '=', project_type_id)]" ,
                                             compute='_compute_analytic_account_id' , readonly=False , store=True )
-    analytic_account_id_assigned = fields.Many2one ( 'account.analytic.plan',related='review_manager_id.plan_id',store=False)
+    analytic_account_id_assigned = fields.Many2one ( 'account.analytic.plan',related='review_manager_id.analytic_plan',store=False)
     approve_uid = fields.Many2one ( 'res.users' , string='Approve User' , )
     approve_date = fields.Datetime ( string='Approve Date' )
     reject_reason = fields.Text ( string='Reject Reason' )
