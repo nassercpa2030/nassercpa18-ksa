@@ -162,7 +162,7 @@ class KBIAnalyticProfitLossWizard ( models.TransientModel ) :
     def _default_analytic_plans(self) :
         if (
                 self.env.user.has_group ( 'base.group_system' )
-                or self.env.user.has_group ( '104__team.shaker' )
+                #or self.env.user.has_group ( '104__team.shaker' )
         ) :
             return self.env['account.analytic.plan'].search ( [
                 ('id' , 'in' , [82 , 83 , 84 , 85 , 87 , 88 , 89])
