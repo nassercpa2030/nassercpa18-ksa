@@ -1043,28 +1043,26 @@ class SaleOrder ( models.Model ) :
     # rec.analytic_account_id = False
     # else :
     # rec.analytic_account_id = False
+    analytic_plan_id = fields.Many2one (
+        'account.analytic.plan' ,
+        compute='_compute_analytic_plan_id' ,
+        store=False ,
+    )
+
+    @api.depends ( 'review_manager_id' )
+    def _compute_analytic_plan_id(self) :
+        for rec in self :
+            rec.analytic_plan_id = rec.review_manager_id.analytic_plan
+            
+
     analytic_account_id_assigned = fields.Many2one (
         'account.analytic.account' ,
         string='Assigned Analytic Account' ,
         compute='_compute_analytic_account_id_assigned' ,
         store=True ,
         readonly=False ,
+        domain="[('plan_id', '=', analytic_plan_id)]" ,
     )
-
-    @api.onchange ( 'review_manager_id' )
-    def _onchange_review_manager_id(self) :
-        domain = []
-
-        if self.review_manager_id and self.review_manager_id.analytic_plan :
-            domain = [
-                ('plan_id' , '=' , self.review_manager_id.analytic_plan.id)
-            ]
-
-        return {
-            'domain' : {
-                'analytic_account_id_assigned' : domain
-            }
-        }
 
     # @api.depends ( 'project_type_id' , 'order_line' , 'review_manager_id' )
     # @api.onchange ( 'project_type_id' , 'order_line' , 'review_manager_id' )
