@@ -1043,37 +1043,38 @@ class SaleOrder ( models.Model ) :
     # rec.analytic_account_id = False
     # else :
     # rec.analytic_account_id = False
-    analytic_account_id_assigned = fields.Char (
-        string="Assigned Analytic Account" ,
+    analytic_account_id_assigned = fields.Many2one (
+        'account.analytic.account' ,
+        string='Assigned Analytic Account' ,
         compute='_compute_analytic_account_id_assigned' ,
         store=True ,
-        readonly=False
     )
 
     @api.depends (
         'analytic_account_id' ,
         'review_manager_id' ,
-        'review_manager_id.analytic_plan'
+        'review_manager_id.analytic_plan' ,
     )
     def _compute_analytic_account_id_assigned(self) :
+        Analytic = self.env['account.analytic.account']
+
         for rec in self :
             rec.analytic_account_id_assigned = False
 
-            if (
+            if not (
                     rec.analytic_account_id
                     and rec.review_manager_id
                     and rec.review_manager_id.analytic_plan
             ) :
-                assigned_account = self.env['account.analytic.account'].search (
-                    [
-                        ('name' , 'ilike' , rec.analytic_account_id.name) ,
-                        ('plan_id' , '=' , rec.review_manager_id.analytic_plan.id) ,
-                    ] ,
-                    limit=1
-                )
+                continue
 
-                rec.analytic_account_id_assigned = assigned_account.name if assigned_account else False
-
+            rec.analytic_account_id_assigned = Analytic.search (
+                [
+                    ('name' , '=' , rec.analytic_account_id.name) ,
+                    ('plan_id' , '=' , rec.review_manager_id.analytic_plan.id) ,
+                ] ,
+                limit=1 ,
+            )
 
 
     # @api.depends ( 'project_type_id' , 'order_line' , 'review_manager_id' )
