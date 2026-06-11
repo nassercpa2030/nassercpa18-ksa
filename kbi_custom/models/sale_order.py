@@ -43,6 +43,7 @@ class SaleOrder ( models.Model ) :
     image_one_audit = fields.Binary ( string="صورة ميل ون أودت" , stored=True )
     project_file_state_test = fields.Char ( "Project File State Demo" , readonly=False , required=False , store=True )
     project_stage_test = fields.Char ( "Project Stage Demo" , readonly=False , required=False , store=True )
+    political_kyan = fields.Char ( "الكـــــيان القـــــانونـي" , readonly=False , required=True , store=True )
 
     # first_payment_test2 = fields.Boolean ( string="first Payment amount test" , readonly=False , required=False , store=True )
 
