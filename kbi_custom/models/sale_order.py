@@ -1048,6 +1048,8 @@ class SaleOrder ( models.Model ) :
         string='Assigned Analytic Account' ,
         compute='_compute_analytic_account_id_assigned' ,
         store=True ,
+        readonly=False ,
+        domain="[('plan_id', '=', review_manager_id.analytic_plan)]" ,
     )
 
     @api.depends (
@@ -1061,20 +1063,18 @@ class SaleOrder ( models.Model ) :
         for rec in self :
             rec.analytic_account_id_assigned = False
 
-            if not (
+            if (
                     rec.analytic_account_id
                     and rec.review_manager_id
                     and rec.review_manager_id.analytic_plan
             ) :
-                continue
-
-            rec.analytic_account_id_assigned = Analytic.search (
-                [
-                    ('name' , '=' , rec.analytic_account_id.name) ,
-                    ('plan_id' , '=' , rec.review_manager_id.analytic_plan.id) ,
-                ] ,
-                limit=1 ,
-            )
+                rec.analytic_account_id_assigned = Analytic.search (
+                    [
+                        ('plan_id' , '=' , rec.review_manager_id.analytic_plan.id) ,
+                        ('name' , '=' , rec.analytic_account_id.name) ,
+                    ] ,
+                    limit=1 ,
+                )
 
 
     # @api.depends ( 'project_type_id' , 'order_line' , 'review_manager_id' )
