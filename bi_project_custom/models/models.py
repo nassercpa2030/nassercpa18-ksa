@@ -602,7 +602,7 @@ class SaleOrder ( models.Model ) :
                 order.first_line_taxed = order.order_line[0].price_total
                 order.first_line_untaxed = order.order_line[0].price_subtotal
                 order.first_line_taxes = round(order.order_line[0].price_tax, 2)
-           else:
+            else:
                 order.first_line_name = False
                 order.first_line_taxed = False
                 order.first_line_untaxed = False
