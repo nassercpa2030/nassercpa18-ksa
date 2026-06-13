@@ -609,7 +609,7 @@ class SaleOrder ( models.Model ) :
                 order.first_line_taxes = False
 
           ####### second line############
-           if len(order.order_line) >= 2:    
+            if len(order.order_line) >= 2:    
                 order.second_line_name = order.order_line[1].product_id.name
                 # order.second_line_name = order.order_line[1].name
                 order.second_line_taxed = order.order_line[1].price_total
