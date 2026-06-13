@@ -602,15 +602,24 @@ class SaleOrder ( models.Model ) :
                 order.first_line_taxed = order.order_line[0].price_total
                 order.first_line_untaxed = order.order_line[0].price_subtotal
                 order.first_line_taxes = round(order.order_line[0].price_tax, 2)
+           else:
+                order.first_line_name = False
+                order.first_line_taxed = False
+                order.first_line_untaxed = False
+                order.first_line_taxes = False
+
+          ####### second line############
+           if len(lines) >= 2:    
                 order.second_line_name = order.order_line[1].product_id.name
                 # order.second_line_name = order.order_line[1].name
                 order.second_line_taxed = order.order_line[1].price_total
                 order.second_line_untaxed = order.order_line[1].price_subtotal
                 order.second_line_taxes = round(order.order_line[1].price_tax, 2)
-
             else :
-                order.first_line_name = False
                 order.second_line_name = False
+                order.second_line_taxed = False
+                order.second_line_untaxed = False
+                order.second_line_taxes = False
 
     def _compute_journal_entry_data(self) :
         for date in self :
