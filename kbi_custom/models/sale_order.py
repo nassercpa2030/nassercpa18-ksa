@@ -130,10 +130,9 @@ class SaleOrder ( models.Model ) :
                                         readonly=False )
     project_code = fields.Char ( string='Project Code' , related="auto_code" )
     contract_signature = fields.Boolean ( "Contract Signature" )
-    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
+    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' ,compute='_compute_analytic_plan_id' ,store=False  )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
-                                            domain="[('plan_id', '=', project_type_id)]" ,
-                                            compute='_compute_analytic_account_id' , readonly=False ,  required=True,store=True )
+                                            domain="[('plan_id', '=', project_type_id)]" ,readonly=False ,  required=True,store=True )
     # analytic_account_id_assigned = fields.Many2one ( 'account.analytic.plan',related='review_manager_id.analytic_plan',store=False)
     approve_uid = fields.Many2one ( 'res.users' , string='Approve User' , )
     approve_date = fields.Datetime ( string='Approve Date' )
@@ -1050,11 +1049,12 @@ class SaleOrder ( models.Model ) :
         store=False ,
     )
 
-    @api.depends ( 'review_manager_id' )
+    @api.depends ( 'review_manager_id',user_id )
     def _compute_analytic_plan_id(self) :
         for rec in self :
             rec.analytic_plan_id = rec.review_manager_id.analytic_plan
-            
+            rec.project_type_id = rec.user_id.analytic_plan_ids
+
 
     analytic_account_id_assigned = fields.Many2one (
         'account.analytic.account' ,
@@ -1212,7 +1212,7 @@ class SaleOrder2 ( models.Model ) :
     # project_code = fields.Char ( string='Project Code' )
     # invoice_count=fields.Integer(string="",store=True,readonly=False)
     contract_signature = fields.Boolean ( "Contract Signature" )
-    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
+    #project_type_id = fields.Many2one ( 'account.analytic.plan' , compute='_compute_analytic_plan_id' ,string='Company Type' )
     # analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
     #                                        domain="[('plan_id', '=', project_type_id)]" ,
     #                                        compute='_compute_analytic_account_id_assigned' , readonly=False , store=True )
