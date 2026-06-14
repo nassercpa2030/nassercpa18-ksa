@@ -1049,7 +1049,7 @@ class SaleOrder ( models.Model ) :
         store=False ,
     )
 
-    @api.depends ( 'review_manager_id',user_id )
+    @api.depends ( 'review_manager_id','user_id' )
     def _compute_analytic_plan_id(self) :
         for rec in self :
             rec.analytic_plan_id = rec.review_manager_id.analytic_plan
@@ -1059,7 +1059,7 @@ class SaleOrder ( models.Model ) :
     analytic_account_id_assigned = fields.Many2one (
         'account.analytic.account' ,
         string='Assigned Analytic Account' ,
-        compute='_compute_analytic_account_id_assigned' ,
+        #compute='_compute_analytic_account_id_assigned' ,
         store=True ,
         readonly=False ,
         domain="[('plan_id', '=', analytic_plan_id)]" ,
