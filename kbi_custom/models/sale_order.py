@@ -130,7 +130,7 @@ class SaleOrder ( models.Model ) :
                                         readonly=False )
     project_code = fields.Char ( string='Project Code' , related="auto_code" )
     contract_signature = fields.Boolean ( "Contract Signature" )
-    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Project Analtic Plan' ,compute='_compute_analytic_plan_default_id' ,readonly=False  )
+    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Project Analytic Plan' ,compute='_compute_analytic_plan_default_id' ,readonly=False  )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
                                             domain="[('plan_id', '=', project_type_id)]" ,readonly=False ,  required=True,store=True )
     # analytic_account_id_assigned = fields.Many2one ( 'account.analytic.plan',related='review_manager_id.analytic_plan',store=False)
