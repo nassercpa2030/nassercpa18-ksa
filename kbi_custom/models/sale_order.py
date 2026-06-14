@@ -43,7 +43,7 @@ class SaleOrder ( models.Model ) :
     image_one_audit = fields.Binary ( string="صورة ميل ون أودت" , stored=True )
     project_file_state_test = fields.Char ( "Project File State Demo" , readonly=False , required=False , store=True )
     project_stage_test = fields.Char ( "Project Stage Demo" , readonly=False , required=False , store=True )
-    political_kyan = fields.Char ( "الكـــــيان القـــــانونـي" , readonly=False , required=True , store=True )
+
 
     # first_payment_test2 = fields.Boolean ( string="first Payment amount test" , readonly=False , required=False , store=True )
 
@@ -142,6 +142,7 @@ class SaleOrder ( models.Model ) :
                                   domain="[('is_broker', '=', True)]" )
     number_700_sale = fields.Char ( related='partner_id.number_700' , string="(700) الرقم الموحد" , readonly=False ,
                                     required=True , store=True )
+    political_kyan = fields.Selection (  related='partner_id.political_kyan', "الكـــــيان القـــــانونـي" , readonly=False , required=True , store=True )
     manager_id_sale = fields.Integer ( related="partner_id.manager_id" , string="Manager Id" , store=True ,
                                        readonly=False )
     contact_manager_team = fields.Many2one ( comodel_name="res.users" , related="user_id" ,
