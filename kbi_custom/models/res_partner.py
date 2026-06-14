@@ -472,7 +472,7 @@ class ResPartner ( models.Model ) :
     identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
     additional_no = fields.Char ( string="الرقم الإضافي" , size=4 , readonly=False )
     political_kyan= fields.Selection([
-        ('a', 'ِشركة ذات مسؤلية محدودة'),
+        ('a','شركة ذات مسؤلية محدودة'),
         ('aa', 'شركة ذات مسؤلية محدودة أجنبية'),
         ('b','شركة ذات مسؤلية محدودة مختلطة'),
         ('bbb','شركة مساهمة'),
