@@ -471,11 +471,14 @@ class ResPartner ( models.Model ) :
     district2 = fields.Char ( string="الحي" , size=10 , readonly=False )
     identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
     additional_no = fields.Char ( string="الرقم الإضافي" , size=4 , readonly=False )
+    political_kyan= fields.Selection([
+        ('a', 'ِشركة ذات مسؤلية محدودة'),
+        ('aa', 'شركة ذات مسؤلية محدودة أجنبية'),
+        ('b','شركة ذات مسؤلية محدودة مختلطة'),
+        ('bbb','شركة مساهمة'),
+        ('bb','مؤسسة فردية')],string="الكـــــيان القـــــانونـي",store=True)
 
-    national_address = fields.Char (
-        string="العنوان الوطني " ,
-        compute="_compute_national_address" , readonly=False )
-
+    national_address = fields.Char (string="العنوان الوطني " ,compute="_compute_national_address" , readonly=False )
     nationality = fields.Char ( "Nationality" )
     leadline = fields.Char ( "الرقم الأرضي" , required=True,store=True , placeholder="أدخل الرقم الأرضي الخاص بالشركة "  )
     email = fields.Char ( "Main Email" , required=True , store=True )
