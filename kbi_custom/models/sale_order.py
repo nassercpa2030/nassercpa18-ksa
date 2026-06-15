@@ -131,8 +131,7 @@ class SaleOrder ( models.Model ) :
     project_code = fields.Char ( string='Project Code' , related="auto_code" )
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Project Analytic Plan' ,compute='_compute_analytic_plan_default_id' ,readonly=False  )
-    analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
-                                            domain="[('plan_id', '=', project_type_id)]" ,readonly=False ,  required=True,store=True )
+    analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,domain="[('plan_id', '=', project_type_id)]" ,readonly=False ,  required=True,store=True )
     # analytic_account_id_assigned = fields.Many2one ( 'account.analytic.plan',related='review_manager_id.analytic_plan',store=False)
     approve_uid = fields.Many2one ( 'res.users' , string='Approve User' , )
     approve_date = fields.Datetime ( string='Approve Date' )
@@ -475,15 +474,27 @@ class SaleOrder ( models.Model ) :
     #    }
     # }
 
-    @api.onchange ( 'analytic_account_id' )
+    @api.onchange ( 'analytic_account_id','analytic_account_id_assigned', 'ass_to_percentage' )
     def _onchange_analytic_account_id(self) :
-        for line in self.order_line :
-            if self.analytic_account_id :
+        for line in order.order_line :
+            if order.analytic_account_id and  order.analytic_account_id_assigned:
+                assigned_percentage = order.ass_to_percentage or 0
+                main_percentage = 100 - assigned_percenta
                 line.analytic_distribution = {
-                    self.analytic_account_id.id : 100
+                    order.analytic_account_id.id: main_percentage,
+                    order.analytic_account_id_assigned.id: assigned_percentage,
                 }
+            elif order.analytic_account_id and  not order.analytic_account_id_assigned  
+                  line.analytic_distribution = {
+                    self.analytic_account_id.id : 100
+            
+            }
             else :
                 line.analytic_distribution = {}
+                raise ValidationError(
+                    "أختـــر الحساب التحليلي (Analytic Account). وإذا كان هناك Assigned To فيجب اختيار Analytic Account Assigned To أيضاً."
+                )
+                
 
     def action_view_invoice(self , invoices=False) :
         self.ensure_one ()  # لو عايزين نتعامل مع order واحد في context
@@ -1106,19 +1117,19 @@ class SaleOrder ( models.Model ) :
 
     #                 rec.analytic_account_id_assigned = assigned_account.id
 
-    @api.depends ( 'project_type_id' , 'order_line')
-    @api.onchange ( 'project_type_id' , 'order_line')
-    def _compute_analytic_account_id(self) :
-        for rec in self :
-            if rec.order_line :
-                account = rec.order_line[0].product_id.product_analytic_ids.filtered (
-                    lambda x : x.analytic_plan_id.id == rec.project_type_id.id )
-                if account :
-                    rec.analytic_account_id = account.analytic_account_id.id
-                # else :
-                # rec.analytic_account_id = False
-            else :
-                rec.analytic_account_id = False
+    # @api.depends ( 'project_type_id' , 'order_line','','')
+    # @api.onchange ( 'project_type_id' , 'order_line','','')
+    # def _compute_analytic_account_id(self) :
+    #     for rec in self :
+    #         if rec.order_line :
+    #             account = rec.order_line[0].product_id.product_analytic_ids.filtered (
+    #                 lambda x : x.analytic_plan_id.id == rec.project_type_id.id )
+    #             if account :
+    #                 rec.analytic_account_id = account.analytic_account_id.id
+    #             # else :
+    #             # rec.analytic_account_id = False
+    #         else :
+    #             rec.analytic_account_id = False
 
     def action_open_payment(self) :
         return {
