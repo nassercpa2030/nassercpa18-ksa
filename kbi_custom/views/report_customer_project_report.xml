@@ -116,7 +116,7 @@
                     <div class="header-title2" t-if="o.archive_signiture_exception and not o.archive_signiture" style="font-weight:bold;font-size:15px;text-decoration:underline;">
                           تقرير متابعة أمر البيع
                          <span style="color:red;" t-if="o.archive_signiture_exception and not o.archive_signiture">مستثني</span>
-                         <span style="color:red;" t-if=" o.archive_signiture_handeld and not o.archive_signiture_exception and not o.archive_signiture">معلـــق</span>
+                         <span style="color:red;" t-if="archive_signiture_handeld">معلـــق</span>
                     </div>
                         <div class="custom-warning" t-if="o.archive_signiture_exception and not o.archive_signiture_exception_complete and not o.archive_signiture" style="font-weight:bold;  font-size:15px;" role="alert">
                                 <span> تنـــبيه هــــام: تــأكد من إرفــاق نمـــوذج إستـــثناء المـــلف قبــل ختــــم هــذا المـــستــند </span>
@@ -377,7 +377,7 @@
                                        
                                         <td  class="signature-images" style="text-align:center; padding:10px; height:55px; vertical-align:bottom; ">
                                              <!-- <t t-set="archive_user" t-value="o.env['res.users'].browse(563)"/> -->
-                                           <img t-if="o.archive_signiture or o.archive_signiture_exception"      t-att-src="image_data_uri(o.env['res.users'].browse(563).sign_signature)" style="max-height:80px; max-width:180px;"/>
+                                           <img t-if="o.archive_signiture or o.archive_signiture_exception or archive_signiture_handeld"      t-att-src="image_data_uri(o.env['res.users'].browse(563).sign_signature)" style="max-height:80px; max-width:180px;"/>
                                        </td>
                                         <td  class="signature-images" style="text-align:center; padding:10px; height:55px; vertical-align:bottom; ">
                                            <img t-if="o.finance_assign" t-att-src="image_data_uri(o.finance_assign)" style="max-height:80px; max-width:180px;"/>
