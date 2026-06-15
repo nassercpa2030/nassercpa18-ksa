@@ -484,7 +484,7 @@ class SaleOrder ( models.Model ) :
                     order.analytic_account_id.id: main_percentage,
                     order.analytic_account_id_assigned.id: assigned_percentage,
                 }
-            elif order.analytic_account_id and  not order.analytic_account_id_assigned  
+            elif order.analytic_account_id and  not order.analytic_account_id_assigned : 
                   line.analytic_distribution = {
                     self.analytic_account_id.id : 100
             
