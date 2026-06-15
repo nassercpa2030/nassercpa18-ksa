@@ -182,7 +182,16 @@ class CloseEntryWizard ( models.TransientModel ) :
                 raise ValidationError ( "No products found in Sale Order to create journal entries." )
 
             # تحديد الحساب والـ journal بناءً على use_account_id1
-            debit_account = wizard.account_id1.id if wizard.use_account_id1 else False
+            #debit_account = wizard.account_id1.id if wizard.use_account_id1 else False
+            if wizard.use_account_id1 :
+                debit_account = wizard.account_id1.id
+            else :
+                debit_account = line.account_id.id
+
+            if not debit_account :
+                raise ValidationError ( f"Missing account for line: {line.name}" )
+            
+            
             journal_to_use = wizard.journal_id2.id if wizard.use_account_id1 else wizard.journal_id1.id
 
             for line in sale_order.order_line :
@@ -248,8 +257,8 @@ class CloseEntryWizard ( models.TransientModel ) :
             } )
 
             return move
-        
-        
+
+
     def close_entry(self) :
         AccountMove = self.env['account.move']
 
