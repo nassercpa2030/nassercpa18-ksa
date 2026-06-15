@@ -168,95 +168,95 @@ class CloseEntryWizard ( models.TransientModel ) :
                 sale_order.journal_entry_count_finance = sale_order.journal_entry_count_finance + 1
             wizard.sale_order_id.project_ids.write ( {'has_closed_entry' : True} )
 
-    def close_entry_draft(self) :
-        AccountMove = self.env['account.move']
+    # def close_entry_draft(self) :
+    #     AccountMove = self.env['account.move']
 
-        for wizard in self :
-            if not wizard.account_id :
-                raise ValidationError ( "Aggregate Account is missing on the wizard." )
+    #     for wizard in self :
+    #         if not wizard.account_id :
+    #             raise ValidationError ( "Aggregate Account is missing on the wizard." )
 
-            move_lines = []
+    #         move_lines = []
 
-            sale_order = wizard.sale_order_id
-            if not sale_order.order_line :
-                raise ValidationError ( "No products found in Sale Order to create journal entries." )
+    #         sale_order = wizard.sale_order_id
+    #         if not sale_order.order_line :
+    #             raise ValidationError ( "No products found in Sale Order to create journal entries." )
 
-            # تحديد الحساب والـ journal بناءً على use_account_id1
-            #debit_account = wizard.account_id1.id if wizard.use_account_id1 else False
-            if wizard.use_account_id1 :
-                debit_account = wizard.account_id1.id
-            else :
-                debit_account = line.account_id.id
+    #         # تحديد الحساب والـ journal بناءً على use_account_id1
+    #         #debit_account = wizard.account_id1.id if wizard.use_account_id1 else False
+    #         if wizard.use_account_id1 :
+    #             debit_account = wizard.account_id1.id
+    #         else :
+    #             debit_account = line.account_id.id
 
-            if not debit_account :
-                raise ValidationError ( f"Missing account for line: {line.name}" )
+    #         if not debit_account :
+    #             raise ValidationError ( f"Missing account for line: {line.name}" )
             
             
-            journal_to_use = wizard.journal_id2.id if wizard.use_account_id1 else wizard.journal_id1.id
+    #         journal_to_use = wizard.journal_id2.id if wizard.use_account_id1 else wizard.journal_id1.id
 
-            for line in sale_order.order_line :
-                if not line.product_id :
-                    continue
+    #         for line in sale_order.order_line :
+    #             if not line.product_id :
+    #                 continue
 
-                total_price = line.price_subtotal
-                if not total_price :
-                    continue
+    #             total_price = line.price_subtotal
+    #             if not total_price :
+    #                 continue
 
-                analytic_distribution = {}
-                partner = sale_order.partner_id.id
+    #             analytic_distribution = {}
+    #             partner = sale_order.partner_id.id
 
-                if sale_order.analytic_account_id :
-                    analytic_distribution = {
-                        sale_order.analytic_account_id.id : 100.0
-                    }
+    #             if sale_order.analytic_account_id :
+    #                 analytic_distribution = {
+    #                     sale_order.analytic_account_id.id : 100.0
+    #                 }
 
-                move_lines += [
-                    (0 , 0 , {
-                        'debit' : total_price ,
-                        'credit' : 0.0 ,
-                        'name' : f'Reversal of {line.name}' ,
-                        'account_id' : debit_account ,
-                        'journal_id' : journal_to_use ,
-                        'product_id' : line.product_id.id ,
-                        'quantity' : line.product_uom_qty ,
-                        'analytic_distribution' : analytic_distribution ,
-                        'partner_id' : partner ,
-                        'sale_order_id' : sale_order.id ,
-                    }) ,
-                    (0 , 0 , {
-                        'debit' : 0.0 ,
-                        'credit' : total_price ,
-                        'name' : f'Reversal aggregate for {line.name}' ,
-                        'account_id' : wizard.account_id.id ,
-                        'product_id' : line.product_id.id ,
-                        'quantity' : line.product_uom_qty ,
-                        'analytic_distribution' : analytic_distribution ,
-                        'partner_id' : partner ,
-                        'sale_order_id' : sale_order.id ,
-                    }) ,
-                ]
+    #             move_lines += [
+    #                 (0 , 0 , {
+    #                     'debit' : total_price ,
+    #                     'credit' : 0.0 ,
+    #                     'name' : f'Reversal of {line.name}' ,
+    #                     'account_id' : debit_account ,
+    #                     'journal_id' : journal_to_use ,
+    #                     'product_id' : line.product_id.id ,
+    #                     'quantity' : line.product_uom_qty ,
+    #                     'analytic_distribution' : analytic_distribution ,
+    #                     'partner_id' : partner ,
+    #                     'sale_order_id' : sale_order.id ,
+    #                 }) ,
+    #                 (0 , 0 , {
+    #                     'debit' : 0.0 ,
+    #                     'credit' : total_price ,
+    #                     'name' : f'Reversal aggregate for {line.name}' ,
+    #                     'account_id' : wizard.account_id.id ,
+    #                     'product_id' : line.product_id.id ,
+    #                     'quantity' : line.product_uom_qty ,
+    #                     'analytic_distribution' : analytic_distribution ,
+    #                     'partner_id' : partner ,
+    #                     'sale_order_id' : sale_order.id ,
+    #                 }) ,
+    #             ]
 
-            move_vals = {
-                'move_type' : 'entry' ,
-                'date' : wizard.journal_entry_date ,
-                'journal_id' : journal_to_use ,
-                'invoice_origin' : sale_order.name ,
-                'line_ids' : move_lines ,
-                'ref' : f'Reversal for {sale_order.name}' ,
-            }
+    #         move_vals = {
+    #             'move_type' : 'entry' ,
+    #             'date' : wizard.journal_entry_date ,
+    #             'journal_id' : journal_to_use ,
+    #             'invoice_origin' : sale_order.name ,
+    #             'line_ids' : move_lines ,
+    #             'ref' : f'Reversal for {sale_order.name}' ,
+    #         }
 
-            # إنشاء القيد فقط Draft (بدون post)
-            move = AccountMove.create ( move_vals )
+    #         # إنشاء القيد فقط Draft (بدون post)
+    #         move = AccountMove.create ( move_vals )
 
-            # تحديث عداد القيود
-            sale_order.journal_entry_count_finance += 1
+    #         # تحديث عداد القيود
+    #         sale_order.journal_entry_count_finance += 1
 
-            # تحديث المشاريع المرتبطة
-            sale_order.project_ids.write ( {
-                'has_closed_entry' : True
-            } )
+    #         # تحديث المشاريع المرتبطة
+    #         sale_order.project_ids.write ( {
+    #             'has_closed_entry' : True
+    #         } )
 
-            return move
+    #         return move
 
 
     def close_entry(self) :
