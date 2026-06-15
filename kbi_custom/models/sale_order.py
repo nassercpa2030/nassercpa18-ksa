@@ -480,7 +480,7 @@ class SaleOrder ( models.Model ) :
         for line in order.order_line :
             if order.analytic_account_id and  order.analytic_account_id_assigned:
                 assigned_percentage = order.ass_to_percentage or 0
-                main_percentage = 100 - assigned_percenta
+                main_percentage = 100 - assigned_percentage
                 line.analytic_distribution = {
                     order.analytic_account_id.id: main_percentage,
                     order.analytic_account_id_assigned.id: assigned_percentage,
