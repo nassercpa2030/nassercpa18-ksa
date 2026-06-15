@@ -1082,7 +1082,7 @@ class SaleOrder ( models.Model ) :
         #compute='_compute_analytic_account_id_assigned' ,
         store=True ,
         readonly=False ,
-        domain="[('plan_id', '=', analytic_plan_ids)]" ,
+        domain="[('plan_id', '=', analytic_plan_id)]" ,
     )
 
     # @api.depends ( 'project_type_id' , 'order_line' , 'review_manager_id' )
