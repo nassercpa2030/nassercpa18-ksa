@@ -101,6 +101,8 @@ class SaleOrder ( models.Model ) :
                                          readonly=False , index=True )
     archive_signiture_exception = fields.Boolean ( string='توقيع الأرشيف للختم (مستثني) ' , default=False ,
                                                    readonly=False , index=True )
+    archive_signiture_handeld = fields.Boolean ( string='توقيع الأرشيف للختم (معــلق) ' , default=False ,
+                                                   readonly=False , index=True )
     approve_finance_exception = fields.Boolean ( string='تأكيــد المالية بتوقيع نمــوذج الإستكمال(مستثني) ' , default=False ,
                                                  readonly=False , index=True )
     archive_signiture_exception_complete = fields.Boolean ( string=' توقيع الأرشيف بإكتمال الملف (المستثني) ' ,
@@ -718,7 +720,21 @@ class SaleOrder ( models.Model ) :
                     } )
 
                     wizard.close_entry ()
+                    
+        elif not 'archive_signiture' in vals and not 'archive_signiture_exception' in vals and 'archive_signiture_handeld' in vals :
+                                sale_order.project_ids.stage_id = 24
+                    sale_order.project_ids.files_state = "done"
+                    wizard = self.env['close.entry.wizard'].with_context (
+                        active_id=sale_order.id ,
+                        active_model='sale.order'
+                    ).create ( {
+                        'sale_order_id' : sale_order.id ,
+                        'journal_entry_date' : fields.Date.context_today ( self ) ,
+                    } )
 
+                    wizard.close_entry ()
+                    wizard.move_id.button_draft()
+        
         elif not 'archive_signiture' in vals and 'archive_signiture_exception' in vals :
 
             for sale_order in self :
