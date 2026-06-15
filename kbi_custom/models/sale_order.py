@@ -71,10 +71,11 @@ class SaleOrder ( models.Model ) :
     # close_entry_year = fields.Integer ( string="Close Entry Year" ,compute="calc_close_date",store=True, readonly=False,searchable=True )
 
     date = fields.Datetime ( string='Date' )
-    review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Assigned To' , readonly=False ,
-                                          domain=[('job_id' , '=' , 'مدير مراجعة')] )
+    # review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Assigned To' , readonly=False ,
+    #                                       domain=[('job_id' , '=' , 'مدير مراجعة')] )
     # review_manager_id=fields.Many2one(comodel_name='res.users',string='Manager',readonly=False )
     # partner_manager = fields.Many2one(comodel_name="res.partner",related='partner_id.user_id',store=True)
+    review_manager_id = fields.Many2one ( comodel_name='res.users' , string='Assigned To' , readonly=False  )
     user_id = fields.Many2one ( 'res.users' , string='Manager' , readonly=False )
     sequence = fields.Integer ( string='Sequence' , )
     report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
@@ -1064,14 +1065,14 @@ class SaleOrder ( models.Model ) :
     @api.depends ('user_id' )
     def _compute_analytic_plan_default_id(self) :
         for rec in self :
-            #rec.analytic_plan_id = rec.review_manager_id.analytic_plan
+            #rec.analytic_plan_id = rec.review_manager_id.analytic_plan_id
             rec.project_type_id = rec.user_id.analytic_plan_ids
 
     
     @api.depends ( 'review_manager_id' )
     def _compute_analytic_plan_id(self) :
         for rec in self :
-            rec.analytic_plan_id = rec.review_manager_id.analytic_plan
+            rec.analytic_plan_id = rec.review_manager_id.analytic_plan_ids
             #rec.project_type_id = rec.user_id.analytic_plan_ids
 
 
@@ -1081,7 +1082,7 @@ class SaleOrder ( models.Model ) :
         #compute='_compute_analytic_account_id_assigned' ,
         store=True ,
         readonly=False ,
-        domain="[('plan_id', '=', analytic_plan_id)]" ,
+        domain="[('plan_id', '=', analytic_plan_ids)]" ,
     )
 
     # @api.depends ( 'project_type_id' , 'order_line' , 'review_manager_id' )
