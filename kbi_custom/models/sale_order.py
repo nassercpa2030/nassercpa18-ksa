@@ -203,7 +203,7 @@ class SaleOrder ( models.Model ) :
     x_studio_auto_code = fields.Char ( string="Auto Code_printing" , related='auto_code' , readonly=False , store=True )
     last_service = fields.Many2one ( string="Last Contract Service" , comodel_name='service.contract' )
     assigned_to = fields.Many2one ( 'res.users' , string="Assigned To" )
-    ass_to_percentage = fields.Integer ( "Ass_to Percentage"و default=False,store=True )
+    ass_to_percentage = fields.Integer ( "Ass_to Percentage", default=False , store=True )
     ass_to = fields.Float ( string="Ass_to" , compute="_compute_ass_to" , store=True )
     ass_from = fields.Float ( string="Ass_from" , compute="_compute_ass_to" , store=True )
     #################### multi_services ############
