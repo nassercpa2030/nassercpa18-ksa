@@ -44,7 +44,6 @@ class SaleOrder ( models.Model ) :
     project_file_state_test = fields.Char ( "Project File State Demo" , readonly=False , required=False , store=True )
     project_stage_test = fields.Char ( "Project Stage Demo" , readonly=False , required=False , store=True )
 
-
     # first_payment_test2 = fields.Boolean ( string="first Payment amount test" , readonly=False , required=False , store=True )
 
     first_payment_journal_test = fields.Char ( 'First Payment Journal Name' , readonly=False , store=True )
@@ -75,7 +74,7 @@ class SaleOrder ( models.Model ) :
     #                                       domain=[('job_id' , '=' , 'مدير مراجعة')] )
     # review_manager_id=fields.Many2one(comodel_name='res.users',string='Manager',readonly=False )
     # partner_manager = fields.Many2one(comodel_name="res.partner",related='partner_id.user_id',store=True)
-    review_manager_id = fields.Many2one ('res.users' , string='Assigned To' , readonly=False ,ondelete='set null'  )
+    review_manager_id = fields.Many2one ( 'res.users' , string='Assigned To' , readonly=False , ondelete='set null' )
     user_id = fields.Many2one ( 'res.users' , string='Manager' , readonly=False )
     sequence = fields.Integer ( string='Sequence' , )
     report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
@@ -99,14 +98,15 @@ class SaleOrder ( models.Model ) :
     finance_signiture = fields.Boolean ( string=' توقيع المالية للختم ' , readonly=False , store=True )
     archive_signiture = fields.Boolean ( string='توقيع الأرشيف للختم (مشـروع مكـتمل) ' , default=False ,
                                          readonly=False , index=True )
+    archive_signiture_handeld = fields.Boolean ( string='توقيع الأرشيف للختم (معــلق) ' , default=False ,
+                                                 readonly=False , index=True )
     archive_signiture_exception = fields.Boolean ( string='توقيع الأرشيف للختم (مستثني) ' , default=False ,
                                                    readonly=False , index=True )
-    archive_signiture_handeld = fields.Boolean ( string='توقيع الأرشيف للختم (معــلق) ' , default=False ,
-                                                   readonly=False , index=True )
-    approve_finance_exception = fields.Boolean ( string='تأكيــد المالية بتوقيع نمــوذج الإستكمال(مستثني) ' , default=False ,
+    approve_finance_exception = fields.Boolean ( string='تأكيــد المالية بتوقيع نمــوذج الإستكمال(مستثني) ' ,
+                                                 default=False ,
                                                  readonly=False , index=True )
     archive_signiture_exception_complete = fields.Boolean ( string=' توقيع الأرشيف بإكتمال الملف (المستثني) ' ,
-                                                            default=False , readonly=False ,index=True )
+                                                            default=False , readonly=False , index=True )
     finance_assign = fields.Binary ( string=' ملف توقيع المالية  ' , default=False ,
                                      compute="_compute_finance_archive_signature" , store=False , readonly=False )
     archive_assign = fields.Binary ( string=' ملف توقيع الأرشيف ' , default=False ,
@@ -133,8 +133,11 @@ class SaleOrder ( models.Model ) :
                                         readonly=False )
     project_code = fields.Char ( string='Project Code' , related="auto_code" )
     contract_signature = fields.Boolean ( "Contract Signature" )
-    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Project Analytic Plan' ,compute='_compute_analytic_plan_default_id' ,readonly=False  )
-    analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,domain="[('plan_id', '=', project_type_id)]" ,readonly=False ,  required=True,store=True )
+    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Project Analytic Plan' ,
+                                        compute='_compute_analytic_plan_default_id' , readonly=False )
+    analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
+                                            domain="[('plan_id', '=', project_type_id)]" , readonly=False ,
+                                            required=True , store=True )
     # analytic_account_id_assigned = fields.Many2one ( 'account.analytic.plan',related='review_manager_id.analytic_plan',store=False)
     approve_uid = fields.Many2one ( 'res.users' , string='Approve User' , )
     approve_date = fields.Datetime ( string='Approve Date' )
@@ -143,7 +146,8 @@ class SaleOrder ( models.Model ) :
                                   domain="[('is_broker', '=', True)]" )
     number_700_sale = fields.Char ( related='partner_id.number_700' , string="(700) الرقم الموحد" , readonly=False ,
                                     required=True , store=True )
-    political_kyan = fields.Selection (related='partner_id.political_kyan',string= "الكـــــيان القـــــانونـي" , readonly=False , required=True , store=True )
+    political_kyan = fields.Selection ( related='partner_id.political_kyan' , string="الكـــــيان القـــــانونـي" ,
+                                        readonly=False , required=True , store=True )
     manager_id_sale = fields.Integer ( related="partner_id.manager_id" , string="Manager Id" , store=True ,
                                        readonly=False )
     contact_manager_team = fields.Many2one ( comodel_name="res.users" , related="user_id" ,
@@ -205,7 +209,7 @@ class SaleOrder ( models.Model ) :
     x_studio_auto_code = fields.Char ( string="Auto Code_printing" , related='auto_code' , readonly=False , store=True )
     last_service = fields.Many2one ( string="Last Contract Service" , comodel_name='service.contract' )
     assigned_to = fields.Many2one ( 'res.users' , string="Assigned To" )
-    ass_to_percentage = fields.Integer ( "Ass_to Percentage", default=None , store=True )
+    ass_to_percentage = fields.Integer ( "Ass_to Percentage" , default=None , store=True )
     ass_to = fields.Float ( string="Ass_to" , compute="_compute_ass_to" , store=True )
     ass_from = fields.Float ( string="Ass_from" , compute="_compute_ass_to" , store=True )
     #################### multi_services ############
@@ -352,10 +356,10 @@ class SaleOrder ( models.Model ) :
     @api.depends ( 'amount_untaxed' , 'ass_to_percentage' )
     def _compute_ass_to(self) :
         for rec in self :
-            try:
-               percent = float(rec.ass_to_percentage or 0.0)
-            except:
-               percent = 0.0
+            try :
+                percent = float ( rec.ass_to_percentage or 0.0 )
+            except :
+                percent = 0.0
 
             rec.ass_to = rec.amount_untaxed * percent / 100
             rec.ass_from = rec.amount_untaxed - rec.ass_to
@@ -482,28 +486,27 @@ class SaleOrder ( models.Model ) :
     #    }
     # }
 
-    @api.onchange ( 'analytic_account_id','analytic_account_id_assigned', 'ass_to_percentage' )
+    @api.onchange ( 'analytic_account_id' , 'analytic_account_id_assigned' , 'ass_to_percentage' )
     def _onchange_analytic_account_id(self) :
-      for order in self: 
-        for line in order.order_line :
-            if order.analytic_account_id and  order.analytic_account_id_assigned:
-                assigned_percentage = order.ass_to_percentage or 0
-                main_percentage = 100 - assigned_percentage
-                line.analytic_distribution = {
-                    order.analytic_account_id.id: main_percentage,
-                    order.analytic_account_id_assigned.id: assigned_percentage,
-                }
-            elif order.analytic_account_id and  not order.analytic_account_id_assigned : 
-                  line.analytic_distribution = {
-                    self.analytic_account_id.id : 100
-            
-            }
-            else :
-                line.analytic_distribution = {}
-                raise ValidationError(
-                    "أختـــر الحساب التحليلي (Analytic Account). وإذا كان هناك Assigned To فيجب اختيار Analytic Account Assigned To أيضاً."
-                )
-                
+        for order in self :
+            for line in order.order_line :
+                if order.analytic_account_id and order.analytic_account_id_assigned :
+                    assigned_percentage = order.ass_to_percentage or 0
+                    main_percentage = 100 - assigned_percentage
+                    line.analytic_distribution = {
+                        order.analytic_account_id.id : main_percentage ,
+                        order.analytic_account_id_assigned.id : assigned_percentage ,
+                    }
+                elif order.analytic_account_id and not order.analytic_account_id_assigned :
+                    line.analytic_distribution = {
+                        self.analytic_account_id.id : 100
+
+                    }
+                else :
+                    line.analytic_distribution = {}
+                    raise ValidationError (
+                        "أختـــر الحساب التحليلي (Analytic Account). وإذا كان هناك Assigned To فيجب اختيار Analytic Account Assigned To أيضاً."
+                    )
 
     def action_view_invoice(self , invoices=False) :
         self.ensure_one ()  # لو عايزين نتعامل مع order واحد في context
@@ -691,6 +694,10 @@ class SaleOrder ( models.Model ) :
             rec.id : rec.archive_signiture
             for rec in self
         }
+        old_archive_handeled = {
+            rec.id : rec.archive_signiture_handeld
+            for rec in self
+        }
         old_archive_exception = {
             rec.id : rec.archive_signiture_exception
             for rec in self
@@ -720,9 +727,15 @@ class SaleOrder ( models.Model ) :
                     } )
 
                     wizard.close_entry ()
-                    
+
         elif not 'archive_signiture' in vals and not 'archive_signiture_exception' in vals and 'archive_signiture_handeld' in vals :
-                                sale_order.project_ids.stage_id = 24
+
+            for sale_order in self :
+                if (
+                        not old_archive_handeled[sale_order.id]
+                        and sale_order.archive_signiture_handeld
+                ) :
+                    sale_order.project_ids.stage_id = 24
                     sale_order.project_ids.files_state = "done"
                     wizard = self.env['close.entry.wizard'].with_context (
                         active_id=sale_order.id ,
@@ -733,8 +746,9 @@ class SaleOrder ( models.Model ) :
                     } )
 
                     wizard.close_entry ()
-                    wizard.move_id.button_draft()
-        
+                    wizard.move_id.button_draft ()
+
+
         elif not 'archive_signiture' in vals and 'archive_signiture_exception' in vals :
 
             for sale_order in self :
@@ -772,8 +786,7 @@ class SaleOrder ( models.Model ) :
                         'journal_entry_date' : fields.Date.context_today ( self ) ,
                     } )
 
-                    wizard.close_entry()
-
+                    wizard.close_entry ()
 
         # self._get_mobile()
         # إعادة معالجة الملفات فقط إذا تم رفع جديد
@@ -1083,24 +1096,22 @@ class SaleOrder ( models.Model ) :
         store=False ,
     )
 
-    @api.depends ('user_id' )
+    @api.depends ( 'user_id' )
     def _compute_analytic_plan_default_id(self) :
         for rec in self :
-            #rec.analytic_plan_id = rec.review_manager_id.analytic_plan_id
+            # rec.analytic_plan_id = rec.review_manager_id.analytic_plan_id
             rec.project_type_id = rec.user_id.analytic_plan_ids
 
-    
     @api.depends ( 'review_manager_id' )
     def _compute_analytic_plan_id(self) :
         for rec in self :
             rec.analytic_plan_id = rec.review_manager_id.analytic_plan_ids
-            #rec.project_type_id = rec.user_id.analytic_plan_ids
-
+            # rec.project_type_id = rec.user_id.analytic_plan_ids
 
     analytic_account_id_assigned = fields.Many2one (
         'account.analytic.account' ,
         string='Assigned Analytic Account' ,
-        #compute='_compute_analytic_account_id_assigned' ,
+        # compute='_compute_analytic_account_id_assigned' ,
         store=True ,
         readonly=False ,
         domain="[('plan_id', '=', analytic_plan_id)]" ,
@@ -1253,7 +1264,7 @@ class SaleOrder2 ( models.Model ) :
     # project_code = fields.Char ( string='Project Code' )
     # invoice_count=fields.Integer(string="",store=True,readonly=False)
     contract_signature = fields.Boolean ( "Contract Signature" )
-    #project_type_id = fields.Many2one ( 'account.analytic.plan' , compute='_compute_analytic_plan_id' ,string='Company Type' )
+    # project_type_id = fields.Many2one ( 'account.analytic.plan' , compute='_compute_analytic_plan_id' ,string='Company Type' )
     # analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
     #                                        domain="[('plan_id', '=', project_type_id)]" ,
     #                                        compute='_compute_analytic_account_id_assigned' , readonly=False , store=True )
@@ -1307,7 +1318,7 @@ class SaleOrder2 ( models.Model ) :
     def _compute_final_close_entry_date(self) :
         for order in self :
             # تنظيف الاسم من مسافات إضافية وتحويله لأحرف صغيرة
-            order_name_clean = (order.name or '').strip()
+            order_name_clean = (order.name or '').strip ()
 
             # البحث عن أول قيد مرتبط بالـ Sale Order
             move = self.env['account.move'].search ( [
