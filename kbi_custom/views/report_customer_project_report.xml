@@ -116,9 +116,14 @@
                     <div class="header-title2" t-if="o.archive_signiture_exception and not o.archive_signiture" style="font-weight:bold;font-size:15px;text-decoration:underline;">
                           تقرير متابعة أمر البيع
                          <span style="color:red;" t-if="o.archive_signiture_exception and not o.archive_signiture">مستثني</span>
+                         <span style="color:red;" t-if=" o.archive_signiture_handeld and not o.archive_signiture_exception and not o.archive_signiture">معلـــق</span>
                     </div>
                         <div class="custom-warning" t-if="o.archive_signiture_exception and not o.archive_signiture_exception_complete and not o.archive_signiture" style="font-weight:bold;  font-size:15px;" role="alert">
                                 <span> تنـــبيه هــــام: تــأكد من إرفــاق نمـــوذج إستـــثناء المـــلف قبــل ختــــم هــذا المـــستــند </span>
+      
+                         </div>
+                        <div class="custom-warning" t-if="o.archive_signiture_handeld and not o.archive_signiture_exception and not o.archive_signiture_exception_complete and not o.archive_signiture" style="font-weight:bold;  font-size:15px;" role="alert">
+                                <span> تنـــبيه هــــام: تــأكد من إرفــاق نمـــوذج تعلــــيق المـــلف قبــل ختــــم هــذا المـــستــند </span>
       
                          </div>
 
@@ -361,7 +366,7 @@
                                     <tr>
                                      
                                         <td style="text-align:center;"><strong> توقيع مدير المجموعة</strong></td>
-                                           <td style="text-align:center;">    <strong> توقيع الأرشيف<br/> <span t-if="o.archive_signiture or o.archive_signiture_exception_complete">[تم إستيفاء المستندات]</span> <span t-if="o.archive_signiture_exception and not o.archive_signiture and not o.archive_signiture_exception_complete">[ملــف مستثـــي غيــر مستــوفي المستــندات]</span></strong></td>
+                                           <td style="text-align:center;">    <strong> توقيع الأرشيف<br/> <span t-if="o.archive_signiture or o.archive_signiture_exception_complete">[تم إستيفاء المستندات]</span> <span t-if="o.archive_signiture_exception or o.archive_signiture_handeld and not o.archive_signiture and not o.archive_signiture_exception_complete">[ملــف مستثـــي غيــر مستــوفي المستــندات]</span></strong></td>
                                         <td style="text-align:center;"><strong> توقيع مدير المالية</strong></td>
                                     </tr>
                                     <tr>
