@@ -476,6 +476,7 @@ class SaleOrder ( models.Model ) :
 
     @api.onchange ( 'analytic_account_id','analytic_account_id_assigned', 'ass_to_percentage' )
     def _onchange_analytic_account_id(self) :
+      for order in self: 
         for line in order.order_line :
             if order.analytic_account_id and  order.analytic_account_id_assigned:
                 assigned_percentage = order.ass_to_percentage or 0
