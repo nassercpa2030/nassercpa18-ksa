@@ -745,9 +745,8 @@ class SaleOrder ( models.Model ) :
                         'journal_entry_date' : fields.Date.context_today ( self ) ,
                     } )
 
-                    wizard.close_entry ()
-                    wizard.move_id.button_draft ()
-
+                    wizard.close_entry_draft ()
+                   
 
         elif not 'archive_signiture' in vals and 'archive_signiture_exception' in vals :
 
