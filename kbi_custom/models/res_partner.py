@@ -221,7 +221,9 @@ class HrPayslip ( models.Model ) :
                                         store=False )
     loan = fields.Monetary ( string="إستقطــاع ســلفة" , compute='_compute_gross_salary' , readonly=False ,
                              store=False )
-    gosi = fields.Monetary ( string="خصم حصـة التـأمينات" , compute='_compute_gross_salary' , readonly=False ,
+    gosi = fields.Monetary ( string=" خصم حصـة التـأمينات علي الموظف" , compute='_compute_gross_salary' , readonly=False ,
+                             store=False )
+    other_gosi = fields.Monetary ( string="خصم حصـة التـأمينات علي الشركة" , compute='_compute_gross_salary' , readonly=False ,
                              store=False )
     vac_allowance = fields.Monetary ( string="بــدل الإجازة السنــويــة" , compute='_compute_gross_salary' , readonly=False ,
                              store=False )
@@ -246,10 +248,12 @@ class HrPayslip ( models.Model ) :
             base = rec._get_contract_wage()+ rec.contract_id.l10n_sa_housing_allowance+ rec.contract_id.l10n_sa_transportation_allowance
             if rec.employee_id.country_id.code == 'SA' and not rec.contract_id.x_gosi_employee_exempt :
                 rate = 0.1025 if rec.contract_id.x_gosi_225 else 0.0975
+                rate_company = 0.1225 if rec.contract_id.x_gosi_225 else 0.1175
                 rec.gosi = base * -rate
+                rec.other_gosi= rate_company * rate
                 rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction 
             elif rec.employee_id.country_id.code != 'SA' :   
-                rec.gosi = (rec._get_contract_wage() + rec.contract_id.l10n_sa_housing_allowance) * 0.02
+                rec.other_gosi = (rec._get_contract_wage() + rec.contract_id.l10n_sa_housing_allowance) * 0.02
                 rec.net_wage = rec.gross_wage - loan  + rec.other_deduction 
                 
             # rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction 
