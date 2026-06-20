@@ -245,6 +245,8 @@ class HrPayslip ( models.Model ) :
             if rec.employee_id.country_id.code == 'SA' and not rec.contract_id.x_gosi_employee_exempt :
                 rate = 0.1025 if rec.contract_id.x_gosi_225 else 0.0975
                 rec.gosi = base * -rate
+            elif rec.employee_id.country_id.code != 'SA'    
+                rec.gosi = (rec._get_contract_wage() + rec.contract_id.l10n_sa_housing_allowance) * 0.02
                 
             rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction 
                 
