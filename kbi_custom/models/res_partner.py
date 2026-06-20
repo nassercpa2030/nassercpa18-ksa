@@ -223,6 +223,8 @@ class HrPayslip ( models.Model ) :
                              store=False )
     gosi = fields.Monetary ( string="خصم حصـة التـأمينات" , compute='_compute_gross_salary' , readonly=False ,
                              store=False )
+    vac_allowance = fields.Monetary ( string="بــدل الإجازة السنــويــة" , compute='_compute_gross_salary' , readonly=False ,
+                             store=False )
     other_deduction = fields.Monetary(string="خصــومـات أخـــري",compute="_compute_gross_salary",readonly=False,store=False) 
 
     # contract.l10n_sa_housing_allowance بدل السكن
@@ -251,6 +253,29 @@ class HrPayslip ( models.Model ) :
                 rec.net_wage = rec.gross_wage - loan  + rec.other_deduction 
                 
             # rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction 
+            if rec.employee_id.contract_id.state =='open' :
+                # تحديد تاريخ بداية الخدمة
+                start_date = rec.employee_id.contract_id.first_contract_date if rec.employee_id.contract_id.first_contract_date else rec.employee_id.contract_id.date_start
+                end_date = rec.date_to
+                # حساب سنوات الخدمة الكاملة
+                years_of_service = (end_date.year - start_date.year) - ((end_date.month, end_date.day) < (start_date.month, start_date.day))
+                # تحديد "الأجر الأساسي للاحتساب"
+                # يشمل: الراتب الأساسي + بدل السكن + بدل المواصلات
+                wage_for_annual = rec._get_contract_wage() + ( rec.employee_id.contract_id.l10n_sa_housing_allowance or 0) + ( rec.employee_id.contract_id.l10n_sa_transportation_allowance or 0)
+                # حساب الأجر اليومي
+                daily_wage = wage_for_annual / 30
+                # تطبيق نظام العمل السعودي لحساب المخصص الشهري
+                if years_of_service < 5:
+                   # أقل من 5 سنوات: 21 يوم إجازة في السنة (1.75 يوم شهرياً)
+                   rec.vac_allowance = daily_wage * (21 / 12)
+                else:
+                   # 5 سنوات فأكثر: 30 يوم إجازة في السنة (2.5 يوم شهرياً)
+                   rec.vac_allowance = daily_wage * (30 / 12)    
+
+
+
+                
+             
                 
 
     def action_payslip_done(self) :
