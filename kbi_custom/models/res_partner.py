@@ -227,6 +227,8 @@ class HrPayslip ( models.Model ) :
                              store=False )
     vac_allowance = fields.Monetary ( string="بــدل الإجازة السنــويــة" , compute='_compute_gross_salary' , readonly=False ,
                              store=False )
+    end_service_benefit = fields.Monetary ( string="مكافأة نهايــة الخــدمة" , compute='_compute_gross_salary' , readonly=False ,
+                             store=False )
     other_deduction = fields.Monetary(string="خصــومـات أخـــري",compute="_compute_gross_salary",readonly=False,store=False) 
 
     # contract.l10n_sa_housing_allowance بدل السكن
@@ -274,8 +276,35 @@ class HrPayslip ( models.Model ) :
                    rec.vac_allowance = daily_wage * (21 / 12)
                 else:
                    # 5 سنوات فأكثر: 30 يوم إجازة في السنة (2.5 يوم شهرياً)
-                   rec.vac_allowance = daily_wage * (30 / 12)    
+                   rec.vac_allowance = daily_wage * (30 / 12)  
+                    
+                    
+                #####  for calculating end of service benefit  ####
+                # تحديد تاريخ بداية الخدمة
+                start_service_date =rec.employee_id.contract_id.date_start 
+                end_service_date = rec.date_to
+                # حساب عدد أيام الخدمة
+               service_days_difference = (end_service_date - start_service_date).days
+               if service_days_difference < 0:
+                  service_days_difference = 0
 
+              service_ years = service_days_difference / 365.0
+              # تحديد "الراتب الأساسي للاحتساب" (شامل الأساسي + السكن + النقل + بدلات أخرى)
+              wage_for_eosp =  rec._get_contract_wage()+ rec.contract_id.l10n_sa_housing_allowance+ rec.contract_id.l10n_sa_transportation_allowance + rec.contract_id.l10n_sa_other_allowances
+              # قانون العمل السعودي:
+              # أول 5 سنوات: نصف راتب عن كل سنة.
+              # ما بعد 5 سنوات: راتب كامل عن كل سنة.
+              if service_ years <= 5:
+                 # (نصف الراتب السنوي مقسوماً على 12 شهر)
+                 rec.end_service_benefit = (wage_for_eosp * 0.5) / 12
+              else:
+                 # (راتب سنوي كامل مقسوماً على 12 شهر)
+                 rec.end_service_benefit = wage_for_eosp / 12
+  
+    
+    
+
+    
 
 
                 
