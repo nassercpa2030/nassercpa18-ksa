@@ -1,6 +1,6 @@
 {
     'name': 'AI ChatGPT Discuss Integration',
-    'version': '18.0.1.0',
+    'version': '18.0.0.0',
     'category': 'Tools',
     'depends': ['base', 'mail'],
     'data': [
