@@ -1,0 +1,10 @@
+.ai_agent_modal {
+    max-width: 720px;
+    border-radius: 12px;
+}
+
+.o_dialog .modal-dialog {
+    display: flex;
+    align-items: center;
+    min-height: calc(100vh - 2rem);
+}

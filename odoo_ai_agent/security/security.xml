@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="copilot_agent_dashboard_rules_id" model="ir.rule">
+        <field name="name">Copilot Agent Rules</field>
+        <field name="model_id" ref="model_copilot_agent_dashboard" />
+        <field eval="False" name="global"/>
+        <field name="groups" eval="[Command.set([ref('base.group_user')])]"/>
+        <field name="domain_force"> [('id', 'in', user.copilot_agent_ids.ids)] </field>
+    </record>
+
+    <record id="rule_copilot_agent_dashboard_admin" model="ir.rule">
+        <field name="name">Agent Rule for Admin</field>
+        <field name="model_id" ref="model_copilot_agent_dashboard"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[
+            (4, ref('base.group_system')),
+            (4, ref('base.group_erp_manager'))
+        ]"/>
+    </record>
+</odoo>

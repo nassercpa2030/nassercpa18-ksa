@@ -1,0 +1,44 @@
+<odoo>
+    <record id="res_users_form_inherit_email_credentials_view" model="ir.ui.view">
+        <field name="name">res.users.form.inherit.email.credentials</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+        <field name="arch" type="xml">
+
+            <!-- Insert a new tab after the HR Settings page -->
+            <page name="page_account_security" position="after">
+                <page name="email_credentials" string="Email Credentials">
+                    <group>
+                        <group string="Server Information">
+                            <field name="server"/>
+                            <field name="port" options="{'format': false}"/>
+                            <field name="is_ssl"/>
+                            <field name="user_smtp_status"
+                                       widget="badge"
+                                       readonly="1"
+                                       class="mr2"
+                                       decoration-success="user_smtp_status == 'connected'"
+                                       decoration-danger="user_smtp_status == 'disconnected'"/>
+                            <button name="test_mail_server_connection" colspan="2"
+                                    string="Test Connection"
+                                    type="object"
+                                    class="btn-primary"/>
+                        </group>
+                        <group string="Login Information">
+                            <field name="mail_user"/>
+                            <field name="mail_password" password="True"/>
+                            <button name="action_clear_smtp_values"
+                                string="Reset Server"
+                                type="object"
+                                class="btn-secondary"
+                                icon="fa-trash"
+                                confirm="Are you sure you want to reset all values?" colspan="2"/>
+                        </group>
+                    </group>
+                </page>
+            </page>
+
+        </field>
+    </record>
+
+</odoo>
