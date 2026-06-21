@@ -13,7 +13,7 @@ class HrPayrollStructure ( models.Model ) :
         string='Type' ,
         required=False
     )
-    name =fields.Char(string="name",required=False)
+    name = fields.Char ( string="name" , required=False )
 
 
 class ResCity ( models.Model ) :
@@ -139,14 +139,13 @@ class ResCity ( models.Model ) :
     pub_loc903_perc_111 = fields.Float ( string="نسبة توزيع التوطين العام علي 111" , store=True , readonly=False )
     pub_loc903_perc_200 = fields.Float ( string="نسبة توزيع التوطين العام علي 200" , store=True , readonly=False )
     pub_loc903_perc_103 = fields.Float ( string="نسبة توزيع التوطين العام علي 103" , store=True , readonly=False )
-        # =====مكتب مصر =====
+    # =====مكتب مصر =====
     egy_nk_perc_101 = fields.Float ( string="نسبة توزيع مكتب مصر علي 101" , store=True , readonly=False )
     egy_nk_perc_104 = fields.Float ( string="نسبة توزيع مكتب مصر علي 104" , store=True , readonly=False )
     egy_nk_perc_110 = fields.Float ( string="نسبة توزيع مكتب مصر علي 110" , store=True , readonly=False )
     egy_nk_perc_111 = fields.Float ( string="نسبة توزيع مكتب مصر علي 111" , store=True , readonly=False )
     egy_nk_perc_200 = fields.Float ( string="نسبة توزيع مكتب مصر علي 200" , store=True , readonly=False )
     egy_nk_perc_103 = fields.Float ( string="نسبة توزيع مكتب مصر علي 103" , store=True , readonly=False )
-   
 
     # 🔥 Constrain واحد فقط لكل المجموعات
     # @api.constrains (
@@ -221,15 +220,20 @@ class HrPayslip ( models.Model ) :
                                         store=False )
     loan = fields.Monetary ( string="إستقطــاع ســلفة" , compute='_compute_gross_salary' , readonly=False ,
                              store=False )
-    gosi = fields.Monetary ( string=" خصم حصـة التـأمينات علي الموظف" , compute='_compute_gross_salary' , readonly=False ,
+    gosi = fields.Monetary ( string=" خصم حصـة التـأمينات علي الموظف" , compute='_compute_gross_salary' ,
+                             readonly=False ,
                              store=False )
-    other_gosi = fields.Monetary ( string="خصم حصـة التـأمينات علي الشركة" , compute='_compute_gross_salary' , readonly=False ,
-                             store=False )
-    vac_allowance = fields.Monetary ( string="بــدل الإجازة السنــويــة" , compute='_compute_gross_salary' , readonly=False ,
-                             store=False )
-    end_service_benefit = fields.Monetary ( string="مكافأة نهايــة الخــدمة" , compute='_compute_gross_salary' , readonly=False ,
-                             store=False )
-    other_deduction = fields.Monetary(string="خصــومـات أخـــري",compute="_compute_gross_salary",readonly=False,store=False) 
+    other_gosi = fields.Monetary ( string="خصم حصـة التـأمينات علي الشركة" , compute='_compute_gross_salary' ,
+                                   readonly=False ,
+                                   store=False )
+    vac_allowance = fields.Monetary ( string="بــدل الإجازة السنــويــة" , compute='_compute_gross_salary' ,
+                                      readonly=False ,
+                                      store=False )
+    end_service_benefit = fields.Monetary ( string="مكافأة نهايــة الخــدمة" , compute='_compute_gross_salary' ,
+                                            readonly=False ,
+                                            store=False )
+    other_deduction = fields.Monetary ( string="خصــومـات أخـــري" , compute="_compute_gross_salary" , readonly=False ,
+                                        store=False )
 
     # contract.l10n_sa_housing_allowance بدل السكن
     # contract.l10n_sa_transportation_allowance بدل المواصلات
@@ -243,180 +247,177 @@ class HrPayslip ( models.Model ) :
             # basic = sum(rec.line_ids.filtered(lambda l: l.code == 'BASIC').mapped('total'))
             # allowance = sum(rec.line_ids.filtered(lambda l: l.code == 'ALW').mapped('total'))
             loan = sum ( rec.input_line_ids.filtered ( lambda l : l.code == 'LOAN' ).mapped ( 'amount' ) )
-            othdeductions = sum(rec.input_line_ids.filtered ( lambda l : l.code == 'DEDUCTION' ).mapped ('amount'))
-            rec.other_deduction= -othdeductions
+            othdeductions = sum ( rec.input_line_ids.filtered ( lambda l : l.code == 'DEDUCTION' ).mapped ( 'amount' ) )
+            rec.other_deduction = -othdeductions
             rec.loan = loan
             rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance + rec.contract_id.l10n_sa_other_allowances
-            base = rec._get_contract_wage()+ rec.contract_id.l10n_sa_housing_allowance+ rec.contract_id.l10n_sa_transportation_allowance
+            base = rec._get_contract_wage () + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance
             if rec.employee_id.country_id.code == 'SA' and not rec.contract_id.x_gosi_employee_exempt :
                 rate = 0.1025 if rec.contract_id.x_gosi_225 else 0.0975
                 rate_company = 0.1225 if rec.contract_id.x_gosi_225 else 0.1175
                 rec.gosi = base * -rate
-                rec.other_gosi= base * rate_company 
-                rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction 
-            elif rec.employee_id.country_id.code != 'SA' :   
-                rec.other_gosi = (rec._get_contract_wage() + rec.contract_id.l10n_sa_housing_allowance) * 0.02
-                rec.net_wage = rec.gross_wage - loan  + rec.other_deduction 
-                
-            # rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction 
-            if rec.employee_id.contract_id.state =='open' :
+                rec.other_gosi = base * rate_company
+                rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction
+            elif rec.employee_id.country_id.code != 'SA' :
+                rec.other_gosi = (rec._get_contract_wage () + rec.contract_id.l10n_sa_housing_allowance) * 0.02
+                rec.net_wage = rec.gross_wage - loan + rec.other_deduction
+
+
+                # rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction
+            if rec.employee_id.contract_id.state == 'open' :
                 # تحديد تاريخ بداية الخدمة
                 start_date = rec.employee_id.contract_id.first_contract_date if rec.employee_id.contract_id.first_contract_date else rec.employee_id.contract_id.date_start
                 end_date = rec.date_to
                 # حساب سنوات الخدمة الكاملة
-                years_of_service = (end_date.year - start_date.year) - ((end_date.month, end_date.day) < (start_date.month, start_date.day))
+                years_of_service = (end_date.year - start_date.year) - (
+                            (end_date.month , end_date.day) < (start_date.month , start_date.day))
                 # تحديد "الأجر الأساسي للاحتساب"
                 # يشمل: الراتب الأساسي + بدل السكن + بدل المواصلات
-                wage_for_annual = rec._get_contract_wage() + ( rec.employee_id.contract_id.l10n_sa_housing_allowance or 0) + ( rec.employee_id.contract_id.l10n_sa_transportation_allowance or 0)
+                wage_for_annual = rec._get_contract_wage () + (
+                            rec.employee_id.contract_id.l10n_sa_housing_allowance or 0) + (
+                                              rec.employee_id.contract_id.l10n_sa_transportation_allowance or 0)
                 # حساب الأجر اليومي
                 daily_wage = wage_for_annual / 30
                 # تطبيق نظام العمل السعودي لحساب المخصص الشهري
-                if years_of_service < 5:
-                   # أقل من 5 سنوات: 21 يوم إجازة في السنة (1.75 يوم شهرياً)
-                   rec.vac_allowance = daily_wage * (21 / 12)
-                else:
-                   # 5 سنوات فأكثر: 30 يوم إجازة في السنة (2.5 يوم شهرياً)
-                   rec.vac_allowance = daily_wage * (30 / 12)  
-                    
-                    
-                #####  for calculating end of service benefit  ####
+                if years_of_service < 5 :
+                    # أقل من 5 سنوات: 21 يوم إجازة في السنة (1.75 يوم شهرياً)
+                    rec.vac_allowance = daily_wage * (21 / 12)
+                else :
+                    # 5 سنوات فأكثر: 30 يوم إجازة في السنة (2.5 يوم شهرياً)
+                    rec.vac_allowance = daily_wage * (30 / 12)
+
+                    #####  for calculating end of service benefit  ####
                 # تحديد تاريخ بداية الخدمة
-                start_service_date =rec.employee_id.contract_id.date_start 
+                start_service_date = rec.employee_id.contract_id.date_start
                 end_service_date = rec.date_to
                 # حساب عدد أيام الخدمة
-               service_days_difference = (end_service_date - start_service_date).days
-               if service_days_difference < 0:
-                  service_days_difference = 0
+                service_days_difference = (end_service_date - start_service_date).days
+                if service_days_difference < 0 :
+                   service_days_difference = 0
 
-              service_ years = service_days_difference / 365.0
-              # تحديد "الراتب الأساسي للاحتساب" (شامل الأساسي + السكن + النقل + بدلات أخرى)
-              wage_for_eosp =  rec._get_contract_wage()+ rec.contract_id.l10n_sa_housing_allowance+ rec.contract_id.l10n_sa_transportation_allowance + rec.contract_id.l10n_sa_other_allowances
-              # قانون العمل السعودي:
-              # أول 5 سنوات: نصف راتب عن كل سنة.
-              # ما بعد 5 سنوات: راتب كامل عن كل سنة.
-              if service_ years <= 5:
-                 # (نصف الراتب السنوي مقسوماً على 12 شهر)
-                 rec.end_service_benefit = (wage_for_eosp * 0.5) / 12
-              else:
-                 # (راتب سنوي كامل مقسوماً على 12 شهر)
-                 rec.end_service_benefit = wage_for_eosp / 12
-  
-    
-    
-
-    
+                service_years = service_days_difference / 365.0
+                # تحديد "الراتب الأساسي للاحتساب" (شامل الأساسي + السكن + النقل + بدلات أخرى)
+                wage_for_eosp = rec._get_contract_wage () + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance + rec.contract_id.l10n_sa_other_allowances
+                # قانون العمل السعودي:
+                # أول 5 سنوات: نصف راتب عن كل سنة.
+                # ما بعد 5 سنوات: راتب كامل عن كل سنة.
+                if service_years <= 5 :
+                    # (نصف الراتب السنوي مقسوماً على 12 شهر)
+                    rec.end_service_benefit = (wage_for_eosp * 0.5) / 12
+                else :
+                    # (راتب سنوي كامل مقسوماً على 12 شهر)
+                    rec.end_service_benefit = wage_for_eosp / 12
 
 
-                
-             
-                
-
-    def action_payslip_done(self) :
-        result = super ().action_payslip_done ()
-
-        for slip in self :
-            employee = slip.employee_id
-
-            if not employee :
-                continue
-
-            if employee.related_partners_count > 0 and employee.related_partner_id :
-                employee_partner = employee.related_partner_id
-            else :
-                employee_partner = self.env['res.partner'].create ( {
-                    'name' : employee.name ,
-                    'email' : employee.work_email ,
-                    'phone' : employee.work_phone ,
-                    'is_company' : False ,
-                } )
-
-            move = slip.move_id
-
-            if move :
-                analytic_account_id = employee.analytic_account_id
-
-                analytic_vals = (
-                    {analytic_account_id.id : 100}
-                    if analytic_account_id
-                    else {}
-                )
-
-                for line in move.line_ids :
-                    line.analytic_account_id = analytic_account_id
-                    line.analytic_distribution = analytic_vals
-                    line.partner_id = employee_partner.id
-
-        return result
-
-    # def action_payslip_done(self) :
-    #     result = super ().action_payslip_done ()
-    #
-    #     messages = []  # لتجميع الرسائل لكل slip
-    #
-    #     for slip in self :
-    #         employee = slip.employee_id
-    #         if not employee :
-    #             continue
-    #
-    #         # جلب partner الموظف أو إنشاء واحد جديد إذا لم يكن موجود
-    #         employee_partner = getattr ( employee , 'user_id' , False ) and getattr ( employee.user_id , 'partner_id' ,
-    #                                                                                   False )
-    #         if not employee_partner :
-    #             employee_partner = self.env['res.partner'].create ( {
-    #                 'name' : employee.name ,
-    #                 'email' : getattr ( employee , 'work_email' , False ) ,
-    #                 'phone' : getattr ( employee , 'work_phone' , False ) ,
-    #                 'is_company' : False ,
-    #             } )
-    #
-    #         # جلب القيود المرتبطة بالرواتب
-    #         move = slip.move_id
-    #         if move :
-    #             # جلب الحساب التحليلي من الموظف
-    #             analytic_account_id = getattr ( employee , 'analytic_account_id' , False )
-    #
-    #             # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
-    #             analytic_vals = {analytic_account_id.id : 100} if analytic_account_id else {}
-    #
-    #             for line in move.line_ids :
-    #                 line.analytic_account_id = analytic_account_id
-    #                 line.analytic_distribution = analytic_vals
-    #                 line.partner_id = employee_partner
-    #
-    #     return result
 
 
-class SalaryAttachements(models.Model):
+def action_payslip_done(self) :
+    result = super ().action_payslip_done ()
+
+    for slip in self :
+        employee = slip.employee_id
+
+        if not employee :
+            continue
+
+        if employee.related_partners_count > 0 and employee.related_partner_id :
+            employee_partner = employee.related_partner_id
+        else :
+            employee_partner = self.env['res.partner'].create ( {
+                'name' : employee.name ,
+                'email' : employee.work_email ,
+                'phone' : employee.work_phone ,
+                'is_company' : False ,
+            } )
+
+        move = slip.move_id
+
+        if move :
+            analytic_account_id = employee.analytic_account_id
+
+            analytic_vals = (
+                {analytic_account_id.id : 100}
+                if analytic_account_id
+                else {}
+            )
+
+            for line in move.line_ids :
+                line.analytic_account_id = analytic_account_id
+                line.analytic_distribution = analytic_vals
+                line.partner_id = employee_partner.id
+
+    return result
+
+
+# def action_payslip_done(self) :
+#     result = super ().action_payslip_done ()
+#
+#     messages = []  # لتجميع الرسائل لكل slip
+#
+#     for slip in self :
+#         employee = slip.employee_id
+#         if not employee :
+#             continue
+#
+#         # جلب partner الموظف أو إنشاء واحد جديد إذا لم يكن موجود
+#         employee_partner = getattr ( employee , 'user_id' , False ) and getattr ( employee.user_id , 'partner_id' ,
+#                                                                                   False )
+#         if not employee_partner :
+#             employee_partner = self.env['res.partner'].create ( {
+#                 'name' : employee.name ,
+#                 'email' : getattr ( employee , 'work_email' , False ) ,
+#                 'phone' : getattr ( employee , 'work_phone' , False ) ,
+#                 'is_company' : False ,
+#             } )
+#
+#         # جلب القيود المرتبطة بالرواتب
+#         move = slip.move_id
+#         if move :
+#             # جلب الحساب التحليلي من الموظف
+#             analytic_account_id = getattr ( employee , 'analytic_account_id' , False )
+#
+#             # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
+#             analytic_vals = {analytic_account_id.id : 100} if analytic_account_id else {}
+#
+#             for line in move.line_ids :
+#                 line.analytic_account_id = analytic_account_id
+#                 line.analytic_distribution = analytic_vals
+#                 line.partner_id = employee_partner
+#
+#     return result
+
+
+class SalaryAttachements ( models.Model ) :
     _inherit = 'hr.salary.attachment'
 
-    paid_amount = fields.Monetary(
-        string="المبــلغ المـدفوع",
-        compute="_compute_loan_remaing_paid",
-        readonly=False)
-    
-    remaining_amount = fields.Monetary(string="المبــلغ الـمتبقــي",compute="_compute_loan_remaing_paid",readonly=False) 
- 
+    paid_amount = fields.Monetary (
+        string="المبــلغ المـدفوع" ,
+        compute="_compute_loan_remaing_paid" ,
+        readonly=False )
 
-    @api.depends('payslip_ids.state', 'payslip_ids.line_ids.total')
-    def _compute_loan_remaing_paid(self):
-        for rec in self:
+    remaining_amount = fields.Monetary ( string="المبــلغ الـمتبقــي" , compute="_compute_loan_remaing_paid" ,
+                                         readonly=False )
+
+    @api.depends ( 'payslip_ids.state' , 'payslip_ids.line_ids.total' )
+    def _compute_loan_remaing_paid(self) :
+        for rec in self :
             amount = 0
 
-            paid_slips = rec.payslip_ids.filtered(
-                lambda p: p.state == 'paid'
+            paid_slips = rec.payslip_ids.filtered (
+                lambda p : p.state == 'paid'
             )
             # not_paid_slips = rec.payslip_ids.filtered(
             #     lambda p: p.state not in ['paid','cancel']
             # )
 
-            amount = sum(paid_slips.mapped('loan'))
-           
+            amount = sum ( paid_slips.mapped ( 'loan' ) )
+
             # not_paid_amount= sum(not_paid_slips.mapped('loan'))
 
             rec.paid_amount = amount
-           
-            remaining= rec.total_amount-amount 
-            rec.remaining_amount = max(remaining, 0)
+
+            remaining = rec.total_amount - amount
+            rec.remaining_amount = max ( remaining , 0 )
 
 
 # ---------------- EMPLOYEE Contract -----------------
@@ -533,16 +534,17 @@ class ResPartner ( models.Model ) :
     district2 = fields.Char ( string="الحي" , size=10 , readonly=False )
     identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
     additional_no = fields.Char ( string="الرقم الإضافي" , size=4 , readonly=False )
-    political_kyan= fields.Selection([
-        ('a','شركة ذات مسؤلية محدودة'),
-        ('aa', 'شركة ذات مسؤلية محدودة أجنبية'),
-        ('b','شركة ذات مسؤلية محدودة مختلطة'),
-        ('bbb','شركة مساهمة'),
-        ('bb','مؤسسة فردية')],string="الكـــــيان القـــــانونـي",store=True)
+    political_kyan = fields.Selection ( [
+        ('a' , 'شركة ذات مسؤلية محدودة') ,
+        ('aa' , 'شركة ذات مسؤلية محدودة أجنبية') ,
+        ('b' , 'شركة ذات مسؤلية محدودة مختلطة') ,
+        ('bbb' , 'شركة مساهمة') ,
+        ('bb' , 'مؤسسة فردية')] , string="الكـــــيان القـــــانونـي" , store=True )
 
-    national_address = fields.Char (string="العنوان الوطني " ,compute="_compute_national_address" , readonly=False )
+    national_address = fields.Char ( string="العنوان الوطني " , compute="_compute_national_address" , readonly=False )
     nationality = fields.Char ( "Nationality" )
-    leadline = fields.Char ( "الرقم الأرضي" , required=True,store=True , placeholder="أدخل الرقم الأرضي الخاص بالشركة "  )
+    leadline = fields.Char ( "الرقم الأرضي" , required=True , store=True ,
+                             placeholder="أدخل الرقم الأرضي الخاص بالشركة " )
     email = fields.Char ( "Main Email" , required=True , store=True )
     another_email = fields.Char ( "Another Email" , store=True )
     real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
