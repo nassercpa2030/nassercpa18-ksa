@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- Dialog template showing fetched history records in a card/list layout -->
+    <t t-name="odoo_ai_agent.AiAgentDialogV2" owl="1">
+        <Dialog title="'AI Agent Details'" size="'md'" contentClass="'ai_agent_modal'">
+            <t t-slot="default">
+                <div>
+                    <!-- Loading / Error / Records -->
+                    <t t-if="state.loading">
+                        <div>Loading records...</div>
+                    </t>
+                    <t t-else="">
+                        <t t-if="state.error">
+                            <div class="text-danger">Failed to load records</div>
+                        </t>
+                        <t t-else="">
+                            <!-- debug: show count -->
+<!--                            <div class="mb-3"><strong>Records:</strong> <t t-esc="state.records &amp;&amp; state.records.length"/></div>-->
+
+                            <!-- If records exist show them as card rows -->
+                            <t t-if="state.records &amp;&amp; state.records.length &gt; 0">
+                                <div class="d-grid gap-2">
+                                    <t t-foreach="state.records" t-as="rec" t-key="rec.agent_id">
+                                        <!-- Card-like row -->
+                                        <div class="d-flex align-items-center justify-content-between p-3 mb-2 rounded-3" style="background:#2f3440;color:#fff;">
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-3">
+                                                    <!-- avatar / logo placeholder -->
+                                                    <div>
+                                                        <img src="/odoo_ai_agent/static/description/icon.png" alt="AI" style="width:32px; height:32px; object-fit:contain;"/>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="text-white" style="font-size:1rem;color:#ffffff;"> <t t-esc="rec.agent || ''"/></div>
+                                                    <div class="text-white" style="font-size:0.75rem;color:#ffffff;"> <t t-esc="rec.category || ''"/></div>
+                                                </div>
+                                            </div>
+
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="text-end me-3" style="min-width:180px;">
+                                                    <div style="color:#ff8c42;font-weight:700;font-size:1.25rem;">Credit Used: <t t-esc="rec.cost || 0"/></div>
+<!--                                                    <div class="text-muted" style="font-size:0.8rem;color:#bfc0c7;"> <t t-esc="rec.run_time_of || ''"/></div>-->
+                                                </div>
+                                                <div>
+                                                    <t t-if="rec.agent_id">
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-sm btn-primary"
+                                                            t-on-click="() => openAgentPopup(rec.agent_id)"
+                                                        >
+                                                            Learn More
+                                                        </button>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+
+                            <!-- Demo placeholders when no records exist -->
+                            <t t-else="">
+                                <div class="d-grid gap-2">
+                                    <div class="text-danger">NO Record Found</div>
+                                </div>
+                            </t>
+                        </t>
+                    </t>
+                </div>
+            </t>
+        </Dialog>
+    </t>
+</templates>
+
