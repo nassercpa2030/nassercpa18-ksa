@@ -223,13 +223,13 @@ class HrPayslip ( models.Model ) :
     gosi = fields.Monetary ( string=" خصم حصـة التـأمينات علي الموظف" , compute='_compute_gross_salary' ,
                              readonly=False ,
                              store=False )
-    other_gosi = fields.Monetary ( string="خصم حصـة التـأمينات علي الشركة" , compute='_compute_gross_salary' ,
+    other_gosi = fields.Monetary ( string="مصروف التـأمينات علي الشركة" , compute='_compute_gross_salary' ,
                                    readonly=False ,
                                    store=False )
-    vac_allowance = fields.Monetary ( string="بــدل الإجازة السنــويــة" , compute='_compute_gross_salary' ,
+    vac_allowance = fields.Monetary ( string=" مصروف بــدل الإجازة السنــويــة " , compute='_compute_gross_salary' ,
                                       readonly=False ,
                                       store=False )
-    end_service_benefit = fields.Monetary ( string="مكافأة نهايــة الخــدمة" , compute='_compute_gross_salary' ,
+    end_service_benefit = fields.Monetary ( string="مصروف نهايــة الخــدمة" , compute='_compute_gross_salary' ,
                                             readonly=False ,
                                             store=False )
     other_deduction = fields.Monetary ( string="خصــومـات أخـــري" , compute="_compute_gross_salary" , readonly=False ,
