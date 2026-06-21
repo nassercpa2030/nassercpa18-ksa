@@ -261,7 +261,7 @@ class HrPayslip ( models.Model ) :
                 
             elif rec.employee_id.country_id.code == 'SA' and  rec.contract_id.x_gosi_employee_exempt :
 
-                rate_all_saudi = 0.2250 if contract.x_gosi_225 else 0.2150
+                rate_all_saudi = 0.2250 if rec.contract_id.x_gosi_225 else 0.2150
                 rec.other_gosi = base * rate_all_saudi
                 rec.net_wage = 0.0    
                 
