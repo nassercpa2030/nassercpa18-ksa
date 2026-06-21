@@ -13,6 +13,7 @@ class HrPayrollStructure ( models.Model ) :
         string='Type' ,
         required=False
     )
+    name =fields.Char(string="name",required=False)
 
 
 class ResCity ( models.Model ) :
@@ -29,8 +30,13 @@ class ResCity ( models.Model ) :
 class ResCity ( models.Model ) :
     _inherit = 'res.users'
 
+<<<<<<< HEAD
     analytic_plan_ids = fields.Many2many(
         'account.analytic.plan',
+=======
+    analytic_plan_ids = fields.Many2many (
+        'account.analytic.plan' ,
+>>>>>>> 09fbdde9759c29247b23a1e25d368881526f3211
         string='Allowed Analytic Plans'
     )
     analytic_account_ids = fields.Many2many (
@@ -199,42 +205,153 @@ _logger = logging.getLogger ( __name__ )
 class HrPayslip ( models.Model ) :
     _inherit = 'hr.payslip'
 
+    basic_wage = fields.Monetary ( string="(Basic)الراتـب الأسـاسـي " , related='contract_id.monthly_yearly_costs' ,
+                                   readonly=False , store=False )
+    gross_wage = fields.Monetary ( string="(Gross)الراتـب الشـامل" , compute='_compute_gross_salary' , readonly=False ,
+                                   store=False )
+    net_wage = fields.Monetary ( string="(Net)صــافي الراتـب" , compute='_compute_gross_salary' , readonly=False ,
+                                 store=False )
+    housing = fields.Monetary ( string="بدل الســـكن" , compute='_compute_gross_salary' , readonly=False , store=False )
+    transportation = fields.Monetary ( string="بدل المواصــلات" , compute='_compute_gross_salary' , readonly=False ,
+                                       store=False )
+    other_allowance = fields.Monetary ( string="بدلات أخــري" , compute='_compute_gross_salary' , readonly=False ,
+                                        store=False )
+    loan = fields.Monetary ( string="إستقطــاع ســلفة" , compute='_compute_gross_salary' , readonly=False ,
+                             store=False )
+    gosi = fields.Monetary ( string="خصم حصـة التـأمينات" , compute='_compute_gross_salary' , readonly=False ,
+                             store=False )
+    other_deduction = fields.Monetary(string="خصــومـات أخـــري",compute="_compute_gross_salary",readonly=False,store=False) 
+
+    # contract.l10n_sa_housing_allowance بدل السكن
+    # contract.l10n_sa_transportation_allowance بدل المواصلات
+    # contract.l10n_sa_other_allowances بدلات أخري
+    # @api.depends('basic_wage','contract.l10n_sa_housing_allowance','contract.l10n_sa_transportation_allowance','contract.l10n_sa_other_allowances')
+    def _compute_gross_salary(self) :
+        for rec in self :
+            rec.housing = rec.contract_id.l10n_sa_housing_allowance
+            rec.transportation = rec.contract_id.l10n_sa_transportation_allowance
+            rec.other_allowance = rec.contract_id.l10n_sa_other_allowances
+            # basic = sum(rec.line_ids.filtered(lambda l: l.code == 'BASIC').mapped('total'))
+            # allowance = sum(rec.line_ids.filtered(lambda l: l.code == 'ALW').mapped('total'))
+            loan = sum ( rec.input_line_ids.filtered ( lambda l : l.code == 'LOAN' ).mapped ( 'amount' ) )
+            othdeductions = sum(rec.input_line_ids.filtered ( lambda l : l.code == 'DEDUCTION' ).mapped ('amount'))
+            rec.other_deduction= -othdeductions
+            rec.loan = loan
+            rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance + rec.contract_id.l10n_sa_other_allowances
+            base = rec._get_contract_wage()+ rec.contract_id.l10n_sa_housing_allowance+ rec.contract_id.l10n_sa_transportation_allowance
+            if rec.employee_id.country_id.code == 'SA' and not rec.contract_id.x_gosi_employee_exempt :
+                rate = 0.1025 if rec.contract_id.x_gosi_225 else 0.0975
+                rec.gosi = base * -rate
+                
+            rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction 
+                
+
     def action_payslip_done(self) :
         result = super ().action_payslip_done ()
 
-        messages = []  # لتجميع الرسائل لكل slip
-
         for slip in self :
             employee = slip.employee_id
+
             if not employee :
                 continue
 
-            # جلب partner الموظف أو إنشاء واحد جديد إذا لم يكن موجود
-            employee_partner = getattr ( employee , 'user_id' , False ) and getattr ( employee.user_id , 'partner_id' ,
-                                                                                      False )
-            if not employee_partner :
+            if employee.related_partners_count > 0 and employee.related_partner_id :
+                employee_partner = employee.related_partner_id
+            else :
                 employee_partner = self.env['res.partner'].create ( {
                     'name' : employee.name ,
-                    'email' : getattr ( employee , 'work_email' , False ) ,
-                    'phone' : getattr ( employee , 'work_phone' , False ) ,
+                    'email' : employee.work_email ,
+                    'phone' : employee.work_phone ,
                     'is_company' : False ,
                 } )
 
-            # جلب القيود المرتبطة بالرواتب
             move = slip.move_id
-            if move :
-                # جلب الحساب التحليلي من الموظف
-                analytic_account_id = getattr ( employee , 'analytic_account_id' , False )
 
-                # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
-                analytic_vals = {analytic_account_id.id : 100} if analytic_account_id else {}
+            if move :
+                analytic_account_id = employee.analytic_account_id
+
+                analytic_vals = (
+                    {analytic_account_id.id : 100}
+                    if analytic_account_id
+                    else {}
+                )
 
                 for line in move.line_ids :
                     line.analytic_account_id = analytic_account_id
                     line.analytic_distribution = analytic_vals
-                    line.partner_id = employee_partner
+                    line.partner_id = employee_partner.id
 
         return result
+
+    # def action_payslip_done(self) :
+    #     result = super ().action_payslip_done ()
+    #
+    #     messages = []  # لتجميع الرسائل لكل slip
+    #
+    #     for slip in self :
+    #         employee = slip.employee_id
+    #         if not employee :
+    #             continue
+    #
+    #         # جلب partner الموظف أو إنشاء واحد جديد إذا لم يكن موجود
+    #         employee_partner = getattr ( employee , 'user_id' , False ) and getattr ( employee.user_id , 'partner_id' ,
+    #                                                                                   False )
+    #         if not employee_partner :
+    #             employee_partner = self.env['res.partner'].create ( {
+    #                 'name' : employee.name ,
+    #                 'email' : getattr ( employee , 'work_email' , False ) ,
+    #                 'phone' : getattr ( employee , 'work_phone' , False ) ,
+    #                 'is_company' : False ,
+    #             } )
+    #
+    #         # جلب القيود المرتبطة بالرواتب
+    #         move = slip.move_id
+    #         if move :
+    #             # جلب الحساب التحليلي من الموظف
+    #             analytic_account_id = getattr ( employee , 'analytic_account_id' , False )
+    #
+    #             # صياغة الحساب التحليلي بشكل dict حسب Odoo 18
+    #             analytic_vals = {analytic_account_id.id : 100} if analytic_account_id else {}
+    #
+    #             for line in move.line_ids :
+    #                 line.analytic_account_id = analytic_account_id
+    #                 line.analytic_distribution = analytic_vals
+    #                 line.partner_id = employee_partner
+    #
+    #     return result
+
+
+class SalaryAttachements(models.Model):
+    _inherit = 'hr.salary.attachment'
+
+    paid_amount = fields.Monetary(
+        string="المبــلغ المـدفوع",
+        compute="_compute_loan_remaing_paid",
+        readonly=False)
+    
+    remaining_amount = fields.Monetary(string="المبــلغ الـمتبقــي",compute="_compute_loan_remaing_paid",readonly=False) 
+ 
+
+    @api.depends('payslip_ids.state', 'payslip_ids.line_ids.total')
+    def _compute_loan_remaing_paid(self):
+        for rec in self:
+            amount = 0
+
+            paid_slips = rec.payslip_ids.filtered(
+                lambda p: p.state == 'paid'
+            )
+            # not_paid_slips = rec.payslip_ids.filtered(
+            #     lambda p: p.state not in ['paid','cancel']
+            # )
+
+            amount = sum(paid_slips.mapped('loan'))
+           
+            # not_paid_amount= sum(not_paid_slips.mapped('loan'))
+
+            rec.paid_amount = amount
+           
+            remaining= rec.total_amount-amount 
+            rec.remaining_amount = max(remaining, 0)
 
 
 # ---------------- EMPLOYEE Contract -----------------
@@ -341,14 +458,14 @@ class ResPartner ( models.Model ) :
     key_information = fields.Boolean ( string="المعلومات الرئيسية" , default=False ,
                                        help="عند تفعيل هذا الحقل يتم عرض المعلومات الرئيسية الخاصة بجهة الاتصال الحالية." )
     call_information = fields.Boolean ( string="معلومات الإتصال " , default=False ,
-                                       help="عند تفعيل هذا الحقل يتم عرض معلومات الإتصال الخاصة بجهة الاتصال الحالية." )
+                                        help="عند تفعيل هذا الحقل يتم عرض معلومات الإتصال الخاصة بجهة الاتصال الحالية." )
     history_information = fields.Boolean ( string=" عقود  العميل " , default=False ,
-                                       help="عند تفعيل هذا الحقل يتم عرض معلومات العقود الخاصة بجهة الاتصال الحالية." )
+                                           help="عند تفعيل هذا الحقل يتم عرض معلومات العقود الخاصة بجهة الاتصال الحالية." )
     additional_information = fields.Boolean ( string="المعلومات الفرعية" , default=True ,
                                               help="عند تفعيل هذا الحقل يتم عرض المعلومات الفرعية او الغير أساسسية الخاصة بجهة الاتصال الحالية." )
 
     zip = fields.Char ( string="الرمز البريدي" , size=5 , readonly=False )
-    district2=fields.Char(string="الحي",size=10,readonly=False)
+    district2 = fields.Char ( string="الحي" , size=10 , readonly=False )
     identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
     additional_no = fields.Char ( string="الرقم الإضافي" , size=4 , readonly=False )
 
@@ -357,8 +474,9 @@ class ResPartner ( models.Model ) :
         compute="_compute_national_address" , readonly=False )
 
     nationality = fields.Char ( "Nationality" )
+    leadline = fields.Char ( "الرقم الأرضي" , required=True,store=True , placeholder="أدخل الرقم الأرضي الخاص بالشركة "  )
     email = fields.Char ( "Main Email" , required=True , store=True )
-    another_email = fields.Char ( "Another Email"  , store=True )
+    another_email = fields.Char ( "Another Email" , store=True )
     real_company_name = fields.Char ( string="أسم الشركة لتقرير التسعير" , readonly=False , store=True )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreements' )
     nationality = fields.Char ( "Nationality" )
@@ -367,7 +485,7 @@ class ResPartner ( models.Model ) :
     is_broker = fields.Boolean ( string='Broker' )
     ref = fields.Char ( string=_ ( "1 Audit No" ) , store=True , index=True )
     name_english = fields.Char ( string="English name" , readonly=False , store=True )
-    partner_vat_placeholder = fields.Char ( string="Vat Number", related="vat", readonly=False )
+    partner_vat_placeholder = fields.Char ( string="Vat Number" , related="vat" , readonly=False )
     number_700 = fields.Char ( string="700 Number" , readonly=False )
     identification_number = fields.Char ( string="Identification_number" , store=True , readonly=False )
     manager_name = fields.Many2one ( string="Manager" , comodel_name='res.users' ,
@@ -397,21 +515,21 @@ class ResPartner ( models.Model ) :
             parts = []
 
             if rec.building_no :
-                parts.append ( rec.l10n_sa_edi_building_number )
+                parts.append ( str ( rec.l10n_sa_edi_building_number ) )
 
             if rec.street :
-                parts.append ( rec.street )
-                
+                parts.append ( str ( rec.street ) )
+
             if rec.district2 :
-                parts.append ( rec.district2 )
-                
+                parts.append ( str ( rec.district2 ) )
+
             if rec.city :
-                parts.append ( rec.city )
+                parts.append ( str ( rec.city ) )
 
             if rec.zip and rec.additional_no :
                 parts.append ( f"{rec.zip}-{rec.additional_no}" )
             elif rec.zip :
-                parts.append ( rec.zip )
+                parts.append ( str ( rec.zip ) )
 
             rec.national_address = "، ".join ( parts )
 
@@ -469,11 +587,11 @@ class ResPartner ( models.Model ) :
         for rec in self :
             name = rec.name or ''
 
-            #if rec.vat  or :
-                #name += f' | VAT: {rec.vat}'
+            # if rec.vat  or :
+            # name += f' | VAT: {rec.vat}'
 
-            #if rec.identification_number :
-                #name += f' | ID: {rec.identification_number}'
+            # if rec.identification_number :
+            # name += f' | ID: {rec.identification_number}'
 
             res.append ( (rec.id , name) )
 
@@ -493,7 +611,6 @@ class ResPartner ( models.Model ) :
                       ] + args
 
         return self.search ( domain , limit=limit ).name_get ()
-
 
     @api.onchange ( 'name' )
     def _onchange_name_lock(self) :

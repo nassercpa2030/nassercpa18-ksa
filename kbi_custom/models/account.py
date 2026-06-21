@@ -205,7 +205,7 @@ class AccountMove ( models.Model ) :
                 } )
 
                 # 3️⃣ تنفيذ نفس زر Close Entry
-                wizard.close_entry ()
+                # wizard.close_entry ()
                 
                 if sale_order.project_ids :
                     project = sale_order.project_ids[0]  # مشروع واحد فقط

@@ -9,6 +9,7 @@ import qrcode
 from odoo import models , fields , api , _
 from odoo.exceptions import ValidationError
 from odoo.exceptions import UserError
+from deep_translator import GoogleTranslator
 
 
 # from odoo.tools.populate import compute
@@ -52,7 +53,7 @@ class SaleOrder ( models.Model ) :
 
     customer_English_name_refrence = fields.Char ( 'customer_English_name_refrence' , readonly=False , store=True )
     close_entry_date_refrence = fields.Date ( string="close_entry_date_refrence" , readonly=False , required=False ,
-                                              store=True )
+                                              store=False )
     invoice_status_refrence = fields.Char ( 'invoice_status_refrence' , readonly=False , required=False , store=True )
     journal_entry_count_finance = fields.Integer ( string='عدد قيود الإغلاق' , store=True , index=True )
     project_budget_refrence = fields.Float ( 'project_budget_refrence' , store=True , readonly=False )
@@ -65,7 +66,7 @@ class SaleOrder ( models.Model ) :
     archived_sale = fields.Boolean ( 'Archived' , readonly=False , required=False , default=False )
     amount_tax = fields.Float ( "Taxes" , readonly=False , required=False )
     audit_date = fields.Date ( string='Audit Date' , readonly=False , required=True , store=True )
-    # close_entry_date = fields.Date (string="Close Entry Date" ,compute="calc_close_date",store=True, readonly=True ,searchable=True)
+    # close_entry_date = fields.Date (string="Close Entry Date" ,compute="calc_close_date",store=False, readonly=True ,searchable=True)
     # close_entry_year = fields.Integer ( string="Close Entry Year" ,compute="calc_close_date",store=True, readonly=False,searchable=True )
 
     date = fields.Datetime ( string='Date' )
@@ -116,7 +117,7 @@ class SaleOrder ( models.Model ) :
     # paid_percent = fields.Float(compute='_compute_payment_count')
     amount_due = fields.Float ( compute="_compute_payment_count" , string="Amount Due" , readonly=False )
     project_budget = fields.Float ( string='Project Budget' , copy=False )
-    project_name = fields.Char ( string='Auto Project Name' , compute="get_project_name" , readonly=False , store=True )
+    project_name = fields.Char ( string='Auto Project Name(AR)' , compute="get_project_name" , readonly=False , store=True )
     auto_contract_name = fields.Boolean ( string="Auto Name" , readonly=False , default=True )
     product_public_name = fields.Char ( string="Product Public Name" , compute="get_pr_nam_fr_service" , store=True ,
                                         readonly=False )
@@ -228,6 +229,7 @@ class SaleOrder ( models.Model ) :
     customer_english_name = fields.Char ( string="Customer_English_Name" , related="partner_id.name_english" ,
                                           store=True , readonly=False )
 
+    project_name_en = fields.Char ( string="Project Name (EN)" )
     project_ids = fields.Many2many ( 'project.project' , 'sale_order_project_rel' , 'sale_order_id' , 'project_id' ,
                                      string='Projects' )
     project_count = fields.Integer (
@@ -280,6 +282,15 @@ class SaleOrder ( models.Model ) :
                     }
 
     ##########print method##########
+    def action_print_customer_history(self) :
+        # إحنا هنا بنجيب التقرير بالـ ID مباشرة
+        report = self.env['ir.actions.report'].browse ( 1645 )
+        if not report :
+            # لو التقرير مش موجود، ممكن نعمل raise أو نرجع التقرير الافتراضي
+            raise ValueError ( "Report with ID 1645 not found!" )
+        # ترجع الـ report action عشان أودو يفتح PDF
+        return report.report_action ( self )
+        
 
     def action_print_project_history(self) :
         # إحنا هنا بنجيب التقرير بالـ ID مباشرة
@@ -290,18 +301,18 @@ class SaleOrder ( models.Model ) :
         # ترجع الـ report action عشان أودو يفتح PDF
         return report.report_action ( self )
 
-    def calc_close_date(self) :
-        for rec in self :
-            move = self.env['account.move'].search (
-                [('sale_order_id_finance' , '=' , rec.id) , ('journal_id' , '=' , 165) , ('state' , '=' , 'posted') ,
-                 ('date' , '!=' , False)] , limit=1 )
-            rec.close_entry_date = move.date if move else False
-            if rec.close_entry_date :
-                rec.close_entry_year = rec.close_entry_date.year
-                print ( 'DEBUG: Sale Order ID:' , rec.id , 'Move ID:' , move.id , 'Move Name:' , move.name )
-            else :
-                rec.close_entry_year = False
-                print ( 'DEBUG: Sale Order ID:' , rec.id , 'No move found with journal 165' )
+    # def calc_close_date(self) :
+    #     for rec in self :
+    #         move = self.env['account.move'].search (
+    #             [('sale_order_id_finance' , '=' , rec.id) , ('journal_id' , '=' , 165) , ('state' , '=' , 'posted') ,
+    #              ('date' , '!=' , False)] , limit=1 )
+    #         rec.close_entry_date = move.date if move else False
+    #         if rec.close_entry_date :
+    #             rec.close_entry_year = rec.close_entry_date.year
+    #             print ( 'DEBUG: Sale Order ID:' , rec.id , 'Move ID:' , move.id , 'Move Name:' , move.name )
+    #         else :
+    #             rec.close_entry_year = False
+    # #             print ( 'DEBUG: Sale Order ID:' , rec.id , 'No move found with journal 165' )
 
     def action_set_project_stage_20(self) :
         stage = self.env['project.project.stage'].browse ( 20 )
@@ -340,6 +351,17 @@ class SaleOrder ( models.Model ) :
             # else :
             # rec.product_public_name = False
 
+    def action_translate_project_name(self) :
+        for rec in self :
+            if rec.project_name :
+                try :
+                    rec.project_name_en = GoogleTranslator (
+                        source='auto' ,
+                        target='en'
+                    ).translate ( rec.project_name )
+                except Exception :
+                    rec.project_name_en = rec.project_name
+
     @api.depends ( 'product_public_name' , 'account_year' , 'auto_contract_name' )
     def get_project_name(self) :
         for rec in self :
@@ -353,44 +375,6 @@ class SaleOrder ( models.Model ) :
 
             rec.project_name = "- ".join ( parts )
 
-
-    #@api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
-    #def get_project_name(self) :
-        #for rec in self :
-            # if not rec.project_name and rec.auto_contract_name:
-            # if rec.product_public_name and rec.account_year:
-            # rec.project_name = f"{rec.product_public_name} {rec.account_year}"
-            #if rec.auto_contract_name :
-                #if not rec.product_public_name or not rec.account_year :
-                    #rec.project_name = ""
-                #else :
-                    #rec.project_name = f"{rec.product_public_name} {rec.account_year}"
-
-    # @api.depends("x_studio_contract_service")
-    # def get_audit_date (self):
-    #   for rec in self :
-    #   if rec.x_studio_contract_service :
-    #      if x_studio_contract_service.id in []
-
-    #def action_get_crm_lead(self):
-       # self.ensure_one() # for insuring that it is one lead
-        # lead = self.opportunity_id
-
-        #leads = self.env['crm.lead'].search([
-            #('partner_id', '=', self.partner_id.id)
-        #])# for getting lead of saleorder
-        # then
-
-        #return {
-         #   'type': 'ir.actions.act_window',
-          #  'name': 'CRM Lead ',
-           # 'res_model': 'crm.lead',
-            #'view_mode':'form',
-            #'list,form',
-            #'domain': lead.id,
-            #[('id', 'in', leads.ids)],
-            #'target': 'new',
-        #}
     def action_get_crm_lead(self) :
         self.ensure_one ()
 
@@ -407,7 +391,6 @@ class SaleOrder ( models.Model ) :
             'res_id' : lead.id ,
             'target' : 'new' ,
         }
-    
 
     @api.depends ( 'review_manager_id' )
     def _compute_ass_visible(self) :
@@ -584,7 +567,7 @@ class SaleOrder ( models.Model ) :
 
     uuid = fields.Char ( string='UUID' , readonly=True )
     opportunity_id = fields.Many2one ( 'crm.lead' , string='Opportunity' )
-    #project_name = fields.Char ( string='Project Name' )
+    # project_name = fields.Char ( string='Project Name' )
     partner_id = fields.Many2one ( 'res.partner' , string='Partner' )
     user_id = fields.Many2one ( 'res.users' , string='Responsible' )
 
@@ -644,7 +627,6 @@ class SaleOrder ( models.Model ) :
 
     @api.model
     def create(self , vals) :
-
         res = super ().create ( vals )
         # res._get_mobile()
         if res.upload_file :
@@ -668,8 +650,31 @@ class SaleOrder ( models.Model ) :
         return res
 
     def write(self , vals) :
+        # this field for  saving last archive signiture value
+        old_archive = {
+            rec.id : rec.archive_signiture
+            for rec in self
+        }
 
         res = super ().write ( vals )
+
+        if 'archive_signiture' in vals :
+
+            for sale_order in self :
+                if (
+                        not old_archive[sale_order.id]
+                        and sale_order.archive_signiture
+                ) :
+                    wizard = self.env['close.entry.wizard'].with_context (
+                        active_id=sale_order.id ,
+                        active_model='sale.order'
+                    ).create ( {
+                        'sale_order_id' : sale_order.id ,
+                        'journal_entry_date' : fields.Date.context_today ( self ) ,
+                    } )
+
+                    wizard.close_entry ()
+
         # self._get_mobile()
         # إعادة معالجة الملفات فقط إذا تم رفع جديد
         if 'upload_file' in vals and vals['upload_file'] :
@@ -1007,6 +1012,49 @@ class SaleOrder ( models.Model ) :
         }
 
 
+
+
+
+# @api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
+# def get_project_name(self) :
+# for rec in self :
+# if not rec.project_name and rec.auto_contract_name:
+# if rec.product_public_name and rec.account_year:
+# rec.project_name = f"{rec.product_public_name} {rec.account_year}"
+# if rec.auto_contract_name :
+# if not rec.product_public_name or not rec.account_year :
+# rec.project_name = ""
+# else :
+# rec.project_name = f"{rec.product_public_name} {rec.account_year}"
+
+# @api.depends("x_studio_contract_service")
+# def get_audit_date (self):
+#   for rec in self :
+#   if rec.x_studio_contract_service :
+#      if x_studio_contract_service.id in []
+
+# def action_get_crm_lead(self):
+# self.ensure_one() # for insuring that it is one lead
+# lead = self.opportunity_id
+
+# leads = self.env['crm.lead'].search([
+# ('partner_id', '=', self.partner_id.id)
+# ])# for getting lead of saleorder
+# then
+
+# return {
+#   'type': 'ir.actions.act_window',
+#  'name': 'CRM Lead ',
+# 'res_model': 'crm.lead',
+# 'view_mode':'form',
+# 'list,form',
+# 'domain': lead.id,
+# [('id', 'in', leads.ids)],
+# 'target': 'new',
+# }
+
+
+
 class SaleOrder2 ( models.Model ) :
     _inherit = 'sale.order'
 
@@ -1062,16 +1110,17 @@ class SaleOrder2 ( models.Model ) :
     price1 = fields.Float ( string="Untaxed Price1" , readonly=False , deFault=False )
     price2 = fields.Float ( string="Untaxed Price2" , readonly=False , deFault=False )
     price3 = fields.Float ( string="Untaxed Price3" , readonly=False , deFault=False )
-    year1 = fields.Char ( string="Year_1" , readonly=False , deFault=False )
-    year2 = fields.Char ( string="Year_2" , readonly=False , deFault=False )
-    year3 = fields.Char ( string="Year_3" , readonly=False , deFault=False )
+    year1 = fields.Char ( string="Description_1" , readonly=False , deFault=False )
+    year2 = fields.Char ( string="Description_2" , readonly=False , deFault=False )
+    year3 = fields.Char ( string="Description_3" , readonly=False , deFault=False )
     uuid = fields.Char ( string='UUID' )
-    final_close_entry_date = fields.Date ( string=" تاريخ قيد الايراد" , compute='_compute_final_close_entry_date' ,
-                                           readonly=False , index=True , searchable=True )
+
     final_close_entry = fields.Char ( string="قيد الايراد" , compute='_compute_final_close_entry_date' ,
                                       readonly=False , index=True , searchable=True )
-    close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , store=True , related="final_close_entry_date" ,
-                                     readonly=False , index=True , searchable=True )
+    close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , rcompute='_compute_final_close_entry_date' ,
+                                     readonly=False )
+    final_close_entry_date = fields.Date ( string=" تاريخ قيد الايراد" , compute='_compute_final_close_entry_date' ,
+                                           index=True , searchable=True , store=True )
     close_entry_year = fields.Integer ( string="Close Entry Year" , store=True , readonly=False , searchable=True )
     validity_date = fields.Date ( string='Validity Date' ,
                                   default=fields.Date.today () + datetime.timedelta ( days=30 ) )
@@ -1094,6 +1143,7 @@ class SaleOrder2 ( models.Model ) :
             ] , order='date asc' , limit=1 )
 
             if move :
+                order.close_entry_date = move.date
                 order.final_close_entry_date = move.date
                 order.final_close_entry = move.name
 

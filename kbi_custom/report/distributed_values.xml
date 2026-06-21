@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <!-- ACTION HTML -->
+        <record id="action_report_kbi_analytic_profit_loss_html" model="ir.actions.report">
+            <field name="name">Analytic Profit and Loss Preview</field>
+            <field name="model">kbi.analytic.profit.loss.wizard</field>
+            <field name="report_type">qweb-html</field>
+            <field name="report_name">kbi_custom.report_kbi_analytic_profit_loss_document</field>
+            <field name="report_file">kbi_custom.report_kbi_analytic_profit_loss_document</field>
+        </record>
+
+        <!-- ACTION PDF -->
+        <record id="action_report_kbi_analytic_profit_loss_pdf" model="ir.actions.report">
+            <field name="name">Analytic Profit and Loss PDF</field>
+            <field name="model">kbi.analytic.profit.loss.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">kbi_custom.report_kbi_analytic_profit_loss_document</field>
+            <field name="report_file">kbi_custom.report_kbi_analytic_profit_loss_document</field>
+        </record>
+
+        <!-- REPORT -->
+        <template id="report_kbi_analytic_profit_loss_document">
+
+            <t t-call="web.html_container">
+
+                <t t-foreach="docs" t-as="doc">
+
+                    <t t-set="doc_data" t-value="doc.get_report_data()"/>
+
+                    <t t-call="web.external_layout">
+
+                        <div class="page">
+
+                            <!-- TITLE -->
+                            <h2 style="text-align:center;">
+                                تقرير الربح والخسارة / Profit &amp; Loss Report
+                            </h2>
+
+                            <!-- FILTERS -->
+                            <div style="text-align:center; margin-bottom:10px;">
+                                <strong>من / From:</strong>
+                                <span t-field="doc.date_from"/>
+
+                                &nbsp; | &nbsp;
+
+                                <strong>إلى / To:</strong>
+                                <span t-field="doc.date_to"/>
+                            </div>
+
+                            <!-- SUMMARY -->
+                            <table class="table table-bordered" style="width:100%; text-align:center;">
+                                <tr>
+                                    <th>الإيرادات / Income</th>
+                                    <th>المصروفات / Expense</th>
+                                    <th>الصافي / Net</th>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <t t-esc="'{:,.2f}'.format(doc_data['total_income'] or 0.0)"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="'{:,.2f}'.format(doc_data['total_expense'] or 0.0)"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="'{:,.2f}'.format(doc_data['total_net'] or 0.0)"/>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <br/>
+
+                            <!-- DETAILS -->
+                            <table class="table table-sm table-striped">
+
+                                <thead>
+                                    <tr>
+                                        <th>البيان / Name</th>
+                                        <th>الإيراد / Income</th>
+                                        <th>المصروف / Expense</th>
+                                        <th>الصافي / Net</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    <t t-if="not doc_data['lines']">
+                                        <tr>
+                                            <td colspan="4" style="text-align:center;">
+                                                لا توجد بيانات / No Data Found
+                                            </td>
+                                        </tr>
+                                    </t>
+
+                                    <t t-foreach="doc_data['lines']" t-as="l">
+
+                                        <tr>
+
+                                            <td>
+                                                <t t-esc="l['name']"/>
+                                            </td>
+
+                                            <td>
+                                                <t t-esc="'{:,.2f}'.format(l['income_amount'] or 0.0)"/>
+                                            </td>
+
+                                            <td>
+                                                <t t-esc="'{:,.2f}'.format(l['expense_amount'] or 0.0)"/>
+                                            </td>
+
+                                            <td>
+                                                <t t-esc="'{:,.2f}'.format(l['net_amount'] or 0.0)"/>
+                                            </td>
+
+                                        </tr>
+
+                                    </t>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </t>
+
+                </t>
+
+            </t>
+
+        </template>
+
+    </data>
+</odoo>
