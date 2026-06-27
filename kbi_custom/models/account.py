@@ -901,7 +901,7 @@ class AccountMove ( models.Model ) :
         readonly=False
     )
     
-    def _compute_analytic_distribution_sset(self) :
+    def _compute_analytic_distribution_asset(self) :
         for rec in self :
             analytic_name = ''
             for line in rec.line_ids :
