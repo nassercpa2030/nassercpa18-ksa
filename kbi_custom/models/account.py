@@ -891,6 +891,35 @@ class HrExpenseSheet ( models.Model ) :
     # store=True ,
     # readonly=False )
 
+class AccountMove ( models.Model ) :
+    _inherit = 'account.asset'
+
+    analytic_acc_desc = fields.Char (
+        string="Journal Analytic Description" ,
+        compute='_compute_analytic_distribution_asset' ,
+        store=True ,
+        readonly=False
+    )
+    
+    def _compute_analytic_distribution_sset(self) :
+        for rec in self :
+            analytic_name = ''
+            for line in rec.line_ids :
+                if hasattr ( line , 'analytic_distribution' ) and line.analytic_distribution :
+                    analytic_ids = list ( line.analytic_distribution.keys () )
+                    try :
+                        analytic_id = int ( analytic_ids[0] )
+                        analytic = self.env['account.analytic.account'].browse ( analytic_id )
+                        if analytic.exists () :
+                            analytic_name = analytic.name
+                            break
+                    except (ValueError , TypeError) :
+                        continue
+            rec.analytic_acc_desc = analytic_name 
+    
+
+
+
 
 class AnalyticDistributuion ( models.Model ) :
     _inherit = 'account.analytic.line'
