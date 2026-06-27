@@ -904,7 +904,7 @@ class AccountMove ( models.Model ) :
     analytic_acc_desc = fields.Char (
         string="Journal Analytic Description" ,
         compute='_compute_analytic_distribution_asset' ,
-        store=True ,
+        #store=True ,
         readonly=False
     )
 
