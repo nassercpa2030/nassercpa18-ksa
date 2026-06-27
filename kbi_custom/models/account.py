@@ -107,11 +107,16 @@ class AccountMove ( models.Model ) :
     def action_post(self) :
         # منع infinite loop إذا تم استدعاء الفاتورة من داخل الكود
         if self.env.context.get ( 'skip_auto_invoice' ) :
-            return super(AccountMove, self).action_post()
-            # return super ().action_post ()
+            #return super(AccountMove, self).action_post()
+            return super ().action_post ()
 
         # 1️⃣ ترحيل الفاتورة الأساسي أولًا مع تجاوز E-Invoicing
-        res = super ( AccountMove , self.with_context ( disable_sa_edi_checks=True ) ).action_post ()
+        
+        #res = super ( AccountMove , self.with_context ( disable_sa_edi_checks=True ) ).action_post ()
+        self = self.with_context(disable_sa_edi_checks=True)
+        res = super().action_post()
+        
+        
 
         for move in self :
             sale_order = move.sale_order_id
