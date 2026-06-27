@@ -908,7 +908,7 @@ class AccountMove ( models.Model ) :
         readonly=False
     )
     
-    @api.depends('analytic_distribution','analytic_distribution.name')
+    @api.depends('analytic_distribution')
     def _compute_analytic_distribution_asset(self) :
         Analytic = self.env['account.analytic.account']
 
