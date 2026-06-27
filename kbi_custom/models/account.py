@@ -9,7 +9,7 @@ class AccountMove ( models.Model ) :
 
     broker_sale_id = fields.Many2one ( 'sale.order' , string='Broker Sale' )
     sale_order_test = fields.Char ( string='Sale Order Test' , readonly=False , required=False )
-    employee_id = fields.Char(string="أسم الموظف", store=True)
+    employee_id = fields.Char ( string="أسم الموظف" , store=True )
     x_studio_auto_code = fields.Char ( string="order name" )
     sale_order_id_finance = fields.Many2one (
         'sale.order' , string='أمر البيع' , compute='_compute_sale_order_id' ,
@@ -163,7 +163,7 @@ class AccountMove ( models.Model ) :
             } )
 
             # حفظ الفاتورة أولًا
-            #invoice.sudo ().write ( {} )
+            # invoice.sudo ().write ( {} )
             # 6️⃣ ترحيل الفاتورة
             invoice.with_context ( skip_auto_invoice=True ).action_post ()
 
@@ -192,7 +192,7 @@ class AccountMove ( models.Model ) :
                 # 1️⃣ استدعاء دالة الإقفال من Sale Order
                 if hasattr ( sale_order , 'action_close_journal_entries' ) :
                     sale_order.action_close_journal_entries ()
-                    sale_order.finance_signiture= True
+                    sale_order.finance_signiture = True
 
                 # 2️⃣ إنشاء Wizard مع context الصحيح (زي الزرار)
                 wizard = self.env['close.entry.wizard'].with_context (
@@ -206,7 +206,7 @@ class AccountMove ( models.Model ) :
 
                 # 3️⃣ تنفيذ نفس زر Close Entry
                 # wizard.close_entry ()
-                
+
                 if sale_order.project_ids :
                     project = sale_order.project_ids[0]  # مشروع واحد فقط
                     # if project.stage_id.id != 24:
@@ -242,18 +242,18 @@ class AccountMove ( models.Model ) :
     ##########end post function ##############
 
     ## create function for creating new customer invoice####
-    def action_create_new_invoice(self):
+    def action_create_new_invoice(self) :
         return {
-            'type': 'ir.actions.act_window',
-            'name': 'New Invoice',
-            'res_model': 'account.move',
-            'view_mode': 'form',
-            'context': {
-                'default_move_type': 'out_invoice',
-            },
-            'target': 'current',
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'New Invoice' ,
+            'res_model' : 'account.move' ,
+            'view_mode' : 'form' ,
+            'context' : {
+                'default_move_type' : 'out_invoice' ,
+            } ,
+            'target' : 'current' ,
         }
-        
+
     ########
     @api.depends ( 'partner_id' )
     def compute_vendor_attachements(self) :
@@ -522,7 +522,7 @@ class AccountMoveLine ( models.Model ) :
 
             }
             distribution_value_auto = {
-                 rec.analytic_account_id.id: 100.0
+                rec.analytic_account_id.id : 100.0
             }
             distribution_vals = {
                 # 8820 : rec.office_supp_perc_101 ,
@@ -676,8 +676,8 @@ class AccountMoveLine ( models.Model ) :
                     '410' ) :
                 rec.analytic_distribution = distribution_vals1
 
-            elif rec.analytic_account_id and rec.account_id.code.startswith('410'):
-                 rec.analytic_distribution = distribution_value_auto
+            elif rec.analytic_account_id and rec.account_id.code.startswith ( '410' ) :
+                rec.analytic_distribution = distribution_value_auto
 
             # الحالات الخاصة بالشركاء
             elif rec.partner_id and rec.partner_id.id == 60597 and rec.account_id and rec.account_id.code and rec.account_id.code.startswith (
@@ -891,6 +891,7 @@ class HrExpenseSheet ( models.Model ) :
     # store=True ,
     # readonly=False )
 
+
 class AccountMove ( models.Model ) :
     _inherit = 'account.asset'
 
@@ -900,26 +901,23 @@ class AccountMove ( models.Model ) :
         store=True ,
         readonly=False
     )
-    
+
     def _compute_analytic_distribution_asset(self) :
+        Analytic = self.env['account.analytic.account']
+
         for rec in self :
-            analytic_name = ''
-            for line in rec.line_ids :
-                if hasattr ( line , 'analytic_distribution' ) and line.analytic_distribution :
-                    analytic_ids = list ( line.analytic_distribution.keys () )
-                    try :
-                        analytic_id = int ( analytic_ids[0] )
-                        analytic = self.env['account.analytic.account'].browse ( analytic_id )
-                        if analytic.exists () :
-                            analytic_name = analytic.name
-                            break
-                    except (ValueError , TypeError) :
-                        continue
-            rec.analytic_acc_desc = analytic_name 
-    
+            result = []
 
+            distribution = rec.analytic_distribution or {}
 
+            for analytic_id , percentage in distribution.items () :
+                analytic = Analytic.browse ( int ( analytic_id ) )
+                if analytic.exists () :
+                    result.append ( f"{analytic.name} ({percentage}%)" )
 
+            rec.analytic_acc_desc = " - ".join ( result )
+            
+            
 
 class AnalyticDistributuion ( models.Model ) :
     _inherit = 'account.analytic.line'
@@ -929,57 +927,63 @@ class AnalyticDistributuion ( models.Model ) :
         store=True ,
         readonly=True )
     # توزيع الحسابات  التحليلة finance##
-    finance_101_distribution_amount = fields.Monetary ( string="101 نسبة توزيع المالية علي " ,compute="_compute_dist_percentage" , readonly=False )
-    finance_104_distribution_amount = fields.Monetary ( string="104 نسبة توزيع المالية علي ",compute="_compute_dist_percentage" , readonly=False)
-    finance_110_distribution_amount = fields.Monetary ( string="110 نسبة توزيع المالية علي ",compute="_compute_dist_percentage" , readonly=False )
-    finance_111_distribution_amount = fields.Monetary ( string="111 نسبة توزيع المالية علي ",compute="_compute_dist_percentage" , readonly=False )
-    finance_200_distribution_amount = fields.Monetary ( string="200 نسبة توزيع المالية علي ",compute="_compute_dist_percentage" , readonly=False )
-    finance_103_distribution_amount = fields.Monetary ( string="103 نسبة توزيع المالية علي ",compute="_compute_dist_percentage" , readonly=False )
+    finance_101_distribution_amount = fields.Monetary ( string="101 نسبة توزيع المالية علي " ,
+                                                        compute="_compute_dist_percentage" , readonly=False )
+    finance_104_distribution_amount = fields.Monetary ( string="104 نسبة توزيع المالية علي " ,
+                                                        compute="_compute_dist_percentage" , readonly=False )
+    finance_110_distribution_amount = fields.Monetary ( string="110 نسبة توزيع المالية علي " ,
+                                                        compute="_compute_dist_percentage" , readonly=False )
+    finance_111_distribution_amount = fields.Monetary ( string="111 نسبة توزيع المالية علي " ,
+                                                        compute="_compute_dist_percentage" , readonly=False )
+    finance_200_distribution_amount = fields.Monetary ( string="200 نسبة توزيع المالية علي " ,
+                                                        compute="_compute_dist_percentage" , readonly=False )
+    finance_103_distribution_amount = fields.Monetary ( string="103 نسبة توزيع المالية علي " ,
+                                                        compute="_compute_dist_percentage" , readonly=False )
     # =========================== الدعم التشغيلي ===========================
     oper_supp902_101_distribution_amount = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 101" ,
                                                           compute="_compute_dist_percentage" ,
-                                                           readonly=False  )
+                                                          readonly=False )
     oper_supp902_104_distribution_amount = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 104" ,
                                                           compute="_compute_dist_percentage" ,
-                                                           readonly=False  )
+                                                          readonly=False )
     oper_supp902_110_distribution_amount = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 110" ,
                                                           compute="_compute_dist_percentage" ,
-                                                           readonly=False   )
+                                                          readonly=False )
     oper_supp902_111_distribution_amount = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 111" ,
                                                           compute="_compute_dist_percentage" ,
-                                                           readonly=False   )
+                                                          readonly=False )
     oper_supp902_200_distribution_amount = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 200" ,
                                                           compute="_compute_dist_percentage" ,
-                                                           readonly=False   )
+                                                          readonly=False )
     oper_supp902_103_distribution_amount = fields.Float ( string="نسبة توزيع الدعم التشغيلي علي 103" ,
                                                           compute="_compute_dist_percentage" ,
-                                                           readonly=False   )
+                                                          readonly=False )
     # =========================== التسويق عام ===========================
     sale_gen911_101_distribution_amount = fields.Float ( string="نسبة توزيع التسويق عام علي 101" ,
                                                          compute="_compute_dist_percentage" ,
-                                                         readonly=False  )
+                                                         readonly=False )
     sale_gen911_104_distribution_amount = fields.Float ( string="نسبة توزيع التسويق عام علي 104" ,
                                                          compute="_compute_dist_percentage" ,
-                                                         readonly=False  )
+                                                         readonly=False )
     sale_gen911_110_distribution_amount = fields.Float ( string="نسبة توزيع التسويق عام علي 110" ,
                                                          compute="_compute_dist_percentage" ,
-                                                         readonly=False  )
+                                                         readonly=False )
     sale_gen911_111_distribution_amount = fields.Float ( string="نسبة توزيع التسويق عام علي 111" ,
                                                          compute="_compute_dist_percentage" ,
-                                                         readonly=False  )
+                                                         readonly=False )
     sale_gen911_200_distribution_amount = fields.Float ( string="نسبة توزيع التسويق عام علي 200" ,
                                                          compute="_compute_dist_percentage" ,
-                                                         readonly=False  )
+                                                         readonly=False )
     sale_gen911_103_distribution_amount = fields.Float ( string="نسبة توزيع التسويق عام علي 103" ,
                                                          compute="_compute_dist_percentage" ,
-                                                         readonly=False  )
+                                                         readonly=False )
     # ===== الجودة =====
     quality901_perc_101_distribution_amount = fields.Float ( string="نسبة توزيع الجودة على 101" ,
                                                              compute="_compute_dist_percentage" , readonly=False ,
                                                              store=True )
     quality901_perc_104_distribution_amount = fields.Float ( string="نسبة توزيع الجودة على 104" ,
                                                              compute="_compute_dist_percentage" , readonly=False ,
-                                                              )
+                                                             )
     quality901_perc_110_distribution_amount = fields.Float ( string="نسبة توزيع الجودة على 110" ,
                                                              compute="_compute_dist_percentage" , readonly=False ,
                                                              )
@@ -991,7 +995,7 @@ class AnalyticDistributuion ( models.Model ) :
                                                              )
     quality901_perc_103_distribution_amount = fields.Float ( string="نسبة توزيع الجودة على 103" ,
                                                              compute="_compute_dist_percentage" , readonly=False ,
-                                                              )
+                                                             )
 
     # ===== المستلزمات المكتبية =====
     office_supp_perc_101_distribution_amount = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 101" ,
@@ -999,137 +1003,139 @@ class AnalyticDistributuion ( models.Model ) :
                                                               )
     office_supp_perc_104_distribution_amount = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 104" ,
                                                               compute="_compute_dist_percentage" , readonly=False ,
-                                                               )
+                                                              )
     office_supp_perc_110_distribution_amount = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 110" ,
                                                               compute="_compute_dist_percentage" , readonly=False ,
-                                                               )
+                                                              )
     office_supp_perc_111_distribution_amount = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 111" ,
                                                               compute="_compute_dist_percentage" , readonly=False ,
                                                               )
     office_supp_perc_200_distribution_amount = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 200" ,
                                                               compute="_compute_dist_percentage" , readonly=False ,
-                                                               )
+                                                              )
     office_supp_perc_103_distribution_amount = fields.Float ( string="نسبة توزيع المستلزمات المكتبية علي 103" ,
                                                               compute="_compute_dist_percentage" , readonly=False ,
-                                                               )
+                                                              )
 
     # ===== الشئون الإدارية =====
     manage_921_perc_101_distribution_amount = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 101" ,
                                                              compute="_compute_dist_percentage" ,
-                                                              readonly=False   )
+                                                             readonly=False )
     manage_921_perc_104_distribution_amount = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 104" ,
                                                              compute="_compute_dist_percentage" ,
-                                                              readonly=False   )
+                                                             readonly=False )
     manage_921_perc_110_distribution_amount = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 110" ,
                                                              compute="_compute_dist_percentage" ,
-                                                              readonly=False   )
+                                                             readonly=False )
     manage_921_perc_111_distribution_amount = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 111" ,
                                                              compute="_compute_dist_percentage" ,
-                                                              readonly=False   )
+                                                             readonly=False )
     manage_921_perc_200_distribution_amount = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 200" ,
                                                              compute="_compute_dist_percentage" ,
-                                                              readonly=False   )
+                                                             readonly=False )
     manage_921_perc_103_distribution_amount = fields.Float ( string="نسبة توزيع الشئون الإدارية علي 103" ,
                                                              compute="_compute_dist_percentage" ,
-                                                              readonly=False   )
+                                                             readonly=False )
 
     # ===== إدارة التقنية =====
     it_922_perc_101_distribution_amount = fields.Float ( string="نسبة توزيع التقنية علي 101" ,
                                                          compute="_compute_dist_percentage" ,
-                                                          readonly=False   )
+                                                         readonly=False )
     it_922_perc_104_distribution_amount = fields.Float ( string="نسبة توزيع التقنية علي 104" ,
                                                          compute="_compute_dist_percentage" ,
-                                                          readonly=False   )
+                                                         readonly=False )
     it_922_perc_110_distribution_amount = fields.Float ( string="نسبة توزيع التقنية علي 110" ,
                                                          compute="_compute_dist_percentage" ,
-                                                          readonly=False   )
+                                                         readonly=False )
     it_922_perc_111_distribution_amount = fields.Float ( string="نسبة توزيع التقنية علي 111" ,
                                                          compute="_compute_dist_percentage" ,
-                                                          readonly=False   )
+                                                         readonly=False )
     it_922_perc_200_distribution_amount = fields.Float ( string="نسبة توزيع التقنية علي 200" ,
                                                          compute="_compute_dist_percentage" ,
-                                                          readonly=False   )
+                                                         readonly=False )
     it_922_perc_103_distribution_amount = fields.Float ( string="نسبة توزيع التقنية علي 103" ,
                                                          compute="_compute_dist_percentage" ,
-                                                          readonly=False   )
+                                                         readonly=False )
     # ===== المباني والمنشئات =====
     build_facil950_perc_101_distribution_amount = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 101" ,
                                                                  compute="_compute_dist_percentage" ,
-                                                                  readonly=False   )
+                                                                 readonly=False )
     build_facil950_perc_104_distribution_amount = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 104" ,
                                                                  compute="_compute_dist_percentage" ,
-                                                                  readonly=False   )
+                                                                 readonly=False )
     build_facil950_perc_110_distribution_amount = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 110" ,
                                                                  compute="_compute_dist_percentage" ,
-                                                                  readonly=False   )
+                                                                 readonly=False )
     build_facil950_perc_111_distribution_amount = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 111" ,
                                                                  compute="_compute_dist_percentage" ,
-                                                                  readonly=False   )
+                                                                 readonly=False )
     build_facil950_perc_200_distribution_amount = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 200" ,
                                                                  compute="_compute_dist_percentage" ,
-                                                                  readonly=False   )
+                                                                 readonly=False )
     build_facil950_perc_103_distribution_amount = fields.Float ( string="نسبة توزيع المباني والمرافق(الرياض) علي 103" ,
                                                                  compute="_compute_dist_percentage" ,
-                                                                  readonly=False   )
+                                                                 readonly=False )
     # ===== القهوة والضيافة =====
     coff_clean_ryd_perc_101_distribution_amount = fields.Float (
         string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 101" ,
         compute="_compute_dist_percentage" ,
-         readonly=False   )
+        readonly=False )
     coff_clean_ryd_perc_104_distribution_amount = fields.Float (
         string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 104" ,
         compute="_compute_dist_percentage" ,
-         readonly=False   )
+        readonly=False )
     coff_clean_ryd_perc_110_distribution_amount = fields.Float (
         string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 110" ,
         compute="_compute_dist_percentage" ,
-         readonly=False   )
+        readonly=False )
     coff_clean_ryd_perc_111_distribution_amount = fields.Float (
         string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 111" ,
         compute="_compute_dist_percentage" ,
-         readonly=False   )
+        readonly=False )
     coff_clean_ryd_perc_200_distribution_amount = fields.Float (
         string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 200" ,
         compute="_compute_dist_percentage" ,
-         readonly=False   )
+        readonly=False )
     coff_clean_ryd_perc_103_distribution_amount = fields.Float (
         string="نسبة توزيع القهوة والضيافة والنضافة (الرياض) علي 103" ,
         compute="_compute_dist_percentage" ,
-         readonly=False   )
+        readonly=False )
     # ===== التوطين العام =====
     pub_loc903_perc_101_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 101" ,
                                                              compute="_compute_dist_percentage" ,
-                                                              readonly=False   )
+                                                             readonly=False )
     pub_loc903_perc_104_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 104" ,
                                                              compute="_compute_dist_percentage" ,
-                                                              readonly=False   )
+                                                             readonly=False )
     pub_loc903_perc_110_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 110" ,
                                                              compute="_compute_dist_percentage" ,
-                                                              readonly=False   )
+                                                             readonly=False )
     pub_loc903_perc_111_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 111" ,
                                                              compute="_compute_dist_percentage" ,
-                                                              readonly=False   )
+                                                             readonly=False )
     pub_loc903_perc_200_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 200" ,
                                                              compute="_compute_dist_percentage" ,
-                                                              readonly=False   )
+                                                             readonly=False )
     pub_loc903_perc_103_distribution_amount = fields.Float ( string="نسبة توزيع التوطين العام علي 103" ,
                                                              compute="_compute_dist_percentage" ,
-                                                              readonly=False   )
+                                                             readonly=False )
     # user_id = fields.Many2one('res.users',default=lambda self: self.env['res.users'].browse(18), string="User")
     user_id = fields.Many2one ( 'res.users' , string="User" , default=lambda self : self.env.user )
 
-    #@api.depends ( 'amount' )
-    @api.depends('amount', 'user_id', 'x_plan98_id', 'x_plan91_id', 'x_plan92_id', 'x_plan95_id', 'x_plan100_id', 'x_plan97_id', 'x_plan99_id', 'x_plan101_id', 'x_plan104_id', 'x_plan93_id')
+    # @api.depends ( 'amount' )
+    @api.depends ( 'amount' , 'user_id' , 'x_plan98_id' , 'x_plan91_id' , 'x_plan92_id' , 'x_plan95_id' ,
+                   'x_plan100_id' , 'x_plan97_id' , 'x_plan99_id' , 'x_plan101_id' , 'x_plan104_id' , 'x_plan93_id' )
     def _compute_dist_percentage(self) :
         for rec in self :
             amt = rec.amount or 0.0
             user = rec.user_id or self.env.user
-            #hide_101 = user.id == 8  # لو current_user_id = 8 نخفي 101
+            # hide_101 = user.id == 8  # لو current_user_id = 8 نخفي 101
 
             # ==================== المالية ====================
             if rec.x_plan98_id and amt :
-                rec.finance_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (amt * (user.finance923_perc_101 or 0.0) / 100)
-                #rec.finance_101_distribution_amount = amt * (user.finance923_perc_101 or 0.0) / 100
+                rec.finance_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
+                            amt * (user.finance923_perc_101 or 0.0) / 100)
+                # rec.finance_101_distribution_amount = amt * (user.finance923_perc_101 or 0.0) / 100
                 rec.finance_104_distribution_amount = amt * (user.finance923_perc_104 or 0.0) / 100
                 rec.finance_110_distribution_amount = amt * (user.finance923_perc_110 or 0.0) / 100
                 rec.finance_111_distribution_amount = amt * (user.finance923_perc_111 or 0.0) / 100
@@ -1145,8 +1151,9 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== الجودة ====================
             if rec.x_plan91_id and amt :
-                rec.quality901_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (amt * (user.quality901_perc_101 or 0.0) / 100)
-                #rec.quality901_perc_101_distribution_amount = amt * (user.quality901_perc_101 or 0.0) / 100
+                rec.quality901_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
+                            amt * (user.quality901_perc_101 or 0.0) / 100)
+                # rec.quality901_perc_101_distribution_amount = amt * (user.quality901_perc_101 or 0.0) / 100
                 rec.quality901_perc_104_distribution_amount = amt * (user.quality901_perc_104 or 0.0) / 100
                 rec.quality901_perc_110_distribution_amount = amt * (user.quality901_perc_110 or 0.0) / 100
                 rec.quality901_perc_111_distribution_amount = amt * (user.quality901_perc_111 or 0.0) / 100
@@ -1162,8 +1169,9 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== الدعم التشغيلي ====================
             if rec.x_plan92_id and amt :
-                rec.oper_supp902_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (amt * (user.oper_supp902_perc_101 or 0.0) / 100)
-                #rec.oper_supp902_101_distribution_amount = amt * (user.oper_supp902_perc_101 or 0.0) / 100
+                rec.oper_supp902_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
+                            amt * (user.oper_supp902_perc_101 or 0.0) / 100)
+                # rec.oper_supp902_101_distribution_amount = amt * (user.oper_supp902_perc_101 or 0.0) / 100
                 rec.oper_supp902_104_distribution_amount = amt * (user.oper_supp902_perc_104 or 0.0) / 100
                 rec.oper_supp902_110_distribution_amount = amt * (user.oper_supp902_perc_110 or 0.0) / 100
                 rec.oper_supp902_111_distribution_amount = amt * (user.oper_supp902_perc_111 or 0.0) / 100
@@ -1179,8 +1187,9 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== التسويق العام ====================
             if rec.x_plan95_id and amt :
-                rec.sale_gen911_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (amt * (user.sale_gen911_perc_101 or 0.0) / 100)
-                #rec.sale_gen911_101_distribution_amount = amt * (user.sale_gen911_perc_101 or 0.0) / 100
+                rec.sale_gen911_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
+                            amt * (user.sale_gen911_perc_101 or 0.0) / 100)
+                # rec.sale_gen911_101_distribution_amount = amt * (user.sale_gen911_perc_101 or 0.0) / 100
                 rec.sale_gen911_104_distribution_amount = amt * (user.sale_gen911_perc_104 or 0.0) / 100
                 rec.sale_gen911_110_distribution_amount = amt * (user.sale_gen911_perc_110 or 0.0) / 100
                 rec.sale_gen911_111_distribution_amount = amt * (user.sale_gen911_perc_111 or 0.0) / 100
@@ -1196,8 +1205,9 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== المستلزمات المكتبية ====================
             if rec.x_plan100_id and amt :
-                rec.office_supp_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (amt * (user.office_supp_perc_101 or 0.0) / 100)
-                #rec.office_supp_perc_101_distribution_amount = amt * (user.office_supp_perc_101 or 0.0) / 100
+                rec.office_supp_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
+                            amt * (user.office_supp_perc_101 or 0.0) / 100)
+                # rec.office_supp_perc_101_distribution_amount = amt * (user.office_supp_perc_101 or 0.0) / 100
                 rec.office_supp_perc_104_distribution_amount = amt * (user.office_supp_perc_104 or 0.0) / 100
                 rec.office_supp_perc_110_distribution_amount = amt * (user.office_supp_perc_110 or 0.0) / 100
                 rec.office_supp_perc_111_distribution_amount = amt * (user.office_supp_perc_111 or 0.0) / 100
@@ -1213,7 +1223,8 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== الشئون الإدارية ====================
             if rec.x_plan97_id and amt :
-                rec.manage_921_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else ( amt * (user.manage_921_perc_101 or 0.0) / 100)
+                rec.manage_921_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
+                            amt * (user.manage_921_perc_101 or 0.0) / 100)
                 rec.manage_921_perc_104_distribution_amount = amt * (user.manage_921_perc_104 or 0.0) / 100
                 rec.manage_921_perc_110_distribution_amount = amt * (user.manage_921_perc_110 or 0.0) / 100
                 rec.manage_921_perc_111_distribution_amount = amt * (user.manage_921_perc_111 or 0.0) / 100
@@ -1229,7 +1240,8 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== التقنية ====================
             if rec.x_plan99_id and amt :
-                rec.it_922_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (amt * (user.it_922_perc_101 or 0.0) / 100)
+                rec.it_922_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
+                            amt * (user.it_922_perc_101 or 0.0) / 100)
                 rec.it_922_perc_104_distribution_amount = amt * (user.it_922_perc_104 or 0.0) / 100
                 rec.it_922_perc_110_distribution_amount = amt * (user.it_922_perc_110 or 0.0) / 100
                 rec.it_922_perc_111_distribution_amount = amt * (user.it_922_perc_111 or 0.0) / 100
@@ -1245,7 +1257,8 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== المباني والمرافق ====================
             if rec.x_plan101_id and amt :
-                rec.build_facil950_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8else (amt * (user.build_facil950_perc_101 or 0.0) / 100)
+                rec.build_facil950_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
+                            amt * (user.build_facil950_perc_101 or 0.0) / 100)
                 rec.build_facil950_perc_104_distribution_amount = amt * (user.build_facil950_perc_104 or 0.0) / 100
                 rec.build_facil950_perc_110_distribution_amount = amt * (user.build_facil950_perc_110 or 0.0) / 100
                 rec.build_facil950_perc_111_distribution_amount = amt * (user.build_facil950_perc_111 or 0.0) / 100
@@ -1261,7 +1274,8 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== القهوة والضيافة ====================
             if rec.x_plan104_id and amt :
-                rec.coff_clean_ryd_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (amt * (user.coff_clean_ryd_perc_101 or 0.0) / 100)
+                rec.coff_clean_ryd_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
+                            amt * (user.coff_clean_ryd_perc_101 or 0.0) / 100)
                 rec.coff_clean_ryd_perc_104_distribution_amount = amt * (user.coff_clean_ryd_perc_104 or 0.0) / 100
                 rec.coff_clean_ryd_perc_110_distribution_amount = amt * (user.coff_clean_ryd_perc_110 or 0.0) / 100
                 rec.coff_clean_ryd_perc_111_distribution_amount = amt * (user.coff_clean_ryd_perc_111 or 0.0) / 100
@@ -1277,7 +1291,8 @@ class AnalyticDistributuion ( models.Model ) :
 
             # ==================== التوطين العام ====================
             if rec.x_plan93_id and amt :
-                rec.pub_loc903_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (amt * (user.pub_loc903_perc_101 or 0.0) / 100)
+                rec.pub_loc903_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
+                            amt * (user.pub_loc903_perc_101 or 0.0) / 100)
                 rec.pub_loc903_perc_104_distribution_amount = amt * (user.pub_loc903_perc_104 or 0.0) / 100
                 rec.pub_loc903_perc_110_distribution_amount = amt * (user.pub_loc903_perc_110 or 0.0) / 100
                 rec.pub_loc903_perc_111_distribution_amount = amt * (user.pub_loc903_perc_111 or 0.0) / 100
@@ -1290,7 +1305,6 @@ class AnalyticDistributuion ( models.Model ) :
                 rec.pub_loc903_perc_111_distribution_amount = 0.0
                 rec.pub_loc903_perc_200_distribution_amount = 0.0
                 rec.pub_loc903_perc_103_distribution_amount = 0.0
-                
 
 
 class AccountPaymentSale ( models.Model ) :
