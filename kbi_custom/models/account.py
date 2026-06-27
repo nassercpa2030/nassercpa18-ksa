@@ -904,10 +904,11 @@ class AccountMove ( models.Model ) :
     analytic_acc_desc = fields.Char (
         string="Journal Analytic Description" ,
         compute='_compute_analytic_distribution_asset' ,
-        #store=True ,
+        store=True ,
         readonly=False
     )
-
+    
+    @api.depends('analytic_distribution','analytic_distribution.name')
     def _compute_analytic_distribution_asset(self) :
         Analytic = self.env['account.analytic.account']
 
