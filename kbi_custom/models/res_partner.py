@@ -453,6 +453,7 @@ class Recruiter ( models.Model ) :
                                            help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
     request_employee_manager = fields.Many2one ( 'res.users' , string='المدير ' , required=True , store=True )
+    user_partner_id = fields.Many2one(comodel_name='res.partner',string='User Partner',related='user_id.partner_id',store=True,readonly=False)
     contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
     residency_visa_number = fields.Integer ( string="رقم الهوية /رقم الإقامة" , store=True )
     border_number = fields.Integer ( string="رقم  الحدود" , store=True )
