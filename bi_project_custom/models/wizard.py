@@ -110,27 +110,35 @@ class CloseEntryWizard ( models.TransientModel ) :
         res['invoice_lines'] = invoice_lines
         res['sale_order_id'] = active_id
         return res
+    
 
     def close_entry_deffered(self) :
         AccountMove = self.env['account.move']
-        AnalyticAccount = self.env['account.analytic.account']
 
         for wizard in self :
             if not wizard.account_id1 :
                 raise ValidationError ( "Deferred Aggregate Account is missing on the wizard." )
+
             sale_order = wizard.sale_order_id
             move_lines = []
+
             for line in wizard.invoice_lines :
                 if not line.account_id :
                     raise ValidationError ( f"Missing original account on invoice line: {line.name}" )
 
+                analytic_account_id = False
                 analytic_distribution = {}
-                if line.x_studio_analytic_account_test :
-                    analytic_account = AnalyticAccount.search (
-                        [('name' , '=' , line.x_studio_analytic_account_test)] , limit=1
-                    )
-                    if analytic_account :
-                        analytic_distribution = {analytic_account.id : 100.0}
+
+                sale_line = sale_order.order_line.filtered (
+                    lambda l : l.product_id.id == line.product_id.id
+                )[:1]
+
+                if sale_line :
+                    analytic_distribution = sale_line.analytic_distribution or {}
+
+                    # لو فيه حساب تحليلي واحد فقط
+                    if len ( analytic_distribution ) == 1 :
+                        analytic_account_id = int ( next ( iter ( analytic_distribution.keys () ) ) )
 
                 move_lines += [
                     (0 , 0 , {
@@ -140,6 +148,7 @@ class CloseEntryWizard ( models.TransientModel ) :
                         'account_id' : line.account_id.id ,
                         'product_id' : line.product_id.id ,
                         'quantity' : line.quantity ,
+                        'analytic_account_id' : analytic_account_id ,
                         'analytic_distribution' : analytic_distribution ,
                     }) ,
                     (0 , 0 , {
@@ -149,115 +158,86 @@ class CloseEntryWizard ( models.TransientModel ) :
                         'account_id' : wizard.account_id1.id ,
                         'product_id' : line.product_id.id ,
                         'quantity' : line.quantity ,
+                        'analytic_account_id' : analytic_account_id ,
                         'analytic_distribution' : analytic_distribution ,
                     }) ,
                 ]
 
             move_vals = {
                 'move_type' : 'entry' ,
-                # 'date': fields.Date.today(),
                 'date' : wizard.journal_entry_date ,
                 'invoice_origin' : sale_order.name ,
                 'journal_id' : wizard.journal_id1.id ,
                 'line_ids' : move_lines ,
                 'ref' : f'Deferred Reversal for {wizard.sale_order_id.name}' ,
             }
+
             move = AccountMove.create ( move_vals )
             move.action_post ()
+
             if move.state == 'posted' :
-                sale_order.journal_entry_count_finance = sale_order.journal_entry_count_finance + 1
-            wizard.sale_order_id.project_ids.write ( {'has_closed_entry' : True} )
+                sale_order.journal_entry_count_finance += 1
 
-    # def close_entry_draft(self) :
+            wizard.sale_order_id.project_ids.write ( {
+                'has_closed_entry' : True
+            } )
+
+    # def close_entry_deffered(self) :
     #     AccountMove = self.env['account.move']
-
+    #     AnalyticAccount = self.env['account.analytic.account']
+    #
     #     for wizard in self :
-    #         if not wizard.account_id :
-    #             raise ValidationError ( "Aggregate Account is missing on the wizard." )
-
-    #         move_lines = []
-
+    #         if not wizard.account_id1 :
+    #             raise ValidationError ( "Deferred Aggregate Account is missing on the wizard." )
     #         sale_order = wizard.sale_order_id
-    #         if not sale_order.order_line :
-    #             raise ValidationError ( "No products found in Sale Order to create journal entries." )
-
-    #         # تحديد الحساب والـ journal بناءً على use_account_id1
-    #         #debit_account = wizard.account_id1.id if wizard.use_account_id1 else False
-    #         if wizard.use_account_id1 :
-    #             debit_account = wizard.account_id1.id
-    #         else :
-    #             debit_account = line.account_id.id
-
-    #         if not debit_account :
-    #             raise ValidationError ( f"Missing account for line: {line.name}" )
-            
-            
-    #         journal_to_use = wizard.journal_id2.id if wizard.use_account_id1 else wizard.journal_id1.id
-
-    #         for line in sale_order.order_line :
-    #             if not line.product_id :
-    #                 continue
-
-    #             total_price = line.price_subtotal
-    #             if not total_price :
-    #                 continue
-
+    #         move_lines = []
+    #         for line in wizard.invoice_lines :
+    #             if not line.account_id :
+    #                 raise ValidationError ( f"Missing original account on invoice line: {line.name}" )
+    #
     #             analytic_distribution = {}
-    #             partner = sale_order.partner_id.id
-
-    #             if sale_order.analytic_account_id :
-    #                 analytic_distribution = {
-    #                     sale_order.analytic_account_id.id : 100.0
-    #                 }
-
+    #             if line.x_studio_analytic_account_test :
+    #                 analytic_account = AnalyticAccount.search (
+    #                     [('name' , '=' , line.x_studio_analytic_account_test)] , limit=1
+    #                 )
+    #                 if analytic_account :
+    #                     analytic_distribution = {analytic_account.id : 100.0}
+    #
     #             move_lines += [
     #                 (0 , 0 , {
-    #                     'debit' : total_price ,
+    #                     'debit' : line.total_price ,
     #                     'credit' : 0.0 ,
-    #                     'name' : f'Reversal of {line.name}' ,
-    #                     'account_id' : debit_account ,
-    #                     'journal_id' : journal_to_use ,
+    #                     'name' : f'Deferred reversal for {line.name}' ,
+    #                     'account_id' : line.account_id.id ,
     #                     'product_id' : line.product_id.id ,
-    #                     'quantity' : line.product_uom_qty ,
+    #                     'quantity' : line.quantity ,
     #                     'analytic_distribution' : analytic_distribution ,
-    #                     'partner_id' : partner ,
-    #                     'sale_order_id' : sale_order.id ,
     #                 }) ,
     #                 (0 , 0 , {
     #                     'debit' : 0.0 ,
-    #                     'credit' : total_price ,
-    #                     'name' : f'Reversal aggregate for {line.name}' ,
-    #                     'account_id' : wizard.account_id.id ,
+    #                     'credit' : line.total_price ,
+    #                     'name' : f'To deferred aggregate account for {line.name}' ,
+    #                     'account_id' : wizard.account_id1.id ,
     #                     'product_id' : line.product_id.id ,
-    #                     'quantity' : line.product_uom_qty ,
+    #                     'quantity' : line.quantity ,
     #                     'analytic_distribution' : analytic_distribution ,
-    #                     'partner_id' : partner ,
-    #                     'sale_order_id' : sale_order.id ,
     #                 }) ,
     #             ]
-
+    #
     #         move_vals = {
     #             'move_type' : 'entry' ,
+    #             # 'date': fields.Date.today(),
     #             'date' : wizard.journal_entry_date ,
-    #             'journal_id' : journal_to_use ,
     #             'invoice_origin' : sale_order.name ,
+    #             'journal_id' : wizard.journal_id1.id ,
     #             'line_ids' : move_lines ,
-    #             'ref' : f'Reversal for {sale_order.name}' ,
+    #             'ref' : f'Deferred Reversal for {wizard.sale_order_id.name}' ,
     #         }
-
-    #         # إنشاء القيد فقط Draft (بدون post)
     #         move = AccountMove.create ( move_vals )
-
-    #         # تحديث عداد القيود
-    #         sale_order.journal_entry_count_finance += 1
-
-    #         # تحديث المشاريع المرتبطة
-    #         sale_order.project_ids.write ( {
-    #             'has_closed_entry' : True
-    #         } )
-
-    #         return move
-
+    #         move.action_post ()
+    #         if move.state == 'posted' :
+    #             sale_order.journal_entry_count_finance = sale_order.journal_entry_count_finance + 1
+    #         wizard.sale_order_id.project_ids.write ( {'has_closed_entry' : True} )
 
     def close_entry(self) :
         AccountMove = self.env['account.move']
