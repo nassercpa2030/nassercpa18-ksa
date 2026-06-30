@@ -232,6 +232,8 @@ class HrPayslip ( models.Model ) :
     end_service_benefit = fields.Monetary ( string="مصروف نهايــة الخــدمة" , compute='_compute_gross_salary' ,
                                             readonly=False ,
                                             store=False )
+    vac_deduction = fields.Monetary ( string="أجازة بدون راتـب" , compute="_compute_gross_salary" , readonly=False ,
+                                        store=False )
     other_deduction = fields.Monetary ( string="خصــومـات أخـــري" , compute="_compute_gross_salary" , readonly=False ,
                                         store=False )
 
@@ -252,22 +254,37 @@ class HrPayslip ( models.Model ) :
             rec.loan = loan
             rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance + rec.contract_id.l10n_sa_other_allowances
             base = rec._get_contract_wage () + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance
+            ###########################################
+            if 'LEAVE90' in rec.worked_days and rec.worked_days['LEAVE90'].number_of_days > 0 :
+                daily_wage = (
+                                     contract.wage
+                                     + contract.l10n_sa_housing_allowance
+                                     + contract.l10n_sa_transportation_allowance
+                                     + contract.l10n_sa_other_allowances
+                             ) / 30
+
+                rec.vac_deduction = - (rec.worked_days['LEAVE90'].number_of_days * daily_wage)
+            else :
+                rec.vac_deduction = 0
+            ###########################################
+
             if rec.employee_id.country_id.code == 'SA' and not rec.contract_id.x_gosi_employee_exempt :
                 rate = 0.1025 if rec.contract_id.x_gosi_225 else 0.0975
                 rate_company = 0.1225 if rec.contract_id.x_gosi_225 else 0.1175
                 rec.gosi = base * -rate
                 rec.other_gosi = base * rate_company
-                rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction
-                
-            elif rec.employee_id.country_id.code == 'SA' and  rec.contract_id.x_gosi_employee_exempt :
+                rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction +rec.vac_deduction
+
+            elif rec.employee_id.country_id.code == 'SA' and rec.contract_id.x_gosi_employee_exempt :
 
                 rate_all_saudi = 0.2250 if rec.contract_id.x_gosi_225 else 0.2150
                 rec.other_gosi = base * rate_all_saudi
-                rec.net_wage = rec.gross_wage - loan + rec.other_deduction    
-                
+                rec.net_wage = rec.gross_wage - loan + rec.other_deduction
+
             elif rec.employee_id.country_id.code != 'SA' :
                 rec.other_gosi = (rec._get_contract_wage () + rec.contract_id.l10n_sa_housing_allowance) * 0.02
                 rec.net_wage = rec.gross_wage - loan + rec.other_deduction
+
 
 
                 # rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction
@@ -277,12 +294,12 @@ class HrPayslip ( models.Model ) :
                 end_date = rec.date_to
                 # حساب سنوات الخدمة الكاملة
                 years_of_service = (end_date.year - start_date.year) - (
-                            (end_date.month , end_date.day) < (start_date.month , start_date.day))
+                        (end_date.month , end_date.day) < (start_date.month , start_date.day))
                 # تحديد "الأجر الأساسي للاحتساب"
                 # يشمل: الراتب الأساسي + بدل السكن + بدل المواصلات
                 wage_for_annual = rec._get_contract_wage () + (
-                            rec.employee_id.contract_id.l10n_sa_housing_allowance or 0) + (
-                                              rec.employee_id.contract_id.l10n_sa_transportation_allowance or 0)
+                        rec.employee_id.contract_id.l10n_sa_housing_allowance or 0) + (
+                                          rec.employee_id.contract_id.l10n_sa_transportation_allowance or 0)
                 # حساب الأجر اليومي
                 daily_wage = wage_for_annual / 30
                 # تطبيق نظام العمل السعودي لحساب المخصص الشهري
@@ -300,7 +317,7 @@ class HrPayslip ( models.Model ) :
                 # حساب عدد أيام الخدمة
                 service_days_difference = (end_service_date - start_service_date).days
                 if service_days_difference < 0 :
-                   service_days_difference = 0
+                    service_days_difference = 0
 
                 service_years = service_days_difference / 365.0
                 # تحديد "الراتب الأساسي للاحتساب" (شامل الأساسي + السكن + النقل + بدلات أخرى)
@@ -314,8 +331,6 @@ class HrPayslip ( models.Model ) :
                 else :
                     # (راتب سنوي كامل مقسوماً على 12 شهر)
                     rec.end_service_benefit = wage_for_eosp / 12
-
-
 
 
 def action_payslip_done(self) :
@@ -453,7 +468,8 @@ class Recruiter ( models.Model ) :
                                            help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
     request_employee_manager = fields.Many2one ( 'res.users' , string='المدير ' , required=True , store=True )
-    user_partner_id = fields.Many2one(comodel_name='res.partner',string='User Partner',related='user_id.partner_id',store=True,readonly=False)
+    user_partner_id = fields.Many2one ( comodel_name='res.partner' , string='User Partner' ,
+                                        related='user_id.partner_id' , store=True , readonly=False )
     contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
     residency_visa_number = fields.Integer ( string="رقم الهوية /رقم الإقامة" , store=True )
     border_number = fields.Integer ( string="رقم  الحدود" , store=True )
