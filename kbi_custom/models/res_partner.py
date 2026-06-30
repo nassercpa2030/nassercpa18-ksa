@@ -280,11 +280,11 @@ class HrPayslip ( models.Model ) :
 
                 rate_all_saudi = 0.2250 if rec.contract_id.x_gosi_225 else 0.2150
                 rec.other_gosi = base * rate_all_saudi
-                rec.net_wage = rec.gross_wage - loan + rec.other_deduction
+                rec.net_wage = rec.gross_wage - loan + rec.other_deduction +rec.vac_deduction
 
             elif rec.employee_id.country_id.code != 'SA' :
                 rec.other_gosi = (rec._get_contract_wage () + rec.contract_id.l10n_sa_housing_allowance) * 0.02
-                rec.net_wage = rec.gross_wage - loan + rec.other_deduction
+                rec.net_wage = rec.gross_wage - loan + rec.other_deduction +ec.vac_deduction
 
 
 
