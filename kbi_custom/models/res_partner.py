@@ -258,10 +258,10 @@ class HrPayslip ( models.Model ) :
             leave90 = rec.worked_days_line_ids.filtered(lambda l: l.code == 'LEAVE90')
             if leave90:
                 daily_wage = (
-                                     contract.wage
-                                     + contract.l10n_sa_housing_allowance
-                                     + contract.l10n_sa_transportation_allowance
-                                     + contract.l10n_sa_other_allowances
+                                     rec.contract_id.wage
+                                     + rec.contract_id.l10n_sa_housing_allowance
+                                     + rec.contract_id.l10n_sa_transportation_allowance
+                                     + rec.contract_id.l10n_sa_other_allowances
                              ) / 30
 
                 rec.vac_deduction = - (leave90.number_of_days * daily_wage)
