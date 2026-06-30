@@ -255,7 +255,8 @@ class HrPayslip ( models.Model ) :
             rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance + rec.contract_id.l10n_sa_other_allowances
             base = rec._get_contract_wage () + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance
             ###########################################
-            if 'LEAVE90' in rec.worked_days and rec.worked_days['LEAVE90'].number_of_days > 0 :
+            leave90 = rec.worked_days_line_ids.filtered(lambda l: l.code == 'LEAVE90')
+            if leave90:
                 daily_wage = (
                                      contract.wage
                                      + contract.l10n_sa_housing_allowance
@@ -263,7 +264,7 @@ class HrPayslip ( models.Model ) :
                                      + contract.l10n_sa_other_allowances
                              ) / 30
 
-                rec.vac_deduction = - (rec.worked_days['LEAVE90'].number_of_days * daily_wage)
+                rec.vac_deduction = - (leave90.number_of_days * daily_wage)
             else :
                 rec.vac_deduction = 0
             ###########################################
