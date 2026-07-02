@@ -873,23 +873,26 @@ class HrExpenseSheet ( models.Model ) :
     # journal_use = fields.Boolean(string="", default=False,readonly=False,store=True)
 
     def action_reset_expense_sheets_custom(self) :
-        for expense in self :
-            if any ( slip.state in ('done' , 'paid') for slip in expense.payslip_id ) :
-                raise UserError ( _ ( "You cannot remove an expense from a validated payslip." ) )
+        def action_reset_expense_sheets(self) :
+            for sheet in self :
+                move = sheet.account_move_id
 
-            # فك الربط
-            expense.sudo ().action_remove_from_payslip ()
+                if move :
+                    # فك أي تسويات
+                    move.line_ids.remove_move_reconcile ()
 
-            # لو محتاج تلغي القيد الأصلي
-            move = expense.payslip_id.move_id
-            if move :
-                if move.state == 'posted' :
-                    move.button_draft ()
-                move.unlink ()
+                    # رجع القيد Draft
+                    if move.state == "posted" :
+                        move.button_draft ()
 
-        return True
-    
-    
+                    # حذف القيد نهائياً
+                    move.unlink ()
+
+                    # إزالة الربط
+                    sheet.account_move_id = False
+
+            return super ().action_reset_expense_sheets ()
+
     
     @api.onchange ( 'employee_id' )
     def compute_journal_from_employee(self) :
