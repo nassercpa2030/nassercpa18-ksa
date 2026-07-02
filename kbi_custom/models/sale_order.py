@@ -25,7 +25,7 @@ class SaleOrder ( models.Model ) :
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
     old_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , stored=True )
     customer_state = fields.Boolean ( string="عميــل غير مؤكـــد" , stored=True )
-    order_lines_count = fields.Integer ( string='Order Lines' , compute='_compute_order_lines_count' , store=True )
+    order_lines_count = fields.Integer ( string='Order Lines' , compute='_compute_order_lines_count'  )
     customer_phone_number = fields.Char ( string='تليفون العميل' , store=True )
     journal_entry_count = fields.Char ( string='عدد القيود' , store=True )
     # comupute='_get_mobile'  )
@@ -109,7 +109,7 @@ class SaleOrder ( models.Model ) :
                                 domain=[('job_id' , '!=' , 'مدير مراجعة')] )
     # invoice_ids = fields.Many2many ( 'account.move' , compute="compute_invoice_ids" , readonly=True , store=True ,
     #                                string="Invoices" )
-    invoice_ids = fields.Many2many ( 'account.move' , compute="compute_invoice_ids" , readonly=True , store=True ,
+    invoice_ids = fields.Many2many ( 'account.move' , compute="compute_invoice_ids" , readonly=True ,
                                      string="Invoices" )
     payment_count2 = fields.Integer ( compute='_compute_payment_count' )
     # paid_total = fields.Float(compute='_compute_payment_count')
@@ -117,16 +117,17 @@ class SaleOrder ( models.Model ) :
     # paid_percent = fields.Float(compute='_compute_payment_count')
     amount_due = fields.Float ( compute="_compute_payment_count" , string="Amount Due" , readonly=False )
     project_budget = fields.Float ( string='Project Budget' , copy=False )
-    project_name = fields.Char ( string='Auto Project Name(AR)' , compute="get_project_name" , readonly=False , store=True )
+    # project_name = fields.Char ( string='Auto Project Name(AR)' , compute="get_project_name" , readonly=False , store=True )
+    project_name = fields.Char ( string='Auto Project Name(AR)' , compute="get_project_name" , readonly=False )
     auto_contract_name = fields.Boolean ( string="Auto Name" , readonly=False , default=True )
-    product_public_name = fields.Char ( string="Product Public Name" , compute="get_pr_nam_fr_service" , store=True ,
+    product_public_name = fields.Char ( string="Product Public Name" , compute="get_pr_nam_fr_service" , 
                                         readonly=False )
     project_code = fields.Char ( string='Project Code' , related="auto_code" )
     contract_signature = fields.Boolean ( "Contract Signature" )
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
                                             domain="[('plan_id', '=', project_type_id)]" ,
-                                            compute='_compute_analytic_account_id' , readonly=False , store=True )
+                                            compute='_compute_analytic_account_id' , readonly=False )
     approve_uid = fields.Many2one ( 'res.users' , string='Approve User' , )
     approve_date = fields.Datetime ( string='Approve Date' )
     reject_reason = fields.Text ( string='Reject Reason' )
