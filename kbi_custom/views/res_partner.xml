@@ -26,7 +26,27 @@
 
     </field>
 </record-->
+<record id="hr_expense_form_inherit_custom" model="ir.ui.view">
+    <field name="name">hr.expense.form.inherit.custom</field>
+    <field name="model">hr.expense</field>
+    <field name="inherit_id" ref="hr_expense.hr_expense_view_form"/>
+    <field name="arch" type="xml">
 
+        <!-- إخفاء الزر الأصلي -->
+        <xpath expr="//button[@name='action_reset_expense_sheets']" position="attributes">
+            <attribute name="invisible">1</attribute>
+        </xpath>
+
+        <!-- إضافة الزر الجديد -->
+        <xpath expr="//button[@name='action_reset_expense_sheets']" position="after">
+            <button name="action_reset_expense_sheets_custom"
+                    string="Reset To Draft Custom"
+                    type="object"
+                    class="btn-primary"/>
+        </xpath>
+
+    </field>
+</record>
         <record model="ir.ui.view" id="kbi_custom.view_res_partner_form_inherit">
             <field name="name">kbi_custom.view.res.partner.form.inherit</field>
             <field name="model">res.partner</field>
