@@ -1324,17 +1324,14 @@ class SaleOrder2 ( models.Model ) :
                 ('invoice_origin' , 'ilike' , order_name_clean) ,  # بحث غير حساس لحالة الأحرف
                 ('journal_id' , 'in' , [165 , 160 , 162])
                 # ('line_ids.account_id', 'in', [1341,1342])          # حسب Journals اللي انت عايزهم
-            ] , order='date asc' , limit=1 )
+            ] , order='date desc' , limit=1 )
 
-            if move.journal_id.id in (162, 165):
+            if move:
                 order.close_entry_date = move.date
                 order.final_close_entry_date = move.date
                 order.final_close_entry = move.name
                 
-            else : 
-                order.close_entry_date = move.date
-                order.final_close_entry_date = move.date
-                order.final_close_entry = move.name
+
                
 
     # @api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
