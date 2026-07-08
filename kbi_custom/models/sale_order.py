@@ -1326,10 +1326,16 @@ class SaleOrder2 ( models.Model ) :
                 # ('line_ids.account_id', 'in', [1341,1342])          # حسب Journals اللي انت عايزهم
             ] , order='date asc' , limit=1 )
 
-            if move :
+            if move.journal_id.id in (162, 165):
                 order.close_entry_date = move.date
                 order.final_close_entry_date = move.date
                 order.final_close_entry = move.name
+                
+            else : 
+                order.close_entry_date = move.date
+                order.final_close_entry_date = move.date
+                order.final_close_entry = move.name
+               
 
     # @api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
     # def _compute_final_close_entry_date(self) :
