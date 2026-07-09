@@ -466,9 +466,11 @@ class Recruiter ( models.Model ) :
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
                                            help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
-    request_employee_manager = fields.Many2one ( string='المـديـر ' , compute='_compute_request_employee_manager' ,
-                                                 required=True , store=True , readonly=True )
-    parent_id = fields.Many2one ( string='Manager',compute = '_compute_request_employee_manager' , required = True , store = True , readonly = True  )
+    request_employee_manager = fields.Many2one ( string='المـديـر ' , 'res.users' ,
+    #                                              required=True , store=True  )
+    # request_employee_manager = fields.Many2one ( string='المـديـر ' , compute='_compute_request_employee_manager' ,
+    #                                              required=True , store=True , readonly=True )
+    # parent_id = fields.Many2one ( string='Manager',compute = '_compute_request_employee_manager' , required = True , store = True , readonly = True  )
     user_partner_id = fields.Many2one ( comodel_name='res.partner' , string='User Partner' ,
                                         related='user_id.partner_id' , store=True , readonly=False )
     contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
@@ -491,15 +493,15 @@ class Recruiter ( models.Model ) :
                                                  help="Same field as housing allowance for employee contract" ,
                                                  readonly=False , store=True )
 
-    @api.depends ( 'coach_id' )
-    def _compute_request_employee_manager(self) :
-        for employee in self :
-            employee.request_employee_manager = False
-            employee.parent_id = False
+    # @api.depends ( 'coach_id' )
+    # def _compute_request_employee_manager(self) :
+    #     for employee in self :
+    #         employee.request_employee_manager = False
+    #         employee.parent_id = False
 
-            if employee.coach_id and employee.coach_id.id :
-                employee.request_employee_manager = employee.coach_id.id
-                employee.parent_id = employee.coach_id.id
+    #         if employee.coach_id and employee.coach_id.id :
+    #             employee.request_employee_manager = employee.coach_id.id
+    #             employee.parent_id = employee.coach_id.id
 
     @api.depends ( 'contract_ids.date_start' )
     def _compute_start_working_date(self) :
