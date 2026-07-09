@@ -4,7 +4,6 @@ import logging
 from odoo.exceptions import UserError , ValidationError
 import re
 
-
 class HrPayrollStructure ( models.Model ) :
     _inherit = 'hr.payroll.structure'
 
@@ -564,7 +563,7 @@ class ResPartner ( models.Model ) :
         ('aa' , 'شركة ذات مسؤلية محدودة أجنبية') ,
         ('b' , 'شركة ذات مسؤلية محدودة مختلطة') ,
         ('bbb' , 'شركة مساهمة') ,
-        ('bb' , 'مؤسسة فردية'),('bc','جمعيــة أهليــة'] , string="الكـــــيان القـــــانونـي" , store=True )
+        ('bb' , 'مؤسسة فردية'),('bc','جمعيــة أهليــة')] , string="الكـــــيان القـــــانونـي" , store=True )
 
     national_address = fields.Char ( string="العنوان الوطني " , compute="_compute_national_address" , readonly=False )
     nationality = fields.Char ( "Nationality" )
