@@ -467,8 +467,8 @@ class Recruiter ( models.Model ) :
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
                                            help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
-    request_employee_manager = fields.Many2one ( related='coach_id' , string='المـديـر ' , required=True , store=True , readonly=True )
-    parent_id = fields.Many2one ( related='coach_id' , string='Manager' , required=True, store=True ,readonly=True  )
+    request_employee_manager = fields.Many2one (   string='المـديـر ',compute='_compute_request_employee_manager' , required=True , store=True , readonly=True )
+    parent_id = fields.Many2one ( string='Manager' compute='_compute_request_employee_manager' , required=True, store=True ,readonly=True  )
     user_partner_id = fields.Many2one ( comodel_name='res.partner' , string='User Partner' ,
                                         related='user_id.partner_id' , store=True , readonly=False )
     contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
@@ -491,6 +491,14 @@ class Recruiter ( models.Model ) :
                                                  help="Same field as housing allowance for employee contract" ,
                                                  readonly=False , store=True )
 
+    @api.depends('coach_id')
+    def _compute_request_employee_manager(self):
+        for employee in self:
+            manager = employee.coach_id if employee.coach_id.exists() else False
+            employee.request_employee_manager = manager
+            employee.parent_id = manager
+
+    
     @api.depends ( 'contract_ids.date_start' )
     def _compute_start_working_date(self) :
         for rec in self :
