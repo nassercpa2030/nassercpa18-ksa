@@ -466,8 +466,7 @@ class Recruiter ( models.Model ) :
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
                                            help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
-    request_employee_manager = fields.Many2one ( string='المـديـر ' , 'res.users' ,
-    #                                              required=True , store=True  )
+    request_employee_manager = fields.Many2one ( string='المـديـر ' , 'res.users' ,required=True , store=True  )
     # request_employee_manager = fields.Many2one ( string='المـديـر ' , compute='_compute_request_employee_manager' ,
     #                                              required=True , store=True , readonly=True )
     # parent_id = fields.Many2one ( string='Manager',compute = '_compute_request_employee_manager' , required = True , store = True , readonly = True  )
