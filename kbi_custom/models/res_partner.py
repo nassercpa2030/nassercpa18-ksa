@@ -4,6 +4,7 @@ import logging
 from odoo.exceptions import UserError , ValidationError
 import re
 
+
 class HrPayrollStructure ( models.Model ) :
     _inherit = 'hr.payroll.structure'
 
@@ -232,7 +233,7 @@ class HrPayslip ( models.Model ) :
                                             readonly=False ,
                                             store=False )
     vac_deduction = fields.Monetary ( string="أجازة بدون راتـب" , compute="_compute_gross_salary" , readonly=False ,
-                                        store=False )
+                                      store=False )
     other_deduction = fields.Monetary ( string="خصــومـات أخـــري" , compute="_compute_gross_salary" , readonly=False ,
                                         store=False )
 
@@ -254,8 +255,8 @@ class HrPayslip ( models.Model ) :
             rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance + rec.contract_id.l10n_sa_other_allowances
             base = rec._get_contract_wage () + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance
             ###########################################
-            leave90 = rec.worked_days_line_ids.filtered(lambda l: l.code == 'LEAVE90')
-            if leave90:
+            leave90 = rec.worked_days_line_ids.filtered ( lambda l : l.code == 'LEAVE90' )
+            if leave90 :
                 daily_wage = (
                                      rec.contract_id.wage
                                      + rec.contract_id.l10n_sa_housing_allowance
@@ -273,7 +274,7 @@ class HrPayslip ( models.Model ) :
                 rate_company = 0.1225 if rec.contract_id.x_gosi_225 else 0.1175
                 rec.gosi = base * -rate
                 rec.other_gosi = base * rate_company
-                rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction +rec.vac_deduction
+                rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction + rec.vac_deduction
 
             elif rec.employee_id.country_id.code == 'SA' and rec.contract_id.x_gosi_employee_exempt :
 
@@ -284,8 +285,6 @@ class HrPayslip ( models.Model ) :
             elif rec.employee_id.country_id.code != 'SA' :
                 rec.other_gosi = (rec._get_contract_wage () + rec.contract_id.l10n_sa_housing_allowance) * 0.02
                 rec.net_wage = rec.gross_wage - loan + rec.other_deduction + rec.vac_deduction
-
-
 
                 # rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction
             if rec.employee_id.contract_id.state == 'open' :
@@ -467,8 +466,9 @@ class Recruiter ( models.Model ) :
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
                                            help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
-    request_employee_manager = fields.Many2one (   string='المـديـر ',compute='_compute_request_employee_manager' , required=True , store=True , readonly=True )
-    parent_id = fields.Many2one ( string='Manager', compute='_compute_request_employee_manager' , required=True, store=True ,readonly=True  )
+    request_employee_manager = fields.Many2one ( string='المـديـر ' , compute='_compute_request_employee_manager' ,
+                                                 required=True , store=True , readonly=True )
+    parent_id = fields.Many2one ( string='Manager',compute = '_compute_request_employee_manager' , required = True , store = True , readonly = True  )
     user_partner_id = fields.Many2one ( comodel_name='res.partner' , string='User Partner' ,
                                         related='user_id.partner_id' , store=True , readonly=False )
     contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
@@ -491,14 +491,16 @@ class Recruiter ( models.Model ) :
                                                  help="Same field as housing allowance for employee contract" ,
                                                  readonly=False , store=True )
 
-    @api.depends('coach_id')
-    def _compute_request_employee_manager(self):
-        for employee in self:
-            manager = employee.coach_id if employee.coach_id.exists() else False
-            employee.request_employee_manager = manager
-            employee.parent_id = manager
+    @api.depends ( 'coach_id' )
+    def _compute_request_employee_manager(self) :
+        for employee in self :
+            employee.request_employee_manager = False
+            employee.parent_id = False
 
-    
+            if employee.coach_id and employee.coach_id.id :
+                employee.request_employee_manager = employee.coach_id.id
+                employee.parent_id = employee.coach_id.id
+
     @api.depends ( 'contract_ids.date_start' )
     def _compute_start_working_date(self) :
         for rec in self :
@@ -572,7 +574,7 @@ class ResPartner ( models.Model ) :
         ('aa' , 'شركة ذات مسؤلية محدودة أجنبية') ,
         ('b' , 'شركة ذات مسؤلية محدودة مختلطة') ,
         ('bbb' , 'شركة مساهمة') ,
-        ('bb' , 'مؤسسة فردية'),('bc','جمعيــة أهليــة')] , string="الكـــــيان القـــــانونـي" , store=True )
+        ('bb' , 'مؤسسة فردية') , ('bc' , 'جمعيــة أهليــة')] , string="الكـــــيان القـــــانونـي" , store=True )
 
     national_address = fields.Char ( string="العنوان الوطني " , compute="_compute_national_address" , readonly=False )
     nationality = fields.Char ( "Nationality" )
