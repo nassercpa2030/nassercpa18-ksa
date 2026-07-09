@@ -564,7 +564,8 @@ class SaleOrder ( models.Model ) :
 
 
             ### last order of the same service You  made
-            last_order = self.env['sale.order'].search ( ('partner_id' , '=' , order.partner_id.id) , ('x_studio_contract_service' , '=' ,order.x_studio_contract_service.id)] , order = 'date_order desc, id desc' , limit = 1)
+            last_order = self.env['sale.order'].search ( [('partner_id' , '=' , order.partner_id.id) , ('x_studio_contract_service' , '=' ,order.x_studio_contract_service.id),('id', '!=', order.id),] , 
+                                                        order = 'date_order desc, id desc' , limit = 1)
             # last_service =last_order.x_studio_contract_service
             # now_service =order.x_studio_contract_service
 
