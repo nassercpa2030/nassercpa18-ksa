@@ -467,7 +467,8 @@ class Recruiter ( models.Model ) :
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
                                            help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
-    request_employee_manager = fields.Many2one ( 'res.users' , string='المدير ' , required=True , store=True )
+    request_employee_manager = fields.Many2one ( related='coach_id' , string='المـديـر ' , required=True , store=True , readonly=True )
+    parent_id = fields.Many2one ( related='coach_id' , string='Manager' , required=True, store=True ,readonly=True  )
     user_partner_id = fields.Many2one ( comodel_name='res.partner' , string='User Partner' ,
                                         related='user_id.partner_id' , store=True , readonly=False )
     contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
