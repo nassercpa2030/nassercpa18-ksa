@@ -463,6 +463,8 @@ class Recruiter ( models.Model ) :
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
                                       placeholder="Enter Analytic Plan" )
+    resumption_work_after_leave=fields.Date(string="إستلام العـمل(بعد الإجازة)",required=True,readonly=False ,store=True)
+    vacance_days=fields.Float(string="عدد أيـام الإجازة",store=True)
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
                                            help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
