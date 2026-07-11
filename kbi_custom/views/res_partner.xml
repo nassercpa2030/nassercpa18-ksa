@@ -95,7 +95,8 @@
         <xpath expr="//field[@name='job_id']" position="after">
             
                 <group string="Employee Important Data &amp; Basic Information" style="width:100%">
-                     <field name="request_employee_manager" widget="many2one_avatar_user" force_save="0" readonly="False" string="المدير"/>
+                      <field name="coach_id" widget="many2one_avatar_user" force_save="0" readonly="False" string="المديـر"/>
+                     <!-- <field name="request_employee_manager" widget="many2one_avatar_user" force_save="0" readonly="False" string="المدير"/> -->
                      <field name="contract_state" widget="badge" decoration-success="contract_state == 'open'" decoration-danger="contract_state == 'close'" decoration-warning="contract_state == 'draft'" decoration-muted="contract_state == 'cancel'" force_save="0" string="حالة العقد" decoration-bf="1"/>
                         <!--field name="related_partner_id" readonly="0"/-->
                    
