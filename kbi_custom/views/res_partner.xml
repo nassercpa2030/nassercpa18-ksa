@@ -92,11 +92,30 @@
     <field name="inherit_id" ref="hr.view_employee_form"/>
     <field name="arch" type="xml">
 
-         
         <xpath expr="//field[@name='job_id']" position="after">
             
                 <group string="Employee Important Data &amp; Basic Information" style="width:100%">
-                     <field name="request_employee_manager" widget="many2one_avatar_user" force_save="0" readonly="False"  string="المدير"/>
+                     <field name="request_employee_manager" widget="many2one_avatar_user" force_save="0" readonly="False" string="المدير"/>
+                     <field name="contract_state" widget="badge" decoration-success="contract_state == 'open'" decoration-danger="contract_state == 'close'" decoration-warning="contract_state == 'draft'" decoration-muted="contract_state == 'cancel'" force_save="0" string="حالة العقد" decoration-bf="1"/>
+                        <!--field name="related_partner_id" readonly="0"/-->
+                   
+                  
+                     <field name="start_working_date" widget="badge" options="{'color':'#1f77b4'}" style="background-color:#6a5acd;color:white;padding:2px 6px;border-radius:4px;" placeholder="تاريخ مباشرة العمل" decoration-bf="1"/> 
+                    <field name="resumption_work_after_leave"/>
+                    <field name="vacance_days" />
+                    <div style="border-top:1px solid #000; margin:10px 0;"/>
+                   <field name="iqama_expiry_date" placeholder="تاريخ انتهاء الإقامة"/>
+                    <field name="passport_expiry_date" placeholder="تاريخ انتهاء الجواز"/> 
+                    <field name="identification_id" options="{'color':'dark'}" style="background-color:#90EE90; color:dark;padding:2px 6px;border-radius:4px;" placeholder="رقم الهوية /رقم الإقامة" string="رقم الهوية /رقم الإقامة" decoration-bf="1"/>   
+                    <field name="border_number" placeholder="رقم الحدود" decoratio-bf="1"/>
+                </group>
+        </xpath>
+         
+        <!-- <xpath expr="//field[@name='job_id']" position="after">
+            
+                <group string="Employee Important Data &amp; Basic Information" style="width:100%">
+                    <field name="request_employee_manager" widget="many2one_avatar_user" force_save="0" readonly="False"  string="المدير"/> 
+                    
                      <field name="contract_state" widget="badge" decoration-success="contract_state == 'open'" decoration-danger="contract_state == 'close'" decoration-warning="contract_state == 'draft'" decoration-muted="contract_state == 'cancel'" force_save="0"  string="حالة العقد"/>
         
                     <field name="start_working_date" widget="badge"
@@ -112,7 +131,7 @@
                            string="رقم الهوية /رقم الإقامة" />
                     <field name="border_number" placeholder="رقم الحدود" />
                 </group>
-        </xpath>
+        </xpath> -->
     </field>
 </record>
     </data>
