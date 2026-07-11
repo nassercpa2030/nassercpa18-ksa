@@ -31,7 +31,7 @@
                     <t t-set="amount_residual_sig" t-value="0.0"/>
 
                     <t t-foreach="docs" t-as="o">
-                        <tr>
+                        <tr t-att-style="'background-color:#E6F7FF;' if abs(o.amount_total) != abs(o.amount_residual_signed) else ''">
                             <td style="padding:8px;"><strong><span t-field="o.name"/></strong></td>
                             <td style="padding:8px;"><strong><span t-field="o.sale_order_id_finance.partner_id.name"/></strong></td>
                             <td style="padding:8px;"><strong><span t-field="o.sale_order_id_finance.name" t-if="o.sale_order_id_finance"/></strong></td>
