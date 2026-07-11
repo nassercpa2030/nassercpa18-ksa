@@ -573,7 +573,7 @@ class SaleOrder ( models.Model ) :
             # ✅ لو العميل له manager والمستخدم مختلف
             if last_order :
                 manager_id = last_order.partner_id.manager_id
-                year_diff = datetime.now ().year - last_order.account_year
+                year_diff = datetime.datetime.now().year - last_order.account_year
                 if manager_id and manager_id != order.user_id.id and year_diff == 1 :
                    manager_user = self.env['res.users'].browse ( manager_id )
                    manager_name = manager_user.name if manager_user.exists () else str ( manager_id )
