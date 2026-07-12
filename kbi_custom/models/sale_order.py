@@ -49,7 +49,7 @@ class SaleOrder ( models.Model ) :
     first_payment_journal_test = fields.Char ( 'First Payment Journal Name' , readonly=False , store=True )
     unpaid_total_refrence = fields.Float ( 'unpaid_total_refrence' , store=True , readonly=False )
     paid_total_refrence = fields.Float ( 'paid_total_refrence' , store=True , readonly=False )
-    paid_percentage_refrence = fields.Float ( 'paid_percentage_refrence' , store=True , readonly=False )
+    paid_percentage_refrence = fields.Float ( 'paid_percentage_refrence' , store=True , group_operator=False,readonly=False )
 
     customer_English_name_refrence = fields.Char ( 'customer_English_name_refrence' , readonly=False , store=True )
     close_entry_date_refrence = fields.Date ( string="close_entry_date_refrence" , readonly=False , required=False ,
