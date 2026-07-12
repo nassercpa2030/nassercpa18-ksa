@@ -553,34 +553,25 @@ class SaleOrder ( models.Model ) :
             else :
                 order.user_id = self.env.user
 
+    @api.constrains (
+        'partner_id' ,
+        'x_studio_contract_service' ,
+        'user_id' ,
+        'audit_date'
+    )
+    def _check_duplicate(self) :
+        for rec in self :
+            duplicate = self.search ( [
+                ('partner_id' , '=' , rec.partner_id.id) ,
+                ('x_studio_contract_service' , '=' , rec.x_studio_contract_service.id) ,
+                ('user_id' , '=' , rec.user_id.id) ,
+                ('audit_date' , '=' , rec.audit_date) ,
+                ('id' , '!=' , rec.id) ,
+            ] , limit=1 )
 
-    @api.onchange ( 'partner_id' , 'x_studio_contract_service' , 'user_id' , 'audit_date' )
-    def _onchange_check_duplicate(self) :
-        if not (
-                self.partner_id
-                and self.x_studio_contract_service
-                and self.user_id
-                and self.audit_date
-        ) :
-            return
+            if duplicate :
+                raise ValidationError ( _ ( "هذا الأوردر موجود بالفعل." ) )
 
-        last_order = self.env['sale.order'].search (
-            [
-                ('partner_id' , '=' , self.partner_id.id) ,
-                ('x_studio_contract_service' , '=' , self.x_studio_contract_service.id) ,
-                ('user_id' , '=' , self.user_id.id) ,
-                ('audit_date' , '=' , self.audit_date) ,
-                ('id' , '!=' , self.id) ,
-            ] ,
-            limit=1 ,
-        )
-
-        if last_order :
-            raise ValidationError (
-                _ ( "لا يجوز عمل أوردر مكرر بالخدمة '%s' لنفس السنة." )
-                % self.x_studio_contract_service.display_name
-            )
-        
 
     @api.constrains ( 'partner_id' , 'user_id' )
     def _check_partner_manager(self) :
