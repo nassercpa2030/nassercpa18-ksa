@@ -553,6 +553,7 @@ class SaleOrder ( models.Model ) :
             else :
                 order.user_id = self.env.user
 
+
     @api.constrains (
         'partner_id' ,
         'x_studio_contract_service' ,
@@ -561,13 +562,21 @@ class SaleOrder ( models.Model ) :
     )
     def _check_duplicate(self) :
         for rec in self :
-            duplicate = self.search ( [
+            if not (
+                    rec.partner_id
+                    and rec.x_studio_contract_service
+                    and rec.user_id
+                    and rec.audit_date
+            ) :
+                continue
+
+            duplicate = self.search_count ( [
                 ('partner_id' , '=' , rec.partner_id.id) ,
                 ('x_studio_contract_service' , '=' , rec.x_studio_contract_service.id) ,
                 ('user_id' , '=' , rec.user_id.id) ,
                 ('audit_date' , '=' , rec.audit_date) ,
                 ('id' , '!=' , rec.id) ,
-            ] , limit=1 )
+            ] )
 
             if duplicate :
                 raise ValidationError ( _ ( "هذا الأوردر موجود بالفعل." ) )
