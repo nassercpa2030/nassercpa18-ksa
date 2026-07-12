@@ -1,7 +1,8 @@
 from odoo import models , fields , api , _
 from odoo.exceptions import ValidationError
 import logging
-import datetime
+from odoo.fields import Date
+#import datetime
 
 _logger = logging.getLogger ( __name__ )
 
@@ -572,8 +573,14 @@ class SaleOrder ( models.Model ) :
 
             # ✅ لو العميل له manager والمستخدم مختلف
             if last_order :
+                if order.user_id == last_order.user_id and order.audit_date == last_order.audit_date:
+                                       raise ValidationError (
+                       ( "لا يجوز عمل أوردر مكرر بنفس الخدمة  لنفس السنة: %s\nبرجاء المراجعته :" )
+                    
+                   )
+                    
                 manager_id = last_order.partner_id.manager_id
-                year_diff = datetime.datetime.now().year - last_order.account_year
+                year_diff = date.now().year - last_order.account_year
                 if manager_id and manager_id != order.user_id.id and year_diff == 1 :
                    manager_user = self.env['res.users'].browse ( manager_id )
                    manager_name = manager_user.name if manager_user.exists () else str ( manager_id )
