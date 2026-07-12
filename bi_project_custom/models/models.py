@@ -518,10 +518,10 @@ class SaleOrder ( models.Model ) :
 
         return record
 
-    def copy(self , default=None) :
-        default = dict ( default or {} )
-        default['audit_date'] = False
-        return super ().copy ( default )
+    # def copy(self , default=None) :
+    #     default = dict ( default or {} )
+    #     default['audit_date'] = False
+    #     return super ().copy ( default )
     
 
     def write(self , vals) :
@@ -560,31 +560,31 @@ class SaleOrder ( models.Model ) :
                 order.user_id = self.env.user
 
 
-    @api.constrains (
-        'partner_id' ,
-        'x_studio_contract_service' ,
-        'user_id' ,
-        'audit_date'
-    )
-    def _check_duplicate(self) :
-        for rec in self :
-            if not (
-                    rec.partner_id
-                    and rec.x_studio_contract_service
-                    and rec.user_id
-                    and rec.audit_date
-            ) :
-                continue
+    # @api.constrains (
+    #     'partner_id' ,
+    #     'x_studio_contract_service' ,
+    #     'user_id' ,
+    #     'audit_date'
+    # )
+    # def _check_duplicate(self) :
+    #     for rec in self :
+    #         if not (
+    #                 rec.partner_id
+    #                 and rec.x_studio_contract_service
+    #                 and rec.user_id
+    #                 and rec.audit_date
+    #         ) :
+    #             continue
 
-            duplicate = self.search_count ( [
-                ('partner_id' , '=' , rec.partner_id.id) ,
-                ('x_studio_contract_service' , '=' , rec.x_studio_contract_service.id) ,
-                ('user_id' , '=' , rec.user_id.id) ,
-                ('audit_date' , '=' , rec.audit_date) ,
-                ('id' , '!=' , rec.id) ,
-            ] )
+    #         duplicate = self.search_count ( [
+    #             ('partner_id' , '=' , rec.partner_id.id) ,
+    #             ('x_studio_contract_service' , '=' , rec.x_studio_contract_service.id) ,
+    #             ('user_id' , '=' , rec.user_id.id) ,
+    #             ('audit_date' , '=' , rec.audit_date) ,
+    #             ('id' , '!=' , rec.id) ,
+    #         ] )
 
-            if duplicate :
+    #         if duplicate :
                 raise ValidationError ( _ ( "هذا الأوردر موجود بالفعل." ) )
 
 
@@ -609,11 +609,13 @@ class SaleOrder ( models.Model ) :
 
             # ✅ لو العميل له manager والمستخدم مختلف
             if last_order :
-                # if order.user_id == last_order.user_id and order.audit_date == last_order.audit_date:
-                #    raise ValidationError(  _("لا يجوز عمل أوردر مكرر بالخدمة '%s' لنفس السنة.")  % order.x_studio_contract_service.display_name)
+                year_diff = date.now ().year - last_order.account_year
+                if order.user_id == last_order.user_id and year_diff == 0  :
+                    raise ValidationError ( _ ( "هذا الأوردر موجود بالفعل." ) )
+                   # raise ValidationError(  _("لا يجوز عمل أوردر مكرر بالخدمة '%s' لنفس السنة.")  % order.x_studio_contract_service.display_name)
 
                 manager_id = last_order.partner_id.manager_id
-                year_diff = date.now ().year - last_order.account_year
+                
                 if manager_id and manager_id != order.user_id.id and year_diff == 1 :
                     manager_user = self.env['res.users'].browse ( manager_id )
                     manager_name = manager_user.name if manager_user.exists () else str ( manager_id )
