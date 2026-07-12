@@ -610,8 +610,8 @@ class SaleOrder ( models.Model ) :
             # ✅ لو العميل له manager والمستخدم مختلف
             if last_order :
                 year_diff = date.now ().year - last_order.account_year
-                if order.user_id == last_order.user_id and year_diff == 0  :
-                    raise ValidationError ( _ ( "هذا الأوردر موجود بالفعل." ) )
+                # if order.user_id == last_order.user_id and year_diff == 0  :
+                #     raise ValidationError ( _ ( "هذا الأوردر موجود بالفعل." ) )
                    # raise ValidationError(  _("لا يجوز عمل أوردر مكرر بالخدمة '%s' لنفس السنة.")  % order.x_studio_contract_service.display_name)
 
                 manager_id = last_order.partner_id.manager_id
