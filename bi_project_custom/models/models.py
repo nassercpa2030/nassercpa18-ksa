@@ -518,6 +518,12 @@ class SaleOrder ( models.Model ) :
 
         return record
 
+    def copy(self , default=None) :
+        default = dict ( default or {} )
+        default['audit_date'] = False
+        return super ().copy ( default )
+    
+
     def write(self , vals) :
         res = super ().write ( vals )
         # for order in self :
