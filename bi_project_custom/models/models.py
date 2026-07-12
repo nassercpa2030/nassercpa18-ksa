@@ -2,7 +2,8 @@ from odoo import models , fields , api , _
 from odoo.exceptions import ValidationError
 import logging
 from odoo.fields import Date
-#import datetime
+
+# import datetime
 
 _logger = logging.getLogger ( __name__ )
 
@@ -561,33 +562,54 @@ class SaleOrder ( models.Model ) :
                 continue
 
             # ✅ لازم يكون فيه عميل ومستخدم
-            if not order.partner_id or not order.user_id or not order.x_studio_contract_service:
+            if not order.partner_id or not order.user_id or not order.x_studio_contract_service :
                 continue
 
-
             ### last order of the same service You  made
-            last_order = self.env['sale.order'].search ( [('partner_id' , '=' , order.partner_id.id) , ('x_studio_contract_service' , '=' ,order.x_studio_contract_service.id),('id', '!=', order.id),] , 
-                                                        order = 'date_order desc, id desc' , limit = 1)
+            last_order = self.env['sale.order'].search ( [('partner_id' , '=' , order.partner_id.id) , (
+            'x_studio_contract_service' , '=' , order.x_studio_contract_service.id) , ('id' , '!=' , order.id) , ] ,
+                                                         order='date_order desc, id desc' , limit=1 )
             # last_service =last_order.x_studio_contract_service
             # now_service =order.x_studio_contract_service
 
             # ✅ لو العميل له manager والمستخدم مختلف
             if last_order :
-                if order.user_id == last_order.user_id and order.audit_date == last_order.audit_date:
-                   raise ValidationError(  _("لا يجوز عمل أوردر مكرر بالخدمة '%s' لنفس السنة.")  % order.x_studio_contract_service.display_name)
+                # if order.user_id == last_order.user_id and order.audit_date == last_order.audit_date:
+                #    raise ValidationError(  _("لا يجوز عمل أوردر مكرر بالخدمة '%s' لنفس السنة.")  % order.x_studio_contract_service.display_name)
 
-                
                 manager_id = last_order.partner_id.manager_id
-                year_diff = date.now().year - last_order.account_year
+                year_diff = date.now ().year - last_order.account_year
                 if manager_id and manager_id != order.user_id.id and year_diff == 1 :
-                   manager_user = self.env['res.users'].browse ( manager_id )
-                   manager_name = manager_user.name if manager_user.exists () else str ( manager_id )
+                    manager_user = self.env['res.users'].browse ( manager_id )
+                    manager_name = manager_user.name if manager_user.exists () else str ( manager_id )
 
-                   raise ValidationError (
+                    raise ValidationError (
                         _ ( "لا يجوز عمل أوردر لهذا العميل لأنه يخص المستخدم: %s\nبرجاء مراجعته لإجراء أي تعديل" )
-                       % manager_name
-                   )
+                        % manager_name
+                    )
 
+    def copy(self , default=None) :
+        self.ensure_one ()
+        default = dict ( default or {} )
+
+        last_order = self.env['sale.order'].search (
+            [
+                ('partner_id' , '=' , self.partner_id.id) ,
+                ('x_studio_contract_service' , '=' , self.x_studio_contract_service.id) ,
+                ('id' , '!=' , self.id) ,
+            ] ,order='date_order desc, id desc' ,limit=1 ,)
+
+        if (
+                last_order
+                and self.user_id == last_order.user_id
+                and self.audit_date == last_order.audit_date
+        ) :
+            raise ValidationError (
+                _ ( "لا يجوز عمل أوردر مكرر بالخدمة '%s' لنفس السنة." )
+                % self.x_studio_contract_service.display_name
+            )
+
+        return super ().copy ( default )
 
     @api.onchange ( 'journal_entry_data' )
     @api.depends ( 'journal_entry_data' )
@@ -782,7 +804,6 @@ class SaleOrder ( models.Model ) :
                 'default_sale_order_id' : self.id ,
             }
         }
-
 
 # from odoo import models , fields , api , _
 # from odoo.exceptions import ValidationError
@@ -1101,7 +1122,6 @@ class SaleOrder ( models.Model ) :
 # #         return True
 
 
-
 # class SaleOrder ( models.Model ) :
 #     _inherit = 'sale.order'
 
@@ -1395,7 +1415,7 @@ class SaleOrder ( models.Model ) :
 #                 order.first_line_taxes = False
 
 #           ####### second line############
-#             if len(order.order_line) >= 2:    
+#             if len(order.order_line) >= 2:
 #                 order.second_line_name = order.order_line[1].product_id.name
 #                 # order.second_line_name = order.order_line[1].name
 #                 order.second_line_taxed = order.order_line[1].price_total
