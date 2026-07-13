@@ -92,16 +92,40 @@
                         padding: 0;
                         border: 0;
                     }
+                    .custom-warning {
+                          background-color: #fff3cd;
+                          color: #664d03;
+                          border: 1px solid #ffecb5;
+                          border-radius: 4px;
+                          padding: 6px;
+                          width: 100%;
+                          display: flex;
+                          align-items: center;
+                          gap: 0.25rem;
+                       }
    
                 </style>
 
                 <!-- ======================= -->
                 <!-- Body Content -->
                 <!-- ======================= -->
-                <div class="page report-body" style="margin:0;padding:0 0 180px 0;">
+                <div class="page report-body" style="margin:0;padding:0 0 180px 0;"  >
 
                     <!-- عنوان التقرير -->
-                    <div class="header-title2">تقرير متابعة أمر البيع</div>
+                    <div class="header-title2" t-if="o.archive_signiture">تقرير متابعة أمر البيع</div>
+                    <div class="header-title2" t-if="o.archive_signiture_exception and not o.archive_signiture" style="font-weight:bold;font-size:15px;text-decoration:underline;">
+                          تقرير متابعة أمر البيع
+                         <span style="color:red;" t-if="o.archive_signiture_exception and not o.archive_signiture">مستثني</span>
+                         <span style="color:red;" t-if="archive_signiture_handeld">معلـــق</span>
+                    </div>
+                        <div class="custom-warning" t-if="o.archive_signiture_exception and not o.archive_signiture_exception_complete and not o.archive_signiture" style="font-weight:bold;  font-size:15px;" role="alert">
+                                <span> تنـــبيه هــــام: تــأكد من إرفــاق نمـــوذج إستـــثناء المـــلف قبــل ختــــم هــذا المـــستــند </span>
+      
+                         </div>
+                        <div class="custom-warning" t-if="o.archive_signiture_handeld and not o.archive_signiture_exception and not o.archive_signiture_exception_complete and not o.archive_signiture" style="font-weight:bold;  font-size:15px;" role="alert">
+                                <span> تنـــبيه هــــام: تــأكد من إرفــاق نمـــوذج تعلــــيق المـــلف قبــل ختــــم هــذا المـــستــند </span>
+      
+                         </div>
 
                     <table style="margin-top:12px;">
                         <tr>
@@ -342,7 +366,7 @@
                                     <tr>
                                      
                                         <td style="text-align:center;"><strong> توقيع مدير المجموعة</strong></td>
-                                           <td style="text-align:center;">    <strong> توقيع الأرشيف<br/> [تم إستيفاء المستندات]  </strong></td>
+                                           <td style="text-align:center;">    <strong> توقيع الأرشيف<br/> <span t-if="o.archive_signiture or o.archive_signiture_exception_complete">[تم إستيفاء المستندات]</span> <span t-if="o.archive_signiture_exception or o.archive_signiture_handeld and not o.archive_signiture and not o.archive_signiture_exception_complete">[ملــف مستثـــي غيــر مستــوفي المستــندات]</span></strong></td>
                                         <td style="text-align:center;"><strong> توقيع مدير المالية</strong></td>
                                     </tr>
                                     <tr>
@@ -350,8 +374,10 @@
                                            <!--img t-if="o.manager_assign" t-att-src="image_data_uri(o.finance_assign)"/-->
                                            ..............................
                                        </td>
+                                       
                                         <td  class="signature-images" style="text-align:center; padding:10px; height:55px; vertical-align:bottom; ">
-                                           <img t-if="o.archive_assign" t-att-src="image_data_uri(o.archive_assign)" style="max-height:80px; max-width:180px;"/>
+                                             <!-- <t t-set="archive_user" t-value="o.env['res.users'].browse(563)"/> -->
+                                           <img t-if="o.archive_signiture or o.archive_signiture_exception or archive_signiture_handeld"      t-att-src="image_data_uri(o.env['res.users'].browse(563).sign_signature)" style="max-height:80px; max-width:180px;"/>
                                        </td>
                                         <td  class="signature-images" style="text-align:center; padding:10px; height:55px; vertical-align:bottom; ">
                                            <img t-if="o.finance_assign" t-att-src="image_data_uri(o.finance_assign)" style="max-height:80px; max-width:180px;"/>

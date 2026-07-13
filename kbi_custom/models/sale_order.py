@@ -49,7 +49,7 @@ class SaleOrder ( models.Model ) :
     first_payment_journal_test = fields.Char ( 'First Payment Journal Name' , readonly=False , store=True )
     unpaid_total_refrence = fields.Float ( 'unpaid_total_refrence' , store=True , readonly=False )
     paid_total_refrence = fields.Float ( 'paid_total_refrence' , store=True , readonly=False )
-    paid_percentage_refrence = fields.Float ( 'paid_percentage_refrence' , store=True , readonly=False )
+    paid_percentage_refrence = fields.Float ( 'paid_percentage_refrence' , store=True , group_operator=False,readonly=False )
 
     customer_English_name_refrence = fields.Char ( 'customer_English_name_refrence' , readonly=False , store=True )
     close_entry_date_refrence = fields.Date ( string="close_entry_date_refrence" , readonly=False , required=False ,
@@ -70,10 +70,11 @@ class SaleOrder ( models.Model ) :
     # close_entry_year = fields.Integer ( string="Close Entry Year" ,compute="calc_close_date",store=True, readonly=False,searchable=True )
 
     date = fields.Datetime ( string='Date' )
-    review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Assigned To' , readonly=False ,
-                                          domain=[('job_id' , '=' , 'مدير مراجعة')] )
+    # review_manager_id = fields.Many2one ( comodel_name='hr.employee' , string='Assigned To' , readonly=False ,
+    #                                       domain=[('job_id' , '=' , 'مدير مراجعة')] )
     # review_manager_id=fields.Many2one(comodel_name='res.users',string='Manager',readonly=False )
     # partner_manager = fields.Many2one(comodel_name="res.partner",related='partner_id.user_id',store=True)
+    review_manager_id = fields.Many2one ( 'res.users' , string='Assigned To' , readonly=False , ondelete='set null' )
     user_id = fields.Many2one ( 'res.users' , string='Manager' , readonly=False )
     sequence = fields.Integer ( string='Sequence' , )
     report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
@@ -95,9 +96,17 @@ class SaleOrder ( models.Model ) :
                                           searchable=True )
     paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" , sorted=True )
     finance_signiture = fields.Boolean ( string=' توقيع المالية للختم ' , readonly=False , store=True )
-    archive_signiture = fields.Boolean ( string='توقيع الأرشيف للختم ' , default=False , readonly=False , index=True )
-    manager_signiture = fields.Boolean ( string='توقيع مدير المجموعة للختم ' , default=False , readonly=False ,
-                                         index=True )
+    archive_signiture = fields.Boolean ( string='توقيع الأرشيف للختم (مشـروع مكـتمل) ' , default=False ,
+                                         readonly=False , index=True )
+    archive_signiture_handeld = fields.Boolean ( string='توقيع الأرشيف للختم (معــلق) ' , default=False ,
+                                                 readonly=False , index=True )
+    archive_signiture_exception = fields.Boolean ( string='توقيع الأرشيف للختم (مستثني) ' , default=False ,
+                                                   readonly=False , index=True )
+    approve_finance_exception = fields.Boolean ( string='تأكيــد المالية بتوقيع نمــوذج الإستكمال(مستثني) ' ,
+                                                 default=False ,
+                                                 readonly=False , index=True )
+    archive_signiture_exception_complete = fields.Boolean ( string=' توقيع الأرشيف بإكتمال الملف (المستثني) ' ,
+                                                            default=False , readonly=False , index=True )
     finance_assign = fields.Binary ( string=' ملف توقيع المالية  ' , default=False ,
                                      compute="_compute_finance_archive_signature" , store=False , readonly=False )
     archive_assign = fields.Binary ( string=' ملف توقيع الأرشيف ' , default=False ,
@@ -117,16 +126,19 @@ class SaleOrder ( models.Model ) :
     # paid_percent = fields.Float(compute='_compute_payment_count')
     amount_due = fields.Float ( compute="_compute_payment_count" , string="Amount Due" , readonly=False )
     project_budget = fields.Float ( string='Project Budget' , copy=False )
-    project_name = fields.Char ( string='Auto Project Name(AR)' , compute="get_project_name" , readonly=False , store=True )
+    project_name = fields.Char ( string='Auto Project Name(AR)' , compute="get_project_name" , readonly=False ,
+                                 store=True )
     auto_contract_name = fields.Boolean ( string="Auto Name" , readonly=False , default=True )
     product_public_name = fields.Char ( string="Product Public Name" , compute="get_pr_nam_fr_service" , store=True ,
                                         readonly=False )
     project_code = fields.Char ( string='Project Code' , related="auto_code" )
     contract_signature = fields.Boolean ( "Contract Signature" )
-    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
+    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Project Analytic Plan' ,
+                                        compute='_compute_analytic_plan_default_id' , readonly=False )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
-                                            domain="[('plan_id', '=', project_type_id)]" ,
-                                            compute='_compute_analytic_account_id' , readonly=False , store=True )
+                                            domain="[('plan_id', '=', project_type_id)]" , readonly=False ,
+                                            required=True , store=True )
+    # analytic_account_id_assigned = fields.Many2one ( 'account.analytic.plan',related='review_manager_id.analytic_plan',store=False)
     approve_uid = fields.Many2one ( 'res.users' , string='Approve User' , )
     approve_date = fields.Datetime ( string='Approve Date' )
     reject_reason = fields.Text ( string='Reject Reason' )
@@ -134,6 +146,8 @@ class SaleOrder ( models.Model ) :
                                   domain="[('is_broker', '=', True)]" )
     number_700_sale = fields.Char ( related='partner_id.number_700' , string="(700) الرقم الموحد" , readonly=False ,
                                     required=True , store=True )
+    political_kyan = fields.Selection ( related='partner_id.political_kyan' , string="الكـــــيان القـــــانونـي" ,
+                                        readonly=False , required=True , store=True )
     manager_id_sale = fields.Integer ( related="partner_id.manager_id" , string="Manager Id" , store=True ,
                                        readonly=False )
     contact_manager_team = fields.Many2one ( comodel_name="res.users" , related="user_id" ,
@@ -195,7 +209,7 @@ class SaleOrder ( models.Model ) :
     x_studio_auto_code = fields.Char ( string="Auto Code_printing" , related='auto_code' , readonly=False , store=True )
     last_service = fields.Many2one ( string="Last Contract Service" , comodel_name='service.contract' )
     assigned_to = fields.Many2one ( 'res.users' , string="Assigned To" )
-    ass_to_percentage = fields.Integer ( "Ass_to Percentage" )
+    ass_to_percentage = fields.Integer ( "Ass_to Percentage" , default=None , store=True )
     ass_to = fields.Float ( string="Ass_to" , compute="_compute_ass_to" , store=True )
     ass_from = fields.Float ( string="Ass_from" , compute="_compute_ass_to" , store=True )
     #################### multi_services ############
@@ -290,7 +304,15 @@ class SaleOrder ( models.Model ) :
             raise ValueError ( "Report with ID 1645 not found!" )
         # ترجع الـ report action عشان أودو يفتح PDF
         return report.report_action ( self )
-        
+
+    def action_print_project_complete(self) :
+        # إحنا هنا بنجيب التقرير بالـ ID مباشرة
+        report = self.env['ir.actions.report'].browse ( 1673 )
+        if not report :
+            # لو التقرير مش موجود، ممكن نعمل raise أو نرجع التقرير الافتراضي
+            raise ValueError ( "Report  of completing filewith ID 1673 not found!" )
+        # ترجع الـ report action عشان أودو يفتح PDF
+        return report.report_action ( self )
 
     def action_print_project_history(self) :
         # إحنا هنا بنجيب التقرير بالـ ID مباشرة
@@ -334,7 +356,12 @@ class SaleOrder ( models.Model ) :
     @api.depends ( 'amount_untaxed' , 'ass_to_percentage' )
     def _compute_ass_to(self) :
         for rec in self :
-            rec.ass_to = rec.amount_untaxed * rec.ass_to_percentage / 100
+            try :
+                percent = float ( rec.ass_to_percentage or 0.0 )
+            except :
+                percent = 0.0
+
+            rec.ass_to = rec.amount_untaxed * percent / 100
             rec.ass_from = rec.amount_untaxed - rec.ass_to
 
     @api.depends ( "x_studio_contract_service" )
@@ -459,15 +486,27 @@ class SaleOrder ( models.Model ) :
     #    }
     # }
 
-    @api.onchange ( 'analytic_account_id' )
+    @api.onchange ( 'analytic_account_id' , 'analytic_account_id_assigned' , 'ass_to_percentage' )
     def _onchange_analytic_account_id(self) :
-        for line in self.order_line :
-            if self.analytic_account_id :
-                line.analytic_distribution = {
-                    self.analytic_account_id.id : 100
-                }
-            else :
-                line.analytic_distribution = {}
+        for order in self :
+            for line in order.order_line :
+                if order.analytic_account_id and order.analytic_account_id_assigned :
+                    assigned_percentage = order.ass_to_percentage or 0
+                    main_percentage = 100 - assigned_percentage
+                    line.analytic_distribution = {
+                        order.analytic_account_id.id : main_percentage ,
+                        order.analytic_account_id_assigned.id : assigned_percentage ,
+                    }
+                elif order.analytic_account_id and not order.analytic_account_id_assigned :
+                    line.analytic_distribution = {
+                        self.analytic_account_id.id : 100
+
+                    }
+                else :
+                    line.analytic_distribution = {}
+                    raise ValidationError (
+                        "أختـــر الحساب التحليلي (Analytic Account). وإذا كان هناك Assigned To فيجب اختيار Analytic Account Assigned To أيضاً."
+                    )
 
     def action_view_invoice(self , invoices=False) :
         self.ensure_one ()  # لو عايزين نتعامل مع order واحد في context
@@ -655,16 +694,30 @@ class SaleOrder ( models.Model ) :
             rec.id : rec.archive_signiture
             for rec in self
         }
+        old_archive_handeled = {
+            rec.id : rec.archive_signiture_handeld
+            for rec in self
+        }
+        old_archive_exception = {
+            rec.id : rec.archive_signiture_exception
+            for rec in self
+        }
+        old_archive_exception_complete = {
+            rec.id : rec.archive_signiture_exception_complete
+            for rec in self
+        }
 
         res = super ().write ( vals )
 
-        if 'archive_signiture' in vals :
+        if 'archive_signiture' in vals and not 'archive_signiture_exception' in vals :
 
             for sale_order in self :
                 if (
                         not old_archive[sale_order.id]
                         and sale_order.archive_signiture
                 ) :
+                    sale_order.project_ids.stage_id = 24
+                    sale_order.project_ids.files_state = "done"
                     wizard = self.env['close.entry.wizard'].with_context (
                         active_id=sale_order.id ,
                         active_model='sale.order'
@@ -675,11 +728,86 @@ class SaleOrder ( models.Model ) :
 
                     wizard.close_entry ()
 
+        elif not 'archive_signiture' in vals and not 'archive_signiture_exception' in vals and 'archive_signiture_handeld' in vals :
+
+            for sale_order in self :
+                if (
+                        not old_archive_handeled[sale_order.id]
+                        and sale_order.archive_signiture_handeld
+                ) :
+                    sale_order.project_ids.stage_id = 24
+                    sale_order.project_ids.files_state = "done"
+                    wizard = self.env['close.entry.wizard'].with_context (
+                        active_id=sale_order.id ,
+                        active_model='sale.order'
+                    ).create ( {
+                        'sale_order_id' : sale_order.id ,
+                        'journal_entry_date' : fields.Date.context_today ( self ) ,
+                    } )
+
+                    wizard.close_entry_deffered ()
+                   
+
+        elif not 'archive_signiture' in vals and 'archive_signiture_exception' in vals :
+
+            for sale_order in self :
+                if (
+                        not old_archive_exception[sale_order.id]
+                        and sale_order.archive_signiture_exception
+                ) :
+                    sale_order.project_ids.files_state = "not_done"
+                    wizard = self.env['close.entry.wizard'].with_context (
+                        active_id=sale_order.id ,
+                        active_model='sale.order'
+                    ).create ( {
+                        'sale_order_id' : sale_order.id ,
+                        'journal_entry_date' : fields.Date.context_today ( self ) ,
+                    } )
+
+                    wizard.close_entry_deffered ()
+
+        elif 'archive_signiture_exception_complete' in vals :
+
+            for sale_order in self :
+                if (
+                        not old_archive_exception_complete[sale_order.id]
+                        and sale_order.archive_signiture_exception_complete
+                ) :
+                    sale_order.project_ids.stage_id = 24
+                    sale_order.project_ids.files_state = "last_done"
+                    wizard = self.env['close.entry.wizard'].with_context (
+                        active_id=sale_order.id ,
+
+                        active_model='sale.order'
+                    ).create ( {
+                        'sale_order_id' : sale_order.id ,
+                        'use_account_id1' : True ,
+                        'journal_entry_date' : fields.Date.context_today ( self ) ,
+                    } )
+
+                    wizard.close_entry ()
+
         # self._get_mobile()
         # إعادة معالجة الملفات فقط إذا تم رفع جديد
         if 'upload_file' in vals and vals['upload_file'] :
             self._process_file ()
         return res
+
+    # def complete_clentry_file(self) :
+    #     for sale_order in self :
+    #         if sale_order.archive_signiture_exception_complete :
+    #
+    #             wizard = self.env['close.entry.wizard'].with_context (
+    #                 active_id=sale_order.id ,
+    #                 active_model='sale.order'
+    #             ).create ( {
+    #                 'sale_order_id' : sale_order.id ,
+    #                 'user_account_id2' : True ,
+    #                 'journal_entry_date' : fields.Date.context_today ( self ) ,
+    #             } )
+    #
+    #             if wizard.user_account_id2 :
+    #                 wizard.close_entry ()
 
     def download_file(self) :
         """تنزيل الملف الأصلي كما رفع"""
@@ -961,20 +1089,80 @@ class SaleOrder ( models.Model ) :
     # rec.analytic_account_id = False
     # else :
     # rec.analytic_account_id = False
+    analytic_plan_id = fields.Many2one (
+        'account.analytic.plan' ,
+        compute='_compute_analytic_plan_id' ,
+        store=False ,
+    )
 
-    @api.depends ( 'project_type_id' , 'order_line' )
-    @api.onchange ( 'project_type_id' , 'order_line' )
-    def _compute_analytic_account_id(self) :
+    @api.depends ( 'user_id' )
+    def _compute_analytic_plan_default_id(self) :
         for rec in self :
-            if rec.order_line :
-                account = rec.order_line[0].product_id.product_analytic_ids.filtered (
-                    lambda x : x.analytic_plan_id.id == rec.project_type_id.id )
-                if account :
-                    rec.analytic_account_id = account.analytic_account_id.id
-                # else :
-                # rec.analytic_account_id = False
-            else :
-                rec.analytic_account_id = False
+            # rec.analytic_plan_id = rec.review_manager_id.analytic_plan_id
+            rec.project_type_id = rec.user_id.analytic_plan_ids
+
+    @api.depends ( 'review_manager_id' )
+    def _compute_analytic_plan_id(self) :
+        for rec in self :
+            rec.analytic_plan_id = rec.review_manager_id.analytic_plan_ids
+            # rec.project_type_id = rec.user_id.analytic_plan_ids
+
+    analytic_account_id_assigned = fields.Many2one (
+        'account.analytic.account' ,
+        string='Assigned Analytic Account' ,
+        # compute='_compute_analytic_account_id_assigned' ,
+        store=True ,
+        readonly=False ,
+        domain="[('plan_id', '=', analytic_plan_id)]" ,
+    )
+
+    # @api.depends ( 'project_type_id' , 'order_line' , 'review_manager_id' )
+    # @api.onchange ( 'project_type_id' , 'order_line' , 'review_manager_id' )
+    # def _compute_analytic_account_id(self) :
+    #     for rec in self :
+
+    #         rec.analytic_account_id = False
+    #         rec.analytic_account_id_assigned = False
+
+    #         if not rec.order_line :
+    #             continue
+
+    #         # =========================
+    #         # 1. الأساسي (حسب project_type)
+    #         # =========================
+    #         account = rec.order_line[0].product_id.product_analytic_ids.filtered (
+    #             lambda x : x.analytic_plan_id.id == rec.project_type_id.id
+    #         )
+
+    #         if account :
+    #             rec.analytic_account_id = account.analytic_account_id.id
+
+    #             # =========================
+    #             # 2. assigned (نفس الاسم داخل plan مختلف)
+    #             # =========================
+    #             if rec.review_manager_id and rec.review_manager_id.plan_id :
+    #                 name_base = account.analytic_account_id.name
+
+    #                 assigned_account = self.env['account.analytic.account'].search ( [
+    #                     ('name' , 'ilike' , name_base) ,
+    #                     ('plan_id' , '=' , rec.review_manager_id.plan_id.id) ,
+    #                 ] , limit=1 )
+
+    #                 rec.analytic_account_id_assigned = assigned_account.id
+
+    # @api.depends ( 'project_type_id' , 'order_line','','')
+    # @api.onchange ( 'project_type_id' , 'order_line','','')
+    # def _compute_analytic_account_id(self) :
+    #     for rec in self :
+    #         if rec.order_line :
+    #             account = rec.order_line[0].product_id.product_analytic_ids.filtered (
+    #                 lambda x : x.analytic_plan_id.id == rec.project_type_id.id )
+    #             if account :
+    #                 rec.analytic_account_id = account.analytic_account_id.id
+    #             # else :
+    #             # rec.analytic_account_id = False
+    #         else :
+    #             rec.analytic_account_id = False
 
     def action_open_payment(self) :
         return {
@@ -1010,9 +1198,6 @@ class SaleOrder ( models.Model ) :
             ] ,
             'context' : {'create' : False} ,
         }
-
-
-
 
 
 # @api.depends ( "product_public_name" , "account_year" , "auto_contract_name" )
@@ -1054,7 +1239,6 @@ class SaleOrder ( models.Model ) :
 # }
 
 
-
 class SaleOrder2 ( models.Model ) :
     _inherit = 'sale.order'
 
@@ -1079,10 +1263,10 @@ class SaleOrder2 ( models.Model ) :
     # project_code = fields.Char ( string='Project Code' )
     # invoice_count=fields.Integer(string="",store=True,readonly=False)
     contract_signature = fields.Boolean ( "Contract Signature" )
-    project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Company Type' )
+    # project_type_id = fields.Many2one ( 'account.analytic.plan' , compute='_compute_analytic_plan_id' ,string='Company Type' )
     # analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
     #                                        domain="[('plan_id', '=', project_type_id)]" ,
-    #                                        compute='_compute_analytic_account_id' , readonly=False , store=True )
+    #                                        compute='_compute_analytic_account_id_assigned' , readonly=False , store=True )
     approve_uid = fields.Many2one ( 'res.users' , string='Approve User' , )
     approve_date = fields.Datetime ( string='Approve Date' )
     reject_reason = fields.Text ( string='Reject Reason' )
@@ -1117,7 +1301,7 @@ class SaleOrder2 ( models.Model ) :
 
     final_close_entry = fields.Char ( string="قيد الايراد" , compute='_compute_final_close_entry_date' ,
                                       readonly=False , index=True , searchable=True )
-    close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , rcompute='_compute_final_close_entry_date' ,
+    close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , compute='_compute_final_close_entry_date' ,
                                      readonly=False )
     final_close_entry_date = fields.Date ( string=" تاريخ قيد الايراد" , compute='_compute_final_close_entry_date' ,
                                            index=True , searchable=True , store=True )
@@ -1133,19 +1317,22 @@ class SaleOrder2 ( models.Model ) :
     def _compute_final_close_entry_date(self) :
         for order in self :
             # تنظيف الاسم من مسافات إضافية وتحويله لأحرف صغيرة
-            order_name_clean = (order.name or '').strip ().lower ()
+            order_name_clean = (order.name or '').strip ()
 
             # البحث عن أول قيد مرتبط بالـ Sale Order
             move = self.env['account.move'].search ( [
                 ('invoice_origin' , 'ilike' , order_name_clean) ,  # بحث غير حساس لحالة الأحرف
                 ('journal_id' , 'in' , [165 , 160 , 162])
                 # ('line_ids.account_id', 'in', [1341,1342])          # حسب Journals اللي انت عايزهم
-            ] , order='date asc' , limit=1 )
+            ] , order='date desc' , limit=1 )
 
-            if move :
+            if move:
                 order.close_entry_date = move.date
                 order.final_close_entry_date = move.date
                 order.final_close_entry = move.name
+                
+
+               
 
     # @api.depends ( 'name' )  # أو أي حقل يربط بالسيل أوردر
     # def _compute_final_close_entry_date(self) :
