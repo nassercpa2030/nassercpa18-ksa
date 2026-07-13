@@ -584,8 +584,8 @@ class SaleOrder ( models.Model ) :
     #             ('id' , '!=' , rec.id) ,
     #         ] )
 
-    #         if duplicate :
-                raise ValidationError ( _ ( "هذا الأوردر موجود بالفعل." ) )
+    # #         if duplicate :
+    #             raise ValidationError ( _ ( "هذا الأوردر موجود بالفعل." ) )
 
 
     @api.constrains ( 'partner_id' , 'user_id' )
