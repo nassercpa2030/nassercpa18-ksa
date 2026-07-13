@@ -1,9 +1,7 @@
 from odoo import models , fields , api , _
 from odoo.exceptions import ValidationError
 import logging
-from odoo.fields import Date
 
-# import datetime
 
 _logger = logging.getLogger ( __name__ )
 
@@ -318,6 +316,7 @@ class QualityStateLog ( models.Model ) :
 #         return True
 
 
+
 class SaleOrder ( models.Model ) :
     _inherit = 'sale.order'
 
@@ -340,8 +339,7 @@ class SaleOrder ( models.Model ) :
     journal_entry_data = fields.Many2many ( comodel_name='account.move' , compute='_compute_journal_entry_data' ,
                                             string='Journal Data Lines' )
     # journal_entry_count_finance = fields.Integer (string='عدد قيود الإغلاق',compute='compute_journal_entry_count_finance',store=True)
-    journal_entry_count_finance = fields.Integer ( string='عدد قيود الإغلاق' ,
-                                                   compute='compute_journal_entry_count_finance' )
+    journal_entry_count_finance = fields.Integer ( string='عدد قيود الإغلاق' , compute='compute_journal_entry_count_finance' )
     one_audit_number = fields.Char ( string="رقم ون أودت" , related="partner_id.ref" , index=True )
     broker_percentage_ = fields.Float ( string="Broker Percentage" , readonly=False ,
                                         compute="compute_broker_percentage" )
@@ -389,7 +387,7 @@ class SaleOrder ( models.Model ) :
     second_line_taxes = fields.Float (
         string="Second Line Taxe" ,
         compute="_compute_second_line_name" ,
-        readonly=False
+       readonly=False
     )
     invoice_attachements_ids = fields.Many2many ( 'ir.attachment' , 'sale_order_invoice_attachment_rel' ,
                                                   'sale_order_id' , 'attachment_id' , string='Invoice Attachments' ,
@@ -518,12 +516,6 @@ class SaleOrder ( models.Model ) :
 
         return record
 
-    # def copy(self , default=None) :
-    #     default = dict ( default or {} )
-    #     default['audit_date'] = False
-    #     return super ().copy ( default )
-    
-
     def write(self , vals) :
         res = super ().write ( vals )
         # for order in self :
@@ -559,35 +551,29 @@ class SaleOrder ( models.Model ) :
             else :
                 order.user_id = self.env.user
 
-
-    # @api.constrains (
-    #     'partner_id' ,
-    #     'x_studio_contract_service' ,
-    #     'user_id' ,
-    #     'audit_date'
-    # )
-    # def _check_duplicate(self) :
-    #     for rec in self :
-    #         if not (
-    #                 rec.partner_id
-    #                 and rec.x_studio_contract_service
-    #                 and rec.user_id
-    #                 and rec.audit_date
-    #         ) :
+    # @api.constrains ( 'partner_id' , 'user_id' )
+    # def _check_partner_manager(self) :
+    #     for order in self :
+    #
+    #         # ✅ Admin مسموح
+    #         if order._is_admin () :
     #             continue
-
-    #         duplicate = self.search_count ( [
-    #             ('partner_id' , '=' , rec.partner_id.id) ,
-    #             ('x_studio_contract_service' , '=' , rec.x_studio_contract_service.id) ,
-    #             ('user_id' , '=' , rec.user_id.id) ,
-    #             ('audit_date' , '=' , rec.audit_date) ,
-    #             ('id' , '!=' , rec.id) ,
-    #         ] )
-
-    # #         if duplicate :
-    #             raise ValidationError ( _ ( "هذا الأوردر موجود بالفعل." ) )
-
-
+    #
+    #         # ✅ لازم يكون فيه عميل ومستخدم
+    #         if not order.partner_id or not order.user_id :
+    #             continue
+    #
+    #         manager_id = order.partner_id.manager_id
+    #
+    #         # ✅ لو العميل له manager والمستخدم مختلف
+    #         if manager_id and manager_id != order.user_id.id :
+    #             manager_user = self.env['res.users'].browse ( manager_id )
+    #             manager_name = manager_user.name if manager_user.exists () else str ( manager_id )
+    #
+    #             raise ValidationError (
+    #                 _ ( "لا يجوز عمل أوردر لهذا العميل لأنه يخص المستخدم: %s\nبرجاء مراجعته لإجراء أي تعديل" )
+    #                 % manager_name
+    #             )
     @api.constrains ( 'partner_id' , 'user_id' )
     def _check_partner_manager(self) :
         for order in self :
@@ -602,20 +588,16 @@ class SaleOrder ( models.Model ) :
 
             ### last order of the same service You  made
             last_order = self.env['sale.order'].search ( [('partner_id' , '=' , order.partner_id.id) , (
-            'x_studio_contract_service' , '=' , order.x_studio_contract_service.id) , ('id' , '!=' , order.id) , ] ,
+                'x_studio_contract_service' , '=' , order.x_studio_contract_service.id) , ('id' , '!=' , order.id) , ] ,
                                                          order='date_order desc, id desc' , limit=1 )
             # last_service =last_order.x_studio_contract_service
             # now_service =order.x_studio_contract_service
 
             # ✅ لو العميل له manager والمستخدم مختلف
             if last_order :
-                year_diff = date.now ().year - last_order.account_year
-                # if order.user_id == last_order.user_id and year_diff == 0  :
-                #     raise ValidationError ( _ ( "هذا الأوردر موجود بالفعل." ) )
-                   # raise ValidationError(  _("لا يجوز عمل أوردر مكرر بالخدمة '%s' لنفس السنة.")  % order.x_studio_contract_service.display_name)
-
+                year_diff = fields.datetime.now ().year - last_order.account_year
                 manager_id = last_order.partner_id.manager_id
-                
+
                 if manager_id and manager_id != order.user_id.id and year_diff == 1 :
                     manager_user = self.env['res.users'].browse ( manager_id )
                     manager_name = manager_user.name if manager_user.exists () else str ( manager_id )
@@ -624,7 +606,6 @@ class SaleOrder ( models.Model ) :
                         _ ( "لا يجوز عمل أوردر لهذا العميل لأنه يخص المستخدم: %s\nبرجاء مراجعته لإجراء أي تعديل" )
                         % manager_name
                     )
-
 
 
     @api.onchange ( 'journal_entry_data' )
@@ -654,20 +635,20 @@ class SaleOrder ( models.Model ) :
                 order.first_line_name = order.order_line[0].product_id.name
                 order.first_line_taxed = order.order_line[0].price_total
                 order.first_line_untaxed = order.order_line[0].price_subtotal
-                order.first_line_taxes = round ( order.order_line[0].price_tax , 2 )
-            else :
+                order.first_line_taxes = round(order.order_line[0].price_tax, 2)
+            else:
                 order.first_line_name = False
                 order.first_line_taxed = False
                 order.first_line_untaxed = False
                 order.first_line_taxes = False
 
-            ####### second line############
-            if len ( order.order_line ) >= 2 :
+          ####### second line############
+            if len(order.order_line) >= 2:
                 order.second_line_name = order.order_line[1].product_id.name
                 # order.second_line_name = order.order_line[1].name
                 order.second_line_taxed = order.order_line[1].price_total
                 order.second_line_untaxed = order.order_line[1].price_subtotal
-                order.second_line_taxes = round ( order.order_line[1].price_tax , 2 )
+                order.second_line_taxes = round(order.order_line[1].price_tax, 2)
             else :
                 order.second_line_name = False
                 order.second_line_taxed = False
@@ -820,7 +801,6 @@ class SaleOrder ( models.Model ) :
                 'default_sale_order_id' : self.id ,
             }
         }
-
 # from odoo import models , fields , api , _
 # from odoo.exceptions import ValidationError
 # import logging
