@@ -31,13 +31,8 @@ class ResCity ( models.Model ) :
 class ResCity ( models.Model ) :
     _inherit = 'res.users'
 
-<<<<<<< HEAD
-    analytic_plan_ids = fields.Many2many(
-        'account.analytic.plan',
-=======
     analytic_plan_ids = fields.Many2many (
         'account.analytic.plan' ,
->>>>>>> 09fbdde9759c29247b23a1e25d368881526f3211
         string='Allowed Analytic Plans'
     )
     analytic_account_ids = fields.Many2many (
