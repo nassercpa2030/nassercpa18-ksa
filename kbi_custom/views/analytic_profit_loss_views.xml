@@ -12,9 +12,9 @@
                             <group>
                                 <field name="date_from"/>
                                 <field name="date_to"/>
-<<<<<<< HEAD
+
                                 <field name="company_id" groups="base.group_multi_company"/>
-=======
+
                                 <!-- <field name="company_id" groups="base.group_multi_company"/> -->
                                 <field name="user_id" invisible="not group_code"/>
                                                                 <field name="finance923_perc_101"   invisible="group_code != '101'"/>
@@ -77,16 +77,16 @@
                                  <field name="pub_loc903_perc_111" invisible="group_code != '111'"/>
                                  <field name="pub_loc903_perc_200" invisible="group_code != '200'"/>
                                 <field name="pub_loc903_perc_103" invisible="group_code != '103'"/>
->>>>>>> 09fbdde9759c29247b23a1e25d368881526f3211
+
                             </group>
                             <group>
                                 <field name="allowed_analytic_plan_ids" invisible="1"/>
                                 <field name="allowed_analytic_account_ids" invisible="1"/>
                                 <!-- <field name="analytic_account_ids" invisible="1"/>-->
-<<<<<<< HEAD
+
                                 <field name="analytic_plan_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True}" modifiers="{'readonly': [('user_has_groups', '!=', 'base.group_system')]}"/> 
                                 <field name="show_details"  groups="base.group_system"/>
-=======
+
 <div class="d-flex rounded overflow-hidden border">
 
     <div class="p-2 border-end"
@@ -137,7 +137,7 @@
        decoration-bf="group_code != False " groups="base.group_system,104__team.shaker"/> -->
 
                                 <!-- <field name="level"  groups="base.group_system,104__team.shaker"/> -->
->>>>>>> 09fbdde9759c29247b23a1e25d368881526f3211
+
                             </group>
                         </group>
                             <div class="alert alert-info" role="alert">
@@ -149,14 +149,14 @@
                     </sheet>
                     <footer>
                         <button name="action_preview_qweb_report" type="object" string="Preview QWeb Report" class="btn-primary"/>
-<<<<<<< HEAD
+
                         <button name="action_print_pdf_report" type="object" string="Print PDF" class="btn-secondary"/>
                         <button name="action_generate_report" type="object" string="Open Lines" class="btn-secondary" groups="base.group_system"/>
-=======
+
                        <button name="action_print_excel_report" type="object" string="Print Excel" class="btn-success" icon="fa-file-excel-o"/>
                             <button name="action_print_pdf_report" type="object" string="Print PDF" class="btn-secondary"/>
                         <button name="action_generate_report" type="object" string="Open Lines" class="btn-secondary" groups="base.group_system,104__team.shaker"/>
->>>>>>> 09fbdde9759c29247b23a1e25d368881526f3211
+
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>
@@ -270,11 +270,8 @@
         </record>
 
         <menuitem id="menu_kbi_analytic_profit_loss"
-<<<<<<< HEAD
                   name="Analytic Profit and Loss"
-=======
                   name="تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة"
->>>>>>> 09fbdde9759c29247b23a1e25d368881526f3211
                   parent="account.menu_finance_reports"
                   action="action_kbi_analytic_profit_loss_wizard"
                   sequence="90"/>
