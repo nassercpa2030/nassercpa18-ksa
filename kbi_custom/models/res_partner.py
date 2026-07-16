@@ -510,26 +510,26 @@ class Recruiter ( models.Model ) :
     def action_open_employee_leaves(self) :
         self.ensure_one ()
 
-        action = self.env["ir.actions.actions"]._for_xml_id (
-            "hr_holidays.hr_leave_action_all"
-        )
+        tree_view = self.env.ref ( "hr_holidays.hr_leave_view_tree" )
+        form_view = self.env.ref ( "hr_holidays.hr_leave_view_form" , raise_if_not_found=False )
 
-        action["domain"] = [
-            ("employee_id" , "=" , self.id)
-        ]
+        views = [(tree_view.id , "list")]
+        if form_view :
+            views.append ( (form_view.id , "form") )
 
-        action["views"] = [
-            (self.env.ref ( "hr_holidays.hr_leave_view_tree" ).id , "list") ,
-            (False , "form") ,
-        ]
-
-        action["context"] = {
-            "default_employee_id" : self.id ,
+        return {
+            "type" : "ir.actions.act_window" ,
+            "name" : "Time Off" ,
+            "res_model" : "hr.leave" ,
+            "view_mode" : "list,form" ,
+            "views" : views ,
+            "domain" : [("employee_id" , "=" , self.id)] ,
+            "context" : {
+                "default_employee_id" : self.id ,
+            } ,
+            "target" : "current" ,
         }
 
-        return action
-    
-    
     @api.onchange ( 'start_working_date' )
     def _onchange_start_working_date(self) :
         if not self.resumption_work_after_leave :
