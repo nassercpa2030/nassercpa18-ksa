@@ -159,8 +159,8 @@
             </field>
         </record>
 
-        <record id="view_kbi_analytic_profit_loss_line_tree" model="ir.ui.view">
-            <field name="name">kbi.analytic.profit.loss.line.tree</field>
+        <record id="view_kbi_analytic_profit_loss_line_list" model="ir.ui.view">
+            <field name="name">kbi.analytic.profit.loss.line.list</field>
             <field name="model">kbi.analytic.profit.loss.line</field>
             <field name="arch" type="xml">
                 <list string="Analytic Profit and Loss" create="0" edit="0" delete="0"
