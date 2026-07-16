@@ -28,7 +28,6 @@
         'security/ir.model.access.csv',
         'data/sequence.xml',
         'views/analytic.xml',
-        'report/analytic_profit_loss_report.xml',
         'views/sale_order.xml',
         'views/product.xml',
         'views/crm_lead.xml',
