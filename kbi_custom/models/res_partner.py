@@ -464,8 +464,10 @@ class Recruiter ( models.Model ) :
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
                                       placeholder="Enter Analytic Plan" )
-    resumption_work_after_leave = fields.Date ( string="إستلام العـمل(بعد الإجازة)" , required=True , readonly=False , store=True )
-    vacance_days = fields.Float ( string="عدد أيـام الإجازة" , compute='_compute_employee_vacance_days' ,readonly=False, store=True )
+    resumption_work_after_leave = fields.Date ( string="إستلام العـمل(بعد الإجازة)" , required=True , readonly=False ,
+                                                store=True )
+    vacance_days = fields.Float ( string="عدد أيـام الإجازة" , compute='_compute_employee_vacance_days' ,
+                                  readonly=False , store=True )
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
                                            help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
@@ -504,12 +506,35 @@ class Recruiter ( models.Model ) :
     #         if employee.coach_id and employee.coach_id.id :
     #             employee.request_employee_manager = employee.coach_id.id
     #             employee.parent_id = employee.coach_id.id
-    @api.onchange('start_working_date')
-    def _onchange_start_working_date(self):
-         if not self.resumption_work_after_leave:
-              self.resumption_work_after_leave = self.start_working_date
 
+    def action_open_employee_leaves(self) :
+        self.ensure_one ()
+
+        action = self.env["ir.actions.actions"]._for_xml_id (
+            "hr_holidays.hr_leave_action_all"
+        )
+
+        action["domain"] = [
+            ("employee_id" , "=" , self.id)
+        ]
+
+        action["views"] = [
+            (self.env.ref ( "hr_holidays.hr_leave_view_tree" ).id , "list") ,
+            (False , "form") ,
+        ]
+
+        action["context"] = {
+            "default_employee_id" : self.id ,
+        }
+
+        return action
     
+    
+    @api.onchange ( 'start_working_date' )
+    def _onchange_start_working_date(self) :
+        if not self.resumption_work_after_leave :
+            self.resumption_work_after_leave = self.start_working_date
+
     @api.depends ( 'resumption_work_after_leave' , 'country_id' )
     def _compute_employee_vacance_days(self) :
         today = fields.Date.today ()
