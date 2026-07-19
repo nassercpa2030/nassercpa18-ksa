@@ -456,24 +456,30 @@ class Recruiter ( models.Model ) :
                                   help="عند إختيار هذا الحقل يتم  إحتساب نسب التأمينات الحديثة للموظف السعودي بنسبة والشركة12.25 % , للموظف %10.25  " ,
                                   store=True );
 
-#--------------hr.leave--------
+
+# --------------hr.leave--------
 class Hrleave ( models.Model ) :
     _inherit = 'hr.leave'
     vacance_days = fields.Float ( string="عدد أيـام الإجازة" , compute='_compute_vacance_days' ,
                                   readonly=False , store=True )
-    
-    @api.depends("request_date_from", "request_date_to")
-    def _compute_vacance_days(self):
-        for rec in self:
+
+    @api.depends ( "request_date_from" , "request_date_to" )
+    def _compute_vacance_days(self) :
+        for rec in self :
             rec.vacance_days = 0
-            if rec.request_date_from and rec.request_date_to:
-               rec.vacance_days = (rec.request_date_to - rec.request_date_from ).days + 1
-    
+            if rec.request_date_from and rec.request_date_to :
+                rec.vacance_days = (rec.request_date_to - rec.request_date_from).days + 1
+
 
 # ---------------- EMPLOYEES  -----------------
 class Recruiter ( models.Model ) :
     _inherit = 'hr.employee'
 
+    used_vacance_days = fields.Float(
+        string='الإجازات المستخدمة',
+        compute='_compute_used_vacance_days',
+        store=True
+    )
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
                                       placeholder="Enter Analytic Plan" )
@@ -519,6 +525,29 @@ class Recruiter ( models.Model ) :
     #         if employee.coach_id and employee.coach_id.id :
     #             employee.request_employee_manager = employee.coach_id.id
     #             employee.parent_id = employee.coach_id.id
+
+    @api.depends (
+        'resumption_work_after_leave' ,
+        'leave_ids.state' ,
+        'leave_ids.request_date_from' ,
+        'leave_ids.vacance_days'
+    )
+    def _compute_used_vacance_days(self) :
+        Leave = self.env['hr.leave']
+
+        for rec in self :
+            rec.used_vacance_days = 0.0
+
+            if not rec.resumption_work_after_leave :
+                continue
+
+            leaves = Leave.search ( [
+                ('employee_id' , '=' , rec.id) ,
+                ('request_date_from' , '>=' , rec.resumption_work_after_leave) ,
+                ('state' , 'not in' , ['cancel' , 'refuse']) ,
+            ] )
+
+            rec.used_vacance_days = sum ( leaves.mapped ( 'vacance_days' ) )
 
     def action_open_employee_leaves(self) :
         self.ensure_one ()
