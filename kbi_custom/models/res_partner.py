@@ -478,7 +478,7 @@ class Recruiter ( models.Model ) :
     used_vacance_days = fields.Float(
         string='الإجازات المستخدمة',
         compute='_compute_used_vacance_days',
-      
+        store=True
     )
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
@@ -526,12 +526,7 @@ class Recruiter ( models.Model ) :
     #             employee.request_employee_manager = employee.coach_id.id
     #             employee.parent_id = employee.coach_id.id
 
-    @api.depends (
-        'resumption_work_after_leave' ,
-        'leave_ids.state' ,
-        'leave_ids.request_date_from' ,
-        'leave_ids.vacance_days'
-    )
+    @api.depends ( 'resumption_work_after_leave' )
     def _compute_used_vacance_days(self) :
         Leave = self.env['hr.leave']
 
