@@ -456,6 +456,19 @@ class Recruiter ( models.Model ) :
                                   help="عند إختيار هذا الحقل يتم  إحتساب نسب التأمينات الحديثة للموظف السعودي بنسبة والشركة12.25 % , للموظف %10.25  " ,
                                   store=True );
 
+#--------------hr.leave--------
+class Hrleave ( models.Model ) :
+    _inherit = 'hr.leave'
+    vacance_days = fields.Float ( string="عدد أيـام الإجازة" , compute='_compute_vacance_days' ,
+                                  readonly=False , store=True )
+    
+    @api.depends("request_date_from", "request_date_to")
+    def _compute_vacance_days(self):
+        for rec in self:
+            rec.vacance_days = 0
+            if rec.request_date_from and rec.request_date_to:
+               rec.vacance_days = (rec.request_date_to - rec.request_date_from ).days + 1
+    
 
 # ---------------- EMPLOYEES  -----------------
 class Recruiter ( models.Model ) :
