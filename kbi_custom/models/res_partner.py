@@ -478,7 +478,7 @@ class Recruiter ( models.Model ) :
     used_vacance_days = fields.Float(
         string='الإجازات المستخدمة',
         compute='_compute_used_vacance_days',
-        store=True
+      
     )
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
