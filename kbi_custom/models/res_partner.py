@@ -485,7 +485,9 @@ class Recruiter ( models.Model ) :
                                       placeholder="Enter Analytic Plan" )
     resumption_work_after_leave = fields.Date ( string="إستلام العـمل(بعد الإجازة)" , required=True , readonly=False ,
                                                 store=True )
-    vacance_days = fields.Float ( string="عدد أيـام الإجازة" , compute='_compute_employee_vacance_days' ,
+    vacance_days = fields.Float ( string="رصيد الإجازة" , compute='_compute_employee_vacance_days' ,
+                                  readonly=False , store=True )
+    reversed_vacance_days = fields.Float ( string="أيـام الإجازة المستحقة" , compute='_compute_employee_vacance_days' ,
                                   readonly=False , store=True )
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
                                            help="this field get partner from contact" , readonly=False ,
@@ -532,6 +534,7 @@ class Recruiter ( models.Model ) :
 
         for rec in self :
             rec.used_vacance_days = 0.0
+         
 
             if not rec.resumption_work_after_leave :
                 continue
@@ -543,6 +546,7 @@ class Recruiter ( models.Model ) :
             ] )
 
             rec.used_vacance_days = sum ( leaves.mapped ( 'vacance_days' ) )
+         
 
     def action_open_employee_leaves(self) :
         self.ensure_one ()
@@ -578,6 +582,7 @@ class Recruiter ( models.Model ) :
 
         for rec in self :
             rec.vacance_days = 0
+            rec.reversed_vacance_days=0
 
             if not rec.resumption_work_after_leave :
                 continue
@@ -595,6 +600,7 @@ class Recruiter ( models.Model ) :
 
             # الرصيد المستحق حتى اليوم
             rec.vacance_days = months_of_service * (annual_days / 12)
+            rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
 
     @api.depends ( 'contract_ids.date_start' )
     def _compute_start_working_date(self) :
