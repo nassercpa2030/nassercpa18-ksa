@@ -465,11 +465,22 @@ class Recruiter ( models.Model ) :
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
                                       placeholder="Enter Analytic Plan" )
-    old_vacance_days = fields.Float (string='رصيد أجــازات سـابق' ,readonly=False)
+    old_vacance_days = fields.Float (
+        string='رصيد أجــازات سـابق' ,readonly=False)
+        #compute='_compute_employee_vacance_days',readonly=False)
+    resumption_work_after_leave = fields.Date ( string="إستلام العـمل(بعد الإجازة)" , required=True , readonly=False ,
+                                                store=True )
+    vacance_days = fields.Float ( string="عدد أيـام الإجازة" , compute='_compute_employee_vacance_days' ,
+                                  readonly=False , store=True )
+    used_vacance_days= fields.Float ( string=" أيـام الإجازة المستخدمة" , compute='_compute_employee_vacance_days' ,
+                                  readonly=False , store=True )
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
                                            help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
-    request_employee_manager = fields.Many2one ( 'res.users' , string='المدير ' , required=True , store=True )
+    request_employee_manager = fields.Many2one ( 'res.users' , string='المـديـر ' , required=True , store=True )
+    # request_employee_manager = fields.Many2one ( string='المـديـر ' , compute='_compute_request_employee_manager' ,
+    #                                              required=True , store=True , readonly=True )
+    # parent_id = fields.Many2one ( string='Manager',compute = '_compute_request_employee_manager' , required = True , store = True , readonly = True  )
     user_partner_id = fields.Many2one ( comodel_name='res.partner' , string='User Partner' ,
                                         related='user_id.partner_id' , store=True , readonly=False )
     contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
@@ -492,6 +503,76 @@ class Recruiter ( models.Model ) :
                                                  help="Same field as housing allowance for employee contract" ,
                                                  readonly=False , store=True )
 
+    # @api.depends ( 'coach_id' )
+    # def _compute_request_employee_manager(self) :
+    #     for employee in self :
+    #         employee.request_employee_manager = False
+    #         employee.parent_id = False
+
+    #         if employee.coach_id and employee.coach_id.id :
+    #             employee.request_employee_manager = employee.coach_id.id
+    #             employee.parent_id = employee.coach_id.id
+
+    def _create_recruitment_interviewers(self) :
+        return True
+
+    def _remove_recruitment_interviewers(self) :
+        return True
+
+
+    def action_open_employee_leaves(self) :
+        self.ensure_one ()
+
+        tree_view = self.env.ref ( "hr_holidays.hr_leave_view_tree" )
+        form_view = self.env.ref ( "hr_holidays.hr_leave_view_form" , raise_if_not_found=False )
+
+        views = [(tree_view.id , "list")]
+        if form_view :
+            views.append ( (form_view.id , "form") )
+
+        return {
+            "type" : "ir.actions.act_window" ,
+            "name" : "Time Off" ,
+            "res_model" : "hr.leave" ,
+            "view_mode" : "list,form" ,
+            "views" : views ,
+            "domain" : [("employee_id" , "=" , self.id)] ,
+            "context" : {
+                "default_employee_id" : self.id ,
+            } ,
+            "target" : "current" ,
+        }
+
+
+    @api.onchange ( 'start_working_date' )
+    def _onchange_start_working_date(self) :
+        if not self.resumption_work_after_leave :
+            self.resumption_work_after_leave = self.start_working_date
+
+    @api.depends ( 'resumption_work_after_leave' , 'country_id' )
+    def _compute_employee_vacance_days(self) :
+        today = fields.Date.today ()
+
+        for rec in self :
+            rec.vacance_days = 0
+
+            if not rec.resumption_work_after_leave :
+                continue
+
+            delta = relativedelta ( today , rec.resumption_work_after_leave )
+            months_of_service = delta.years * 12 + delta.months
+
+            # الموظف سعودي
+            if rec.country_id.code == 'SA' :
+                annual_days = 21 if delta.years < 5 else 30
+
+            # الموظف غير سعودي
+            else :
+                annual_days = 21 if delta.years < 2 else 30
+
+            # الرصيد المستحق حتى اليوم
+            rec.vacance_days = months_of_service * (annual_days / 12)
+
     @api.depends ( 'contract_ids.date_start' )
     def _compute_start_working_date(self) :
         for rec in self :
@@ -509,6 +590,7 @@ class Recruiter ( models.Model ) :
             # rec.other_allowance = rec.contract_id.l10n_sa_other_allowances if rec.contract_id else 0.0
 
 
+
 class Recruiter ( models.Model ) :
     _inherit = 'hr.job'
     recruiter_id = fields.Many2one ( 'hr.employee' , string="Recruiter" , readonly=False )
@@ -516,14 +598,14 @@ class Recruiter ( models.Model ) :
         ('id' , 'in' , self.env['hr.employee'].sudo ().search ( [] ).ids)] )
 
 
-class Recruiter ( models.Model ) :
-    _inherit = 'hr.employee'
-
-    def _create_recruitment_interviewers(self) :
-        return True
-
-    def _remove_recruitment_interviewers(self) :
-        return True
+# class Recruiter ( models.Model ) :
+#     _inherit = 'hr.employee'
+# 
+#     def _create_recruitment_interviewers(self) :
+#         return True
+# 
+#     def _remove_recruitment_interviewers(self) :
+#         return True
 
 
 ################## HR ATTACHMENTS###################
