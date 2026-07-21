@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+        <record id="res_config_settings_view_form_inh_aircall" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inh.aircall</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="50"/>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@id='contacts_settings']" position="before">
+                    <block title="Aircall Integration Settings"
+                           name="aircall_auth_container">
+                        <setting help="Provide credentials, enable the checkbox, and click save to activate the integration."
+                                 id="aircall_id">
+                            <field string="Connection" name="aircall_auth"/>
+                            <div id="aircall_authen"
+                                 class="content-group aircall_fetch_number_setting"
+                                 invisible="not aircall_auth">
+                                <div class="mt16" title="This is the URL used for API integration with Aircall.">
+                                    <label for="api_url" class="o_form_label mr8"/>
+                                    <field name="api_url" class="oe_inline"
+                                           required="aircall_auth"/>
+                                </div>
+                                <div class="mt8" title="This is the API ID used for authentication in Aircall API integration.">
+                                    <label for="api_id" class="o_form_label mr8"/>
+                                    <field name="api_id" class="oe_inline" password="True"
+                                           required="aircall_auth"/>
+                                </div>
+                                <div class="mt8" title="Enter your API token here. This token is used for integration with Aircall.">
+                                    <label for="api_token" class="o_form_label mr8"/>
+                                    <field name="api_token" class="oe_inline" password="True"
+                                           required="aircall_auth"/>
+                                </div>
+                                <div class="mt8" title="Enter your Aircall integration token here. This token is used for integration purposes.">
+                                    <label for="aircall_integration_token" class="o_form_label mr8"/>
+                                    <field name="aircall_integration_token" class="oe_inline"
+                                           password="True" required="aircall_auth"/>
+                                </div>
+                            </div>
+                        </setting>
+                        <setting invisible="not aircall_auth" string="Enable Crm Module"
+                                 help="If this option is enabled, call logs will be added to opportunities in the CRM module."
+                                 id="enable_crm_module">
+                            <field name="enable_crm_module" />
+                        </setting>
+                        <setting invisible="not aircall_auth"
+                                 string="Create Contacts For Unknown Numbers"
+                                 help="If this option is enabled, the integration will create a contact when an external phone number is not linked to any of your contacts." id="unknown_contact">
+                            <field name="allow_create_unknown_contacts" />
+                        </setting>
+                        <setting invisible="not aircall_auth"
+                                 string="Enable Helpdesk Module"
+                                 help="If this option is enabled, call logs will be added to Help desk tickets in the helpdesk module."
+                                 id="enable_helpdesk_module">
+                            <field name="enable_helpdesk_module"/>
+                            <div invisible="not (enable_helpdesk_module and aircall_auth)"
+                                 class="mt8" title="This field allows users to configure the behavior related to helpdesk log notes.">
+                                <label for="helpdesk_log_note_setting" class="o_form_label col-6"/>
+                                <p>Helpdesk Ticket logging options</p>
+                                <field name="helpdesk_log_note_setting"/>
+                            </div>
+                        </setting>
+                        <setting invisible="not aircall_auth"
+                                 help="The retry functionality will stop trying to sync failed contacts."
+                                 id="enable_try_again_syncing">
+                            <field string="Disable contact sync retry" name="enable_try_again_syncing"/>
+                        </setting>
+                        <setting invisible="not aircall_auth"
+                                 help="Call summaries, key topics and customer sentiment will be logged in your activity timeline and Aircall dedicated calls section." id="enable_summary_id">
+                            <field string="Enable AI Insight" name="enable_summary"/>
+                        </setting>
+                        <setting invisible="not aircall_auth"
+                                 string="Manual log when multiple records exist"
+                                 help="When enabled, this option will require the user to choose where to log the call if multiple records are present. If disabled, the system will apply the automatic behavior."
+                                 id="manual_contact">
+                            <field name="manual_call_loging"/>
+                        </setting>
+                         <setting invisible="not aircall_auth"
+                                  help="Call transcriptions will be logged in your activity timeline and Aircall dedicated calls section."
+                                  id="enable_transcription_id">
+                            <field string="Enable Call Transcription"
+                                   name="enable_transcription"/>
+                        </setting>
+                        <setting invisible="not aircall_auth" id="timezone">
+                            <h6>Timezone</h6>
+                            <div class="mt16" title="Timezone ">
+                                <field name="timezone_setting" class="oe_inline"
+                                       required="aircall_auth"/>
+                            </div>
+                        </setting>
+                        <setting invisible="not aircall_auth" help="If this option enabled, Aircall SMS will be store in Aircall Message History."
+                                 id="enable_sms_id">
+                            <field string="Enable SMS" name="enable_sms"/>
+                            <div id="enable_sms" class="content-group"
+                                 invisible="not enable_sms">
+                                <div class="mt16">
+                                    <field name="enable_sms_in_chatter"
+                                           class="oe_inline"/>
+                                    <label for="enable_sms_in_chatter"
+                                           class="o_form_label mr8"/>
+                                </div>
+                            </div>
+                        </setting>
+                        <setting invisible="not aircall_auth" help="If this option is enabled, Format phone number automatically."
+                                 id="phone_formate_id">
+                            <field string="Phone Number Format" name="phone_formate" />
+                        </setting>
+                        <setting><span/></setting>
+                        <setting invisible="not aircall_auth" id="number_maping">
+                            <h6>Number Mapping</h6>
+                            <p class="text-muted">Choose what numbers log to each module.</p>
+                            <h6>Contacts Module</h6>
+                            <button name="fetch_numbers" icon="oi-arrow-right"
+                                    type="object" string="Connect All" class="btn-link"/>
+                            <br/>
+                            <field name="number_config_ids" widget="many2many_tags"
+                                   class="oe_inline"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <div class="o_setting_box col-12 col-lg-6 o_searchable_setting"
+                                 invisible="not (enable_crm_module and aircall_auth)">
+                                <h6>CRM Module</h6>
+                                <button name="fetch_crm_numbers" icon="oi-arrow-right"
+                                        type="object" string="Connect All"
+                                        class="btn-link"/>
+                                <field name="number_crm_config_ids"
+                                       widget="many2many_tags" class="oe_inline"
+                                       options="{'no_create': True, 'no_create_edit': True}"
+                                       title="Aircall CRM Numbers"/>
+                            </div>
+                            <div class="o_setting_box col-12 col-lg-6 o_searchable_setting"
+                                 invisible="not (enable_helpdesk_module and aircall_auth)">
+                                <h6>Helpdesk Module</h6>
+                                <button name="fetch_helpdesk_numbers"
+                                        icon="oi-arrow-right" type="object"
+                                        string="Connect All" class="btn-link"/>
+                                <field name="number_helpdesk_config_ids"
+                                       widget="many2many_tags" class="oe_inline"
+                                       options="{'no_create': True, 'no_create_edit': True}"/>
+                            </div>
+                        </setting>
+                    </block>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

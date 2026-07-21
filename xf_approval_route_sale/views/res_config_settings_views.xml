@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form_sale_approval_route" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sale.approval.route</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="25"/>
+        <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <!-- استهدف الفورم مباشرة -->
+            <xpath expr="//form" position="inside">
+                <group string="Sale Approval Settings" groups="xf_approval_route_sale.group_sale_approval_manager">
+
+                    <field name="use_approval_route_sale" widget="radio"/>
+                    <label for="use_approval_route_sale"/>
+                    <span class="fa fa-lg fa-building-o" title="Values set here are company-specific."
+                          aria-label="Values set here are company-specific." groups="base.group_multi_company"
+                          role="img"/>
+                    <div class="text-muted">
+                        Use Dynamic Approval Route for Sale Orders
+                    </div>
+
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

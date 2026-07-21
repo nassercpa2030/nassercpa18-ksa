@@ -1,0 +1,80 @@
+<odoo>
+
+    <!-- ✅ تعديل Form View الخاص بالمشروع -->
+    <record id="project_form_view_inherit" model="ir.ui.view">
+        <field name="name">project_form_view_inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+
+            <!-- إضافة الحقول بعد حقل الشركة -->
+            <xpath expr="//field[@name='company_id' and @groups='base.group_multi_company']" position="after">
+                <field name="code"/>
+                <field name="contract_name"/>
+                <field name="is_system_user" invisible="1"/>
+                <field name="stage_name" invisible="1"/>
+                <field name="files_state"
+                       widget="badge"
+                       options='{
+                         "style": {
+                           "done": "background-color: #28a745; color: white; font-weight: bold; font-size: 16px;",
+                           "not_done": "background-color: #dc3545; color: white; font-weight: bold; font-size: 16px;"
+                         }
+                       }'
+                       modifiers="{'readonly': [('files_state','!=',False), ('is_system_user','=',False), ('stage_name','!=','جودة')]}"/>
+                <field name="paid_percent"
+                       widget="progressbar"
+                       options='{"max_value": 1.0}'
+                       style="width: 100%; font-weight: bold;"
+                       readonly="0"/>
+                <!-- field name="close_type"
+                       readonly="1"
+                       options="{'invisible': ['|', ('stage_name','!=','قيد مالي'), ('files_state','!=','not_done')]}"
+                       style="background-color: #dc3545; color: white; font-weight: bold; padding: 6px; border-radius: 6px;"
+                       placeholder="قيد إغلاق مؤجل"
+                       invisible="1"/-->
+            </xpath>
+
+            <!-- إضافة حقل التاريخ المالي -->
+            <xpath expr="//group/group[2]" position="inside">
+                <field name="financial_period_date"/>
+                 <field name="manager_id"/>
+            </xpath>
+
+            <!-- تبويب جديد للتاريخ -->
+            <xpath expr="//notebook/page[last()]" position="after">
+                <page string="History">
+                    <field name="stage_history_ids" readonly="1" force_save="1">
+                        <list create="0" edit="0" delete="0">
+                            <field name="project_id" invisible="1"/>
+                            <field name="user_id"/>
+                            <field name="source_stage_id"/>
+                            <field name="dest_stage_id"/>
+                            <field name="date"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ✅ تعديل Kanban View الخاص بالمشروع -->
+    <record id="project_form_view_inheritt" model="ir.ui.view">
+        <field name="name">project_form_view_inheritt</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_kanban"/>
+        <field name="arch" type="xml">
+
+            <!-- إضافة حقول مخصصة داخل الكانبان -->
+            <!--xpath expr="//t[@t-name='kanban-box']/div/div/span/field[@name='is_favorite']" position="after"-->
+        
+
+            <!-- إضافة Default Group By حسب المراحل -->
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_group_by">stage_id</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

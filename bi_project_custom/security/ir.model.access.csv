@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_invoice_line_wizard,bi_project_custom.invoice_line_wizard,model_invoice_line_wizard,,1,1,1,1
+access_close_entry_wizard,bi_project_custom.close_entry_wizard,model_close_entry_wizard,,1,1,1,1
+access_project_project_stage_route_rule,bi_project_custom.project_project_stage_route_rule,model_project_project_stage_route_rule,,1,1,1,1
+access_project_project_stage_history,bi_project_custom.project_project_stage_history,model_project_project_stage_history,,1,1,1,1
+access_quality_state_log,bi_project_custom.quality_state_log,model_quality_state_log,,1,1,1,1
