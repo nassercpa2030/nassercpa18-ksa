@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================= -->
+    <!-- Report Action -->
+    <!-- ============================= -->
+    <record id="action_report_customer_project_tracking" model="ir.actions.report">
+        <field name="name">نموذج تتبع أمر البيع</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">kbi_custom.report_customer_project_tracking</field>
+        <field name="print_report_name">f"أمر بيع - {object.name or ''} - {object.partner_id.name or ''}"</field>
+        <field name="paperformat_id" ref="kbi_custom.paperformat_zero_margin"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- ============================= -->
+    <!-- QWEB REPORT -->
+    <!-- ============================= -->
+    <template id="report_customer_project_tracking">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="kbi_custom.external_layout_seti">
+
+                <!-- ======================= -->
+                <!-- Body CSS only -->
+                <!-- ======================= -->
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
+
+                    /* CSS يطبق فقط على محتوى التقرير */
+                    .report-body, 
+                    .report-body table, 
+                    .report-body td, 
+                    .report-body th { 
+                        font-family: 'Tajawal', sans-serif; 
+                        font-size: 13px; 
+                    }
+
+                    .report-body th { 
+                        font-weight: bold; 
+                        font-size: 13.5px; 
+                        background:#EAF3FF; 
+                    }
+
+                    .report-body table { 
+                        width: 100%; 
+                        border-collapse: collapse; 
+                    }
+
+                    .report-body td, .report-body th { 
+                        padding:5px; 
+                        border:1px solid #2F6FB2; 
+                        text-align:right; 
+                        vertical-align:middle; 
+                    }
+
+                    .report-body .thank-you { 
+                        text-align:center; 
+                        font-size:12px; 
+                        color:#2F6FB2; 
+                    }
+
+                    .report-body .decor { 
+                        color:#c71585; 
+                        margin-top:5px; 
+                        letter-spacing:2px; 
+                    }
+
+                    .report-body .header-title2 { 
+                        font-size:18px; 
+                        text-align:center; 
+                        font-weight:bold; 
+                        margin-bottom:10px;  
+                        padding-top:6px;
+                    }
+
+                    .report-body .signature-cell { 
+                        width:45%; 
+                        text-align:center; 
+                        vertical-align:middle; 
+                    }
+
+                    .report-body strong { 
+                        display:block; 
+                        text-align:center; 
+                    }
+                    .signature-images img {
+                        display: block;
+                        height: 55px;
+                        max-width: 25%;
+                        margin: 0 auto;
+                        padding: 0;
+                        border: 0;
+                    }
+                    .custom-warning {
+                          background-color: #fff3cd;
+                          color: #664d03;
+                          border: 1px solid #ffecb5;
+                          border-radius: 4px;
+                          padding: 6px;
+                          width: 100%;
+                          display: flex;
+                          align-items: center;
+                          gap: 0.25rem;
+                       }
+   
+                </style>
+
+                <!-- ======================= -->
+                <!-- Body Content -->
+                <!-- ======================= -->
+                <div class="page report-body" style="margin:0;padding:0 0 180px 0;"  >
+
+                    <!-- عنوان التقرير -->
+                    <div class="header-title2" t-if="o.archive_signiture">تقرير متابعة أمر البيع</div>
+                    <div class="header-title2" t-if="o.archive_signiture_exception and not o.archive_signiture" style="font-weight:bold;font-size:15px;text-decoration:underline;">
+                          تقرير متابعة أمر البيع
+                         <span style="color:red;" t-if="o.archive_signiture_exception and not o.archive_signiture">مستثني</span>
+                         <span style="color:red;" t-if="archive_signiture_handeld">معلـــق</span>
+                    </div>
+                        <div class="custom-warning" t-if="o.archive_signiture_exception and not o.archive_signiture_exception_complete and not o.archive_signiture" style="font-weight:bold;  font-size:15px;" role="alert">
+                                <span> تنـــبيه هــــام: تــأكد من إرفــاق نمـــوذج إستـــثناء المـــلف قبــل ختــــم هــذا المـــستــند </span>
+      
+                         </div>
+                        <div class="custom-warning" t-if="o.archive_signiture_handeld and not o.archive_signiture_exception and not o.archive_signiture_exception_complete and not o.archive_signiture" style="font-weight:bold;  font-size:15px;" role="alert">
+                                <span> تنـــبيه هــــام: تــأكد من إرفــاق نمـــوذج تعلــــيق المـــلف قبــل ختــــم هــذا المـــستــند </span>
+      
+                         </div>
+
+                    <table style="margin-top:12px;">
+                        <tr>
+                            <td width="100%">
+                                <table width="100%" style="border-collapse:collapse;">
+
+                                    <!-- تاريخ الطباعة -->
+                                    <!--tr>
+                                        <td><strong>تاريخ الطباعة:</strong></td>
+                                        <td style="text-align:center;"><strong><span t-esc="o.printdate or '-'"/></strong></td>
+                                        <td style="text-align:center;"><strong>Printing Date</strong></td>
+                                    </tr-->
+
+                                    <!-- بيانات العميل وأمر البيع -->
+                                    <tr>
+                                        <td><strong>رقم أمر البيع</strong></td>
+                                        <td style="text-align:center;"><strong><span t-esc="o.name or '-'"/></strong></td>
+                                        <td style="text-align:left;"><strong>Sale Order No</strong></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><strong>العميل</strong></td>
+                                        <td style="text-align:center;"><strong><span t-esc="o.partner_id.name or '-'"/></strong></td>
+                                        <td style="text-align:left;"><strong>Customer</strong></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><strong>تاريخ الطلب</strong></td>
+                                        <td style="text-align:center;"><strong><span t-esc="o.date_order or '-'"/></strong></td>
+                                        <td style="text-align:left;"><strong>Order Date</strong></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><strong>الخدمة المقدمة </strong></td>
+                                        <td style="text-align:center;"><strong><span t-esc="o.project_name or '-'"/></strong></td>
+                                        <td style="text-align:left;"><strong>Provided Service</strong></td>
+                                    </tr>
+
+                                    <!-- الدفعات -->
+                                    <!--t t-set="payments" t-value="o.env['account.payment'].search([('sale_order_id','=',o.id)], order='date asc') or []"/>
+                                    <t t-set="payment_count" t-value="len(payments)"/>
+                                    <t t-if="payment_count &gt; 0">
+                                        <t t-foreach="payments" t-as="pay" t-index="i">
+                                            <tr>
+                                                <td>
+                                                    <strong>الدفعة <t t-esc="(i or 0) + 1"/><br/>
+                                                    البنك/الخزنة
+                                                    </strong>
+                                                </td-->
+                                                <!--td style="text-align:center;">
+                                                    <strong><span t-esc="pay.amount or 0"/> ريال</strong><br/>
+                                                    <strong><span t-esc="pay.journal_id.name or '-'"/></strong><br/>
+                                                    <small>
+                                                        تاريخ الدفع: <strong><span t-esc="pay.date or '-'"/></strong>
+                                                    </small>
+                                                </td-->
+<!--td style="text-align:center;">
+    <div><strong><span t-esc="pay.amount or 0"/> ريال</strong></div>
+    <div><strong><span t-esc="pay.journal_id.name or '-'"/></strong></div>
+    <div><small>تاريخ الدفع: <span t-esc="pay.date or '-'"/></small></div>
+</td>
+
+                                                
+                                                <td style="text-align:left;">
+                                                    <strong>
+                                                        Payment <t t-esc="(i or 0) + 1"/><br/>
+                                                        Bank
+                                                    </strong>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                    <t t-if="payment_count == 0">
+                                        <tr>
+                                            <td><strong>الدفعات</strong></td>
+                                            <td style="text-align:center;">0</td>
+                                            <td style="text-align:left;"><strong>Payments</strong></td>
+                                        </tr>
+                                    </t-->
+
+                                    <!-- الفواتير -->
+                                    <!--t t-set="invoices" t-value="o.invoice_ids or []"/>
+                                    <t t-set="invoice_count" t-value="len(invoices)"/>
+                                    <t t-if="invoice_count &gt; 0">
+                                        <tr t-foreach="invoices" t-as="inv" t-index="i">
+                                            <td><strong>الفاتورة <t t-esc="(i or 0) + 1"/></strong></td>
+                                            <td style="text-align:center;">
+                                                <span t-esc="inv.name or '-'"/> - <span t-esc="inv.date or '-'"/>
+                                            </td>
+                                            <td style="text-align:left;"><strong>Invoice <t t-esc="(i or 0) + 1"/> - Date</strong></td>
+                                        </tr>
+                                    </t>
+                                    <t t-if="invoice_count == 0">
+                                        <tr>
+                                            <td><strong>الفاتورة الأولى</strong></td>
+                                            <td style="text-align:center;">0</td>
+                                            <td style="text-align:left;"><strong>First Invoice - Date</strong></td>
+                                        </tr>
+                                    </t-->
+<!-- الدفعات -->
+<t t-set="payments"
+   t-value="o.env['account.payment'].search([('sale_order_id','=',o.id)], order='date asc') or []"/>
+
+<t t-if="payments">
+    <t t-set="pay_index" t-value="0"/>
+    <t t-set="payment_count" t-value="len(payments)"/>
+    
+    <!-- تعريف قائمة ألوان -->
+   <!--t t-set="bg_colors" t-value="['#cce5ff', '#99ccff', '#66b2ff', '#3399ff', '#99aab5', '#cccccc']"/-->
+    <t t-set="bg_colors" t-value="['#e6f2ff', '#cce6ff', '#b3d9ff', '#99ccff', '#cce0e6', '#e6e6e6']"/>
+
+
+    <t t-foreach="payments" t-as="pay">
+        <t t-set="pay_index" t-value="pay_index + 1"/>
+        
+        <!-- حساب اللون حسب index -->
+        <t t-set="color" t-value="bg_colors[(pay_index-1) % len(bg_colors)]"/>
+        
+        <tr t-att-style="'background-color: %s;' % color">
+            <td>
+                <strong>
+                    الدفعة <t t-esc="pay_index"/><br/>
+                    البنك/الخزنة
+                </strong>
+            </td>
+            
+    <!-- نسبة الدفع -->
+           
+            <td style="text-align:center;">
+    <div>
+        <strong>
+            <span t-esc="round((pay.amount / o.amount_total * 100) if o.amount_total else 0, 2)"/> %
+        </strong>
+    </div>
+    <div><strong><span t-esc="pay.journal_id.name or '-'"/></strong></div>
+    <div>
+        <small>
+            تاريخ الدفع: <span t-esc="pay.date or '-'"/>
+        </small>
+    </div>
+</td>
+
+
+            <!--td style="text-align:center;">
+                <div><strong><span t-esc="pay.amount or 0"/> ريال</strong></div>
+                <div><strong><span t-esc="pay.journal_id.name or '-'"/></strong></div>
+                <div>
+                    <small>
+                        تاريخ الدفع:
+                       <strong> <span t-esc="pay.date or '-'"/></strong>
+                    </small>
+                </div>
+            </td-->
+
+            <td style="text-align:left;">
+                <strong>
+                    Payment <t t-esc="pay_index"/><br/>
+                    Bank
+                </strong>
+            </td>
+        </tr>
+    </t>
+</t>
+
+<t t-if="not payments">
+    <tr>
+        <td><strong>الدفعات</strong></td>
+        <td style="text-align:center;">0</td>
+        <td style="text-align:left;"><strong>Payments</strong></td>
+    </tr>
+</t>
+
+
+                                    
+                                    <!-- الفواتير -->
+<t t-set="invoices" t-value="o.invoice_ids or []"/>
+
+<t t-if="invoices">
+    <t t-set="inv_index" t-value="0"/>
+
+    <t t-foreach="invoices" t-as="inv">
+        <t t-set="inv_index" t-value="inv_index + 1"/>
+
+        <tr>
+            <td>
+                <strong>فاتورة <t t-esc="inv_index"/></strong>
+            </td>
+
+            <td style="text-align:center;">
+                <strong><span t-esc="inv.name or '-'"/> -
+                <span t-esc="inv.date or '-'"/></strong>
+            </td>
+
+            <td style="text-align:left;">
+                <strong>Invoice <t t-esc="inv_index"/> - Date</strong>
+            </td>
+        </tr>
+    </t>
+</t>
+
+<t t-if="not invoices">
+    <tr>
+        <td><strong>فاتورة 1</strong></td>
+        <td style="text-align:center;">-</td>
+        <td style="text-align:left;"><strong>Invoice 1 - Date</strong></td>
+    </tr>
+</t>
+
+
+                                    <!-- الإجمالي -->
+                                    <tr>
+                                        <td><strong> نسبة دفع أمر البيع </strong></td>
+                                        <td style="text-align:center;"><strong>
+                                            <!--span t-esc="o.paid_percent or 0"/--> 
+                                              <span t-esc="('%.2f' % (o.paid_percent or 0))"/> %
+                                        </strong></td>
+                                        <td style="text-align:left;"><strong>Sales Order Payment Percentage</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>مدير المجموعة </strong></td>
+                                        <td style="text-align:center;"><strong> أ/<span t-esc="o.user_id.name or 0"/></strong></td>
+                                        <td style="text-align:left;"><strong>Sale Order Manager</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>تاريخ قيد الإيراد</strong></td>
+                                        <td style="text-align:center;"><strong><span t-esc="o.final_close_entry_date or 0"/> </strong></td>
+                                        <td style="text-align:left;"><strong>Close Entry Date</strong></td>
+                                    </tr>
+
+                                    <!-- عدد الدفعات -->
+                                    <!--tr>
+                                        <td><strong>عدد الدفعات:</strong></td>
+                                        <td style="text-align:center;" t-esc="payment_count or 0"/>
+                                        <td style="text-align:left;"><strong>Number of Payments</strong></td>
+                                    </tr-->
+
+                                    <!-- توقيعات -->
+                                    <tr>
+                                     
+                                        <td style="text-align:center;"><strong> توقيع مدير المجموعة</strong></td>
+                                           <td style="text-align:center;">    <strong> توقيع الأرشيف<br/> <span t-if="o.archive_signiture or o.archive_signiture_exception_complete">[تم إستيفاء المستندات]</span> <span t-if="o.archive_signiture_exception or o.archive_signiture_handeld and not o.archive_signiture and not o.archive_signiture_exception_complete">[ملــف مستثـــي غيــر مستــوفي المستــندات]</span></strong></td>
+                                        <td style="text-align:center;"><strong> توقيع مدير المالية</strong></td>
+                                    </tr>
+                                    <tr>
+                                       <td  class="signature-images" style="text-align:center; padding:10px; height:55px; vertical-align:bottom; ">
+                                           <!--img t-if="o.manager_assign" t-att-src="image_data_uri(o.finance_assign)"/-->
+                                           ..............................
+                                       </td>
+                                       
+                                        <td  class="signature-images" style="text-align:center; padding:10px; height:55px; vertical-align:bottom; ">
+                                             <!-- <t t-set="archive_user" t-value="o.env['res.users'].browse(563)"/> -->
+                                           <img t-if="o.archive_signiture or o.archive_signiture_exception or archive_signiture_handeld"      t-att-src="image_data_uri(o.env['res.users'].browse(563).sign_signature)" style="max-height:80px; max-width:180px;"/>
+                                       </td>
+                                        <td  class="signature-images" style="text-align:center; padding:10px; height:55px; vertical-align:bottom; ">
+                                           <img t-if="o.finance_assign" t-att-src="image_data_uri(o.finance_assign)" style="max-height:80px; max-width:180px;"/>
+                                       </td>
+
+                                       <!--td style="text-align:center; padding:15px; height:30px; vertical-align:bottom;">..............................</td>
+                                       <td style="text-align:center; padding:5px; height:25px; vertical-align:bottom;">..................................</td>
+                                       <td style="text-align:center; padding:5px; height:25px; vertical-align:bottom;">..............................</td-->
+                                    </tr>
+
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- شكر ودعم نهائي -->
+                    <div class="thank-you" style="margin-top:40px; text-align:center; font-size:12px; line-height:1.4;">
+                        <strong>🌸🌸🌸 نشكر لكم ثقتكم باستخدام نظام أودوو 🌸🌸🌸</strong>
+                        <div class="decor" style="margin:5px 0;">
+                            ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀ ❀
+                        </div>
+                        <p style="margin-top:5px; font-size:11px; font-style:italic;">
+                            مقدم من إدارة الدعم الفني بشركة 
+                            <strong>ناصر عوض أل كيرعان – محاسبون ومراجعون قانونيون</strong>، متمنين لكم دوام التميز والرقي.
+                        </p>
+                    </div>
+
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

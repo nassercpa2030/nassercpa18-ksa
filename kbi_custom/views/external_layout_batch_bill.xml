@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="external_layout_batch_bill">
+        <t t-call="web.basic_layout">
+            <t t-set="company" t-value="o.company_id"/>
+            <div class="page" style="margin:0; padding:0; font-family: 'Tajawal', sans-serif; direction: rtl; font-size:12px; color:#555555;">
+                
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
+
+          /* HEADER TABLE */
+    table.header-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+        font-weight: bold;
+        background-color: #EAF3FF; /* أزرق فاتح*/
+       /* background-color: #e0e0e0; رمادي فاتح */
+      /* border: 2px solid #999999;  رمادي غامق */
+        border: 2px solid #2F6FB2; /* أزرق غامق */
+        font-family: 'Tajawal', sans-serif;
+    }
+
+    table.header-table td {
+        width: 50%;
+        vertical-align: top;
+        padding: 10px;
+        border: 1px solid #999999;
+    }
+
+    .company-info { text-align: right; }
+    .client-info { text-align: left; 
+                  direction: ltr;}
+
+    img.company-logo {
+        max-height: 80px;
+        max-width: 180px;
+        display: block;
+    }
+
+    /* FOOTER */
+    .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        text-align: center;
+        font-size: 11px;
+        border-top: 1px solid #2F6FB2;
+        padding-top: 5px;
+        color: #333333;
+        font-weight: bold;
+        background-color: #EAF3FF; /* فاتح للفوتر */
+        font-family: 'Tajawal', sans-serif;
+    }
+    .footer_blue {
+    width: 100%;
+    border-collapse: collapse;
+    }
+
+   .footer_blue td {
+    background-color: #EAF3FF; /* أهم سطر */
+    padding: 6px 4px;
+    text-align: center;
+    font-weight: bold;
+    border: none;
+     }
+
+
+    .footer span {
+        display: block;
+        margin: 2px 0;
+    }
+     .table-center {
+    margin-top: 20px;
+    margin-bottom: 20px;
+                </style>
+    <table class="header-table">
+        <tr>
+            <td style="text-align:right;">
+                <table>
+                <tr>
+                    <td>
+                <p style="margin:2px 0;">التاريخ: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"/></p>
+                <p style="margin:2px 0;">المسوق: <span t-field="o.partner_id.name"/></p>
+                 <p style="margin: 3px 0;"> مدير المجموعة: <span t-field="docs[0].sale_order_id_finance.user_id.name"/> </p> 
+                 <p style="margin: 3px 0;"> مجموعة: <span t-field="docs[0].sale_order_id_finance.team_id.name"/> </p>
+                        
+                    </td>
+                </tr>
+                    <tr><td class="signature-texts" style="padding:40px 0; text-align:right;"><label style="text-decoration: underline; font-weight:bold; "> توقيع المسوق بإستلام المبلغ: </label></td></tr>
+                </table>
+               
+            </td>
+            <td style="text-align:left;">
+                <t t-if="o.partner_id.image_1920">
+                    <img t-att-src="'data:image/png;base64,%s' % (o.partner_id.image_1920.decode() if isinstance(o.partner_id.image_1920, bytes) else o.partner_id.image_1920)"
+                         style="max-width:450px; max-height:200px; border:2px solid #000;"/>
+                </t>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:center;">
+                <strong>طلب صرف مكافأة مسوق بالقطعة</strong>
+            </td>
+        </tr>
+    </table>
+                <!-- هنا ييجي كل محتوى التقرير -->
+                <t t-raw="0"/>
+
+<!-- Footer -->
+<!-- Footer -->
+<div class="footer" style="font-family: Verdana, Geneva, sans-serif;
+     font-size:10px;
+     background-color:#EAF3FF;
+     border-top:2px solid #2F6FB2;
+     padding:5px 10px;
+     font-weight:bold; overflow:hidden; border:none;">
+
+    <table style="width:100%; border-collapse:collapse; border:none;">
+        <tr style="border:none;">
+            <td style="border:none; padding:5px;">
+
+                <div style="width:100%; overflow:hidden;">
+
+                    <!-- رقم الصفحة -->
+                    <span style="float:right;">
+                        صفحة <span class="page"/> من <span class="topage"/>
+                    </span>
+
+                    <!-- الرسالة -->
+                    <span style="float:left;">
+                     .... برجاء المراجعة قبل التوقيع وشكراً 
+                    </span>
+
+                </div>
+
+            </td>
+        </tr>
+    </table>
+
+</div>
+            </div>
+        </t>
+    </template>
+</odoo>
