@@ -31,8 +31,13 @@ class ResCity ( models.Model ) :
 class ResCity ( models.Model ) :
     _inherit = 'res.users'
 
+<<<<<<< HEAD
+    analytic_plan_ids = fields.Many2many(
+        'account.analytic.plan',
+=======
     analytic_plan_ids = fields.Many2many (
         'account.analytic.plan' ,
+>>>>>>> 09fbdde9759c29247b23a1e25d368881526f3211
         string='Allowed Analytic Plans'
     )
     analytic_account_ids = fields.Many2many (
@@ -457,38 +462,15 @@ class Recruiter ( models.Model ) :
                                   store=True );
 
 
-# --------------hr.leave--------
-class Hrleave ( models.Model ) :
-    _inherit = 'hr.leave'
-    vacance_days = fields.Float ( string="عدد أيـام الإجازة" , compute='_compute_vacance_days' ,
-                                  readonly=False , store=True )
-
-    @api.depends ( "request_date_from" , "request_date_to" )
-    def _compute_vacance_days(self) :
-        for rec in self :
-            rec.vacance_days = 0
-            if rec.request_date_from and rec.request_date_to :
-                rec.vacance_days = (rec.request_date_to - rec.request_date_from).days + 1
-
-
 # ---------------- EMPLOYEES  -----------------
 class Recruiter ( models.Model ) :
     _inherit = 'hr.employee'
 
-    used_vacance_days = fields.Float(
-        string='الإجازات المستخدمة',
-        compute='_compute_used_vacance_days',
-        store=True
-    )
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
                                       placeholder="Enter Analytic Plan" )
-    resumption_work_after_leave = fields.Date ( string="إستلام العـمل(بعد الإجازة)" , required=True , readonly=False ,
-                                                store=True )
-    vacance_days = fields.Float ( string="رصيد الإجازة" , compute='_compute_employee_vacance_days' ,
-                                  readonly=False , store=True )
-    reversed_vacance_days = fields.Float ( string="أيـام الإجازة المستحقة" , compute='_compute_employee_vacance_days' ,
-                                  readonly=False , store=True )
+    resumption_work_after_leave = fields.Date ( string="إستلام العـمل(بعد الإجازة)" , required=True , readonly=False , store=True )
+    vacance_days = fields.Float ( string="عدد أيـام الإجازة" , compute='_compute_employee_vacance_days' ,readonly=False, store=True )
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
                                            help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
@@ -527,62 +509,18 @@ class Recruiter ( models.Model ) :
     #         if employee.coach_id and employee.coach_id.id :
     #             employee.request_employee_manager = employee.coach_id.id
     #             employee.parent_id = employee.coach_id.id
+    @api.onchange('start_working_date')
+    def _onchange_start_working_date(self):
+         if not self.resumption_work_after_leave:
+              self.resumption_work_after_leave = self.start_working_date
 
-    @api.depends ( 'resumption_work_after_leave' )
-    def _compute_used_vacance_days(self) :
-        Leave = self.env['hr.leave']
-
-        for rec in self :
-            rec.used_vacance_days = 0.0
-         
-
-            if not rec.resumption_work_after_leave :
-                continue
-
-            leaves = Leave.search ( [
-                ('employee_id' , '=' , rec.id) ,
-                ('request_date_from' , '>=' , rec.resumption_work_after_leave) ,
-                ('state' , 'not in' , ['cancel' , 'refuse']) ,
-            ] )
-
-            rec.used_vacance_days = sum ( leaves.mapped ( 'vacance_days' ) )
-         
-
-    def action_open_employee_leaves(self) :
-        self.ensure_one ()
-
-        tree_view = self.env.ref ( "hr_holidays.hr_leave_view_tree" )
-        form_view = self.env.ref ( "hr_holidays.hr_leave_view_form" , raise_if_not_found=False )
-
-        views = [(tree_view.id , "list")]
-        if form_view :
-            views.append ( (form_view.id , "form") )
-
-        return {
-            "type" : "ir.actions.act_window" ,
-            "name" : "Time Off" ,
-            "res_model" : "hr.leave" ,
-            "view_mode" : "list,form" ,
-            "views" : views ,
-            "domain" : [("employee_id" , "=" , self.id)] ,
-            "context" : {
-                "default_employee_id" : self.id ,
-            } ,
-            "target" : "current" ,
-        }
-
-    @api.onchange ( 'start_working_date' )
-    def _onchange_start_working_date(self) :
-        if not self.resumption_work_after_leave :
-            self.resumption_work_after_leave = self.start_working_date
-
+    
     @api.depends ( 'resumption_work_after_leave' , 'country_id' )
     def _compute_employee_vacance_days(self) :
         today = fields.Date.today ()
 
         for rec in self :
             rec.vacance_days = 0
-            rec.reversed_vacance_days=0
 
             if not rec.resumption_work_after_leave :
                 continue
@@ -600,7 +538,6 @@ class Recruiter ( models.Model ) :
 
             # الرصيد المستحق حتى اليوم
             rec.vacance_days = months_of_service * (annual_days / 12)
-            rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
 
     @api.depends ( 'contract_ids.date_start' )
     def _compute_start_working_date(self) :

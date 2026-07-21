@@ -20,8 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    # 'depends': ['base','project','sale_project','sale','hr_timesheet','kbi_custom'],
-    'depends': ['base','project','sale_project','sale','hr_timesheet','kbi_custom','hr','hr_attendance',],
+    'depends': ['base','project','sale_project','sale','hr_timesheet','kbi_custom'],
 
     # always loaded
     'data': [

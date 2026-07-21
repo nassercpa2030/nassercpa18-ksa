@@ -2,4 +2,3 @@
 
 from . import wizard
 from . import models
-from . import biometric_device
