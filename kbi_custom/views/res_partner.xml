@@ -1,0 +1,139 @@
+<odoo>
+    <data>
+        <!--record model="ir.ui.view" id="kbi_custom.view_res_partner_form_inherit_v2">
+    <field name="name">kbi_custom.view.res.partner.form.inherit.v2</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="arch" type="xml">
+
+  
+
+        <xpath expr="//field[@name='mobile']" position="before">
+           
+                 <field name="key_information"
+                   widget="boolean_toggle"
+                   style="font-weight:bold; background-color:#d4f8d4;
+                          display:inline-block; width:fit-content;
+                          padding:2px 8px; border-radius:6px;
+                          font-size:14px;"/>
+                <field name="fax_number"
+                       string=" فون أرضي"
+                       placeholder="Mobile number 2"
+                       invisible="not key_information"
+                       style="font-weight:bold; font-size:14px;"/>
+           
+        </xpath>
+
+    </field>
+</record-->
+
+        <record model="ir.ui.view" id="kbi_custom.view_res_partner_form_inherit">
+            <field name="name">kbi_custom.view.res.partner.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <!--xpath expr="//field[@name='category_id']" position="after">
+                     
+                </xpath-->
+                 <!--xpath expr="//field[@name='function']" position="after">
+                  <field name="key_information" style="font-weight:bold  background-color: #d4f8d4; display: inline-block; width: fit-content;padding: 2px 8px;border-radius: 6px; font-size:14px;" widget="boolean_toggle" />
+                           
+                </xpath-->
+                <!--xpath expr="//field[@name='email']" position="before">
+                  <group>  <field name="fax_number" style="font-weight:bold; font-size:14px;" string="mobile2" placeholder="Mobile number 2" invisible="not key_information"/></group>
+                           
+                </xpath-->
+                <xpath expr="//field[@name='function']" position="after">
+                   
+                            <field name='nationality' modifiers="{'invisible': [('is_broker', '=', True)]}"/>
+                            <field name="is_broker"/>
+                            <!--field name="number_700" style ="font-weight:bold; font-size:14px;" options="{'required': [('company_type', '=','company')]}"/-->
+                            <field name="agreement_id" modifiers="{'invisible': [('is_broker', '=', True)]}"/>
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="kbi_custom.view_res_partner_sa_form_inherit">
+            <field name="name">kbi_custom.view.res.partner.sa.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="l10n_sa_edi.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='l10n_sa_additional_identification_scheme']" position="attributes">
+                            <attribute name="modifiers">{'invisible': [('is_broker', '=', True)]}</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='l10n_sa_additional_identification_number']" position="attributes">
+                            <attribute name="modifiers">{'invisible': [('is_broker', '=', True)]}</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='vat']" position="attributes">
+                            <attribute name="modifiers">{'invisible': [('is_broker', '=', True)]}</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="kbi_custom.view_res_partner_address_form_inherit">
+            <field name="name">kbi_custom.view.res.partner.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="l10n_sa_edi.sa_partner_address_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='city']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='city']" position="before">
+                    <field name="state_id"  modifiers="{'invisible': [('key_information', '=', False)]}" />
+                   <field name="city_id" placeholder="City" class="o_address_city" modifiers="{ 'readonly': [('type', '=', 'contact'), ('parent_id', '!=', False)], 'invisible': [('key_information', '=', False)] }"/>
+                </xpath>
+            </field>
+        </record>
+
+       <record model="ir.ui.view" id="kbi_custom.view_hr_employee_date_form_contract">
+    <field name="name">hr.employee.form.contract.custom</field>
+    <field name="model">hr.employee</field>
+    <field name="inherit_id" ref="hr.view_employee_form"/>
+    <field name="arch" type="xml">
+
+        <xpath expr="//field[@name='job_id']" position="after">
+            
+                <group string="Employee Important Data &amp; Basic Information" style="width:100%">
+                      <field name="coach_id" widget="many2one_avatar_user" force_save="0" readonly="False" string="المديـر"/>
+                     <!-- <field name="request_employee_manager" widget="many2one_avatar_user" force_save="0" readonly="False" string="المدير"/> -->
+                     <field name="contract_state" widget="badge" decoration-success="contract_state == 'open'" decoration-danger="contract_state == 'close'" decoration-warning="contract_state == 'draft'" decoration-muted="contract_state == 'cancel'" force_save="0" string="حالة العقد" decoration-bf="1"/>
+                        <!--field name="related_partner_id" readonly="0"/-->
+                   
+                  
+                     <field name="start_working_date" widget="badge" options="{'color':'#1f77b4'}" style="background-color:#6a5acd;color:white;padding:2px 6px;border-radius:4px;" placeholder="تاريخ مباشرة العمل" decoration-bf="1"/> 
+                    <field name="resumption_work_after_leave"/>
+                    <field name="vacance_days" />
+                    <div style="border-top:1px solid #000; margin:10px 0;"/>
+                   <field name="iqama_expiry_date" placeholder="تاريخ انتهاء الإقامة"/>
+                    <field name="passport_expiry_date" placeholder="تاريخ انتهاء الجواز"/> 
+                    <field name="identification_id" options="{'color':'dark'}" style="background-color:#90EE90; color:dark;padding:2px 6px;border-radius:4px;" placeholder="رقم الهوية /رقم الإقامة" string="رقم الهوية /رقم الإقامة" decoration-bf="1"/>   
+                    <field name="border_number" placeholder="رقم الحدود" decoratio-bf="1"/>
+                </group>
+        </xpath>
+         
+        <!-- <xpath expr="//field[@name='job_id']" position="after">
+            
+                <group string="Employee Important Data &amp; Basic Information" style="width:100%">
+                    <field name="request_employee_manager" widget="many2one_avatar_user" force_save="0" readonly="False"  string="المدير"/> 
+                    
+                     <field name="contract_state" widget="badge" decoration-success="contract_state == 'open'" decoration-danger="contract_state == 'close'" decoration-warning="contract_state == 'draft'" decoration-muted="contract_state == 'cancel'" force_save="0"  string="حالة العقد"/>
+        
+                    <field name="start_working_date" widget="badge"
+                           options="{'color':'#1f77b4'}"
+                           style="background-color:#6a5acd;color:white;padding:2px 6px;border-radius:4px;"
+                           placeholder="تاريخ مباشرة العمل" />
+                    <field name="iqama_expiry_date" placeholder="تاريخ انتهاء الإقامة" />
+                    <field name="passport_expiry_date" placeholder="تاريخ انتهاء الجواز" />
+                    <field name="residency_visa_number"
+                           options="{'color':'dark'}"
+                           style="background-color:#90EE90; color:dark;padding:2px 6px;border-radius:4px;"
+                           placeholder="رقم الهوية /رقم الإقامة"
+                           string="رقم الهوية /رقم الإقامة" />
+                    <field name="border_number" placeholder="رقم الحدود" />
+                </group>
+        </xpath> -->
+    </field>
+</record>
+    </data>
+</odoo>

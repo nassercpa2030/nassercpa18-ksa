@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="view_kbi_analytic_profit_loss_wizard_form" model="ir.ui.view">
+            <field name="name">kbi.analytic.profit.loss.wizard.form</field>
+            <field name="model">kbi.analytic.profit.loss.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Analytic Profit and Loss">
+                    <sheet>
+                        <group string="Report Filters">
+                            <group>
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+<<<<<<< HEAD
+                                <field name="company_id" groups="base.group_multi_company"/>
+=======
+                                <!-- <field name="company_id" groups="base.group_multi_company"/> -->
+                                <field name="user_id" invisible="not group_code"/>
+                                                                <field name="finance923_perc_101"   invisible="group_code != '101'"/>
+                                <field name="finance923_perc_104"   invisible="group_code != '104'"/>
+                                 <field name="finance923_perc_110"   invisible="group_code != '110'"/>
+                                 <field name="finance923_perc_111"   invisible="group_code != '111'"/>
+                                 <field name="finance923_perc_200"   invisible="group_code != '200'"/>
+                                 <field name="finance923_perc_103"   invisible="group_code != '103'"/>
+                                 <field name="quality901_perc_101"   invisible="group_code != '101'"/>
+                                <field name="quality901_perc_104"   invisible="group_code != '104'"/>
+                                <field name="quality901_perc_110"   invisible="group_code != '110'"/>
+                                <field name="quality901_perc_111"   invisible="group_code != '111'"/>
+                                <field name="quality901_perc_200"    invisible="group_code != '200'"/>
+                                <field name="quality901_perc_103"   invisible="group_code != '103'"/>
+                                <field name="oper_supp902_perc_101" invisible="group_code != '101'"/>
+                                <field name="oper_supp902_perc_104" invisible="group_code != '104'"/>
+                                 <field name="oper_supp902_perc_110" invisible="group_code != '110'"/>
+                                 <field name="oper_supp902_perc_111" invisible="group_code != '111'"/>
+                                 <field name="oper_supp902_perc_200" invisible="group_code != '200'"/>
+                                 <field name="oper_supp902_perc_103" invisible="group_code != '103'"/>
+                                 <field name="sale_gen911_perc_101" invisible="group_code != '101'"/>
+                                <field name="sale_gen911_perc_104" invisible="group_code != '104'"/>
+                                <field name="sale_gen911_perc_110" invisible="group_code != '110'"/>
+                                <field name="sale_gen911_perc_111" invisible="group_code != '111'"/>
+                                <field name="sale_gen911_perc_200" invisible="group_code != '200'"/>
+                                <field name="sale_gen911_perc_103" invisible="group_code != '103'"/>
+                                <field name="office_supp_perc_101" invisible="group_code != '101'"/>
+                                <field name="office_supp_perc_104" invisible="group_code != '104'"/>
+                                <field name="office_supp_perc_110" invisible="group_code != '110'"/>
+                                <field name="office_supp_perc_111" invisible="group_code != '111'"/>
+                                <field name="office_supp_perc_200" invisible="group_code != '200'"/>
+                                <field name="office_supp_perc_103" invisible="group_code != '103'"/>
+                                <field name="manage_921_perc_101" invisible="group_code != '101'"/>
+                                 <field name="manage_921_perc_104" invisible="group_code != '104'"/>
+                                 <field name="manage_921_perc_110" invisible="group_code != '110'"/>
+                                 <field name="manage_921_perc_111" invisible="group_code != '111'"/>
+                                 <field name="manage_921_perc_200" invisible="group_code != '200'"/>
+                                 <field name="manage_921_perc_103" invisible="group_code != '103'"/>
+                                 <field name="it_922_perc_101" invisible="group_code != '101'"/>
+                                 <field name="it_922_perc_104" invisible="group_code != '104'"/>
+                                 <field name="it_922_perc_110" invisible="group_code != '110'"/>
+                                 <field name="it_922_perc_111" invisible="group_code != '111'"/>
+                                 <field name="it_922_perc_200" invisible="group_code != '200'"/>
+                                 <field name="it_922_perc_103" invisible="group_code != '103'"/>
+                                <field name="build_facil950_perc_101" invisible="group_code != '101'"/>
+                                 <field name="build_facil950_perc_104" invisible="group_code != '104'"/>
+                                 <field name="build_facil950_perc_110" invisible="group_code != '110'"/>
+                                 <field name="build_facil950_perc_111" invisible="group_code != '111'"/>
+                                 <field name="build_facil950_perc_200" invisible="group_code != '200'"/>
+                                 <field name="build_facil950_perc_103" invisible="group_code != '103'"/>
+                                <field name="coff_clean_ryd_perc_101" invisible="group_code != '101'"/>
+                                <field name="coff_clean_ryd_perc_104" invisible="group_code != '104'"/>
+                                <field name="coff_clean_ryd_perc_110" invisible="group_code != '110'"/>
+                                <field name="coff_clean_ryd_perc_111" invisible="group_code != '111'"/>
+                                <field name="coff_clean_ryd_perc_200" invisible="group_code != '200'"/>
+                                <field name="coff_clean_ryd_perc_103" invisible="group_code != '103'"/>
+                                <field name="pub_loc903_perc_101" invisible="group_code != '101'"/>
+                                 <field name="pub_loc903_perc_104" invisible="group_code != '104'"/>
+                                 <field name="pub_loc903_perc_110" invisible="group_code != '110'"/>
+                                 <field name="pub_loc903_perc_111" invisible="group_code != '111'"/>
+                                 <field name="pub_loc903_perc_200" invisible="group_code != '200'"/>
+                                <field name="pub_loc903_perc_103" invisible="group_code != '103'"/>
+>>>>>>> 09fbdde9759c29247b23a1e25d368881526f3211
+                            </group>
+                            <group>
+                                <field name="allowed_analytic_plan_ids" invisible="1"/>
+                                <field name="allowed_analytic_account_ids" invisible="1"/>
+                                <!-- <field name="analytic_account_ids" invisible="1"/>-->
+<<<<<<< HEAD
+                                <field name="analytic_plan_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True}" modifiers="{'readonly': [('user_has_groups', '!=', 'base.group_system')]}"/> 
+                                <field name="show_details"  groups="base.group_system"/>
+=======
+<div class="d-flex rounded overflow-hidden border">
+
+    <div class="p-2 border-end"
+         style="flex:4; background:#f8f9fa;">
+        <label class="fw-bold" for="analytic_plan_ids">الخطط التحليلية</label>
+        <field name="analytic_plan_ids"
+               widget="many2many_tags"
+               options="{'no_create': True, 'no_open': True}"
+               groups="base.group_system"/>
+    </div>
+
+    <div class="p-2 text-center"
+         style="flex:1; background:#ffffff;">
+        <div class="mt-1">
+                          <button name="action_preview_dvided_qweb_report" type="object" string="طباعة الخطط الموزعة " class="btn-primary" icon="fa-share-alt" groups="base.group_system,104__team.shaker"/>
+               <!-- <button name="action_preview_dvided_qweb_report" type="object" string="طباعة الخطط الموزعة " class="btn-primary" icon="fa-sitemap" groups="base.group_system,104__team.shaker"/> -->
+
+        </div>
+    </div>
+
+</div>
+                                
+                                <field name="show_details"  widget="boolean_toggle" style="background-color:#d1ecf1; padding:6px; border-radius:6px;" string="عــرض تفاصيـل القــيود" groups="base.group_system,104__team.shaker"/>
+                                <!-- <field name="show_divided"   widget="boolean-toggle" groups="base.group_system,104__team.shaker"/> -->
+                       
+                                 <field name="level" string="مستوي التقرير" style="background-color:#fff3e0; padding:6px; border-radius:6px; margin-bottom:5px;" groups="base.group_system,104__team.shaker"/>
+                              
+                                    <!-- <field name="show_divided" widget="boolean_toggle" style="background-color:#d1ecf1; padding:6px; border-radius:6px;" groups="base.group_system,104__team.shaker"/> -->
+                             <field name="group_code" string=" 📊المجموعة المطلوب التوزيع عليها" style="background-color:#f8d7da; padding:6px; border-radius:6px;"
+                                   decoration-success="group_code == '101'"
+       decoration-info="group_code == '103'"
+       decoration-primary="group_code == '104'"
+       decoration-warning="group_code == '110'"
+       decoration-muted="group_code == '111'"
+       decoration-danger="group_code == '200'"
+       decoration-bf="group_code != False " groups="base.group_system,104__team.shaker"/>
+                            <!-- <div style="background-color:#d1ecf1; padding:6px; border-radius:6px;" groups="base.group_system,104__team.shaker"> <button name="action_preview_dvided_qweb_report" type="object" string="طباعة الخطة + الخطط الموزعة " class="btn-primary" invisible="not group_code" icon="fa-file-text-o" groups="base.group_system,104__team.shaker"/>
+</div> -->
+                               
+          
+                              <!-- <field name="group_code"
+       decoration-success="group_code == '101'"
+       decoration-info="group_code == '103'"
+       decoration-primary="group_code == '104'"
+       decoration-warning="group_code == '110'"
+       decoration-muted="group_code == '111'"
+       decoration-danger="group_code == '200'"
+       decoration-bf="group_code != False " groups="base.group_system,104__team.shaker"/> -->
+
+                                <!-- <field name="level"  groups="base.group_system,104__team.shaker"/> -->
+>>>>>>> 09fbdde9759c29247b23a1e25d368881526f3211
+                            </group>
+                        </group>
+                            <div class="alert alert-info" role="alert">
+                            يتم اختيار التقرير على مستوى الخطة التحليلية كاملة. يقوم التقرير بالتجميع حسب الخطة التحليلية  ثم الحساب المالي، ويتم احتساب القيم حسب نسب التوزيع التحليلي وليس كامل قيمة سطر القيد.
+                        </div>
+                        <!-- <div class="alert alert-info" role="alert">
+                            يتم اختيار التقرير على مستوى الخطة التحليلية كاملة. يقوم التقرير بالتجميع حسب الخطة التحليلية ثم الحساب التحليلي ثم الحساب المالي، ويتم احتساب القيم حسب نسب التوزيع التحليلي وليس كامل قيمة سطر القيد.
+                        </div> -->
+                    </sheet>
+                    <footer>
+                        <button name="action_preview_qweb_report" type="object" string="Preview QWeb Report" class="btn-primary"/>
+<<<<<<< HEAD
+                        <button name="action_print_pdf_report" type="object" string="Print PDF" class="btn-secondary"/>
+                        <button name="action_generate_report" type="object" string="Open Lines" class="btn-secondary" groups="base.group_system"/>
+=======
+                       <button name="action_print_excel_report" type="object" string="Print Excel" class="btn-success" icon="fa-file-excel-o"/>
+                            <button name="action_print_pdf_report" type="object" string="Print PDF" class="btn-secondary"/>
+                        <button name="action_generate_report" type="object" string="Open Lines" class="btn-secondary" groups="base.group_system,104__team.shaker"/>
+>>>>>>> 09fbdde9759c29247b23a1e25d368881526f3211
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_kbi_analytic_profit_loss_line_tree" model="ir.ui.view">
+            <field name="name">kbi.analytic.profit.loss.line.tree</field>
+            <field name="model">kbi.analytic.profit.loss.line</field>
+            <field name="arch" type="xml">
+                <list string="Analytic Profit and Loss" create="0" edit="0" delete="0"
+                      decoration-info="line_type == 'plan'"
+                      decoration-primary="line_type == 'analytic'"
+                      decoration-muted="line_type == 'detail'">
+                    <field name="sequence" optional="hide"/>
+                    <field name="level" optional="hide"/>
+                    <field name="line_type"/>
+                    <field name="analytic_plan_id"/>
+                    <!-- <field name="analytic_account_id"/> -->
+                    <field name="account_code"/>
+                    <field name="account_name"/>
+                    <field name="date" optional="show"/>
+                    <field name="move_id" optional="show"/>
+                    <field name="journal_id" optional="hide"/>
+                    <field name="partner_id" optional="show"/>
+                    <field name="name"/>
+                    <field name="percentage" optional="show"/>
+                    <field name="original_balance" sum="Original Balance" optional="show"/>
+                    <field name="analytic_balance" sum="Analytic Balance"/>
+                    <field name="income_amount" sum="Income"/>
+                    <field name="expense_amount" sum="Expense"/>
+                    <field name="net_amount" sum="Net Profit / Loss"/>
+                    <field name="company_currency_id" invisible="1"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_kbi_analytic_profit_loss_line_form" model="ir.ui.view">
+            <field name="name">kbi.analytic.profit.loss.line.form</field>
+            <field name="model">kbi.analytic.profit.loss.line</field>
+            <field name="arch" type="xml">
+                <form string="Analytic Profit and Loss Line" create="0" edit="0" delete="0">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="line_type"/>
+                                <field name="analytic_plan_id"/>
+                                <!-- <field name="analytic_account_id"/> -->
+                                <field name="account_id"/>
+                                <field name="move_id"/>
+                                <field name="move_line_id"/>
+                            </group>
+                            <group>
+                                <field name="date"/>
+                                <field name="partner_id"/>
+                                <field name="percentage"/>
+                                <field name="original_balance"/>
+                                <field name="analytic_balance"/>
+                                <field name="income_amount"/>
+                                <field name="expense_amount"/>
+                                <field name="net_amount"/>
+                                <field name="company_currency_id" invisible="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_kbi_analytic_profit_loss_line_search" model="ir.ui.view">
+            <field name="name">kbi.analytic.profit.loss.line.search</field>
+            <field name="model">kbi.analytic.profit.loss.line</field>
+            <field name="arch" type="xml">
+                <search string="Analytic Profit and Loss">
+                    <field name="analytic_plan_id"/>
+                    <!-- <field name="analytic_account_id"/> -->
+                    <field name="account_id"/>
+                    <field name="move_id"/>
+                    <filter string="Plans" name="group_by_plan" context="{'group_by': 'analytic_plan_id'}"/>
+                    <!-- <filter string="Analytic Accounts" name="group_by_analytic" context="{'group_by': 'analytic_account_id'}"/> -->
+                    <filter string="Financial Accounts" name="group_by_account" context="{'group_by': 'account_id'}"/>
+                    <filter string="Line Type" name="group_by_line_type" context="{'group_by': 'line_type'}"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_kbi_analytic_profit_loss_line_pivot" model="ir.ui.view">
+            <field name="name">kbi.analytic.profit.loss.line.pivot</field>
+            <field name="model">kbi.analytic.profit.loss.line</field>
+            <field name="arch" type="xml">
+                <pivot string="Analytic Profit and Loss" disable_linking="1">
+                    <field name="analytic_plan_id" type="row"/>
+                    <!-- <field name="analytic_account_id" type="row"/> -->
+                    <field name="account_id" type="row"/>
+                    <field name="income_amount" type="measure"/>
+                    <field name="expense_amount" type="measure"/>
+                    <field name="net_amount" type="measure"/>
+                    <field name="analytic_balance" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <record id="action_kbi_analytic_profit_loss_wizard" model="ir.actions.act_window">
+            <field name="name">Analytic Profit and Loss</field>
+            <field name="res_model">kbi.analytic.profit.loss.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_kbi_analytic_profit_loss"
+<<<<<<< HEAD
+                  name="Analytic Profit and Loss"
+=======
+                  name="تقــرير الربــح والخــسارة شــامل المــبالغ المــوزعة"
+>>>>>>> 09fbdde9759c29247b23a1e25d368881526f3211
+                  parent="account.menu_finance_reports"
+                  action="action_kbi_analytic_profit_loss_wizard"
+                  sequence="90"/>
+
+    </data>
+</odoo>

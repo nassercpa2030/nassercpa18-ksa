@@ -1,0 +1,221 @@
+<odoo>
+    <data>
+
+        <!-- CRM Stage View -->
+        <record model="ir.ui.view" id="kbi_custom.crm_stage_view_form_inherit">
+            <field name="name">kbi_custom.sale_order.crm.stage.view.form.inherit</field>
+            <field name="model">crm.stage</field>
+            <field name="inherit_id" ref="crm.crm_stage_form"/>
+            <field name="arch" type="xml">
+                
+                <!-- CRM Required Fields Section -->
+                <xpath expr="//group[1]" position="after">
+                    <group string="CRM Required Fields">
+                        <group>
+                            <field name="street_required"/>
+                            <field name="street2_required"/>
+                            <field name="building_number_required"/>
+                            <field name="zip_required"/>
+                            <field name="city_required"/>
+                            <field name="state_id_required"/>
+                            <field name="country_id_required"/>
+                        </group>
+                        <group>
+                            <field name="email_from_required"/>
+                            <field name="phone_required"/>
+                            <field name="polt_number_required"/>
+                            <field name="vat_number_required"/>
+                            <field name="cr_number_required"/>
+                            <field name="allow_create_agreement"/>
+                        </group>
+                    </group>
+                </xpath>
+
+                <!-- Route Rules Notebook -->
+                <xpath expr="//sheet" position="inside">
+                    <notebook>
+                        <page string="Route Rules">
+                            <group>
+                                <group>
+                                    <field name="allowed_users_ids" widget="many2many_tags"/>
+                                </group>
+                                <group/>
+                            </group>
+                            <field name="rout_rule_ids">
+                                <list editable="bottom">
+                                    <field name="stage_id" modifiers="{'invisible': True}" string="Parent Stage"/>
+                                    <field name="allow_stage_id"/>
+                                    <field name="allowed_users_ids" widget="many2many_tags"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- CRM Lead View -->
+        <record model="ir.ui.view" id="kbi_custom.crm_lead_view_form_inherit">
+            <field name="name">kbi_custom.sale_order.crm.lead.view.form.inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+            <field name="arch" type="xml">
+
+                <!-- Buttons -->
+                <xpath expr="//header" position="inside">
+                    <button name="action_create_agreement"
+                            type="object"
+                            string="New Agreement/Quotation"
+                            class="oe_highlight"
+                            modifiers='{"invisible": [["|", ["allow_create_agreement","=",false], ["is_readonly","=",true]]]}'/>
+                    <button name="action_open_print_sale_wizard"
+                            type="object"
+                            string="Print Offer/Contract"
+                            class="oe_highlight"/>
+                </xpath>
+                <xpath expr="//header" position="inside">
+
+    <button
+        string="🎤 عربي"
+        type="button"
+        class="btn btn-primary"
+        id="voice_note_ar"/>
+
+    <button
+        string="🎤 English"
+        type="button"
+        class="btn btn-secondary"
+        id="voice_note_en"/>
+
+</xpath>
+
+                <!-- Hide default buttons -->
+                <xpath expr="//button[@name='action_schedule_meeting']" position="attributes">
+                    <attribute name="modifiers">{'invisible': True}</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_sale_quotations_new']" position="attributes">
+                    <attribute name="modifiers">{'invisible': True}</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_show_potential_duplicates']" position="attributes">
+                    <attribute name="modifiers">{'invisible': True}</attribute>
+                </xpath>
+
+                <!-- Fields Readonly -->
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="modifiers">{'readonly': [["is_readonly","=",True]]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='expected_revenue']" position="attributes">
+                    <attribute name="modifiers">{'readonly': [["is_readonly","=",True]]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='probability']" position="attributes">
+                    <attribute name="modifiers">{'readonly': [["is_readonly","=",True]]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='company_id']" position="attributes">
+                    <attribute name="modifiers">{'readonly': [["is_readonly","=",True]]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='team_id']" position="attributes">
+                    <attribute name="modifiers">{'readonly': [["is_readonly","=",True]]}</attribute>
+                </xpath>
+
+                <!-- Replace Lead Main Group -->
+                <xpath expr="//page[@name='lead']/group/group" position="replace"/>
+
+                <!-- Custom Fields Section -->
+                <xpath expr="//group[1]" position="after">
+                    <field name="company_type"
+                           widget="radio"
+                           options="{'horizontal': true}"
+                           modifiers='{"readonly": [["is_readonly","=",true]]}'/>
+
+                    <div class="oe_title">
+                        <!--label for="partner_id">Customer</label>
+                        <h1>
+                            <field name="partner_id"
+                                   options="{'no_create_edit': True}"
+                                   modifiers='{"readonly": [["is_readonly","=",true]]}'/>
+                        </h1-->
+                        <div class="alert alert-success" role="alert">
+                            <field name="agreement_notes" nolabel="1"
+                                   class="h2 text-danger"
+                                   modifiers='{"invisible": true, "readonly": true}'/>
+                            <span class="fa fa-star" style="font-size: 13px; color: green;">Customer classification:</span>
+                            <field name="classification_key"
+                                   nolabel="1"
+                                   widget="radio"
+                                   class="oe_edit_only text-success font-bold"
+                                   options="{'vertical': true}"
+                                   modifiers="{}"
+                                   style="display:inline-block; width:80%;"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+ <group>
+                        <field name="old_sale_wo_agreement_ids" invisible="1"/>
+                        <field name="is_readonly" invisible="1"/>
+                        <field name="allow_create_agreement" invisible="1"/>
+                        <field name="email_from_required" invisible="1"/>
+                        <field name="phone_required" invisible="1"/>
+                        <field name="street_required" invisible="1"/>
+                        <field name="street2_required" invisible="1"/>
+                        <field name="zip_required" invisible="1"/>
+                        <field name="city_required" invisible="1"/>
+                        <field name="state_id_required" invisible="1"/>
+                        <field name="country_id_required" invisible="1"/>
+                        <field name="building_number_required" invisible="1"/>
+                        <field name="polt_number_required" invisible="1"/>
+                        <field name="vat_number_required" invisible="1"/>
+                        <field name="cr_number_required" invisible="1"/>
+ </group>
+                        <group string="Basic Information / المعلومات الأساسية">
+                            <field name="last_contracting_date" string="Last contracting date" class="bg-warning fw-bold rounded p-2 shadow-sm" style="font-size:12px; font-weight:bold;"/>
+                            <field name="sale_person" style="font-weight:bold; font-size:14px;"/>             
+                            <field name="sale_team" style="font-weight:bold; font-size:14px; "/>
+                            <field name="customer_follow_up" style="font-weight:bold; font-size:14px;"/>
+                            <field name="email_from" modifiers="{'required': [('email_from_required', '=', True)], 'readonly': [('is_readonly', '=', True)]}"/>
+                            <field name="phone" modifiers="{'required': [('phone_required', '=', True)], 'readonly': [('is_readonly', '=', True)]}"/>
+                            <field name="vat_number" modifiers="{'required': [('vat_number_required', '=', True)], 'readonly': [('is_readonly', '=', True)]}"/>
+                            <field name="cr_number" modifiers="{'required': [('cr_number_required', '=', True)], 'readonly': [('is_readonly', '=', True)]}"/>
+                             <field name="number_700"/>
+                            <field name="agreement_id" modifiers="{'invisible': [('agreement_id', '=', False)], 'readonly': [('is_readonly', '=', True)]}"/>
+                             <field name="isic_code" style="font-weight:bold; font-size:14px;"/>
+                            <field name="isic_description"/>
+                          <field name="isic_group" style="font-weight:bold; font-size:14px;"/>
+                         <field name="isic_group_code" style="font-weight:bold; font-size:14px;"/>
+                         <field name="cr_type_arabic"/>
+                        <field name="main_cr_number"/>
+                        <field name="capital"/>
+                        <field name="city_modified"/>
+                        <field name="state_modified"/> 
+                        <field name="main_region"/>
+                         
+                        </group>
+                        </div>
+                       <div class="col">
+                        <group string="Contact Information / معلومات التواصل">
+                            <label for="street_page_lead" string="Address"/>
+                            <div class="o_address_format">
+                                <field name="street" id="street_page_lead" placeholder="Street..." class="o_address_street" modifiers="{'required': [('street_required', '=', True)], 'readonly': [('is_readonly', '=', True)]}"/>
+                                <field name="street2" placeholder="Street 2..." class="o_address_street" modifiers="{'required': [('street2_required', '=', True)], 'readonly': [('is_readonly', '=', True)]}"/>
+                                <field name="building_number" placeholder="Building Number..." modifiers="{'required': [('building_number_required', '=', True)], 'readonly': [('is_readonly', '=', True)]}"/>
+                                <field name="polt_number" placeholder="Polt Number..." modifiers="{'required': [('polt_number_required', '=', True)], 'readonly': [('is_readonly', '=', True)]}"/>
+                                <field name="city_id" placeholder="City" class="o_address_city" modifiers="{'required': [('city_required', '=', True)], 'readonly': [('is_readonly', '=', True)]}"/>
+                                <field name="state_id" class="o_address_state" placeholder="State" options="{'no_open': True}" modifiers="{'required': [('state_id_required', '=', True)], 'readonly': [('is_readonly', '=', True)]}"/>
+                                <field name="zip" placeholder="ZIP" class="o_address_zip" modifiers="{'required': [('zip_required', '=', True)], 'readonly': [('is_readonly', '=', True)]}"/>
+                                <field name="country_id" placeholder="Country" class="o_address_country" options="{'no_open': True, 'no_create': True}" modifiers="{'required': [('country_id_required', '=', True)], 'readonly': [('is_readonly', '=', True)]}"/>
+                            </div>
+                            <field name="website" widget="url" placeholder="e.g. https://www.odoo.com" modifiers="{'readonly': [('is_readonly', '=', True)]}"/>
+                            <field name="lang_active_count" invisible="1"/>
+                            <field name="lang_id" modifiers="{'invisible': [('lang_active_count', '&lt;=', 1)], 'readonly': [('is_readonly', '=', True)]}" options="{'no_quick_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                        
+                        </group>
+                        </div>
+                        </div>
+                   
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

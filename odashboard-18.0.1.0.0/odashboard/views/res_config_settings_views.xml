@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form_odashboard" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.odashboard</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="inside">
+                    <field name="is_root_company" invisible="1"/>
+                    <app data-string="Odashboard"
+                         string="Odashboard" name="odashboard"
+                         logo="/odashboard/static/description/icon.png">
+
+                        <div id="odashboard_key">
+                            <block title="License" name="odashboard_key_container">
+                                <div class="row mt16 o_settings_container" id="odashboard_settings">
+
+                                    <!-- UUID -->
+                                    <div class="col-12 col-lg-6 o_setting_box" id="odashboard_uuid">
+                                        <div class="o_setting_left_pane"/>
+                                        <div class="o_setting_right_pane">
+                                            <span class="o_form_label">Instance UUID</span>
+                                            <div class="text-muted">Unique identifier for this Odoo instance (for support)</div>
+                                            <field name="odashboard_uuid" readonly="1" class="oe_input_uuid"/>
+                                        </div>
+                                    </div>
+
+                                    <!-- Plan and License Valid Until -->
+                                    <div class="col-12 col-lg-6 o_setting_box" id="odashboard_plan">
+                                        <div class="o_setting_left_pane"/>
+                                        <div class="o_setting_right_pane">
+                                            <span class="o_form_label">Plan</span>
+                                            <div class="text-muted">Your Odashboard plan</div>
+                                            <span readonly="1" class="badge bg-success text-white rounded">
+                                                Premium
+                                            </span>
+                                            <div class="mt-2 text-success">
+                                                <i class="fa fa-check-circle me-1"/>
+                                                <span>License Valid Until: </span>
+                                                <field name="odashboard_free_trial_end_date" readonly="1" class="d-inline"/>
+                                            </div>
+
+                                            <!-- Get / Synchronize / Desynchronize buttons -->
+                                            <div class="mt-3">
+                                                <button name="get_my_key"
+                                                        string="Get my Key"
+                                                        type="object"
+                                                        class="btn btn-outline-secondary"
+                                                        invisible="odashboard_key_synchronized"/>
+                                                <button name="synchronize_key"
+                                                        string="Synchronize Key"
+                                                        type="object"
+                                                        class="btn btn-primary"
+                                                        invisible="odashboard_key_synchronized"/>
+                                                <button name="desynchronize_key"
+                                                        string="Desynchronize Key"
+                                                        type="object"
+                                                        class="btn btn-secondary"
+                                                        invisible="not odashboard_key_synchronized"/>
+                                            </div>
+
+                                            <!-- Hidden fields -->
+                                            <field name="odashboard_key" invisible="1"/>
+                                            <field name="odashboard_key_synchronized" invisible="1"/>
+                                            <field name="odashboard_is_free_trial" invisible="1"/>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </block>
+                        </div>
+                    </app>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

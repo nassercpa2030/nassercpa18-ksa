@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="external_layout_seti">
+        <t t-call="web.basic_layout">
+            <t t-set="company" t-value="o.company_id"/>
+
+           <style>
+    /* استيراد خط Tajawal */
+       @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap');
+    @page {
+        size: A4;
+        margin: 25mm 15mm 25mm 15mm;
+        @bottom-center {
+            content: "";
+        }
+    }
+
+    html, body {
+        margin: 0;
+        padding: 0;
+        direction: rtl;
+        font-family: 'Tajawal', sans-serif;
+        color: #555555;
+    }
+
+    body {
+        font-size: 12px;
+        margin-bottom: 90px; /* مساحة كافية للفوتر */
+    }
+
+    .page {
+        font-size: 12px;
+        line-height: 1.6;
+        margin-bottom: 40px;
+    }
+
+    strong {
+        font-size: 13px;
+        color: #333333;
+    }
+
+    /* HEADER TABLE */
+    table.header-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+        font-weight: bold;
+        background-color: #EAF3FF; /* أزرق فاتح*/
+       /* background-color: #e0e0e0; رمادي فاتح */
+      /* border: 2px solid #999999;  رمادي غامق */
+        border: 2px solid #2F6FB2; /* أزرق غامق */
+        font-family: 'Tajawal', sans-serif;
+    }
+
+    table.header-table td {
+        width: 50%;
+        vertical-align: top;
+        padding: 10px;
+        border: 1px solid #999999;
+    }
+
+    .company-info { text-align: right; }
+    .client-info { text-align: left; 
+                  direction: ltr;}
+
+    img.company-logo {
+        max-height: 80px;
+        max-width: 180px;
+        display: block;
+    }
+
+    /* FOOTER */
+    .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        text-align: center;
+        font-size: 11px;
+        border-top: 1px solid #2F6FB2;
+        padding-top: 5px;
+        color: #333333;
+        font-weight: bold;
+        background-color: #EAF3FF; /* فاتح للفوتر */
+        font-family: 'Tajawal', sans-serif;
+    }
+    .footer_blue {
+    width: 100%;
+    border-collapse: collapse;
+    }
+
+   .footer_blue td {
+    background-color: #EAF3FF; /* أهم سطر */
+    padding: 6px 4px;
+    text-align: center;
+    font-weight: bold;
+    border: none;
+     }
+
+
+    .footer span {
+        display: block;
+        margin: 2px 0;
+    }
+     .table-center {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+</style>
+
+            <!-- ================= HEADER ================= -->
+            <table class="header-table table-center" style="width:100%; margin:0 auto;">
+     <tr  >
+    <!-- بيانات الشركة (يمين) -->
+    <td class="company-info" style="width:40%; text-align:right; vertical-align:top;">
+        <!--strong>بيانات الشركة</strong><br/><br/-->
+          <div style="text-align:center; font-weight:bold; margin-bottom:10px;">
+           <!--strong>بيانات الشركة </strong-->
+        </div>
+
+        <strong t-esc="company.name"/><br/>
+
+        <t t-if="company.street">
+            
+                    <strong>العنوان:
+                <span t-if="company.street" t-esc="company.street"/>
+                ,<span t-if="company.street2" t-esc="company.street2"/>
+                ,<span t-if="company.city" t-esc="company.city"/>
+                ,<span t-if="company.country_id.name" t-esc="company.country_id.name"/>
+            </strong><br/>
+        </t>
+
+        <t t-if="company.company_registry">
+            <strong>(CR) السجل التجاري:
+                <span t-esc="company.company_registry"/>
+            </strong><br/>
+        </t>
+
+        <t t-if="company.vat">
+            <strong>(VAT) الرقم الضريبي:
+                <span t-esc="company.vat"/>
+            </strong><br/>
+        </t>
+    </td>
+
+    <!-- اللوجو (في النص) -->
+         <td style="width:20%; text-align:center; vertical-align:middle; background-color:white;">
+    <img t-if="company.logo"
+         t-att-src="image_data_uri(company.logo)"
+         style="max-width:160px; max-height:80px; width:auto; height:auto; object-fit:contain; display:inline-block;"
+         alt="Company Logo"/>
+</td>
+    <!-- <td style="width:20%; text-align:center; vertical-align:middle; background-color:white;">
+        <img t-if="company.logo"
+             t-att-src="image_data_uri(company.logo)"
+             style="height:100%; max-width:100%;"
+             alt="Company Logo"/>
+    </td> -->
+
+    <!-- بيانات العميل (شمال) -->
+<t t-set="customer" t-value="o.partner_id.parent_id if o.partner_id.parent_id else o.partner_id"/>
+
+<td class="client-info" style="width:40%; text-align:left; vertical-align:top;">
+
+    <div style="text-align:center; font-weight:bold; margin-bottom:10px;">
+        <strong>العـمــيــل</strong>
+    </div>
+
+    <strong>
+        <span t-esc="customer.name"/>
+    </strong><br/>
+
+    <strong>Address:
+        <span t-if="customer.street" t-esc="customer.street"/>
+        <span t-if="customer.street2">, <span t-esc="customer.street2"/></span>
+        <span t-if="customer.city">, <span t-esc="customer.city"/></span>
+        <span t-if="customer.country_id">, <span t-esc="customer.country_id.name"/></span>
+    </strong><br/>
+
+    <t t-if="customer.email">
+        <strong>Email: <span t-esc="customer.email"/></strong><br/>
+    </t>
+
+    <t t-if="customer.mobile">
+        <strong>Phone: <span t-esc="customer.mobile"/></strong><br/>
+    </t>
+
+    <t t-if="customer.cr_number_sale">
+        <strong>Commercial Registration:
+            <span t-esc="customer.cr_number_sale"/>
+        </strong><br/>
+    </t>
+
+    <t t-if="customer.number_700">
+        <strong>Unified Number:
+            <span t-esc="customer.number_700"/>
+        </strong><br/>
+    </t>
+
+    <t t-if="customer.partner_vat_placeholder">
+        <strong>VAT Number:
+            <span t-esc="customer.partner_vat_placeholder"/>
+        </strong><br/>
+    </t>
+<t t-if="o.partner_id.parent_id">
+    <strong>عن العميــــل:
+        <span t-esc="o.partner_id.name"/>
+    </strong><br/>
+</t>
+</td>
+</tr>
+
+            </table>
+
+            <!-- ================= BODY ================= -->
+            <div class="page">
+                <t t-raw="0"/>
+            </div>
+
+    
+
+            <!-- ================= FOOTER ================= -->
+<div class="footer"  style="font-family: Verdana, Geneva, sans-serif; font-size: 10px;">
+    <table  class="footer_blue" style="width:100%; border-collapse:collapse; text-align:center;  background-color: #EAF3FF; border-top: 1px solid #2F6FB2 !important; outline: none !important;  border-top: 2px solid #2F6FB2;">
+        <tr>
+            <td style="width:5%; border-left: 1px solid transparent;
+           border-right: 1px solid transparent;
+           border-bottom: 1px solid transparent;
+           border-top: 2px solid #2F6FB2;
+           outline: none !important;"></td>
+
+            <td style="width:30%;  border-left: 1px solid transparent;
+           border-right: 1px solid transparent;
+           border-bottom: 1px solid transparent;
+           border-top: 2px solid #2F6FB2;
+           outline: none !important;">
+                <t t-if="company.phone">
+                    <span>Tel: <t t-esc="company.phone"/></span>
+                </t>
+            </td>
+
+            <td style="width:30%; border: border-left: 1px solid transparent;
+           border-right: 1px solid transparent;
+           border-bottom: 1px solid transparent;
+           border-top: 2px solid #2F6FB2;
+           outline: none !important;">
+                <t t-if="company.email">
+                    <span>Email: <t t-esc="company.email"/></span>
+                </t>
+            </td>
+
+            <td style="width:30%;border-left: 1px solid transparent;
+           border-right: 1px solid transparent;
+           border-bottom: 1px solid transparent;
+           border-top: 2px solid #2F6FB2;
+           outline: none !important;">
+                <t t-if="company.website">
+                    <span>Website: <t t-esc="company.website"/></span>
+                </t>
+            </td>
+
+            <td style="width:5%;border-left: 1px solid transparent;
+           border-right: 1px solid transparent;
+           border-bottom: 1px solid transparent;
+           border-top: 2px solid #2F6FB2;
+           outline: none !important;"></td>
+        </tr>
+    </table>
+</div>
+           
+
+        </t>
+    </template>
+</odoo>
+
+

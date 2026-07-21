@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- for sales -->
+    <record id="view_sale_order_form_inherit_name_badge" model="ir.ui.view">
+    <field name="name">sale.order.form.inherit.name.badge</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+
+         <xpath expr="//field[@name='name']" position="attributes">
+            <attribute name="widget">badge</attribute>
+            <attribute name="decoration-danger">
+                name in ['S2026/00584','S2026/00531','S2026/00516','S2026/00377','S2026/00189','S01551'] or customer_state
+                <!-- name in ( -->
+                    <!-- 'S2026/00584', -->
+                    <!-- 'S2026/00531', -->
+                    <!-- 'S2026/00516', -->
+                    <!-- 'S2026/00377', -->
+                    <!-- 'S2026/00292', -->
+                    <!-- 'S2026/00189', -->
+                    <!-- 'S01551' -->
+                <!-- ) or customer_state  -->
+                </attribute>
+        </xpath>
+
+
+    </field>
+</record>
+    <record id="view_sale_order_list_inherit_name_badge" model="ir.ui.view">
+    <field name="name">sale.order.list.inherit.name.badge</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_tree"/>
+    <field name="arch" type="xml">
+
+        <xpath expr="//list" position="attributes">
+            <attribute name="decoration-danger">
+               name in ['S2026/00584','S2026/00531','S2026/00516','S2026/00377','S2026/00189','S01551'] or customer_state
+            </attribute>
+        </xpath>
+                 <xpath expr="//field[@name='invoice_status']" position="attributes">
+            <attribute name="widget">badge</attribute>
+            <attribute name="decoration-danger">
+                customer_state
+                </attribute>
+        </xpath>
+         <!--xpath expr="//field[@name='project_name']" position="attributes">
+            <attribute name="widget">badge</attribute>
+            <attribute name="decoration-danger">
+                name in ['S2026/00584','S2026/00531','S2026/00516','S2026/00377','S2026/00189','S01551'] or customer_state
+                
+                </attribute>
+        </xpath-->
+         <xpath expr="//field[@name='partner_id']" position="attributes">
+            <attribute name="widget">badge</attribute>
+            <attribute name="decoration-danger">
+                customer_state
+               
+                </attribute>
+        </xpath>
+
+    </field>
+</record>
+    <!-- end sales -->
+    <record id="view_hr_payslip_form_inherit_line_badge" model="ir.ui.view">
+        <field name="name">hr.payslip.form.inherit.line.color.badge</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form"/>
+        <field name="arch" type="xml">
+
+            <!-- 1️⃣ NAME + Row Decoration -->
+            <xpath expr="//field[@name='line_ids']/list/field[@name='name']" position="attributes">
+
+                <attribute name="widget">badge</attribute>
+
+                <attribute name="decoration-primary">code == 'BASIC-A'</attribute>
+
+                <attribute name="decoration-success">
+                    code and (
+                        'HOUALLOW' in code or
+                        'TRAALLOW' in code or
+                        'OTALLOW' in code
+                    )
+                </attribute>
+
+                <attribute name="decoration-warning">
+                    code and 'GROSS' in code
+                </attribute>
+
+                <attribute name="decoration-info">
+                    code and 'NET' in code
+                </attribute>
+
+                <attribute name="decoration-danger">
+                    code and 'DED' in code
+                </attribute>
+
+            </xpath>
+            <!-- ⭐ code as badge (نفس الألوان) -->
+            <xpath expr="//field[@name='line_ids']/list/field[@name='code']" position="attributes">
+                <attribute name="widget">badge</attribute>
+
+                <attribute name="decoration-primary">code == 'BASIC-A'</attribute>
+
+                <attribute name="decoration-success">
+                    code and (
+                        'HOUALLOW' in code or
+                        'TRAALLOW' in code or
+                        'OTALLOW' in code
+                    )
+                </attribute>
+
+                <attribute name="decoration-warning">
+                    code and 'GROSS' in code
+                </attribute>
+
+                <attribute name="decoration-info">
+                    code and 'NET' in code
+                </attribute>
+
+                <attribute name="decoration-danger">
+                    code and 'DED' in code
+                </attribute>
+
+            </xpath>
+            <!-- ⭐ salary_rule_id as badge (نفس الألوان) -->
+            <xpath expr="//field[@name='line_ids']/list/field[@name='salary_rule_id']" position="attributes">
+                <attribute name="widget">badge</attribute>
+
+                <attribute name="decoration-primary">code == 'BASIC-A'</attribute>
+
+                <attribute name="decoration-success">
+                    code and (
+                        'HOUALLOW' in code or
+                        'TRAALLOW' in code or
+                        'OTALLOW' in code
+                    )
+                </attribute>
+
+                <attribute name="decoration-warning">
+                    code and 'GROSS' in code
+                </attribute>
+
+                <attribute name="decoration-info">
+                    code and 'NET' in code
+                </attribute>
+
+                <attribute name="decoration-danger">
+                    code and 'DED' in code
+                </attribute>
+
+            </xpath>
+            <!-- ⭐ CATEGORY as badge (نفس الألوان) -->
+            <xpath expr="//field[@name='line_ids']/list/field[@name='category_id']" position="attributes">
+                <attribute name="widget">badge</attribute>
+
+                <attribute name="decoration-primary">code == 'BASIC-A'</attribute>
+
+                <attribute name="decoration-success">
+                    code and (
+                        'HOUALLOW' in code or
+                        'TRAALLOW' in code or
+                        'OTALLOW' in code
+                    )
+                </attribute>
+
+                <attribute name="decoration-warning">
+                    code and 'GROSS' in code
+                </attribute>
+
+                <attribute name="decoration-info">
+                    code and 'NET' in code
+                </attribute>
+
+                <attribute name="decoration-danger">
+                    code and 'DED' in code
+                </attribute>
+
+            </xpath>
+ <!-- ⭐ ytd as badge (نفس الألوان) -->
+            <xpath expr="//field[@name='line_ids']/list/field[@name='ytd']" position="attributes">
+                <attribute name="widget">badge</attribute>
+
+                <attribute name="decoration-primary">code == 'BASIC-A'</attribute>
+
+                <attribute name="decoration-success">
+                    code and (
+                        'HOUALLOW' in code or
+                        'TRAALLOW' in code or
+                        'OTALLOW' in code
+                    )
+                </attribute>
+
+                <attribute name="decoration-warning">
+                    code and 'GROSS' in code
+                </attribute>
+
+                <attribute name="decoration-info">
+                    code and 'NET' in code
+                </attribute>
+
+                <attribute name="decoration-danger">
+                    code and 'DED' in code
+                </attribute>
+
+            </xpath>
+             <!-- ⭐ quantity as badge (نفس الألوان) -->
+            <xpath expr="//field[@name='line_ids']/list/field[@name='quantity']" position="attributes">
+                <attribute name="widget">badge</attribute>
+
+                <attribute name="decoration-primary">code == 'BASIC-A'</attribute>
+
+                <attribute name="decoration-success">
+                    code and (
+                        'HOUALLOW' in code or
+                        'TRAALLOW' in code or
+                        'OTALLOW' in code
+                    )
+                </attribute>
+
+                <attribute name="decoration-warning">
+                    code and 'GROSS' in code
+                </attribute>
+
+                <attribute name="decoration-info">
+                    code and 'NET' in code
+                </attribute>
+
+                <attribute name="decoration-danger">
+                    code and 'DED' in code
+                </attribute>
+
+            </xpath>
+              <!-- ⭐ rate as badge (نفس الألوان) -->
+            <xpath expr="//field[@name='line_ids']/list/field[@name='rate']" position="attributes">
+                <attribute name="widget">badge</attribute>
+
+                <attribute name="decoration-primary">code == 'BASIC-A'</attribute>
+
+                <attribute name="decoration-success">
+                    code and (
+                        'HOUALLOW' in code or
+                        'TRAALLOW' in code or
+                        'OTALLOW' in code
+                    )
+                </attribute>
+
+                <attribute name="decoration-warning">
+                    code and 'GROSS' in code
+                </attribute>
+
+                <attribute name="decoration-info">
+                    code and 'NET' in code
+                </attribute>
+
+                <attribute name="decoration-danger">
+                    code and 'DED' in code
+                </attribute>
+
+            </xpath>
+
+ <!-- ⭐ total as badge (نفس الألوان) -->
+            <xpath expr="//field[@name='line_ids']/list/field[@name='total']" position="attributes">
+                <attribute name="widget">badge</attribute>
+
+                <attribute name="decoration-primary">code == 'BASIC-A'</attribute>
+
+                <attribute name="decoration-success">
+                    code and (
+                        'HOUALLOW' in code or
+                        'TRAALLOW' in code or
+                        'OTALLOW' in code
+                    )
+                </attribute>
+
+                <attribute name="decoration-warning">
+                    code and 'GROSS' in code
+                </attribute>
+
+                <attribute name="decoration-info">
+                    code and 'NET' in code
+                </attribute>
+
+                <attribute name="decoration-danger">
+                    code and 'DED' in code
+                </attribute>
+
+            </xpath>
+
+            <!-- ⭐ amount as badge (نفس الألوان) -->
+            <xpath expr="//field[@name='line_ids']/list/field[@name='amount']" position="attributes">
+                <attribute name="widget">badge</attribute>
+
+                <attribute name="decoration-primary">code == 'BASIC-A'</attribute>
+
+                <attribute name="decoration-success">
+                    code and (
+                        'HOUALLOW' in code or
+                        'TRAALLOW' in code or
+                        'OTALLOW' in code
+                    )
+                </attribute>
+
+                <attribute name="decoration-warning">
+                    code and 'GROSS' in code
+                </attribute>
+
+                <attribute name="decoration-info">
+                    code and 'NET' in code
+                </attribute>
+
+                <attribute name="decoration-danger">
+                    code and 'DED' in code
+                </attribute>
+
+            </xpath>
+
+            <!-- ⭐ Bold NAME -->
+            <xpath expr="//field[@name='line_ids']/list/field[@name='name']" position="attributes">
+                <attribute name="style">font-weight: bold; color: inherit;</attribute>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

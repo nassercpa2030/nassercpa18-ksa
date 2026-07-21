@@ -1,0 +1,50 @@
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="kbi_custom.product_template_form_view_inherit">
+            <field name="name">kbi_custom.view.order.form.inherit</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='options']/span[last()]" position="inside">
+                    <span class="d-inline-block">
+                        <field name="finance_service_ok"/>
+                        <label for="finance_service_ok"/>
+                    </span>
+                    <span class="d-inline-block">
+                        <field name="downpayment_ok"/>
+                        <label for="downpayment_ok"/>
+                    </span>
+                </xpath>
+                <xpath expr="//page[last()]" position="after">
+                    <page string="Reports" modifiers="{'invisible': [('finance_service_ok', '=', False)]}" groups="kbi_custom.can_add_print_template">
+                        <group>
+                            <group>
+                                <field name="super_report_user_ids" widget="many2many_tags"/>
+                            </group>
+                        </group>
+                        <field name="report_template_ids">
+                            <list editable="bottom">
+                                <field name="product_id" />
+                                <field name="report_template_id"/>
+                                <field name="allowed_users_ids" widget="many2many_tags"/>
+                                <field name="need_approved"/>
+                            </list>
+                        </field>
+                    </page>
+                    <page string="Analytic Accounts" modifiers="{'invisible': [('finance_service_ok', '=', False)]}" >
+                         <field name="product_analytic_ids">
+                            <list editable="bottom">     
+                                   <field name="product_id"/>
+                                <field name="analytic_plan_id"/>
+                                <field name="analytic_account_id"/>
+                            </list>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

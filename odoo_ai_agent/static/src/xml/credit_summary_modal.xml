@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="odoo_ai_agent.MyModal">
+        <div class="modal-backdrop">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">AI Modal</h5>
+                        <button type="button" class="btn-close" t-on-click="close"/>
+                    </div>
+                    <div class="modal-body">
+                        <p>This is your AI modal!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" t-on-click="close">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
+
