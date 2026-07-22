@@ -3,6 +3,7 @@ from odoo import models , fields , api , _
 import logging
 from odoo.exceptions import UserError , ValidationError
 import re
+from dateutil.relativedelta import relativedelta
 
 
 class HrPayrollStructure ( models.Model ) :
