@@ -470,10 +470,10 @@ class Recruiter ( models.Model ) :
     reversed_vacance_days= fields.Float (string='رصيد أجــازات باقي' ,compute='_compute_employee_vacance_days',readonly=False)
         #compute='_compute_employee_vacance_days',readonly=False)
     resumption_work_after_leave = fields.Date ( string="إستلام العـمل(بعد الإجازة)" , required=True , readonly=False ,
-                                                store=True )
+                                                 )
     vacance_days = fields.Float ( string="عدد أيـام الإجازة" , compute='_compute_employee_vacance_days' ,
-                                  readonly=False , store=True )
-    used_vacance_days= fields.Float ( string=" أيـام الإجازة المستخدمة" , readonly=False , store=True )
+                                  readonly=False  )
+    used_vacance_days= fields.Float ( string=" أيـام الإجازة المستخدمة" , readonly=False  )
                                      #compute='_compute_employee_vacance_days' ,
                                   
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
