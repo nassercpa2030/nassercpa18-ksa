@@ -560,8 +560,11 @@ class Recruiter ( models.Model ) :
             if not rec.resumption_work_after_leave :
                 continue
 
-            delta_vacance = relativedelta ( today , rec.start_working_date )
-            delta = relativedelta ( today , rec.start_working_date )
+            if rec.start_working_date:
+               delta_vacance = relativedelta(today, rec.start_working_date)
+       
+            #delta_vacance = relativedelta ( today , rec.start_working_date )
+            #delta = relativedelta ( today , rec.start_working_date )
             delta=relativedelta ( today , rec.resumption_work_after_leave )
             months_of_service = delta.years * 12 + delta.months
 
