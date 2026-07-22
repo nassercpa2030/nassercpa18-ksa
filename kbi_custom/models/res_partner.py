@@ -578,7 +578,7 @@ class Recruiter ( models.Model ) :
                 annual_days = 21 if delta.years < 2 else 30
 
               
-            if rec.start_working_date and rec.start_working_date >= fields.Date.from_string('2026-07-30'):
+            if rec.resumption_work_after_leave and rec.resumption_work_after_leave >= fields.Date.from_string('2026-07-30'):
                 rec.old_vacance_days=0
             
             else:
