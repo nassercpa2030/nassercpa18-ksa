@@ -18,7 +18,25 @@
                         <label for="downpayment_ok"/>
                     </span>
                 </xpath>
-                     <xpath expr="//field[@name='seller_ids']" position="after">
+                <xpath expr="//field[@name='seller_ids']" position="after">
+    <group col="2">
+        <group>
+            <field name="vendor"/>
+            <field name="concentration"/>
+            <field name="package_contents"/>
+            <field name="discount_money"/>
+        </group>
+
+        <group>
+            <field name="scientific_name"/>
+            <field name="shape"/>
+            <field name="discount"/>
+            <field name="unit"/>
+        </group>
+    </group>
+</xpath>
+
+                     <!-- <xpath expr="//field[@name='seller_ids']" position="after">
                      <group>
                       <span class="d-inline-block">
                                     <field name="vendor"/>
@@ -53,7 +71,7 @@
                           <label for="unit"/>
                       </span>
                      </group>
-                 </xpath>
+                 </xpath> -->
                 <xpath expr="//page[last()]" position="after">
                     <page string="Reports" modifiers="{'invisible': [('finance_service_ok', '=', False)]}" groups="kbi_custom.can_add_print_template">
                         <group>
