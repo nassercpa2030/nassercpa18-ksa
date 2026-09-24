@@ -24,14 +24,14 @@
             <field name="vendor"/>
             <field name="concentration"/>
             <field name="package_contents"/>
-            <field name="discounts_money"/>
+             <field name="unit"/>
         </group>
 
         <group>
             <field name="scientific_name"/>
             <field name="shape"/>
             <field name="discount" widget="percentage"/>
-            <field name="unit"/>
+           <field name="discounts_money"/>
         </group>
     </group>
 </xpath>
