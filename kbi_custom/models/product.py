@@ -11,7 +11,7 @@ class ProductTemplate(models.Model):
     vendor =fields.Char(string="أسم المورد")
     scientific_name =fields.Char(string="الأسم العلمي")
     concentration=fields.Char(string="التركيز")
-    shape=fields.Char("string="الشكل")
+    shape=fields.Char(string="الشكل")
     package_contents=fields.Char(string="العبــوة")
     discount=fields.Char(string="نسبة الخصم")
     discount_money=fields.Boolean(string="مبلغ الخصم")
