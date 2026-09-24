@@ -8,8 +8,8 @@ class ProductTemplate(models.Model):
 
     finance_service_ok = fields.Boolean(string='Revenue M - Analysis')
     nk_service= fields.Boolean(string='NK Service')
-    vendor =fields.Char(string="أسم المورد")
-    scientific_name =fields.Char(string="الأسم العلمي")
+    vendor =fields.Char(string="أسم المورد",store=True)
+    scientific_name =fields.Char(string="الأسم العلمي",store=True)
     concentration=fields.Char(string="التركيز")
     shape=fields.Char(string="الشكل")
     package_contents=fields.Char(string="العبــوة")
