@@ -24,7 +24,7 @@
             <field name="vendor"/>
             <field name="concentration"/>
             <field name="package_contents"/>
-            <field name="discount_money"/>
+            <field name="discount_moneys"/>
         </group>
 
         <group>
