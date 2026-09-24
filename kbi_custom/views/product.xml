@@ -7,14 +7,38 @@
             <field name="inherit_id" ref="product.product_template_form_view"/>
             <field name="arch" type="xml">
                  <xpath expr="//field[@name='seller_ids']" position="after">
+                      <span class="d-inline-block">
                                     <field name="vendor"/>
+                             <label for="vendor"/>
+                    </span>  
+                      <span class="d-inline-block">
                     <field name="scientific_name"/>
+                          <label for="scientific_name"/>
+                      </span>
+                      <span class="d-inline-block">
                     <field name="concentration"/>
+                          <label for="concentration"/>
+                      </span>
+                      <span class="d-inline-block">
                     <field name="shape"/>
+                          <label for="shape"/>
+                      </span>
+                      <span class="d-inline-block">
                     <field name="package_contents"/>
+                          <label for="package_contents"/>
+                      </span>
+                      <span class="d-inline-block">
                     <field name="discount"/>
+                          <label for="discount"/>
+                      </span>
+                      <span class="d-inline-block">
                     <field name="discount_money"/>
+                          <label for="discount_money"/>
+                      </span>
+                      <span class="d-inline-block">
                     <field name="unit"/>
+                          <label for="unit"/>
+                      </span>
                  </xpath>
                 <xpath expr="//div[@name='options']/span[last()]" position="inside">
 
