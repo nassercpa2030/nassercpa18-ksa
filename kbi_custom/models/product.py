@@ -14,7 +14,7 @@ class ProductTemplate(models.Model):
     shape=fields.Char(string="الشكل")
     package_contents=fields.Char(string="العبــوة")
     discount=fields.Char(string="نسبة الخصم")
-    discount_money=fields.Float(string="مبلغ الخصم")
+    discounts_money=fields.Float(string="مبلغ الخصم")
     unit=fields.Char(string="الوحدة")
     product_id = fields.Many2one('product.product', string='Product', store=True)
     allowed_users_ids = fields.Many2many(comodel_name='res.users',  relation='product_template_allowed_user_rel', string='Allowed Users', column1='product_tmpl_id',column2='user_id')
