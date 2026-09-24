@@ -30,7 +30,7 @@
         <group>
             <field name="scientific_name"/>
             <field name="shape"/>
-            <field name="discount"/>
+            <field name="discount" widget="percentage"/>
             <field name="unit"/>
         </group>
     </group>
