@@ -11,8 +11,7 @@
                     <field name="scientific_name"/>
                     <field name="concentration"/>
                     <field name="shape"/>
-                    <field name="package"/>
-                    <field name="package"/>
+                    <field name="package_contents"/>
                     <field name="discount"/>
                     <field name="discount_money"/>
                     <field name="unit"/>
