@@ -6,6 +6,18 @@ from odoo import models, fields, api
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    def button_validate(self):
+        res = super().button_validate()
+
+        for picking in self:
+            if picking.purchase_id:
+                picking.purchase_id.write({
+                    'quality_check': False,
+                })
+
+        return res
+
+
     def quality_checked(self):
         for picking in self:
             if picking.purchase_id:
@@ -13,7 +25,6 @@ class StockPicking(models.Model):
                     'quality_check': True,
                 })
         return True
-    
 
 
 class PurchaseOrder(models.Model):
