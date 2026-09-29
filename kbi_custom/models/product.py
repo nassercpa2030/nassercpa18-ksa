@@ -10,7 +10,7 @@ class PurchaseOrder(models.Model):
             ('draft', 'RFQ'),
             ('sent', 'RFQ Sent'),
             ('to approve', 'To Approve'),
-           ('quality_checked', 'Quality Checked'),
+           ('quality_checked', 'Purchase Quality Checked'),
             ('purchase', 'Purchase Order'),
             ('done', 'Locked'),
             ('cancel', 'Cancelled'),
