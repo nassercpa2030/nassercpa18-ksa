@@ -5,7 +5,21 @@ from odoo import models, fields, api
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
     quality_check=fields.Boolean(string="أختبار الجودة",default=False)
-    bill_check=fields.Boolean(string="عمل الفاتورة",default=False)
+    state = fields.Selection(
+      [
+            ('draft', 'RFQ'),
+            ('sent', 'RFQ Sent'),
+            ('to approve', 'To Approve'),
+           ('quality_checked', 'Quality Checked'),
+            ('purchase', 'Purchase Order'),
+            ('done', 'Locked'),
+            ('cancel', 'Cancelled'),
+            
+        ],
+        string='Purchase Order Status',
+        default='draft',
+    )
+    
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
