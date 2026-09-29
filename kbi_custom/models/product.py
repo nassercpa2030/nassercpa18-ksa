@@ -10,7 +10,7 @@ class StockPicking(models.Model):
         for picking in self:
             if picking.purchase_id:
                 picking.purchase_id.write({
-                    'state': 'quality_checked',
+                    'quality_check': True,
                 })
         return True
     
@@ -24,7 +24,6 @@ class PurchaseOrder(models.Model):
             ('draft', 'RFQ'),
             ('sent', 'RFQ Sent'),
             ('to approve', 'To Approve'),
-            ('quality_checked', 'Purchase Quality Checked'),
             ('purchase', 'Purchase Order'),
             ('done', 'Locked'),
             ('cancel', 'Cancelled'),
