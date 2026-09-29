@@ -2,6 +2,22 @@
 
 from odoo import models, fields, api
 
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+    def button_validate(self):
+        res = super().button_validate()
+
+        for picking in self:
+            purchase = picking.purchase_id
+
+            if purchase:
+                purchase.write({
+                    'state': 'quality_checked',
+                })
+
+        return res 
+        
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
     quality_check=fields.Boolean(string="أختبار الجودة",default=False)
