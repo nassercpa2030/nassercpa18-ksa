@@ -2,100 +2,110 @@
 
 from odoo import models, fields, api
 
+
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
     def quality_checked(self):
-        #res = super().button_validate()
-
         for picking in self:
-            purchase = picking.purchase_id
-
-            if purchase:
-                purchase.write({
+            if picking.purchase_id:
+                picking.purchase_id.write({
                     'state': 'quality_checked',
                 })
-         return res 
-        
+        return True
+    
+
+
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
-    quality_check=fields.Boolean(string="أختبار الجودة",default=False)
+    quality_check = fields.Boolean(string="أختبار الجودة", default=False)
     state = fields.Selection(
-      [
+        [
             ('draft', 'RFQ'),
             ('sent', 'RFQ Sent'),
             ('to approve', 'To Approve'),
-           ('quality_checked', 'Purchase Quality Checked'),
+            ('quality_checked', 'Purchase Quality Checked'),
             ('purchase', 'Purchase Order'),
             ('done', 'Locked'),
             ('cancel', 'Cancelled'),
-            
+
         ],
         string='Purchase Order Status',
         default='draft',
     )
-    
+
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     finance_service_ok = fields.Boolean(string='Revenue M - Analysis')
-    nk_service= fields.Boolean(string='NK Service')
-    vendor =fields.Char(string="أسم المورد",store=True)
-    scientific_name =fields.Char(string="الأسم العلمي",store=True)
-    concentration=fields.Char(string="التركيز")
-    shape=fields.Char(string="الشكل")
-    package_contents=fields.Char(string="العبــوة")
-    discount=fields.Char(string="نسبة الخصم")
-    discounts_money=fields.Float(string="مبلغ الخصم")
-    unit=fields.Char(string="الوحدة")
+    nk_service = fields.Boolean(string='NK Service')
+    vendor = fields.Char(string="أسم المورد", store=True)
+    scientific_name = fields.Char(string="الأسم العلمي", store=True)
+    concentration = fields.Char(string="التركيز")
+    shape = fields.Char(string="الشكل")
+    package_contents = fields.Char(string="العبــوة")
+    discount = fields.Char(string="نسبة الخصم")
+    discounts_money = fields.Float(string="مبلغ الخصم")
+    unit = fields.Char(string="الوحدة")
     product_id = fields.Many2one('product.product', string='Product', store=True)
-    allowed_users_ids = fields.Many2many(comodel_name='res.users',  relation='product_template_allowed_user_rel', string='Allowed Users', column1='product_tmpl_id',column2='user_id')
+    allowed_users_ids = fields.Many2many(comodel_name='res.users', relation='product_template_allowed_user_rel',
+                                         string='Allowed Users', column1='product_tmpl_id', column2='user_id')
     need_approved = fields.Boolean(string='Need to be approved')
     downpayment_ok = fields.Boolean(string='Downpayment Service')
     analytic_plan_id = fields.Many2one('account.analytic.plan', string='Analytic Plan', required=False)
-    analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account', required=False, domain="[('plan_id', '=', analytic_plan_id)]")
-    report_template_ids = fields.One2many(comodel_name='product.report.template', inverse_name="product_tmpl_id", string='Report Templates')
+    analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account', required=False,
+                                          domain="[('plan_id', '=', analytic_plan_id)]")
+    report_template_ids = fields.One2many(comodel_name='product.report.template', inverse_name="product_tmpl_id",
+                                          string='Report Templates')
     report_template_id = fields.Many2one('ir.actions.report', string='Report Template', required=True)
-    product_analytic_ids = fields.One2many(comodel_name='product.analytic.account', inverse_name='product_tmpl_id', string='Products')
-    public_name = fields.Char(string="Product Description", readonly=False , store=True)
+    product_analytic_ids = fields.One2many(comodel_name='product.analytic.account', inverse_name='product_tmpl_id',
+                                           string='Products')
+    public_name = fields.Char(string="Product Description", readonly=False, store=True)
     super_report_user_ids = fields.Many2many(comodel_name='res.users', string='Super Report Users')
-    planning_enabled = fields.Boolean( string="Planning Enabled",default=False )
+    planning_enabled = fields.Boolean(string="Planning Enabled", default=False)
     planning_role_id = fields.Many2one(
         'res.users',  # أو أي موديل مناسب
         string="Planning Role",
         help="Temporary field to prevent OWL error"
     )
-    
-    
-    #@api.depends("name")
-    #def get_public_name(self):
-        #rec.name[10:] if isinstance(rec.name, str) else False
-        
+
+    # @api.depends("name")
+    # def get_public_name(self):
+    # rec.name[10:] if isinstance(rec.name, str) else False
+
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
     finance_service_ok = fields.Boolean(string='Revenue M - Analysis', related='product_tmpl_id.finance_service_ok')
     downpayment_ok = fields.Boolean(string='Downpayment Service', related='product_tmpl_id.downpayment_ok')
-    report_template_ids = fields.One2many(comodel_name='product.report.template', string='Report Templates',inverse_name="product_id", related='product_tmpl_id.report_template_ids')
-    product_analytic_ids = fields.One2many(comodel_name='product.analytic.account', inverse_name='product_id', string='Products', related='product_tmpl_id.product_analytic_ids')
+    report_template_ids = fields.One2many(comodel_name='product.report.template', string='Report Templates',
+                                          inverse_name="product_id", related='product_tmpl_id.report_template_ids')
+    product_analytic_ids = fields.One2many(comodel_name='product.analytic.account', inverse_name='product_id',
+                                           string='Products', related='product_tmpl_id.product_analytic_ids')
     public_name = fields.Char(string='Public Name', related='product_tmpl_id.public_name')
-    super_report_user_ids = fields.Many2many(comodel_name='res.users', string='Super Report Users', related='product_tmpl_id.super_report_user_ids')
+    super_report_user_ids = fields.Many2many(comodel_name='res.users', string='Super Report Users',
+                                             related='product_tmpl_id.super_report_user_ids')
+
 
 class ProductReportTemplate(models.Model):
     _name = 'product.report.template'
     _rec_name = 'report_template_id'
     product_tmpl_id = fields.Many2one('product.template', string='Product Template')
-    product_id = fields.Many2one('product.product', string='Product', related='product_tmpl_id.product_variant_id', store=True)
+    product_id = fields.Many2one('product.product', string='Product', related='product_tmpl_id.product_variant_id',
+                                 store=True)
     report_template_id = fields.Many2one('ir.actions.report', string='Report Template', required=True)
     allowed_users_ids = fields.Many2many(comodel_name='res.users', string='Allowed Users')
     need_approved = fields.Boolean(string='Need to be approved')
+
 
 class ProductAnalyticAccount(models.Model):
     _name = 'product.analytic.account'
 
     product_tmpl_id = fields.Many2one('product.template', string='Product Template')
-   # product_id = fields.Many2one('product.product', string='Product', related='product_tmpl_id.product_variant_id')
+    # product_id = fields.Many2one('product.product', string='Product', related='product_tmpl_id.product_variant_id')
     product_id = fields.Many2one('product.product', string='Product')
-    analytic_plan_id = fields.Many2one('account.analytic.plan', string='Analytic Plan', required=False,readony=False)
-    analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account', required=False,readonly=False, domain="[('plan_id', '=', analytic_plan_id)]")
+    analytic_plan_id = fields.Many2one('account.analytic.plan', string='Analytic Plan', required=False, readony=False)
+    analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account', required=False,
+                                          readonly=False, domain="[('plan_id', '=', analytic_plan_id)]")
