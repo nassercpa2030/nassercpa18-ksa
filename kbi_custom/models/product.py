@@ -2,6 +2,9 @@
 
 from odoo import models, fields, api
 
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
+    quality_check=fields.Boolean(string="أختبار الجودة",default=False)
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
