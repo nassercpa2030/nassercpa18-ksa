@@ -5,8 +5,8 @@ from odoo import models, fields, api
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    def button_validate(self):
-        res = super().button_validate()
+    def quality_checked(self):
+        #res = super().button_validate()
 
         for picking in self:
             purchase = picking.purchase_id
@@ -15,8 +15,7 @@ class StockPicking(models.Model):
                 purchase.write({
                     'state': 'quality_checked',
                 })
-
-        return res 
+         return res 
         
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
