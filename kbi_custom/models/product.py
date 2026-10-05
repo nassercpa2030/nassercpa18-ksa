@@ -62,6 +62,7 @@ class ProductTemplate ( models.Model ) :
     _inherit = 'product.template'
 
     finance_service_ok = fields.Boolean ( string='Revenue M - Analysis' )
+    price=fields,Float("تكلفة المنتج",compute="_compute_best_discount",store=True)
     nk_service = fields.Boolean ( string='NK Service' )
     vendor = fields.Char ( string="(أفضل خصم)أسم المورد" ,compute="_compute_best_discount",store=True )
     scientific_name = fields.Char ( string="(أفضل خصم)الأسم العلمي" ,compute="_compute_best_discount",store=True )
