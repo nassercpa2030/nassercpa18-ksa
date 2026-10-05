@@ -64,7 +64,7 @@ class ProductTemplate ( models.Model ) :
     _inherit = 'product.template'
 
     finance_service_ok = fields.Boolean ( string='Revenue M - Analysis' )
-    price=fields,Float("تكلفة المنتج",compute="_compute_best_discount",store=True)
+    price=fields.Float("تكلفة المنتج",compute="_compute_best_discount",store=True)
     nk_service = fields.Boolean ( string='NK Service' )
     product_barcode_new =fields.Char(string="باركود المنتـج",size=13,index=True,copy=False,)
     vendor = fields.Char ( string="(أفضل خصم)أسم المورد" ,compute="_compute_best_discount",store=True )
