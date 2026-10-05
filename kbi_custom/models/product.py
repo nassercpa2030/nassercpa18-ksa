@@ -66,7 +66,7 @@ class ProductTemplate ( models.Model ) :
     finance_service_ok = fields.Boolean ( string='Revenue M - Analysis' )
     price=fields,Float("تكلفة المنتج",compute="_compute_best_discount",store=True)
     nk_service = fields.Boolean ( string='NK Service' )
-    produt-barcode_new =fields.Char(string="باركود المنتـج",size=13,index=True,copy=False,)
+    produt_barcode_new =fields.Char(string="باركود المنتـج",size=13,index=True,copy=False,)
     vendor = fields.Char ( string="(أفضل خصم)أسم المورد" ,compute="_compute_best_discount",store=True )
     scientific_name = fields.Char ( string="(أفضل خصم)الأسم العلمي" ,compute="_compute_best_discount",store=True )
     concentration = fields.Char ( string="(أفضل خصم)التركيز" ,compute="_compute_best_discount" ,store=True)
