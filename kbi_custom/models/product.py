@@ -43,6 +43,18 @@ class PurchaseOrder(models.Model):
         string='Purchase Order Status',
         default='draft',
     )
+    
+class ProductSupplierInfo(models.Model):
+    _inherit = 'product.supplierinfo'
+
+    scientific_name_sell = fields.Char(string="الأسم العلمي", store=True)
+    concentration_sell = fields.Char(string="التركيز")
+    shape_sell = fields.Char(string="الشكل")
+    package_contents_sell = fields.Char(string="العبــوة")
+    discount_sell = fields.Char(string="نسبة الخصم")
+    discounts_money_sell = fields.Float(string="مبلغ الخصم")
+    unit_sell = fields.Char(string="الوحدة")
+
 
 
 class ProductTemplate(models.Model):
