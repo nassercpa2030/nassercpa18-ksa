@@ -92,53 +92,53 @@ class ProductTemplate ( models.Model ) :
         help="Temporary field to prevent OWL error"
     )
 
-@api.depends (
-        'seller_ids' ,
-        'seller_ids.discounts_money_sell' ,
-        'seller_ids.scientific_name_sell' ,
-        'seller_ids.concentration_sell' ,
-        'seller_ids.shape_sell' ,
-        'seller_ids.package_contents_sell' ,
-        'seller_ids.discount_sell' ,
-        'seller_ids.unit_sell' ,
-        'seller_ids.partner_id' ,
-    )
+# @api.depends (
+#         'seller_ids' ,
+#         'seller_ids.discounts_money_sell' ,
+#         'seller_ids.scientific_name_sell' ,
+#         'seller_ids.concentration_sell' ,
+#         'seller_ids.shape_sell' ,
+#         'seller_ids.package_contents_sell' ,
+#         'seller_ids.discount_sell' ,
+#         'seller_ids.unit_sell' ,
+#         'seller_ids.partner_id' ,
+#     )
 
 
-def _compute_best_discount(self) :
-    for product in self :
-        # تصفير القيم أولاً
-        product.vendor = False
-        product.scientific_name = False
-        product.concentration = False
-        product.shape = False
-        product.package_contents = False
-        product.discount = False
-        product.discounts_money = 0.0
-        product.unit = False
+# def _compute_best_discount(self) :
+#     for product in self :
+#         # تصفير القيم أولاً
+#         product.vendor = False
+#         product.scientific_name = False
+#         product.concentration = False
+#         product.shape = False
+#         product.package_contents = False
+#         product.discount = False
+#         product.discounts_money = 0.0
+#         product.unit = False
 
-        sellers = product.seller_ids.filtered (
-            lambda s : s.discounts_money_sell is not False
-        )
+#         sellers = product.seller_ids.filtered (
+#             lambda s : s.discounts_money_sell is not False
+#         )
 
-        if not sellers :
-            continue
+#         if not sellers :
+#             continue
 
-        # الحصول على السطر صاحب أقل مبلغ خصم
-        best_seller = min (
-            sellers ,
-            key=lambda s : s.discounts_money_sell
-        )
+#         # الحصول على السطر صاحب أقل مبلغ خصم
+#         best_seller = min (
+#             sellers ,
+#             key=lambda s : s.discounts_money_sell
+#         )
 
-        # جلب كل البيانات من نفس السطر
-        product.vendor = best_seller.partner_id.name
-        product.scientific_name = best_seller.scientific_name_sell
-        product.concentration = best_seller.concentration_sell
-        product.shape = best_seller.shape_sell
-        product.package_contents = best_seller.package_contents_sell
-        product.discount = best_seller.discount_sell
-        product.discounts_money = best_seller.discounts_money_sell
-        product.unit = best_seller.unit_sell
+#         # جلب كل البيانات من نفس السطر
+#         product.vendor = best_seller.partner_id.name
+#         product.scientific_name = best_seller.scientific_name_sell
+#         product.concentration = best_seller.concentration_sell
+#         product.shape = best_seller.shape_sell
+#         product.package_contents = best_seller.package_contents_sell
+#         product.discount = best_seller.discount_sell
+#         product.discounts_money = best_seller.discounts_money_sell
+#         product.unit = best_seller.unit_sell
 
 
 # @api.depends("name")
