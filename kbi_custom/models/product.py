@@ -54,6 +54,7 @@ class ProductSupplierInfo(models.Model):
     discount_sell = fields.Char(string="نسبة الخصم")
     discounts_money_sell = fields.Float(string="مبلغ الخصم")
     unit_sell = fields.Char(string="الوحدة")
+    commercial_name = fields.Char(string="الأسم التجاري")
 
 
 
@@ -63,13 +64,13 @@ class ProductTemplate(models.Model):
     finance_service_ok = fields.Boolean(string='Revenue M - Analysis')
     nk_service = fields.Boolean(string='NK Service')
     vendor = fields.Char(string="أسم المورد", store=True)
-    scientific_name = fields.Char(string="الأسم العلمي", store=True)
-    concentration = fields.Char(string="التركيز")
-    shape = fields.Char(string="الشكل")
-    package_contents = fields.Char(string="العبــوة")
-    discount = fields.Char(string="نسبة الخصم")
-    discounts_money = fields.Float(string="مبلغ الخصم")
-    unit = fields.Char(string="الوحدة")
+    scientific_name = fields.Char(string="(أفضل خصم)الأسم العلمي", store=True)
+    concentration = fields.Char(string="(أفضل خصم)التركيز")
+    shape = fields.Char(string="(أفضل خصم)الشكل")
+    package_contents = fields.Char(string="العبــوة (أفضل خصم)")
+    discount = fields.Char(string="(أفضل خصم)نسبة الخصم")
+    discounts_money = fields.Float(string="(أفضل خصم)مبلغ الخصم")
+    unit = fields.Char(string="(أفضل خصم)الوحدة")
     product_id = fields.Many2one('product.product', string='Product', store=True)
     allowed_users_ids = fields.Many2many(comodel_name='res.users', relation='product_template_allowed_user_rel',
                                          string='Allowed Users', column1='product_tmpl_id', column2='user_id')
