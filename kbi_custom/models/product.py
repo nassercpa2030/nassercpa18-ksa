@@ -145,7 +145,7 @@ class ProductTemplate ( models.Model ) :
 
             # جلب كل البيانات من نفس السطر
             product.vendor = best_seller.partner_id.name
-            product.cost = best_seller.price
+            product.standard_price = best_seller.price
             product.scientific_name = best_seller.scientific_name_sell
             product.concentration = best_seller.concentration_sell
             product.shape = best_seller.shape_sell
