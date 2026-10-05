@@ -52,6 +52,7 @@ class ProductSupplierInfo ( models.Model ) :
     shape_sell = fields.Char ( string="الشكل" )
     package_contents_sell = fields.Char ( string="العبــوة" )
     discount_sell = fields.Char ( string="" )
+    prediscount_money_sell = fields.Float ( string="السعر قبل الخصم" )
     discounts_money_sell = fields.Float ( string="مبلغ الخصم" )
     unit_sell = fields.Char ( string="الوحدة" )
     commercial_name = fields.Char ( string="الأسم التجاري" )
@@ -132,6 +133,7 @@ def _compute_best_discount(self) :
 
         # جلب كل البيانات من نفس السطر
         product.vendor = best_seller.partner_id.name
+        product.cost = best_seller.price
         product.scientific_name = best_seller.scientific_name_sell
         product.concentration = best_seller.concentration_sell
         product.shape = best_seller.shape_sell
