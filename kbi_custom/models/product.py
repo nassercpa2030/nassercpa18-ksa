@@ -64,17 +64,17 @@ class ProductTemplate ( models.Model ) :
     _inherit = 'product.template'
 
     finance_service_ok = fields.Boolean ( string='Revenue M - Analysis' )
-    price=fields.Float("تكلفة المنتج",compute="_compute_best_discount",store=True)
+    price = fields.Float ( "تكلفة المنتج" , compute="_compute_best_discount" , store=True )
     nk_service = fields.Boolean ( string='NK Service' )
-    product_barcode_new =fields.Char(string="باركود المنتـج",size=13,index=True,copy=False,)
-    vendor = fields.Char ( string="(أفضل خصم)أسم المورد" ,compute="_compute_best_discount",store=True )
-    scientific_name = fields.Char ( string="(أفضل خصم)الأسم العلمي" ,compute="_compute_best_discount",store=True )
-    concentration = fields.Char ( string="(أفضل خصم)التركيز" ,compute="_compute_best_discount" ,store=True)
-    shape = fields.Char ( string="(أفضل خصم)الشكل" ,compute="_compute_best_discount" ,store=True)
-    package_contents = fields.Char ( string="العبــوة (أفضل خصم)" ,compute="_compute_best_discount" ,store=True)
-    discount = fields.Char ( string="(أفضل خصم)نسبة الخصم" ,compute="_compute_best_discount",store=True )
-    discounts_money = fields.Float ( string="(أفضل خصم)مبلغ الخصم" ,compute="_compute_best_discount" ,store=True)
-    unit = fields.Char ( string="(أفضل خصم)الوحدة" ,compute="_compute_best_discount",store=True )
+    product_barcode_new = fields.Char ( string="باركود المنتـج" , size=13 , index=True , copy=False , )
+    vendor = fields.Char ( string="(أفضل خصم)أسم المورد" , compute="_compute_best_discount" , store=True )
+    scientific_name = fields.Char ( string="(أفضل خصم)الأسم العلمي" , compute="_compute_best_discount" , store=True )
+    concentration = fields.Char ( string="(أفضل خصم)التركيز" , compute="_compute_best_discount" , store=True )
+    shape = fields.Char ( string="(أفضل خصم)الشكل" , compute="_compute_best_discount" , store=True )
+    package_contents = fields.Char ( string="العبــوة (أفضل خصم)" , compute="_compute_best_discount" , store=True )
+    discount = fields.Char ( string="(أفضل خصم)نسبة الخصم" , compute="_compute_best_discount" , store=True )
+    discounts_money = fields.Float ( string="(أفضل خصم)مبلغ الخصم" , compute="_compute_best_discount" , store=True )
+    unit = fields.Char ( string="(أفضل خصم)الوحدة" , compute="_compute_best_discount" , store=True )
     product_id = fields.Many2one ( 'product.product' , string='Product' , store=True )
     allowed_users_ids = fields.Many2many ( comodel_name='res.users' , relation='product_template_allowed_user_rel' ,
                                            string='Allowed Users' , column1='product_tmpl_id' , column2='user_id' )
@@ -97,14 +97,101 @@ class ProductTemplate ( models.Model ) :
         help="Temporary field to prevent OWL error"
     )
     
-    # check barcode #
 
+    # Merge Products #
+    def merge_duplicate_barcodes(self) :
+        Product = self.env['product.template']
+
+        products = Product.search ( [
+            ('product_barcode_new' , '!=' , False) ,
+        ] )
+
+        barcode_groups = {}
+
+        # تجميع المنتجات حسب الباركود
+        for product in products :
+            barcode_groups.setdefault (
+                product.product_barcode_new ,
+                Product
+            )
+            barcode_groups[product.product_barcode_new] |= product
+
+        for barcode , group in barcode_groups.items () :
+
+            # مفيش تكرار
+            if len ( group ) <= 1 :
+                continue
+
+            # ==========================================
+            # أحدث منتج هو المنتج الأساسي
+            # ==========================================
+
+            group = group.sorted (
+                key=lambda p : p.create_date or '' ,
+                reverse=True
+            )
+
+            master = group[0]
+            duplicates = group[1 :]
+
+            seller_field = master._fields['seller_ids']
+            seller_model = self.env[seller_field.comodel_name]
+            inverse_name = seller_field.inverse_name
+
+            # ==========================================
+            # نقل ALL seller_ids
+            # من كل المنتجات المكررة
+            # ==========================================
+
+            for old_product in duplicates :
+
+                for seller in old_product.seller_ids :
+
+                    vals = {}
+
+                    # انسخ كل حقول seller
+                    # ماعدا id وحقول النظام
+                    for field_name , field in seller._fields.items () :
+
+                        if field_name in (
+                                'id' ,
+                                'create_uid' ,
+                                'create_date' ,
+                                'write_uid' ,
+                                'write_date' ,
+                        ) :
+                            continue
+
+                        # حقل الربط بالمنتج
+                        if field_name == inverse_name :
+                            continue
+
+                        # لو الحقل قابل للنسخ
+                        if not field.compute and not field.related :
+                            vals[field_name] = seller[field_name]
+
+                    # ربط الـ seller بالمنتج الأساسي
+                    vals[inverse_name] = master.id
+
+                    seller_model.create ( vals )
+
+            # ==========================================
+            # حذف المنتجات المكررة
+            # ==========================================
+
+            duplicates.unlink ()
+
+        return True
+
+
+
+
+    # check barcode #
     @api.constrains ( "product_barcode_new" )
     def _check_barcode_digits(self) :
         for record in self :
             if record.barcode and not re.fullmatch ( r"\d{13}" , record.barcode ) :
                 raise ValidationError ( "Barcode must contain exactly 13 digits." )
-
 
 
     @api.depends (
@@ -152,12 +239,11 @@ class ProductTemplate ( models.Model ) :
             product.package_contents = best_seller.package_contents_sell
             product.discount = best_seller.discount_sell
             product.discounts_money = best_seller.discounts_money_sell
-            product.unit = best_seller.unit_sell
-
-
-
-
-
+            product.unit = best_seller.unit_sell  
+            
+            
+            
+            
 
 
 
