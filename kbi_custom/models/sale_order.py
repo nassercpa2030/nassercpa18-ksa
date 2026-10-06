@@ -38,6 +38,7 @@ class SaleOrder ( models.Model ) :
     )
     next_number = fields.Integer ( string="next sequence number" , store=True )
     product_code = fields.Char ( string="Product Code" , related="x_studio_contract_service.barcode" , store=True )
+    
     one_audit_archive = fields.Boolean ( string="أرشفة علي ون أودت " , stored=True )
     papers_archive = fields.Boolean ( string="أرشفة ورقية" , stored=True )
     box_paper_archive = fields.Integer ( string="رقم أرشيف الصندوق" , stored=True )
@@ -81,7 +82,9 @@ class SaleOrder ( models.Model ) :
     sequence = fields.Integer ( string='Sequence' , )
     report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
                                   domain="[('id', 'in', exist_report_ids)]" )
-    x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="Contract_service" )
+    x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="أسم المنتج" )
+    product_cost = fields.Char ( string="الـســعر" , related="x_studio_contract_service.cost" , store=True )
+    #x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="Contract_service" )
     report_template_id = fields.Many2one ( comodel_name='ir.actions.report' , string='Report Template' ,
                                            related="report_id.report_template_id" )
     printdate = fields.Date ( string='تاريخ  الطباعة' , default=fields.Datetime.now )
