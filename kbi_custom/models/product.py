@@ -58,10 +58,10 @@ class ProductSupplierInfo ( models.Model ) :
     discounts_money_sell = fields.Float ( string="مبلغ الخصم" )
     unit_sell = fields.Char ( string="الوحدة" )
     commercial_name = fields.Char ( string="الأسم التجاري" )
-    
-    partner_id = fields.Many2one('res.partner',
-        string='Vendor',
-        required=False, )
+
+    partner_id = fields.Many2one ( 'res.partner' ,
+                                   string='Vendor' ,
+                                   required=False , )
 
 
 class ProductTemplate ( models.Model ) :
@@ -100,9 +100,9 @@ class ProductTemplate ( models.Model ) :
         string="Planning Role" ,
         help="Temporary field to prevent OWL error"
     )
-    
 
     # Merge Products #
+    
     def merge_duplicate_barcodes(self) :
         Product = self.env['product.template']
 
@@ -112,13 +112,20 @@ class ProductTemplate ( models.Model ) :
 
         barcode_groups = {}
 
+        # ==========================================
         # تجميع المنتجات حسب الباركود
+        # ==========================================
+
         for product in products :
             barcode_groups.setdefault (
                 product.product_barcode_new ,
                 Product
             )
             barcode_groups[product.product_barcode_new] |= product
+
+        # ==========================================
+        # معالجة كل مجموعة باركود
+        # ==========================================
 
         for barcode , group in barcode_groups.items () :
 
@@ -138,13 +145,17 @@ class ProductTemplate ( models.Model ) :
             master = group[0]
             duplicates = group[1 :]
 
+            # ==========================================
+            # الحصول على موديل seller_ids
+            # ==========================================
+
             seller_field = master._fields['seller_ids']
             seller_model = self.env[seller_field.comodel_name]
             inverse_name = seller_field.inverse_name
 
             # ==========================================
             # نقل ALL seller_ids
-            # من كل المنتجات المكررة
+            # من المنتجات المكررة
             # ==========================================
 
             for old_product in duplicates :
@@ -153,9 +164,15 @@ class ProductTemplate ( models.Model ) :
 
                     vals = {}
 
-                    # انسخ كل حقول seller
-                    # ماعدا id وحقول النظام
+                    # ==========================================
+                    # نسخ الحقول
+                    # ==========================================
+
                     for field_name , field in seller._fields.items () :
+
+                        # --------------------------------------
+                        # تجاهل حقول النظام
+                        # --------------------------------------
 
                         if field_name in (
                                 'id' ,
@@ -166,16 +183,42 @@ class ProductTemplate ( models.Model ) :
                         ) :
                             continue
 
-                        # حقل الربط بالمنتج
+                        # --------------------------------------
+                        # تجاهل حقل ربط seller بالمنتج
+                        # --------------------------------------
+
                         if field_name == inverse_name :
                             continue
 
-                        # لو الحقل قابل للنسخ
-                        if not field.compute and not field.related :
-                            vals[field_name] = seller[field_name]
+                        # --------------------------------------
+                        # تجاهل جميع حقول Many2one
+                        # --------------------------------------
 
-                    # ربط الـ seller بالمنتج الأساسي
+                        if field.type == 'many2one' :
+                            continue
+
+                        # --------------------------------------
+                        # تجاهل computed و related
+                        # --------------------------------------
+
+                        if field.compute or field.related :
+                            continue
+
+                        # --------------------------------------
+                        # نسخ القيمة
+                        # --------------------------------------
+
+                        vals[field_name] = seller[field_name]
+
+                    # ==========================================
+                    # ربط seller بالمنتج الأساسي
+                    # ==========================================
+
                     vals[inverse_name] = master.id
+
+                    # ==========================================
+                    # إنشاء seller جديد
+                    # ==========================================
 
                     seller_model.create ( vals )
 
@@ -187,16 +230,12 @@ class ProductTemplate ( models.Model ) :
 
         return True
 
-
-
-
     # check barcode #
     @api.constrains ( "product_barcode_new" )
     def _check_barcode_digits(self) :
         for record in self :
             if record.barcode and not re.fullmatch ( r"\d{13}" , record.barcode ) :
                 raise ValidationError ( "Barcode must contain exactly 13 digits." )
-
 
     @api.depends (
         'seller_ids' ,
@@ -235,8 +274,8 @@ class ProductTemplate ( models.Model ) :
             )
 
             # جلب كل البيانات من نفس السطر
-            #product.vendor = best_seller.partner_id.name
-            product.vendor =  best_seller.x_studio_char_field_864_1k4699f9k_1
+            # product.vendor = best_seller.partner_id.name
+            product.vendor = best_seller.x_studio_char_field_864_1k4699f9k_1
             product.standard_price = best_seller.price
             product.scientific_name = best_seller.scientific_name_sell
             product.concentration = best_seller.concentration_sell
@@ -244,9 +283,11 @@ class ProductTemplate ( models.Model ) :
             product.package_contents = best_seller.package_contents_sell
             product.discount = best_seller.discount
             product.discounts_money = best_seller.discounts_money_sell
-            product.unit = best_seller.unit_sell  
-            
-# @api.depends("name")
+            product.unit = best_seller.unit_sell
+
+        # @api.depends("name")
+
+
 # def get_public_name(self):
 # rec.name[10:] if isinstance(rec.name, str) else False
 
