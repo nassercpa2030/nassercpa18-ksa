@@ -205,7 +205,7 @@ class ProductTemplate ( models.Model ) :
         'seller_ids.concentration_sell' ,
         'seller_ids.shape_sell' ,
         'seller_ids.package_contents_sell' ,
-        'seller_ids.discount_sell' ,
+        'seller_ids.discount' ,
         'seller_ids.unit_sell' ,
         'seller_ids.partner_id' ,
     )
@@ -242,7 +242,7 @@ class ProductTemplate ( models.Model ) :
             product.concentration = best_seller.concentration_sell
             product.shape = best_seller.shape_sell
             product.package_contents = best_seller.package_contents_sell
-            product.discount = best_seller.discount_sell
+            product.discount = best_seller.discount
             product.discounts_money = best_seller.discounts_money_sell
             product.unit = best_seller.unit_sell  
             
