@@ -227,7 +227,8 @@ class QualityStateLog ( models.Model ) :
     _name = 'quality.state.log'
     _description = 'Quality State Change Log'
 
-    project_id = fields.Many2one ( 'project.project' , string='Project' , required=True )
+    project_id = fields.Many2one ( 'project.project' , string='Project'  )
+    #project_id = fields.Many2one ( 'project.project' , string='Project' , required=True )
     old_value = fields.Selection ( [
         ('to_quality' , 'التحويل للجودة') ,
         ('review_again' , 'إعادة للمراجعة') ,
