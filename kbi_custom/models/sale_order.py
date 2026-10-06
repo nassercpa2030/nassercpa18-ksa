@@ -323,7 +323,6 @@ class SaleOrder ( models.Model ) :
         return report.report_action ( self )
 
     ### add new line in order line from button of stock keeper###
-
     def action_add_contract_service_line(self) :
         for order in self :
 
@@ -335,14 +334,45 @@ class SaleOrder ( models.Model ) :
             if not order.x_studio_integer_field_93s_1k487upbl :
                 raise UserError ( "من فضلك أدخل الكمية." )
 
-            # إنشاء سطر جديد في أمر البيع
+            # البحث عن العملة المصرية
+            egp_currency = self.env['res.currency'].search ( [
+                ('name' , '=' , 'EGP')
+            ] , limit=1 )
+
+            if not egp_currency :
+                raise UserError ( "لم يتم العثور على العملة EGP." )
+
+            # تغيير عملة الـ Sale Order بالكامل إلى EGP
+            order.currency_id = egp_currency.id
+
+            # إضافة سطر جديد إلى Order Lines
             self.env['sale.order.line'].create ( {
                 'order_id' : order.id ,
                 'product_id' : order.x_studio_contract_service.id ,
                 'product_uom_qty' : order.x_studio_integer_field_93s_1k487upbl ,
-                'currency_id':order.currency_id ,
                 'price_unit' : order.product_cost or 0.0 ,
             } )
+
+    # def action_add_contract_service_line(self) :
+    #     for order in self :
+    # 
+    #         # التأكد من اختيار المنتج
+    #         if not order.x_studio_contract_service :
+    #             raise UserError ( "من فضلك اختر المنتج أولاً." )
+    # 
+    #         # التأكد من إدخال الكمية
+    #         if not order.x_studio_integer_field_93s_1k487upbl :
+    #             raise UserError ( "من فضلك أدخل الكمية." )
+    # 
+    #         # إنشاء سطر جديد في أمر البيع
+    #         self.env['sale.order.line'].create ( {
+    #             'order_id' : order.id ,
+    #             'product_id' : order.x_studio_contract_service.id ,
+    #             'product_uom_qty' : order.x_studio_integer_field_93s_1k487upbl ,
+    #             #'currency_id':order.currency_id ,
+    #             'currency_id':env['res.currency'].search([('name', '=', 'EGP')], limit=1)
+    #             'price_unit' : order.product_cost or 0.0 ,
+    #         } )
 
 
     def action_print_project_history(self) :
