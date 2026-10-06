@@ -70,7 +70,7 @@ class ProductTemplate ( models.Model ) :
     finance_service_ok = fields.Boolean ( string='Revenue M - Analysis' )
     price = fields.Float ( "تكلفة المنتج" , compute="_compute_best_discount" , store=True )
     nk_service = fields.Boolean ( string='NK Service' )
-    product_barcode_new = fields.Char ( string="باركود المنتـج" , size=13 , index=True , copy=False , store=True)
+    product_barcode_new = fields.Char ( string="باركود المنتـج" , size=13 , index=True , copy=False , store=True )
     vendor = fields.Char ( string="(أفضل خصم)أسم المورد" , compute="_compute_best_discount" , store=True )
     scientific_name = fields.Char ( string="(أفضل خصم)الأسم العلمي" , compute="_compute_best_discount" , store=True )
     concentration = fields.Char ( string="(أفضل خصم)التركيز" , compute="_compute_best_discount" , store=True )
@@ -100,15 +100,15 @@ class ProductTemplate ( models.Model ) :
         string="Planning Role" ,
         help="Temporary field to prevent OWL error"
     )
+    
 
     # Merge Products #
-    
-    def merge_duplicate_barcodes(self) :
+    def merge_duplicate_barcodes(self):
         Product = self.env['product.template']
 
-        products = Product.search ( [
-            ('product_barcode_new' , '!=' , False) ,
-        ] )
+        products = Product.search([
+            ('product_barcode_new', '!=', False),
+        ])
 
         barcode_groups = {}
 
@@ -116,9 +116,9 @@ class ProductTemplate ( models.Model ) :
         # تجميع المنتجات حسب الباركود
         # ==========================================
 
-        for product in products :
-            barcode_groups.setdefault (
-                product.product_barcode_new ,
+        for product in products:
+            barcode_groups.setdefault(
+                product.product_barcode_new,
                 Product
             )
             barcode_groups[product.product_barcode_new] |= product
@@ -127,23 +127,23 @@ class ProductTemplate ( models.Model ) :
         # معالجة كل مجموعة باركود
         # ==========================================
 
-        for barcode , group in barcode_groups.items () :
+        for barcode, group in barcode_groups.items():
 
             # مفيش تكرار
-            if len ( group ) <= 1 :
+            if len(group) <= 1:
                 continue
 
             # ==========================================
             # أحدث منتج هو المنتج الأساسي
             # ==========================================
 
-            group = group.sorted (
-                key=lambda p : p.create_date or '' ,
+            group = group.sorted(
+                key=lambda p: p.create_date or '',
                 reverse=True
             )
 
             master = group[0]
-            duplicates = group[1 :]
+            duplicates = group[1:]
 
             # ==========================================
             # الحصول على موديل seller_ids
@@ -158,9 +158,9 @@ class ProductTemplate ( models.Model ) :
             # من المنتجات المكررة
             # ==========================================
 
-            for old_product in duplicates :
+            for old_product in duplicates:
 
-                for seller in old_product.seller_ids :
+                for seller in old_product.seller_ids:
 
                     vals = {}
 
@@ -168,40 +168,40 @@ class ProductTemplate ( models.Model ) :
                     # نسخ الحقول
                     # ==========================================
 
-                    for field_name , field in seller._fields.items () :
+                    for field_name, field in seller._fields.items():
 
                         # --------------------------------------
                         # تجاهل حقول النظام
                         # --------------------------------------
 
                         if field_name in (
-                                'id' ,
-                                'create_uid' ,
-                                'create_date' ,
-                                'write_uid' ,
-                                'write_date' ,
-                        ) :
+                                'id',
+                                'create_uid',
+                                'create_date',
+                                'write_uid',
+                                'write_date',
+                        ):
                             continue
 
                         # --------------------------------------
                         # تجاهل حقل ربط seller بالمنتج
                         # --------------------------------------
 
-                        if field_name == inverse_name :
+                        if field_name == inverse_name:
                             continue
 
                         # --------------------------------------
                         # تجاهل جميع حقول Many2one
                         # --------------------------------------
 
-                        if field.type == 'many2one' :
+                        if field.type == 'many2one':
                             continue
 
                         # --------------------------------------
                         # تجاهل computed و related
                         # --------------------------------------
 
-                        if field.compute or field.related :
+                        if field.compute or field.related:
                             continue
 
                         # --------------------------------------
@@ -220,13 +220,13 @@ class ProductTemplate ( models.Model ) :
                     # إنشاء seller جديد
                     # ==========================================
 
-                    seller_model.create ( vals )
+                    seller_model.create(vals)
 
             # ==========================================
             # حذف المنتجات المكررة
             # ==========================================
 
-            duplicates.unlink ()
+            duplicates.unlink()
 
         return True
 
