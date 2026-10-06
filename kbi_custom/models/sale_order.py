@@ -351,19 +351,27 @@ class SaleOrder ( models.Model ) :
                 'product_id' : order.x_studio_contract_service.id ,
                 'product_uom_qty' : order.x_studio_integer_field_93s_1k487upbl ,
                 'price_unit' : order.product_cost or 0.0 ,
+                'tax_id': [(5, 0, 0)],
+            } )
+            # ==========================================
+            # التأكد مرة أخرى أن كل السطور بدون ضرائب
+            # ==========================================
+
+            order.order_line.write ( {
+                'tax_id' : [(5 , 0 , 0)] ,
             } )
 
     # def action_add_contract_service_line(self) :
     #     for order in self :
-    # 
+    #
     #         # التأكد من اختيار المنتج
     #         if not order.x_studio_contract_service :
     #             raise UserError ( "من فضلك اختر المنتج أولاً." )
-    # 
+    #
     #         # التأكد من إدخال الكمية
     #         if not order.x_studio_integer_field_93s_1k487upbl :
     #             raise UserError ( "من فضلك أدخل الكمية." )
-    # 
+    #
     #         # إنشاء سطر جديد في أمر البيع
     #         self.env['sale.order.line'].create ( {
     #             'order_id' : order.id ,
