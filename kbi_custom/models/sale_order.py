@@ -340,7 +340,7 @@ class SaleOrder ( models.Model ) :
                 'order_id' : order.id ,
                 'product_id' : order.x_studio_contract_service.id ,
                 'product_uom_qty' : order.x_studio_integer_field_93s_1k487upbl ,
-                'currency_id':order.currency_id
+                'currency_id':order.currency_id ,
                 'price_unit' : order.product_cost or 0.0 ,
             } )
 
