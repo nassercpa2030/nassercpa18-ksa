@@ -58,6 +58,10 @@ class ProductSupplierInfo ( models.Model ) :
     discounts_money_sell = fields.Float ( string="مبلغ الخصم" )
     unit_sell = fields.Char ( string="الوحدة" )
     commercial_name = fields.Char ( string="الأسم التجاري" )
+    
+    partner_id = fields.Many2one('res.partner',
+        string='Vendor',
+        required=False, )
 
 
 class ProductTemplate ( models.Model ) :
