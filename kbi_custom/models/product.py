@@ -267,8 +267,8 @@ class ProductTemplate ( models.Model ) :
             if not sellers :
                 continue
 
-            # الحصول على السطر صاحب أقل مبلغ خصم
-            best_seller = min (
+            # الحصول على السطر صاحب أكبر مبلغ خصم
+            best_seller = max (
                 sellers ,
                 key=lambda s : s.discounts_money_sell
             )
