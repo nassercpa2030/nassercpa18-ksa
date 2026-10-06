@@ -74,6 +74,7 @@ class ProductTemplate ( models.Model ) :
     vendor = fields.Char ( string="(أفضل خصم)أسم المورد" , compute="_compute_best_discount" , store=True )
     scientific_name = fields.Char ( string="(أفضل خصم)الأسم العلمي" , compute="_compute_best_discount" , store=True )
     concentration = fields.Char ( string="(أفضل خصم)التركيز" , compute="_compute_best_discount" , store=True )
+    prediscount_money=  fields.Float ( string="(أفضل خصم)السعر قبل الخصم" , compute="_compute_best_discount" , store=True )
     shape = fields.Char ( string="(أفضل خصم)الشكل" , compute="_compute_best_discount" , store=True )
     package_contents = fields.Char ( string="العبــوة (أفضل خصم)" , compute="_compute_best_discount" , store=True )
     discount = fields.Float ( string="(أفضل خصم)نسبة الخصم" , compute="_compute_best_discount" , store=True )
@@ -287,6 +288,7 @@ class ProductTemplate ( models.Model ) :
             product.discount = False
             product.discounts_money = 0.0
             product.unit = False
+            product.prediscount_money=0.0
 
             sellers = product.seller_ids.filtered (
                 lambda s : s.discounts_money_sell is not False
@@ -312,6 +314,7 @@ class ProductTemplate ( models.Model ) :
             product.discount = best_seller.discount
             product.discounts_money = best_seller.discounts_money_sell
             product.unit = best_seller.unit_sell
+            product.prediscount_money = best_seller.prediscount_money_sell
 
         # @api.depends("name")
 
