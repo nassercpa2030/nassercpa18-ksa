@@ -75,7 +75,6 @@ class ProductTemplate ( models.Model ) :
     scientific_name = fields.Char ( string="(أفضل خصم)الأسم العلمي" , compute="_compute_best_discount" , store=True )
     concentration = fields.Char ( string="(أفضل خصم)التركيز" , compute="_compute_best_discount" , store=True )
     shape = fields.Char ( string="(أفضل خصم)الشكل" , compute="_compute_best_discount" , store=True )
-    prediscount_money = fields.Char ( string="السعر قبل الخصم(أفضل خصم)" , compute="_compute_best_discount" , store=True )
     package_contents = fields.Char ( string="العبــوة (أفضل خصم)" , compute="_compute_best_discount" , store=True )
     discount = fields.Float ( string="(أفضل خصم)نسبة الخصم" , compute="_compute_best_discount" , store=True )
     discounts_money = fields.Float ( string="(أفضل خصم)مبلغ الخصم" , compute="_compute_best_discount" , store=True )
@@ -162,6 +161,18 @@ class ProductTemplate ( models.Model ) :
             duplicates = group[1 :]
 
             # ==========================================
+            # تعديل اسم المنتج الرئيسي
+            # name - barcode
+            # ==========================================
+
+            if master.product_barcode_new :
+                barcode_value = str ( master.product_barcode_new )
+
+                # منع تكرار الباركود في الاسم
+                if not master.name.endswith ( f" - {barcode_value}" ) :
+                    master.name = f"{master.name} - {barcode_value}"
+
+            # ==========================================
             # seller_ids information
             # ==========================================
 
@@ -245,7 +256,8 @@ class ProductTemplate ( models.Model ) :
             duplicates.unlink ()
 
         return True
-
+    
+    
     # check barcode #
     @api.constrains ( "product_barcode_new" )
     def _check_barcode_digits(self) :
@@ -275,7 +287,6 @@ class ProductTemplate ( models.Model ) :
             product.discount = False
             product.discounts_money = 0.0
             product.unit = False
-            product.prediscount_money=0.0
 
             sellers = product.seller_ids.filtered (
                 lambda s : s.discounts_money_sell is not False
@@ -301,7 +312,6 @@ class ProductTemplate ( models.Model ) :
             product.discount = best_seller.discount
             product.discounts_money = best_seller.discounts_money_sell
             product.unit = best_seller.unit_sell
-            product.prediscount_money =best_seller.prediscount_money_sell
 
         # @api.depends("name")
 
