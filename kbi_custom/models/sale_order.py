@@ -83,7 +83,7 @@ class SaleOrder ( models.Model ) :
     report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
                                   domain="[('id', 'in', exist_report_ids)]" )
     x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="أسم المنتج" )
-    product_cost = fields.Char ( string="الـســعر" , related="x_studio_contract_service.cost" , store=True )
+    product_cost = fields.Float ( string="الـســعر" , related="x_studio_contract_service.cost" , store=True )
     #x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="Contract_service" )
     report_template_id = fields.Many2one ( comodel_name='ir.actions.report' , string='Report Template' ,
                                            related="report_id.report_template_id" )
