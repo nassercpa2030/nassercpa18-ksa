@@ -22,7 +22,7 @@ class SaleOrder ( models.Model ) :
     planning_hours_to_plan = fields.Float ( string="Hours to Plan" , readonly=True )
     planning_hours_planned = fields.Float ( string="Hours Planned" , readonly=True )
     contract_date = fields.Date ( string='Contract Date' , readonly=False , )
-                                 #required=True )
+    # required=True )
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
     old_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , stored=True )
     customer_state = fields.Boolean ( string="عميــل غير مؤكـــد" , stored=True )
@@ -38,7 +38,7 @@ class SaleOrder ( models.Model ) :
     )
     next_number = fields.Integer ( string="next sequence number" , store=True )
     product_code = fields.Char ( string="Product Code" , related="x_studio_contract_service.barcode" , store=True )
-    
+
     one_audit_archive = fields.Boolean ( string="أرشفة علي ون أودت " , stored=True )
     papers_archive = fields.Boolean ( string="أرشفة ورقية" , stored=True )
     box_paper_archive = fields.Integer ( string="رقم أرشيف الصندوق" , stored=True )
@@ -68,7 +68,7 @@ class SaleOrder ( models.Model ) :
     archived_sale = fields.Boolean ( 'Archived' , readonly=False , required=False , default=False )
     amount_tax = fields.Float ( "Taxes" , readonly=False , required=False )
     audit_date = fields.Date ( string='Audit Date' , readonly=False , required=False , store=True )
-    #audit_date = fields.Date ( string='Audit Date' , readonly=False , required=True , store=True )
+    # audit_date = fields.Date ( string='Audit Date' , readonly=False , required=True , store=True )
     # close_entry_date = fields.Date (string="Close Entry Date" ,compute="calc_close_date",store=False, readonly=True ,searchable=True)
     # close_entry_year = fields.Integer ( string="Close Entry Year" ,compute="calc_close_date",store=True, readonly=False,searchable=True )
 
@@ -83,8 +83,9 @@ class SaleOrder ( models.Model ) :
     report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
                                   domain="[('id', 'in', exist_report_ids)]" )
     x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="أسم المنتج" )
-    product_cost = fields.Float ( string="الـســعر" , related="x_studio_contract_service.standard_price", readonly=False )
-    #x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="Contract_service" )
+    product_cost = fields.Float ( string="الـســعر" , related="x_studio_contract_service.standard_price" ,
+                                  readonly=False )
+    # x_studio_contract_service = fields.Many2one ( comodel_name='product.product' , string="Contract_service" )
     report_template_id = fields.Many2one ( comodel_name='ir.actions.report' , string='Report Template' ,
                                            related="report_id.report_template_id" )
     printdate = fields.Date ( string='تاريخ  الطباعة' , default=fields.Datetime.now )
@@ -142,18 +143,19 @@ class SaleOrder ( models.Model ) :
                                         compute='_compute_analytic_plan_default_id' , readonly=False )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
                                             domain="[('plan_id', '=', project_type_id)]" , readonly=False , store=True )
-                                            #required=True , store=True )
+    # required=True , store=True )
     # analytic_account_id_assigned = fields.Many2one ( 'account.analytic.plan',related='review_manager_id.analytic_plan',store=False)
     approve_uid = fields.Many2one ( 'res.users' , string='Approve User' , )
     approve_date = fields.Datetime ( string='Approve Date' )
     reject_reason = fields.Text ( string='Reject Reason' )
     broker_id = fields.Many2one ( comodel_name='res.partner' , string='Salesperson' ,
                                   domain="[('is_broker', '=', True)]" )
-    number_700_sale = fields.Char ( related='partner_id.number_700' , string="(700) الرقم الموحد" , readonly=False  , store=True )
-                                    #required=True , store=True )
+    number_700_sale = fields.Char ( related='partner_id.number_700' , string="(700) الرقم الموحد" , readonly=False ,
+                                    store=True )
+    # required=True , store=True )
     political_kyan = fields.Selection ( related='partner_id.political_kyan' , string="الكـــــيان القـــــانونـي" ,
-                                        readonly=False  , store=True )
-                                       #required=True , store=True )
+                                        readonly=False , store=True )
+    # required=True , store=True )
     manager_id_sale = fields.Integer ( related="partner_id.manager_id" , string="Manager Id" , store=True ,
                                        readonly=False )
     contact_manager_team = fields.Many2one ( comodel_name="res.users" , related="user_id" ,
@@ -319,6 +321,28 @@ class SaleOrder ( models.Model ) :
             raise ValueError ( "Report  of completing filewith ID 1673 not found!" )
         # ترجع الـ report action عشان أودو يفتح PDF
         return report.report_action ( self )
+
+    ### add new line in order line from button of stock keeper###
+
+    def action_add_contract_service_line(self) :
+        for order in self :
+
+            # التأكد من اختيار المنتج
+            if not order.x_studio_contract_service :
+                raise UserError ( "من فضلك اختر المنتج أولاً." )
+
+            # التأكد من إدخال الكمية
+            if not order.x_studio_integer_field_93s_1k487upbl :
+                raise UserError ( "من فضلك أدخل الكمية." )
+
+            # إنشاء سطر جديد في أمر البيع
+            self.env['sale.order.line'].create ( {
+                'order_id' : order.id ,
+                'product_id' : order.x_studio_contract_service.id ,
+                'product_uom_qty' : order.x_studio_integer_field_93s_1k487upbl ,
+                'price_unit' : order.product_cost or 0.0 ,
+            } )
+
 
     def action_print_project_history(self) :
         # إحنا هنا بنجيب التقرير بالـ ID مباشرة
@@ -752,7 +776,7 @@ class SaleOrder ( models.Model ) :
                     } )
 
                     wizard.close_entry_deffered ()
-                   
+
 
         elif not 'archive_signiture' in vals and 'archive_signiture_exception' in vals :
 
@@ -1251,7 +1275,7 @@ class SaleOrder2 ( models.Model ) :
     # contract_date = fields.Date(string='Contract Date')
     audit_date = fields.Date ( string='Audit Date' )
     # account_year = fields.Integer ( string='Year' , required=True , default=lambda self : fields.Date.today ().year )
-    account_year = fields.Integer ( string='Year' ,compute='compute_audit_year' , index=True , readonly=False )
+    account_year = fields.Integer ( string='Year' , compute='compute_audit_year' , index=True , readonly=False )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreement' )
     payment_ids = fields.Many2many ( 'account.payment' , string='Payments' , compute='_compute_payment_ids' )
     payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
@@ -1663,7 +1687,7 @@ class SaleOrderPrint ( models.Model ) :
     _description = 'Sale Order Print Wizard'
 
     exist_sale_ids = fields.Many2many ( 'sale.order' , string='Sale Order' , )
-    sale_id = fields.Many2one ( 'sale.order' , string='Sale Order' , 
+    sale_id = fields.Many2one ( 'sale.order' , string='Sale Order' ,
                                 domain="[('id', 'in', exist_sale_ids)]" )
     exist_report_ids = fields.Many2many ( 'product.report.template' , string='Report' , )
     report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
@@ -1700,7 +1724,7 @@ class SaleOrderRejectWizard ( models.TransientModel ) :
     _name = 'sale.order.reject.wizard'
 
     sale_id = fields.Many2one ( 'sale.order' , string='Sale Order' )
-                              # , required=True )
+    # , required=True )
     reject_reason = fields.Text ( string='Reject Reason' , required=True )
 
     def action_reject(self) :
