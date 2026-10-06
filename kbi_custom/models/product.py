@@ -235,7 +235,8 @@ class ProductTemplate ( models.Model ) :
             )
 
             # جلب كل البيانات من نفس السطر
-            product.vendor = best_seller.partner_id.name
+            #product.vendor = best_seller.partner_id.name
+            product.vendor =  best_seller.x_studio_char_field_864_1k4699f9k_1
             product.standard_price = best_seller.price
             product.scientific_name = best_seller.scientific_name_sell
             product.concentration = best_seller.concentration_sell
@@ -245,12 +246,6 @@ class ProductTemplate ( models.Model ) :
             product.discounts_money = best_seller.discounts_money_sell
             product.unit = best_seller.unit_sell  
             
-            
-            
-            
-
-
-
 # @api.depends("name")
 # def get_public_name(self):
 # rec.name[10:] if isinstance(rec.name, str) else False
