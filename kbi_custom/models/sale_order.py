@@ -21,7 +21,8 @@ class SaleOrder ( models.Model ) :
     planning_initial_date = fields.Date ( string="Initial Planning Date" , readonly=True )
     planning_hours_to_plan = fields.Float ( string="Hours to Plan" , readonly=True )
     planning_hours_planned = fields.Float ( string="Hours Planned" , readonly=True )
-    contract_date = fields.Date ( string='Contract Date' , readonly=False , required=True )
+    contract_date = fields.Date ( string='Contract Date' , readonly=False , )
+                                 #required=True )
     local_server_archive = fields.Boolean ( string="أرشفة علي السيرفر المحلي" , stored=True )
     old_sale_orders = fields.Boolean ( string="عقود ماقبل السيستم" , stored=True )
     customer_state = fields.Boolean ( string="عميــل غير مؤكـــد" , stored=True )
@@ -65,7 +66,8 @@ class SaleOrder ( models.Model ) :
     partner_shipping_id = fields.Many2one ( string='Delivery Address' , required=False , readonly=False )
     archived_sale = fields.Boolean ( 'Archived' , readonly=False , required=False , default=False )
     amount_tax = fields.Float ( "Taxes" , readonly=False , required=False )
-    audit_date = fields.Date ( string='Audit Date' , readonly=False , required=True , store=True )
+    audit_date = fields.Date ( string='Audit Date' , readonly=False , required=False , store=True )
+    #audit_date = fields.Date ( string='Audit Date' , readonly=False , required=True , store=True )
     # close_entry_date = fields.Date (string="Close Entry Date" ,compute="calc_close_date",store=False, readonly=True ,searchable=True)
     # close_entry_year = fields.Integer ( string="Close Entry Year" ,compute="calc_close_date",store=True, readonly=False,searchable=True )
 
@@ -136,18 +138,19 @@ class SaleOrder ( models.Model ) :
     project_type_id = fields.Many2one ( 'account.analytic.plan' , string='Project Analytic Plan' ,
                                         compute='_compute_analytic_plan_default_id' , readonly=False )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
-                                            domain="[('plan_id', '=', project_type_id)]" , readonly=False ,
-                                            required=True , store=True )
+                                            domain="[('plan_id', '=', project_type_id)]" , readonly=False , store=True )
+                                            #required=True , store=True )
     # analytic_account_id_assigned = fields.Many2one ( 'account.analytic.plan',related='review_manager_id.analytic_plan',store=False)
     approve_uid = fields.Many2one ( 'res.users' , string='Approve User' , )
     approve_date = fields.Datetime ( string='Approve Date' )
     reject_reason = fields.Text ( string='Reject Reason' )
     broker_id = fields.Many2one ( comodel_name='res.partner' , string='Salesperson' ,
                                   domain="[('is_broker', '=', True)]" )
-    number_700_sale = fields.Char ( related='partner_id.number_700' , string="(700) الرقم الموحد" , readonly=False ,
-                                    required=True , store=True )
+    number_700_sale = fields.Char ( related='partner_id.number_700' , string="(700) الرقم الموحد" , readonly=False  , store=True )
+                                    #required=True , store=True )
     political_kyan = fields.Selection ( related='partner_id.political_kyan' , string="الكـــــيان القـــــانونـي" ,
-                                        readonly=False , required=True , store=True )
+                                        readonly=False  , store=True )
+                                       #required=True , store=True )
     manager_id_sale = fields.Integer ( related="partner_id.manager_id" , string="Manager Id" , store=True ,
                                        readonly=False )
     contact_manager_team = fields.Many2one ( comodel_name="res.users" , related="user_id" ,
@@ -1245,8 +1248,7 @@ class SaleOrder2 ( models.Model ) :
     # contract_date = fields.Date(string='Contract Date')
     audit_date = fields.Date ( string='Audit Date' )
     # account_year = fields.Integer ( string='Year' , required=True , default=lambda self : fields.Date.today ().year )
-    account_year = fields.Integer ( string='Year' , required=True , compute='compute_audit_year' , index=True ,
-                                    readonly=False )
+    account_year = fields.Integer ( string='Year' ,compute='compute_audit_year' , index=True , readonly=False )
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreement' )
     payment_ids = fields.Many2many ( 'account.payment' , string='Payments' , compute='_compute_payment_ids' )
     payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
@@ -1658,10 +1660,10 @@ class SaleOrderPrint ( models.Model ) :
     _description = 'Sale Order Print Wizard'
 
     exist_sale_ids = fields.Many2many ( 'sale.order' , string='Sale Order' , )
-    sale_id = fields.Many2one ( 'sale.order' , string='Sale Order' , required=True ,
+    sale_id = fields.Many2one ( 'sale.order' , string='Sale Order' , 
                                 domain="[('id', 'in', exist_sale_ids)]" )
     exist_report_ids = fields.Many2many ( 'product.report.template' , string='Report' , )
-    report_id = fields.Many2one ( 'product.report.template' , string='Report' , required=True ,
+    report_id = fields.Many2one ( 'product.report.template' , string='Report' ,
                                   domain="[('id', 'in', exist_report_ids)]" )
     from_crm = fields.Boolean ( string='From CRM' , default=False , store=False )
 
@@ -1694,7 +1696,8 @@ class SaleOrderPrint ( models.Model ) :
 class SaleOrderRejectWizard ( models.TransientModel ) :
     _name = 'sale.order.reject.wizard'
 
-    sale_id = fields.Many2one ( 'sale.order' , string='Sale Order' , required=True )
+    sale_id = fields.Many2one ( 'sale.order' , string='Sale Order' )
+                              # , required=True )
     reject_reason = fields.Text ( string='Reject Reason' , required=True )
 
     def action_reject(self) :
