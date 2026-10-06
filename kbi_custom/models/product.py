@@ -76,7 +76,7 @@ class ProductTemplate ( models.Model ) :
     concentration = fields.Char ( string="(أفضل خصم)التركيز" , compute="_compute_best_discount" , store=True )
     shape = fields.Char ( string="(أفضل خصم)الشكل" , compute="_compute_best_discount" , store=True )
     package_contents = fields.Char ( string="العبــوة (أفضل خصم)" , compute="_compute_best_discount" , store=True )
-    discount = fields.Char ( string="(أفضل خصم)نسبة الخصم" , compute="_compute_best_discount" , store=True )
+    discount = fields.Float ( string="(أفضل خصم)نسبة الخصم" , compute="_compute_best_discount" , store=True )
     discounts_money = fields.Float ( string="(أفضل خصم)مبلغ الخصم" , compute="_compute_best_discount" , store=True )
     unit = fields.Char ( string="(أفضل خصم)الوحدة" , compute="_compute_best_discount" , store=True )
     product_id = fields.Many2one ( 'product.product' , string='Product' , store=True )
