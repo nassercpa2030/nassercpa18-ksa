@@ -100,15 +100,14 @@ class ProductTemplate ( models.Model ) :
         string="Planning Role" ,
         help="Temporary field to prevent OWL error"
     )
-    
 
     # Merge Products #
-    def merge_duplicate_barcodes(self):
+    def merge_duplicate_barcodes(self) :
         Product = self.env['product.template']
 
-        products = Product.search([
-            ('product_barcode_new', '!=', False),
-        ])
+        products = Product.search ( [
+            ('product_barcode_new' , '!=' , False) ,
+        ] )
 
         barcode_groups = {}
 
@@ -116,37 +115,53 @@ class ProductTemplate ( models.Model ) :
         # تجميع المنتجات حسب الباركود
         # ==========================================
 
-        for product in products:
-            barcode_groups.setdefault(
-                product.product_barcode_new,
+        for product in products :
+            barcode_groups.setdefault (
+                product.product_barcode_new ,
                 Product
             )
             barcode_groups[product.product_barcode_new] |= product
 
         # ==========================================
-        # معالجة كل مجموعة باركود
+        # معالجة الباركودات المكررة فقط
         # ==========================================
 
-        for barcode, group in barcode_groups.items():
+        for barcode , group in barcode_groups.items () :
 
-            # مفيش تكرار
-            if len(group) <= 1:
+            # لو الباركود موجود على منتج واحد فقط
+            # لا نعمل أي حاجة
+            if len ( group ) <= 1 :
                 continue
 
             # ==========================================
-            # أحدث منتج هو المنتج الأساسي
+            # أكبر Discount لكل Product
             # ==========================================
 
-            group = group.sorted(
-                key=lambda p: p.create_date or '',
+            def get_max_discount(product) :
+                discounts = product.seller_ids.mapped ( 'discount' )
+                return max ( discounts or [0.0] )
+
+            # ==========================================
+            # اختيار الـ Master
+            #
+            # الأولوية:
+            # 1 - أكبر Discount
+            # 2 - لو متساوي → أحدث create_date
+            # ==========================================
+
+            group = group.sorted (
+                key=lambda p : (
+                    get_max_discount ( p ) ,
+                    p.create_date or ''
+                ) ,
                 reverse=True
             )
 
             master = group[0]
-            duplicates = group[1:]
+            duplicates = group[1 :]
 
             # ==========================================
-            # الحصول على موديل seller_ids
+            # seller_ids information
             # ==========================================
 
             seller_field = master._fields['seller_ids']
@@ -154,54 +169,54 @@ class ProductTemplate ( models.Model ) :
             inverse_name = seller_field.inverse_name
 
             # ==========================================
-            # نقل ALL seller_ids
-            # من المنتجات المكررة
+            # نقل كل seller_ids
+            # من المنتجات المكررة إلى الـ Master
             # ==========================================
 
-            for old_product in duplicates:
+            for old_product in duplicates :
 
-                for seller in old_product.seller_ids:
+                for seller in old_product.seller_ids :
 
                     vals = {}
 
                     # ==========================================
-                    # نسخ الحقول
+                    # نسخ بيانات seller
                     # ==========================================
 
-                    for field_name, field in seller._fields.items():
+                    for field_name , field in seller._fields.items () :
 
                         # --------------------------------------
                         # تجاهل حقول النظام
                         # --------------------------------------
 
                         if field_name in (
-                                'id',
-                                'create_uid',
-                                'create_date',
-                                'write_uid',
-                                'write_date',
-                        ):
+                                'id' ,
+                                'create_uid' ,
+                                'create_date' ,
+                                'write_uid' ,
+                                'write_date' ,
+                        ) :
                             continue
 
                         # --------------------------------------
-                        # تجاهل حقل ربط seller بالمنتج
+                        # تجاهل حقل الربط بالمنتج
                         # --------------------------------------
 
-                        if field_name == inverse_name:
+                        if field_name == inverse_name :
                             continue
 
                         # --------------------------------------
-                        # تجاهل جميع حقول Many2one
+                        # تجاهل كل Many2one
                         # --------------------------------------
 
-                        if field.type == 'many2one':
+                        if field.type == 'many2one' :
                             continue
 
                         # --------------------------------------
-                        # تجاهل computed و related
+                        # تجاهل computed / related
                         # --------------------------------------
 
-                        if field.compute or field.related:
+                        if field.compute or field.related :
                             continue
 
                         # --------------------------------------
@@ -211,22 +226,22 @@ class ProductTemplate ( models.Model ) :
                         vals[field_name] = seller[field_name]
 
                     # ==========================================
-                    # ربط seller بالمنتج الأساسي
+                    # ربط Seller بالـ Master
                     # ==========================================
 
                     vals[inverse_name] = master.id
 
                     # ==========================================
-                    # إنشاء seller جديد
+                    # إنشاء Seller جديد
                     # ==========================================
 
-                    seller_model.create(vals)
+                    seller_model.create ( vals )
 
             # ==========================================
             # حذف المنتجات المكررة
             # ==========================================
 
-            duplicates.unlink()
+            duplicates.unlink ()
 
         return True
 
