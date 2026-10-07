@@ -538,6 +538,24 @@ class Recruiter ( models.Model ) :
             } ,
         }
 
+    
+    ##### retrive employee time off####
+    def action_view_employee_timeoff(self) :
+        self.ensure_one ()
+
+        return {
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'Employee Time Off' ,
+            'res_model' : 'hr.leave' ,
+            'view_mode' : 'list,form' ,
+            'domain' : [
+                ('employee_ids' , 'in' , self.id) ,
+            ] ,
+            'context' : {
+                'default_employee_ids' : self.id ,
+            } ,
+        }
+
     def action_open_employee_leaves(self) :
         self.ensure_one ()
 
