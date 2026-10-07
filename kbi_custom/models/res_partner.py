@@ -489,7 +489,7 @@ class Recruiter ( models.Model ) :
     residency_visa_number = fields.Integer ( string="رقم الهوية /رقم الإقامة" , store=True )
     border_number = fields.Integer ( string="رقم  الحدود" , store=True )
     loans_count = fields.Integer ( compute='_compute_employee_counts' , )
-    payslips_count = fields.Intger ( compute='_compute_employee_counts' , )
+    payslips_count = fields.Integer ( compute='_compute_employee_counts' , )
     discount_count = fields.Intger ( compute='_compute_employee_counts' , )
     iqama_expiry_date = fields.Date ( string="تاريخ انتهاء الإقامة" , store=True )
     start_working_date = fields.Date ( string="تاريخ المباشرة" , compute="_compute_start_working_date" )
