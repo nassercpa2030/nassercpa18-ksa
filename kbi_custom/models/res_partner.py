@@ -539,14 +539,14 @@ class Recruiter ( models.Model ) :
         }
 
     
-    ##### retrive employee time off####
-    def action_view_employee_timeoff(self) :
+    ##### retrive employee payslip####
+    def action_view_employee_payslip(self) :
         self.ensure_one ()
 
         return {
             'type' : 'ir.actions.act_window' ,
-            'name' : 'Employee Time Off' ,
-            'res_model' : 'hr.leave' ,
+            'name' : 'Employee Payslips' ,
+            'res_model' : 'hr.payslip' ,
             'view_mode' : 'list,form' ,
             'domain' : [
                 ('employee_id' , '=' , self.id) ,
