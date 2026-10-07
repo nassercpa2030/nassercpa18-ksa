@@ -549,10 +549,10 @@ class Recruiter ( models.Model ) :
             'res_model' : 'hr.leave' ,
             'view_mode' : 'list,form' ,
             'domain' : [
-                ('employee_ids' , 'in' , self.id) ,
+                ('employee_id' , '=' , self.id) ,
             ] ,
             'context' : {
-                'default_employee_ids' : self.id ,
+                'default_employee_id' : self.id ,
             } ,
         }
 
