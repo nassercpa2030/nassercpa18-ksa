@@ -234,7 +234,7 @@ class HrPayslip ( models.Model ) :
                                             readonly=False ,
                                             store=False )
     vac_deduction = fields.Monetary ( string="أجازة بدون راتـب" , compute="_compute_gross_salary" , readonly=False ,
-                                        store=False )
+                                      store=False )
     other_deduction = fields.Monetary ( string="خصــومـات أخـــري" , compute="_compute_gross_salary" , readonly=False ,
                                         store=False )
 
@@ -256,8 +256,8 @@ class HrPayslip ( models.Model ) :
             rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance + rec.contract_id.l10n_sa_other_allowances
             base = rec._get_contract_wage () + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance
             ###########################################
-            leave90 = rec.worked_days_line_ids.filtered(lambda l: l.code == 'LEAVE90')
-            if leave90:
+            leave90 = rec.worked_days_line_ids.filtered ( lambda l : l.code == 'LEAVE90' )
+            if leave90 :
                 daily_wage = (
                                      rec.contract_id.wage
                                      + rec.contract_id.l10n_sa_housing_allowance
@@ -275,7 +275,7 @@ class HrPayslip ( models.Model ) :
                 rate_company = 0.1225 if rec.contract_id.x_gosi_225 else 0.1175
                 rec.gosi = base * -rate
                 rec.other_gosi = base * rate_company
-                rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction +rec.vac_deduction
+                rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction + rec.vac_deduction
 
             elif rec.employee_id.country_id.code == 'SA' and rec.contract_id.x_gosi_employee_exempt :
 
@@ -286,8 +286,6 @@ class HrPayslip ( models.Model ) :
             elif rec.employee_id.country_id.code != 'SA' :
                 rec.other_gosi = (rec._get_contract_wage () + rec.contract_id.l10n_sa_housing_allowance) * 0.02
                 rec.net_wage = rec.gross_wage - loan + rec.other_deduction + rec.vac_deduction
-
-
 
                 # rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction
             if rec.employee_id.contract_id.state == 'open' :
@@ -466,16 +464,18 @@ class Recruiter ( models.Model ) :
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
                                       placeholder="Enter Analytic Plan" )
-    old_vacance_days = fields.Float (string='رصيد أجــازات سـابق' ,compute='_compute_employee_vacance_days',readonly=False)
-    reversed_vacance_days= fields.Float (string='رصيد أجــازات باقي' ,compute='_compute_employee_vacance_days',readonly=False)
-        #compute='_compute_employee_vacance_days',readonly=False)
+    old_vacance_days = fields.Float ( string='رصيد أجــازات سـابق' , compute='_compute_employee_vacance_days' ,
+                                      readonly=False )
+    reversed_vacance_days = fields.Float ( string='رصيد أجــازات باقي' , compute='_compute_employee_vacance_days' ,
+                                           readonly=False )
+    # compute='_compute_employee_vacance_days',readonly=False)
     resumption_work_after_leave = fields.Date ( string="إستلام العـمل(بعد الإجازة)" , required=True , readonly=False ,
-                                                 )
+                                                )
     vacance_days = fields.Float ( string="عدد أيـام الإجازة" , compute='_compute_employee_vacance_days' ,
-                                  readonly=False  )
-    used_vacance_days= fields.Float ( string=" أيـام الإجازة المستخدمة" , readonly=False  )
-                                     #compute='_compute_employee_vacance_days' ,
-                                  
+                                  readonly=False )
+    used_vacance_days = fields.Float ( string=" أيـام الإجازة المستخدمة" , readonly=False )
+    # compute='_compute_employee_vacance_days' ,
+
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
                                            help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
@@ -521,6 +521,22 @@ class Recruiter ( models.Model ) :
     def _remove_recruitment_interviewers(self) :
         return True
 
+    ##### retrive employee loans####
+    def action_view_employee_loans(self) :
+        self.ensure_one ()
+
+        return {
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'Employee Loans' ,
+            'res_model' : 'hr.salary.attachment' ,
+            'view_mode' : 'list,form' ,
+            'domain' : [
+                ('employee_ids' , 'in' , self.id) ,
+            ] ,
+            'context' : {
+                'default_employee_ids' : self.id ,
+            } ,
+        }
 
     def action_open_employee_leaves(self) :
         self.ensure_one ()
@@ -545,7 +561,6 @@ class Recruiter ( models.Model ) :
             "target" : "current" ,
         }
 
-
     @api.onchange ( 'start_working_date' )
     def _onchange_start_working_date(self) :
         if not self.resumption_work_after_leave :
@@ -561,12 +576,12 @@ class Recruiter ( models.Model ) :
             if not rec.resumption_work_after_leave :
                 continue
 
-            if rec.start_working_date:
-               delta_vacance = relativedelta(today, rec.start_working_date)
-       
-            #delta_vacance = relativedelta ( today , rec.start_working_date )
-            #delta = relativedelta ( today , rec.start_working_date )
-            delta=relativedelta ( today , rec.resumption_work_after_leave )
+            if rec.start_working_date :
+                delta_vacance = relativedelta ( today , rec.start_working_date )
+
+            # delta_vacance = relativedelta ( today , rec.start_working_date )
+            # delta = relativedelta ( today , rec.start_working_date )
+            delta = relativedelta ( today , rec.resumption_work_after_leave )
             months_of_service = delta.years * 12 + delta.months
 
             # الموظف سعودي
@@ -577,14 +592,14 @@ class Recruiter ( models.Model ) :
             else :
                 annual_days = 21 if delta.years < 2 else 30
 
-              
-            if rec.resumption_work_after_leave and rec.resumption_work_after_leave >= fields.Date.from_string('2026-07-30'):
-                rec.old_vacance_days=0
-            
-            else:
-              continue
+            if rec.resumption_work_after_leave and rec.resumption_work_after_leave >= fields.Date.from_string (
+                    '2026-07-30' ) :
+                rec.old_vacance_days = 0
+
+            else :
+                continue
             # الرصيد المستحق حتى اليوم
-            rec.vacance_days =( months_of_service * (annual_days / 12))+ rec.old_vacance_days
+            rec.vacance_days = (months_of_service * (annual_days / 12)) + rec.old_vacance_days
             rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
 
     @api.depends ( 'contract_ids.date_start' )
@@ -604,7 +619,6 @@ class Recruiter ( models.Model ) :
             # rec.other_allowance = rec.contract_id.l10n_sa_other_allowances if rec.contract_id else 0.0
 
 
-
 class Recruiter ( models.Model ) :
     _inherit = 'hr.job'
     recruiter_id = fields.Many2one ( 'hr.employee' , string="Recruiter" , readonly=False )
@@ -614,10 +628,10 @@ class Recruiter ( models.Model ) :
 
 # class Recruiter ( models.Model ) :
 #     _inherit = 'hr.employee'
-# 
+#
 #     def _create_recruitment_interviewers(self) :
 #         return True
-# 
+#
 #     def _remove_recruitment_interviewers(self) :
 #         return True
 
