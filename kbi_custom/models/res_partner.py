@@ -518,7 +518,7 @@ class Recruiter ( models.Model ) :
     #             employee.request_employee_manager = employee.coach_id.id
     #             employee.parent_id = employee.coach_id.id
 
-    @api.depends ( 'id' )
+    @api.depends ( 'employee_id' )
     def _compute_employee_counts(self) :
         Loan = self.env['hr.salary.attachment']
         payslip = self.env['hr.payslip']
