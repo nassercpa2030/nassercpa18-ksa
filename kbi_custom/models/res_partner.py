@@ -488,6 +488,9 @@ class Recruiter ( models.Model ) :
     contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
     residency_visa_number = fields.Integer ( string="رقم الهوية /رقم الإقامة" , store=True )
     border_number = fields.Integer ( string="رقم  الحدود" , store=True )
+    loans_count = fields.Integer ( compute='_compute_employee_counts' , )
+    payslips_count = fields.Intger ( compute='_compute_employee_counts' , )
+    discount_count = fields.Intger ( compute='_compute_employee_counts' , )
     iqama_expiry_date = fields.Date ( string="تاريخ انتهاء الإقامة" , store=True )
     start_working_date = fields.Date ( string="تاريخ المباشرة" , compute="_compute_start_working_date" )
     passport_expiry_date = fields.Date ( string="تاريخ انتهاء الجواز" )
@@ -515,6 +518,24 @@ class Recruiter ( models.Model ) :
     #             employee.request_employee_manager = employee.coach_id.id
     #             employee.parent_id = employee.coach_id.id
 
+    @api.depends ( 'id' )
+    def _compute_employee_counts(self) :
+        Loan = self.env['hr.salary.attachment']
+        payslip = self.env['hr.payslip']
+
+        for employee in self :
+
+            # Loans
+            employee.loans_count = Loan.search_count ( [
+                ('employee_ids' , 'in' , employee.id) ,
+            ] )
+            # ==========payslip
+            employee.payslips_count = payslip.search_count ( [
+                ('employee_id' , 'in' , employee.id) ,
+
+            ] )
+
+
     def _create_recruitment_interviewers(self) :
         return True
 
@@ -538,7 +559,6 @@ class Recruiter ( models.Model ) :
             } ,
         }
 
-    
     ##### retrive employee payslip####
     def action_view_employee_payslip(self) :
         self.ensure_one ()
@@ -636,22 +656,21 @@ class Recruiter ( models.Model ) :
             # rec.housing_allowance = rec.contract_id.l10n_sa_housing_allowance if rec.contract_id else 0.0اً
             # rec.other_allowance = rec.contract_id.l10n_sa_other_allowances if rec.contract_id else 0.0
 
+    class Recruiter ( models.Model ) :
+        _inherit = 'hr.job'
+        recruiter_id = fields.Many2one ( 'hr.employee' , string="Recruiter" , readonly=False )
+        interviewer_ids = fields.Many2many ( 'hr.employee' , string="Interviewers" , readonly=False ,
+                                             domain=lambda self : [
+                                                 ('id' , 'in' , self.env['hr.employee'].sudo ().search ( [] ).ids)] )
 
-class Recruiter ( models.Model ) :
-    _inherit = 'hr.job'
-    recruiter_id = fields.Many2one ( 'hr.employee' , string="Recruiter" , readonly=False )
-    interviewer_ids = fields.Many2many ( 'hr.employee' , string="Interviewers" , readonly=False , domain=lambda self : [
-        ('id' , 'in' , self.env['hr.employee'].sudo ().search ( [] ).ids)] )
-
-
-# class Recruiter ( models.Model ) :
-#     _inherit = 'hr.employee'
-#
-#     def _create_recruitment_interviewers(self) :
-#         return True
-#
-#     def _remove_recruitment_interviewers(self) :
-#         return True
+    # class Recruiter ( models.Model ) :
+    #     _inherit = 'hr.employee'
+    #
+    #     def _create_recruitment_interviewers(self) :
+    #         return True
+    #
+    #     def _remove_recruitment_interviewers(self) :
+    #         return True
 
 
 ################## HR ATTACHMENTS###################
