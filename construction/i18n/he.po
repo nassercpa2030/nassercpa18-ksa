@@ -1,0 +1,868 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * construction
+#
+# Translators:
+# Lilach Gilliam <lilach.gilliam@gmail.com>, 2024
+# Leandro Noijovich <eliel.sorcerer@gmail.com>, 2024
+# Martin Trigaux, 2024
+# Yihya Hugirat <hugirat@gmail.com>, 2024
+# שהאב חוסיין <shhab89@gmail.com>, 2024
+# דודי מלכה <Dudimalka6@gmail.com>, 2024
+# ZVI BLONDER <ZVIBLONDER@gmail.com>, 2024
+# ExcaliberX <excaliberx@gmail.com>, 2024
+# Hed Shefer <hed@laylinetech.com>, 2024
+# Yoram Lavi, 2024
+# or balmas, 2025
+# or balmas <or@laylinetech.com>, 2025.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-10-08 12:51+0000\n"
+"PO-Revision-Date: 2025-09-28 23:00+0000\n"
+"Last-Translator: or balmas <or@laylinetech.com>\n"
+"Language-Team: Hebrew <https://translate.odoo.com/projects/odoo-18/"
+"construction/he/>\n"
+"Language: he\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n == 2) ? 1 : 2);\n"
+"X-Generator: Weblate 5.12.2\n"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"*This list will, of course, depend on your installed apps and configuration."
+msgstr "*רשימה זו תהיה, כמובן, תלויה באפליקציות המותקנות ובתצורה שלך."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"<i class=\"o_editor_banner_icon mb-3 fst-normal\" aria-label=\"Banner "
+"Info\">💡</i>"
+msgstr ""
+"<i class=\"o_editor_banner_icon mb-3 fst-normal\" aria-label=\"Banner "
+"Info\">💡</i> "
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<i class=\"o_editor_banner_icon mb-3 fst-normal\">🚀</i>"
+msgstr "<i class=\"o_editor_banner_icon mb-3 fst-normal\">🚀1</i>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<span class=\"h2-fs\"><strong>Employees 🧑‍🤝‍🧑</strong></span>"
+msgstr "<strong><span class=\"h2-fs\"> עובדים🧑‍🤝‍🧑</strong></span>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<span class=\"h2-fs\"><strong>Equipment 🛠️</strong></span>"
+msgstr "<span class=\"h2-fs\"><strong> ציוד🛠️</strong></span>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<span class=\"h2-fs\"><strong>Take care of your resources </strong></span>"
+msgstr "<span class=\"h2-fs\"><strong>שמור על המשאבים שלך</strong></span>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<span class=\"h2-fs\">Make your customers happy </span>🆘"
+msgstr "<span class=\"h2-fs\">תשמח את הלקוחות שלך</span> 🆘"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<strong><span class=\"h2-fs\">Accounting made easy 🧮</span></strong>"
+msgstr "<strong><span class=\"h2-fs\">הנהלת חשבונות קלה 🧮</span></strong>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"<strong><span class=\"h2-fs\">Create an attractive website 🌐</span></strong>"
+msgstr "<strong><span class=\"h2-fs\">צור אתר אטרקטיבי🌐</span></strong>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<strong><span class=\"h2-fs\">Fleet 🚚</span></strong>"
+msgstr "<strong><span class=\"h2-fs\">צי רכב 🚚</span></strong>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<strong><span class=\"h2-fs\">Sell product sets 🔩</span></strong>"
+msgstr "<strong><span class=\"h2-fs\">מכירת ערכות מוצרים 🔩</span></strong>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"A good work cannot be achieved without motivated and skilled employees, "
+"reliable equipment nor suitable vehicles."
+msgstr ""
+"לא ניתן להשיג עבודה טובה ללא עובדים חדורי מוטיבציה ומיומנים, ציוד אמין או "
+"רכבים מתאימים."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"A link to reach the online quotation from where the customer can confirm and"
+" sign it."
+msgstr "קישור להגעה להצעת המחיר המקוונת ממנו יוכל הלקוח לאשר ולחתום עליה."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Accurately track the project 🔍"
+msgstr "עקוב במדויק אחר הפרויקט 🔍"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"All these components will give you an accurate overview on the project "
+"profitability."
+msgstr "כל הרכיבים הללו יתנו לך סקירה מדויקת על רווחיות הפרויקט."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Amazing employees deserve amazing equipment. Make the sure all your tools are fit and well by tracking their health in the\n"
+"            <strong><font class=\"text-o-color-1\">Maintenance</font></strong> app."
+msgstr ""
+"לעובדים מדהימים מגיע ציוד מדהים. ודא שכל הכלים שלך מתאימים ותקינים על ידי מעקב אחר מצבם ב-\n"
+"אפליקציית <strong><font class=\"text-o-color-1\">תחזוקה</font></strong>."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Analytic Items ➡️ Track any cost using Analytic Items from the Accounting "
+"App"
+msgstr ""
+"פריטים אנליטיים ➡️ עקוב אחר כל עלות באמצעות פריטים אנליטיים מאפליקציית הנהלת"
+" החשבונות"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Architect"
+msgstr "אדריכל"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"As the first invoicing step, create a down payment from the sales order. This will generate the first invoice in the\n"
+"            <strong><font class=\"text-o-color-1\">Invoicing</font></strong> app. Then, schedule one or several \"Invoicing Schedule\" activities on the sales order with the aim to never forget to send an intermediary invoice in order to sustain\n"
+"            your cash flow."
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Assign the tasks to the right responsible and easily check the progress in "
+"the Kanban view."
+msgstr ""
+"הקצה את המשימות לגורם האחראי הנכון ובדקו בקלות את ההתקדמות בתצוגת קנבן."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"At any time, you can create from an opportunity a beautiful and tailor-made "
+"quotation that displays the price, the discount, the unit of measure, and "
+"the tax of each:"
+msgstr ""
+"בכל עת, ניתן ליצור מהזדמנות הצעת מחיר יפה ומותאמת אישית, המציגה את המחיר, "
+"ההנחה, יחידת המידה והמס של כל אחד:"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Basics"
+msgstr "בסיסי"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Before generating an intermediary invoice in the\n"
+"            <strong><font class=\"text-o-color-1\">Invoicing</font></strong> app, freeze the project status in the <strong><font class=\"text-o-color-1\">Project</font></strong> app to get an overview on the progress in terms of:"
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Before starting the project, make sure you have enough stock. The confirmation of the quotation also triggers the creation of a delivery in the <strong><font class=\"text-o-color-1\">Inventory</font></strong>\n"
+"            app where you can check the stock levels of each needed storable product."
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Bills of Materials"
+msgstr "עץ מוצר "
+
+#. module: construction
+#: model:product.template,name:construction.product_product_5_product_template
+msgid "Building Blocks 39x14x19cm"
+msgstr ""
+
+#. module: construction
+#: model:project.task.type,name:construction.planning_project_stage_4
+msgid "Cancelled"
+msgstr "בוטל"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Centralize all the important information 📝"
+msgstr "מרכז את כל המידע החשוב 📝"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Construction"
+msgstr "בנייה"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Create an opportunity each time you face a potential customer, receive a "
+"phone call, etc."
+msgstr ""
+"צור הזדמנות בכל פעם שאתה מתמודד עם לקוח פוטנציאלי, מקבל שיחת טלפון וכו'."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Dashboard ➡️ Your project's status at a glance."
+msgstr "לוח מחוונים ➡️ סטטוס הפרויקט שלך במבט חטוף."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Do you want to go further?"
+msgstr "האם תרצה להמשיך ?"
+
+#. module: construction
+#: model:project.task.type,name:construction.planning_project_stage_3
+msgid "Done"
+msgstr "בוצע"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Down Payment"
+msgstr "מקדמה"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"During and after the construction project, provide a five star customer service by answering the questions from your customer through the\n"
+"            <strong><font class=\"text-o-color-1\">Helpdesk</font></strong> app. All the emails sent to"
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Easily create beautiful quotations 💲"
+msgstr "צור בקלות הצעות מחיר יפות 💲"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Efficiently schedule the work 📆"
+msgstr "תזמן את העבודה ביעילות 📆"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Enrich the core apps by installing the following ones."
+msgstr "העשיר את אפליקציות הליבה על ידי התקנת האפליקציות הבאות."
+
+#. module: construction
+#: model:account.analytic.account,name:construction.account_analytic_account_2
+msgid "Field Service"
+msgstr "שירות שטח"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"For each ordered material, don't forget to fill the analytic distribution in"
+" which you will be able to set for which project it will be used."
+msgstr ""
+"עבור כל חומר שהוזמן, אל תשכח למלא את התפלגות האנליטית שבה תוכל להגדיר לאיזה "
+"פרויקט הוא ישמש."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"From WH ➡️ Deliveries from your warehouse to this specific construction site"
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"If a technical operation such as a repair is needed, directly create a task in the <strong><font class=\"text-o-color-1\">Field Service</font></strong> project from a ticket. Then assign it and schedule it to quickly solve the\n"
+"            problem. Your employee will be able to use some material to fix the issue. Then these materials and the time spent could be invoiced to the customer."
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"If the customer replies to the email, the answer is automatically logged in the chatter on the right of the screen. Thereby, all the discussions regarding the quotation, its updates, and its fine tuning are attached, and the history\n"
+"            can be easily consulted by all the involved users"
+msgstr ""
+"אם הלקוח עונה למייל, התשובה נרשמת אוטומטית בצ'אט בצד ימין של המסך. בכך מצורפים כל הדיונים בנוגע להצעת המחיר, העדכונים שלו והתאמתו וההיסטוריה\n"
+"ניתן להתייעץ בקלות על ידי כל המשתמשים המעורבים"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"If the stock levels are too low, resupply the materials from the\n"
+"            <strong><font class=\"text-o-color-1\">Purchase</font></strong> app by creating a purchase order linked to the right vendor. In the <strong><font class=\"text-o-color-1\">Contact</font></strong> app, you can easily manage all your\n"
+"            preferred vendors and don't hesitate to set a warning to remind if there is a minimum amount to get free transport costs."
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"If you want to push your quotation building much further and add all the "
+"power of Spreadsheet beneath any line of your Sales Orders, use the quote "
+"calculation feature."
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"If your country benefits from a tax rebate under certain conditions, you can"
+" easily apply it to your entire quotation by creating a fiscal position that"
+" will automatically replace the default tax rate by the reduced one"
+msgstr ""
+"אם המדינה שלך נהנית מהנחת מס בתנאים מסוימים, תוכל להחיל אותה בקלות על כל "
+"הצעת המחיר שלך על ידי יצירת עמדה פיסקלית שתחליף אוטומטית את שיעור המס המופחת"
+" בשיעור המופחת."
+
+#. module: construction
+#: model:project.task.type,name:construction.planning_project_stage_2
+msgid "In Progress"
+msgstr "בתהליך"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Increase you visibility and get more leads by creating a beautiful\n"
+"            <strong><font class=\"text-o-color-1\">Website</font></strong>! When a potential customer sends a request through the contact form, it could automatically create an opportunity in the\n"
+"            <strong><font class=\"text-o-color-1\">CRM</font></strong> app."
+msgstr ""
+
+#. module: construction
+#: model:account.analytic.account,name:construction.account_analytic_account_1
+#: model:project.project,name:construction.project_project_1
+#: model:project.task.type,name:construction.internal_project_default_stage
+msgid "Internal"
+msgstr "פנימי"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Invoice at the right time 📈"
+msgstr " צור חשבונית בזמן הנכון 📈"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Invoices"
+msgstr "חשבוניות"
+
+#. module: construction
+#: model:mail.activity.type,name:construction.mail_activity_type_20
+msgid "Invoicing Schedule"
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Keep an eye on materials 📦"
+msgstr "שימו עין על חומרים 📦"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Know the skills of each employee by filling them in the\n"
+"            <strong><font class=\"text-o-color-1\">Employees</font></strong> app. This will help you to find the right person to make a good work."
+msgstr ""
+
+#. module: construction
+#: model:product.template,name:construction.product_product_8_product_template
+msgid "Labor hour with equipment"
+msgstr "שעת עבודה עם ציוד"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Make your customers happy 🆘"
+msgstr "הפוך לקוחות למרוצים  🆘"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Manage your vehicles in the\n"
+"            <strong><font class=\"text-o-color-1\">Fleet</font></strong> app."
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Manufacturing Orders"
+msgstr "הוראות ייצור"
+
+#. module: construction
+#: model:product.template,name:construction.product_product_6_product_template
+msgid "Masonry mortar 25kg"
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Material that will be used to build the project."
+msgstr "חומר שישמש לבניית הפרויקט."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Materials purchased."
+msgstr "חומרים שנרכשו."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Materials sold."
+msgstr "חומרים שנמכרו."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Never miss an opportunity 🎯"
+msgstr "לעולם אל תפספס הזדמנות 🎯"
+
+#. module: construction
+#: model:project.task.type,name:construction.planning_project_stage_0
+msgid "New"
+msgstr "חדש"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Odoo empowers you to manage every aspect of your construction projects "
+"effortlessly and efficiently, and its integrated applications ensure "
+"unparalleled success and client satisfaction."
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Of course, feel free to create all the products you use often. This will "
+"save you time when preparing when preparing your next quotations."
+msgstr ""
+"כמובן, אל תהסס ליצור את כל המוצרים שבהם אתה משתמש לעתים קרובות. זה יחסוך לך "
+"זמן בעת ​​הכנה בעת הכנת הצעות המחיר הבאות שלך."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Of course, these default tasks can be adapted in the Project Template "
+"according to your personal way of managing a construction project."
+msgstr ""
+"כמובן שניתן להתאים משימות ברירת מחדל אלו בתבנית הפרויקט בהתאם להעדפה האישית "
+"שלכם לניהול פרויקט בנייה."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Once confirmed, the quotation becomes a sales order. All quotations and "
+"sales orders are centralized in the <strong><font class=\"text-o-"
+"color-1\">Sales</font></strong> app."
+msgstr ""
+"לאחר אישור, הצעת המחיר הופכת להזמנת מכירה. כל הצעות המחיר והזמנות המכירה "
+"מרוכזות באפליקציית <strong><font class=\"text-o-"
+"color-1\">המכירות</font></strong>."
+
+#. module: construction
+#: model:uom.uom,name:construction.uom_uom_28
+msgid "Pallet of 48"
+msgstr "משטח של 48"
+
+#. module: construction
+#: model:uom.uom,name:construction.uom_uom_27
+msgid "Pallet of 96"
+msgstr "משטח של 96"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Planification"
+msgstr "תכנון"
+
+#. module: construction
+#: model:project.task.type,name:construction.planning_project_stage_1
+msgid "Planned"
+msgstr "מתוכנן"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Planning"
+msgstr "תכנון"
+
+#. module: construction
+#: model:account.analytic.account,name:construction.account_analytic_account_3
+#: model:project.project,name:construction.project_project_3
+msgid "Project Template"
+msgstr "תבנית פרויקט"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Purchase Orders"
+msgstr "הזמנות רכש"
+
+#. module: construction
+#: model:hr.job,name:construction.hr_job_1
+msgid "Qualified Worker"
+msgstr "עובד מוסמך"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Quickly start the construction projects 🏗️"
+msgstr "התחל במהירות את פרויקטי הבנייה 🏗️"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Receipt"
+msgstr "קבלה"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Record the time spent by your employees on each project by using the\n"
+"            <strong><font class=\"text-o-color-1\">Timesheets</font></strong> app. Don't forget to define a hourly cost on the employee form."
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Redirect the emails sent to"
+msgstr "הפנה מחדש את המיילים שנשלחו אל"
+
+#. module: construction
+#: model:account.analytic.account,name:construction.account_analytic_account_4
+#: model:project.project,name:construction.project_project_4
+msgid "S00001 - VDK Project"
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Sales Orders"
+msgstr "הזמנות לקוח"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Save time by directly sending the quotation by email to your customer. The "
+"personalized email provides:"
+msgstr ""
+"חסוך זמן על ידי שליחת הצעת המחיר ישירות למייל ללקוח שלך. האימייל המותאם "
+"אישית מספק:"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Schedule a demo"
+msgstr "קבע דמו"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Service such as labor hours, traveling costs, etc."
+msgstr "שירות כגון שעות עבודה, עלויות נסיעה וכו'."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Speed up the signing process thanks to the\n"
+"            <strong><font class=\"text-o-color-1\">Sign</font></strong> app. Once again, all the signed documents will be stored in the <strong><font class=\"text-o-color-1\">Documents</font></strong> app."
+msgstr ""
+
+#. module: construction
+#: model:product.template,description_sale:construction.product_product_5_product_template
+msgid ""
+"Standard gray concrete block, hollow, 39x14x19 cm, for all load-bearing and "
+"non-load-bearing masonry, indoors and outdoors. This concrete block meets "
+"the strict quality requirements of the BENOR label."
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Starting a construction project implies a lot of important documents such as contracts, building plans, instructions for use, subcontracting agreements, etc. Instead of scattering them in your emails, storage services or computer,\n"
+"            attach them in the chatter and they will be automatically centralized in the\n"
+"            <strong><font class=\"text-o-color-1\">Documents</font></strong> app."
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Take advantage of every opportunity. The <strong><font class=\"text-o-color-1\">CRM</font></strong> centralizes everything and allows you to ensure the follow-up of each request efficiently. If the request becomes concrete, create the\n"
+"            customer in the <strong><font class=\"text-o-color-1\">Contact</font></strong> app."
+msgstr ""
+
+#. module: construction
+#: model:project.project,label_tasks:construction.project_project_1
+#: model:project.project,label_tasks:construction.project_project_3
+#: model:project.project,label_tasks:construction.project_project_4
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Tasks"
+msgstr "משימות"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Thanks to the invoicing policy set on delivered quantities, the generated "
+"invoice is always the reflect of the reality on the field and it is fair for"
+" the customer."
+msgstr ""
+"הודות למדיניות החיוב שנקבעה על כמויות שנמסרו, החשבונית המופקת היא תמיד משקפת"
+" המציאות בשטח והיא הוגנת עבור הלקוח."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"The <font class=\"text-o-color-1\"> <strong>CRM</strong> </font> application"
+" allows you to collect requests from your potential customers by aggregating"
+" several sources:"
+msgstr ""
+"אפליקציית<font class=\"text-o-color-1\"><strong> ניהול קשרי הלקוחות "
+"</strong></font>מאפשרת לך לאסוף בקשות מהלקוחות הפוטנציאליים שלך על ידי צבירת"
+" מספר מקורות:"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "The customer reminders."
+msgstr "תזכורות לקוח."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "The financial reporting."
+msgstr "דו\"ח פיננסי."
+
+#. module: construction
+#: model:product.template,description_sale:construction.product_product_6_product_template
+msgid ""
+"The prepared mortar is a dry, industrially premixed masonry mortar in "
+"strength class M5. The mortar is mainly designed for load-bearing and non-"
+"load-bearing masonry."
+msgstr ""
+"הטיט המוכן הינו טיט בנייה יבש, מעורב תעשייתי מראש, בדרגת חוזק M5. הטיט מיועד"
+" בעיקר לבנייה נושאת ולא נושאת."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"The quotation confirmation automatically triggers the creation of a "
+"dedicated project in the... <strong><font class=\"text-o-"
+"color-1\">Project</font></strong> app! Each project is initiated with "
+"several default tasks, such as:"
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "The quotation in PDF format"
+msgstr "הצעת מחיר זו היא בפורמט PDF"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "The synchronisation with the banks."
+msgstr "הסנכרון עם הבנקים."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "The vendor bills payment."
+msgstr "תשלום חשבוניות ספק."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"This industry is tailor-made for construction businesses that excel in managing construction projects. It encompasses the crucial stages of project conceptualization, accurate quotation(s), seamless project kick-off, meticulous\n"
+"            planning, streamlined (re)supply, flawless execution, effective collaboration with third parties, meticulous budget follow-up, prompt invoicing, and exceptional customer service."
+msgstr ""
+"ענף זה מותאם לעסקי בנייה המצטיינים בניהול פרויקטי בנייה. הוא מקיף את השלבים המכריעים של המשגה של הפרויקט, הצעות מחיר מדויקות, פתיחת פרויקט חלקה, קפדנית\n"
+"תכנון, אספקה ​​(מחדש) יעילה, ביצוע ללא רבב, שיתוף פעולה יעיל עם צדדים שלישיים, מעקב תקציבי קפדני, הפקת חשבוניות מהירה ושירות לקוחות יוצא דופן."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Time spent on the project."
+msgstr "זמן שהושקע בפרויקט."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Timesheets"
+msgstr "דיווחי שעות"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "To WH ➡️ Products sent back to your warehouse"
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"To ease the quotation of usually sold together, the\n"
+"            <strong><font class=\"text-o-color-1\">Manufacturing</font></strong> app allows you to create kits. These can contain several products. When added in a quotation, the kits is displayed as a single line but the delivery order displays\n"
+"            all the components to pick up."
+msgstr ""
+
+#. module: construction
+#: model:product.template,name:construction.product_product_7_product_template
+msgid "Travelling costs"
+msgstr "עלויות נסיעה"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Use the <strong><font class=\"text-o-color-1\">Accounting</font></strong> "
+"app to easily handle:"
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Use the <strong><font class=\"text-o-color-1\">Planning</font></strong> app to organize the work of your employees. Define on which project and when they have to work. Easily manage shift conflicts, workload and replacements in case\n"
+"            of leaves."
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Use the Website app to create a contact form that will redirect all the "
+"requests to the <strong><font class=\"text-o-color-1\">CRM</font></strong>."
+msgstr ""
+"השתמש באפליקציית האתר כדי ליצור טופס יצירת קשר שיפנה את כל הבקשות "
+"ל-<strong><font class=\"text-o-color-1\"> ניהול קשרי לקוחות</font></strong>."
+
+#. module: construction
+#: model_terms:web_tour.tour,rainbow_man_message:construction.knowledge_tour
+msgid "Welcome! Happy exploring."
+msgstr "ברוכים הבאים! חקר שמח."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Work"
+msgstr "עבודה"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Would you like to discuss your Odoo setup with us or go even further?"
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"You can adapt your overview for each project by selecting the small \"Sliders\" icon at the top right of your screen. It will allow you to add a bunch of practical views to get the complete overview of your project,\n"
+"                    including*:"
+msgstr ""
+"אתה יכול להתאים את הסקירה הכללית שלך לכל פרויקט על ידי בחירה בסמל הקטן \"מחוונים\" בפינה השמאלית העליונה של המסך. זה יאפשר לך להוסיף חבורה של תצוגות מעשיות כדי לקבל את הסקירה המלאה של הפרויקט שלך,\n"
+"לְרַבּוֹת*:"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"You can add other views with specific filters and ease your construction "
+"project follow-up."
+msgstr ""
+"אתה יכול להוסיף תצוגות אחרות עם מסננים ספציפיים ולהקל על מעקב אחר פרויקט "
+"הבנייה שלך."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "help@industry-construction.odoo.com"
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "info@my-construction-business.com"
+msgstr "info@my-construction-business.com"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "to the <strong><font class=\"text-o-color-1\">CRM</font></strong>."
+msgstr ""
+"ל-<strong><font class=\"text-o-color-1\">ניהול קשרי לקוחות</font></strong>."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "will create a ticket that can be assigned to ensure the follow-up."
+msgstr "תיצור כרטיס שניתן להקצות כדי להבטיח את המעקב."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Accounting"
+msgstr "🎓 הנהלת חשבונות"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Activities"
+msgstr "🎓 פעילויות"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 CRM"
+msgstr "🎓 ניהול קשרי לקוחות( CRM)"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Documents"
+msgstr "🎓 מסמכים"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Employees"
+msgstr "🎓 עובדים"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Field Service"
+msgstr "🎓 שירות שטח"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Fiscal Positions"
+msgstr ""
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Fleet"
+msgstr "🎓 צי רכב"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Helpdesk"
+msgstr "🎓 מוקד תמיכה"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Inventory"
+msgstr "🎓 מלאי"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Invoicing"
+msgstr "🎓 חשבוניות "
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Maintenance"
+msgstr "🎓 תחזוקה"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Manufacturing"
+msgstr "🎓 ייצור"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Project"
+msgstr "🎓 פרויקט"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Purchase"
+msgstr "🎓 רכש"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Sign"
+msgstr "🎓 חתימה"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Timesheets"
+msgstr "🎓 דיווחי שעות"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Website"
+msgstr "🎓אתר אינטרנט"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓Sales"
+msgstr "🎓 מכירות"

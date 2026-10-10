@@ -1,0 +1,870 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* construction
+# 
+# Translators:
+# Tiffany Chang, 2024
+# Martin Trigaux, 2024
+# Wil Odoo, 2024
+# Odoo哥 <vnsoft.he@gmail.com>, 2024
+# Raymond Yu <cl_yu@hotmail.com>, 2024
+# Chloe Wang, 2024
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-10-08 12:51+0000\n"
+"PO-Revision-Date: 2024-09-27 12:51+0000\n"
+"Last-Translator: Chloe Wang, 2024\n"
+"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"*This list will, of course, depend on your installed apps and configuration."
+msgstr "“当然，这份清单取决于你已安装的应用及配置。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"<i class=\"o_editor_banner_icon mb-3 fst-normal\" aria-label=\"Banner "
+"Info\">💡</i>"
+msgstr "<i class=\"o_editor_banner_icon mb-3 fst-normal\" aria-label=\"横幅信息 \">💡</i>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<i class=\"o_editor_banner_icon mb-3 fst-normal\">🚀</i>"
+msgstr "<i class=\"o_editor_banner_icon mb-3 fst-normal\">🚀</i>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<span class=\"h2-fs\"><strong>Employees 🧑‍🤝‍🧑</strong></span>"
+msgstr "<span class=\"h2-fs\"><strong>员工 🧑‍🤝‍🧑</strong></span>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<span class=\"h2-fs\"><strong>Equipment 🛠️</strong></span>"
+msgstr "<span class=\"h2-fs\"><strong>设备及器才 🛠️</strong></span>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<span class=\"h2-fs\"><strong>Take care of your resources </strong></span>"
+msgstr "<span class=\"h2-fs\"><strong>保护资源 </strong></span>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<span class=\"h2-fs\">Make your customers happy </span>🆘"
+msgstr "<span class=\"h2-fs\">让客户满意</span>🆘"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<strong><span class=\"h2-fs\">Accounting made easy 🧮</span></strong>"
+msgstr "<strong><span class=\"h2-fs\">轻松进行会计核算 🧮</span></strong>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"<strong><span class=\"h2-fs\">Create an attractive website 🌐</span></strong>"
+msgstr "<strong><span class=\"h2-fs\">制作吸引人的网站 🌐</span></strong>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<strong><span class=\"h2-fs\">Fleet 🚚</span></strong>"
+msgstr "<strong><span class=\"h2-fs\">车队 🚚</span></strong>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<strong><span class=\"h2-fs\">Sell product sets 🔩</span></strong>"
+msgstr "<strong><span class=\"h2-fs\">销售产品套装 🔩</span></strong>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"A good work cannot be achieved without motivated and skilled employees, "
+"reliable equipment nor suitable vehicles."
+msgstr "没有积极主动、技术娴熟的员工，没有可靠的设备，也没有合适的车辆，就不可能完成出色的工作。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"A link to reach the online quotation from where the customer can confirm and"
+" sign it."
+msgstr "访问在线报价的链接，客户可以从中确认并签名。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Accurately track the project 🔍"
+msgstr "准确追踪项目🔍"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"All these components will give you an accurate overview on the project "
+"profitability."
+msgstr "所有这些组件将为您提供项目盈利能力的准确概览。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Amazing employees deserve amazing equipment. Make the sure all your tools are fit and well by tracking their health in the\n"
+"            <strong><font class=\"text-o-color-1\">Maintenance</font></strong> app."
+msgstr ""
+"优秀员工配得上优秀设备。通过<strong><font class=\"text-o-color-1\">维护</font></strong>应用程序跟踪工具的健康状况\n"
+"            确保所有工具都健康良好。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Analytic Items ➡️ Track any cost using Analytic Items from the Accounting "
+"App"
+msgstr "分析项目 ➡️ 使用会计应用程序中的分析项目跟踪任何成本"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Architect"
+msgstr "建筑师"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"As the first invoicing step, create a down payment from the sales order. This will generate the first invoice in the\n"
+"            <strong><font class=\"text-o-color-1\">Invoicing</font></strong> app. Then, schedule one or several \"Invoicing Schedule\" activities on the sales order with the aim to never forget to send an intermediary invoice in order to sustain\n"
+"            your cash flow."
+msgstr ""
+"作为开票的第一步，从销售订单中创建首付款。这将在\n"
+"            <strong><font class=\"text-o-color-1\">开票</font></strong>应用程序中生成第一张发票。然后，在销售订单上安排一个或多个 “开票计划 ”活动，目的是永远不要忘记发送中间发票，以维持\n"
+"            现金流."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Assign the tasks to the right responsible and easily check the progress in "
+"the Kanban view."
+msgstr "将任务分配给合适的负责人，并在看板视图中轻松查看进度."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"At any time, you can create from an opportunity a beautiful and tailor-made "
+"quotation that displays the price, the discount, the unit of measure, and "
+"the tax of each:"
+msgstr "您可以随时根据商机创建一份精美的定制报价单，显示价格、折扣、计量单位和每项税费："
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Basics"
+msgstr "基础"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Before generating an intermediary invoice in the\n"
+"            <strong><font class=\"text-o-color-1\">Invoicing</font></strong> app, freeze the project status in the <strong><font class=\"text-o-color-1\">Project</font></strong> app to get an overview on the progress in terms of:"
+msgstr ""
+"在 <strong><font class=\"text-o-"
+"color-1\">开票</font></strong>应用程序中生成中间发票之前，请在<strong><font class=\"text-o-"
+"color-1\">项目</font></strong>应用程序中冻结项目状态，以便全面了解以下方面的进展情况："
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Before starting the project, make sure you have enough stock. The confirmation of the quotation also triggers the creation of a delivery in the <strong><font class=\"text-o-color-1\">Inventory</font></strong>\n"
+"            app where you can check the stock levels of each needed storable product."
+msgstr ""
+"开始项目前，确保您有足够的库存。报价确认也会触发在<strong><font class=\"text-o-color-1\">库存</font></strong>\n"
+"            应用程序中创建交付，您可以在该应用程序中检查每种需要的可储存产品的库存水平."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Bills of Materials"
+msgstr "物料清单"
+
+#. module: construction
+#: model:product.template,name:construction.product_product_5_product_template
+msgid "Building Blocks 39x14x19cm"
+msgstr "积木 39x14x19cm"
+
+#. module: construction
+#: model:project.task.type,name:construction.planning_project_stage_4
+msgid "Cancelled"
+msgstr "已取消"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Centralize all the important information 📝"
+msgstr "集中管理所有重要信息📝"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Construction"
+msgstr "施工"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Create an opportunity each time you face a potential customer, receive a "
+"phone call, etc."
+msgstr "每次面对潜在客户、接到电话等，都要创造机会。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Dashboard ➡️ Your project's status at a glance."
+msgstr "仪表板 ➡️ 您的项目状态一目了然。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Do you want to go further?"
+msgstr "想再进一步吗？"
+
+#. module: construction
+#: model:project.task.type,name:construction.planning_project_stage_3
+msgid "Done"
+msgstr "已完成"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Down Payment"
+msgstr "预付款"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"During and after the construction project, provide a five star customer service by answering the questions from your customer through the\n"
+"            <strong><font class=\"text-o-color-1\">Helpdesk</font></strong> app. All the emails sent to"
+msgstr ""
+"在施工期间和施工结束后，提供五星级客户服务，通过\n"
+"            <strong><font class=\"text-o-color-1\">服务台</font></strong>应用程序。所有发送到"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Easily create beautiful quotations 💲"
+msgstr "轻松创建精美报价单💲"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Efficiently schedule the work 📆"
+msgstr "高效安排工作📆"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Enrich the core apps by installing the following ones."
+msgstr "安装以下应用程序，丰富核心应用程序."
+
+#. module: construction
+#: model:account.analytic.account,name:construction.account_analytic_account_2
+msgid "Field Service"
+msgstr "现场服务"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"For each ordered material, don't forget to fill the analytic distribution in"
+" which you will be able to set for which project it will be used."
+msgstr "对于每种订购的材料，不要忘记填写分析分布，您可以在其中设置该材料将用于哪个项目."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"From WH ➡️ Deliveries from your warehouse to this specific construction site"
+msgstr "来自 WH ➡️ 从贵公司仓库向该特定建筑工地交货"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"If a technical operation such as a repair is needed, directly create a task in the <strong><font class=\"text-o-color-1\">Field Service</font></strong> project from a ticket. Then assign it and schedule it to quickly solve the\n"
+"            problem. Your employee will be able to use some material to fix the issue. Then these materials and the time spent could be invoiced to the customer."
+msgstr ""
+"如果需要进行维修等技术操作，可直接在 <strong><font class=\"text-o-color-1\">现场服务</font></strong> 项目中根据工单创建任务。然后分配并安排任务，以快速解决\n"
+"            问题。 您的员工可以使用一些材料来解决问题。然后，这些材料和花费的时间就可以向客户开具发票."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"If the customer replies to the email, the answer is automatically logged in the chatter on the right of the screen. Thereby, all the discussions regarding the quotation, its updates, and its fine tuning are attached, and the history\n"
+"            can be easily consulted by all the involved users"
+msgstr ""
+"如果客户回复电子邮件，答案会自动记录在屏幕右方的聊天窗口内。因此，所有关于报价、报价单更新及微调的讨论，都会全部记下，\n"
+"            所有相关用户都可以轻松查阅历程记录"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"If the stock levels are too low, resupply the materials from the\n"
+"            <strong><font class=\"text-o-color-1\">Purchase</font></strong> app by creating a purchase order linked to the right vendor. In the <strong><font class=\"text-o-color-1\">Contact</font></strong> app, you can easily manage all your\n"
+"            preferred vendors and don't hesitate to set a warning to remind if there is a minimum amount to get free transport costs."
+msgstr ""
+"如果库存水平过低，请通过\n"
+"            <strong><font class=\"text-o-color-1\">采购</font></strong> 应用程序创建与正确供应商关联的采购订单进行补货。在 <strong><font class=\"text-o-color-1\">联系人</font></strong> 应用程序中，您可以轻松管理所有首选供应商\n"
+"            并且可方便设置警告，提醒是否有最低数量要求才能获得免费。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"If you want to push your quotation building much further and add all the "
+"power of Spreadsheet beneath any line of your Sales Orders, use the quote "
+"calculation feature."
+msgstr "如果您想更进一步建立报价单，并在销售订单的任何一行下添加电子表格的所有功能，请使用报价计算功能。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"If your country benefits from a tax rebate under certain conditions, you can"
+" easily apply it to your entire quotation by creating a fiscal position that"
+" will automatically replace the default tax rate by the reduced one"
+msgstr ""
+"如果您所在的国家/地区在某些条件下可享受退税，您可以通过创建一个财务规则，轻松地将退税应用到您的整个报价。该财务规则将自动套用较低税率，替换默认税率"
+
+#. module: construction
+#: model:project.task.type,name:construction.planning_project_stage_2
+msgid "In Progress"
+msgstr "进行中"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Increase you visibility and get more leads by creating a beautiful\n"
+"            <strong><font class=\"text-o-color-1\">Website</font></strong>! When a potential customer sends a request through the contact form, it could automatically create an opportunity in the\n"
+"            <strong><font class=\"text-o-color-1\">CRM</font></strong> app."
+msgstr ""
+"创建精美的网站，提高您的知名度并获得更多潜在客户\n"
+"            <strong><font class=\"text-o-color-1\">潜在客户</font></strong>！当有潜在客户通过联系表单发送请求时，系统可自动在\n"
+"            <strong><font class=\"text-o-color-1\">客户关系</font></strong>应用程序中，创建销售机会。"
+
+#. module: construction
+#: model:account.analytic.account,name:construction.account_analytic_account_1
+#: model:project.project,name:construction.project_project_1
+#: model:project.task.type,name:construction.internal_project_default_stage
+msgid "Internal"
+msgstr "内部"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Invoice at the right time 📈"
+msgstr "适时开具发票📈"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Invoices"
+msgstr "发票"
+
+#. module: construction
+#: model:mail.activity.type,name:construction.mail_activity_type_20
+msgid "Invoicing Schedule"
+msgstr "开具发票时间表"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Keep an eye on materials 📦"
+msgstr "关注材料 📦"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Know the skills of each employee by filling them in the\n"
+"            <strong><font class=\"text-o-color-1\">Employees</font></strong> app. This will help you to find the right person to make a good work."
+msgstr ""
+"在<strong><font class=\"text-o-color-1\">员工</font></strong>应用程序中\n"
+"            填写每位员工的技能，了解他们的技能。这将有助于你找到合适的人选，从而做好工作。"
+
+#. module: construction
+#: model:product.template,name:construction.product_product_8_product_template
+msgid "Labor hour with equipment"
+msgstr "设备工时"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Make your customers happy 🆘"
+msgstr "让客户满意 🆘"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Manage your vehicles in the\n"
+"            <strong><font class=\"text-o-color-1\">Fleet</font></strong> app."
+msgstr ""
+"管理您的车辆在\n"
+"            <strong><font class=\"text-o-color-1\">车队</font></strong>应用程序中."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Manufacturing Orders"
+msgstr "制造订单"
+
+#. module: construction
+#: model:product.template,name:construction.product_product_6_product_template
+msgid "Masonry mortar 25kg"
+msgstr "砌筑砂浆 25 千克"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Material that will be used to build the project."
+msgstr "用于建设项目的材料."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Materials purchased."
+msgstr "已采购物料。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Materials sold."
+msgstr "已售出物料。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Never miss an opportunity 🎯"
+msgstr "机不可失 🎯"
+
+#. module: construction
+#: model:project.task.type,name:construction.planning_project_stage_0
+msgid "New"
+msgstr "新建"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Odoo empowers you to manage every aspect of your construction projects "
+"effortlessly and efficiently, and its integrated applications ensure "
+"unparalleled success and client satisfaction."
+msgstr "Odoo 使您能够毫不费力、高效地管理建筑项目的方方面面，其集成应用程序可确保无与伦比的成功和客户满意度。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Of course, feel free to create all the products you use often. This will "
+"save you time when preparing when preparing your next quotations."
+msgstr "当然，您也可以创建您经常使用的所有产品。这将为您在准备下一次报价时节省时间。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Of course, these default tasks can be adapted in the Project Template "
+"according to your personal way of managing a construction project."
+msgstr "当然，这些默认任务可以在项目模板中根据个人管理建筑项目的方式进行调整。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Once confirmed, the quotation becomes a sales order. All quotations and "
+"sales orders are centralized in the <strong><font class=\"text-o-"
+"color-1\">Sales</font></strong> app."
+msgstr ""
+"一经确认，报价单即成为销售订单。所有报价单和销售订单都集中在<strong><font class=\"text-o-"
+"color-1\">销售</font></strong> 应用程序中."
+
+#. module: construction
+#: model:uom.uom,name:construction.uom_uom_28
+msgid "Pallet of 48"
+msgstr "48 件货板装"
+
+#. module: construction
+#: model:uom.uom,name:construction.uom_uom_27
+msgid "Pallet of 96"
+msgstr "96 件货板装"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Planification"
+msgstr "规划"
+
+#. module: construction
+#: model:project.task.type,name:construction.planning_project_stage_1
+msgid "Planned"
+msgstr "已安排"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Planning"
+msgstr "计划"
+
+#. module: construction
+#: model:account.analytic.account,name:construction.account_analytic_account_3
+#: model:project.project,name:construction.project_project_3
+msgid "Project Template"
+msgstr "项目模板"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Purchase Orders"
+msgstr "采购订单"
+
+#. module: construction
+#: model:hr.job,name:construction.hr_job_1
+msgid "Qualified Worker"
+msgstr "合格员工"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Quickly start the construction projects 🏗️"
+msgstr "快速启动建设项目️🏗️"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Receipt"
+msgstr "收货"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Record the time spent by your employees on each project by using the\n"
+"            <strong><font class=\"text-o-color-1\">Timesheets</font></strong> app. Don't forget to define a hourly cost on the employee form."
+msgstr ""
+"使用<strong><font class=\"text-o-color-1\">时间表</font></strong>应用程序\n"
+"            记录员工在每个项目上花费的时间。不要忘记在员工表格中定义小时成本."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Redirect the emails sent to"
+msgstr "重定向邮件发送至"
+
+#. module: construction
+#: model:account.analytic.account,name:construction.account_analytic_account_4
+#: model:project.project,name:construction.project_project_4
+msgid "S00001 - VDK Project"
+msgstr "S00001 - VDK 项目"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Sales Orders"
+msgstr "销售订单"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Save time by directly sending the quotation by email to your customer. The "
+"personalized email provides:"
+msgstr "通过电子邮件直接向客户发送报价单，节省时间。个性化电子邮件可提供:"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Schedule a demo"
+msgstr "安排演示"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Service such as labor hours, traveling costs, etc."
+msgstr "服务，如工时、差旅费等."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Speed up the signing process thanks to the\n"
+"            <strong><font class=\"text-o-color-1\">Sign</font></strong> app. Once again, all the signed documents will be stored in the <strong><font class=\"text-o-color-1\">Documents</font></strong> app."
+msgstr ""
+"<strong><font class=\"text-o-color-1\">签名</font></strong>应用程序\n"
+"            加快签名流程。同样，所有已签署的文件都将存储在<strong><font class=\"text-o-color-1\">文档</font></strong>应用程序中."
+
+#. module: construction
+#: model:product.template,description_sale:construction.product_product_5_product_template
+msgid ""
+"Standard gray concrete block, hollow, 39x14x19 cm, for all load-bearing and "
+"non-load-bearing masonry, indoors and outdoors. This concrete block meets "
+"the strict quality requirements of the BENOR label."
+msgstr "标准灰色空心混凝土砌块，39x14x19 cm，适用于室内外所有承重和非承重砌体。这种混凝土砌块符合 BENOR 标签的严格质量要求。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Starting a construction project implies a lot of important documents such as contracts, building plans, instructions for use, subcontracting agreements, etc. Instead of scattering them in your emails, storage services or computer,\n"
+"            attach them in the chatter and they will be automatically centralized in the\n"
+"            <strong><font class=\"text-o-color-1\">Documents</font></strong> app."
+msgstr ""
+"开展建筑项目时，会有很多重要文件，例如合约、建筑图纸、使用指示、分包协议等。与其让大量文件分散在不同电邮、储存服务及电脑内，\n"
+"            您应将文件附加至聊天视窗，而系统会自动将所有文件，集中在\n"
+"            <strong><font class=\"text-o-color-1\">文件管理</font></strong>应用程序内处理。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Take advantage of every opportunity. The <strong><font class=\"text-o-color-1\">CRM</font></strong> centralizes everything and allows you to ensure the follow-up of each request efficiently. If the request becomes concrete, create the\n"
+"            customer in the <strong><font class=\"text-o-color-1\">Contact</font></strong> app."
+msgstr ""
+"把握每次销售机会。利用<strong><font class=\"text-o-color-1\">客户关系</font></strong>应用程式集中所有资料，确保您能有效率地跟进每项要求。如果请求变得具体，\n"
+"            可在<strong><font class=\"text-o-color-1\">联系人</font></strong>应用程式中建立客户。"
+
+#. module: construction
+#: model:project.project,label_tasks:construction.project_project_1
+#: model:project.project,label_tasks:construction.project_project_3
+#: model:project.project,label_tasks:construction.project_project_4
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Tasks"
+msgstr "任务"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Thanks to the invoicing policy set on delivered quantities, the generated "
+"invoice is always the reflect of the reality on the field and it is fair for"
+" the customer."
+msgstr "由于根据交付数量设定了开票政策，生成的发票总是反映现场的实际情况，对客户来说也是公平的。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"The <font class=\"text-o-color-1\"> <strong>CRM</strong> </font> application"
+" allows you to collect requests from your potential customers by aggregating"
+" several sources:"
+msgstr ""
+"通过<font class=\"text-o-"
+"color-1\"><strong>客户关系管理</strong></font>应用程序，您可以汇总多个来源，收集潜在客户的请求："
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "The customer reminders."
+msgstr "客户提醒。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "The financial reporting."
+msgstr "财务报告。"
+
+#. module: construction
+#: model:product.template,description_sale:construction.product_product_6_product_template
+msgid ""
+"The prepared mortar is a dry, industrially premixed masonry mortar in "
+"strength class M5. The mortar is mainly designed for load-bearing and non-"
+"load-bearing masonry."
+msgstr "配制好的砂浆是一种干燥的行业预拌砌筑砂浆，强度等级为 M5。该砂浆主要用于承重和非承重砌体。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"The quotation confirmation automatically triggers the creation of a "
+"dedicated project in the... <strong><font class=\"text-o-"
+"color-1\">Project</font></strong> app! Each project is initiated with "
+"several default tasks, such as:"
+msgstr ""
+"报价确认会在<strong><font class=\"text-o-"
+"color-1\">项目</font></strong>应用程序中自动触发一个特定项目的生成！每个项目启动时都有几个默认任务，例如："
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "The quotation in PDF format"
+msgstr "PDF 格式的报价单"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "The synchronisation with the banks."
+msgstr "与银行同步."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "The vendor bills payment."
+msgstr "供应商开具付款账单."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"This industry is tailor-made for construction businesses that excel in managing construction projects. It encompasses the crucial stages of project conceptualization, accurate quotation(s), seamless project kick-off, meticulous\n"
+"            planning, streamlined (re)supply, flawless execution, effective collaboration with third parties, meticulous budget follow-up, prompt invoicing, and exceptional customer service."
+msgstr ""
+"该行业专为擅长管理建筑项目的建筑企业量身定制。它包括项目构思、准确报价、无缝项目启动、精心规划、简化（再）供应、完美执行、有效的第三方合作、细致的预算跟进、及时开具发票和卓越的客户服务等关键阶段。\n"
+"            规划、精简（再）供应、完美执行、与第三方的有效合作、细致的预算跟进、及时开具发票以及卓越的客户服务。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Time spent on the project."
+msgstr "已花费在项目上的工时。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Timesheets"
+msgstr "工时单"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "To WH ➡️ Products sent back to your warehouse"
+msgstr "往仓库 ➡️ 已送回仓库的产品"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"To ease the quotation of usually sold together, the\n"
+"            <strong><font class=\"text-o-color-1\">Manufacturing</font></strong> app allows you to create kits. These can contain several products. When added in a quotation, the kits is displayed as a single line but the delivery order displays\n"
+"            all the components to pick up."
+msgstr ""
+"为了便于引用通常一起销售的产品, 这个\n"
+"            <strong><font class=\"text-o-color-1\">制造</font></strong> 应用程序允许您创建套装。这些套装可以包含多个产品。在报价中添加时，套装显示为单行，但交货订单显示为多行\n"
+"            所有要挑选的组件."
+
+#. module: construction
+#: model:product.template,name:construction.product_product_7_product_template
+msgid "Travelling costs"
+msgstr "差旅费用"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Use the <strong><font class=\"text-o-color-1\">Accounting</font></strong> "
+"app to easily handle:"
+msgstr "使用<strong><font class=\"text-o-color-1\">会计</font></strong>应用程序轻松处理:"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Use the <strong><font class=\"text-o-color-1\">Planning</font></strong> app to organize the work of your employees. Define on which project and when they have to work. Easily manage shift conflicts, workload and replacements in case\n"
+"            of leaves."
+msgstr ""
+"使用<strong><font class=\"text-o-color-1\">计划</font></strong>应用程序安排员工的工作. 确定他们必须为哪个项目工作以及何时工作. 轻松管理轮班冲突、工作量以及休假时的\n"
+"            替代人员。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Use the Website app to create a contact form that will redirect all the "
+"requests to the <strong><font class=\"text-o-color-1\">CRM</font></strong>."
+msgstr ""
+"使用网站应用程序创建一个联系表单，将所有请求重定向到<strong><font class=\"text-o-"
+"color-1\">客户关系管理软件</font></strong>."
+
+#. module: construction
+#: model_terms:web_tour.tour,rainbow_man_message:construction.knowledge_tour
+msgid "Welcome! Happy exploring."
+msgstr "欢迎！祝您探索愉快。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Work"
+msgstr "工作"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Would you like to discuss your Odoo setup with us or go even further?"
+msgstr "想与我们讨论您的 Odoo 设置或更进一步吗？"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"You can adapt your overview for each project by selecting the small \"Sliders\" icon at the top right of your screen. It will allow you to add a bunch of practical views to get the complete overview of your project,\n"
+"                    including*:"
+msgstr ""
+"您可以选择屏幕右上方的 “滑块”小图标，调整每个项目的概览。通过它，您可以添加一系列实用视图，从而获得项目的完整概览、\n"
+"                    包括*："
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"You can add other views with specific filters and ease your construction "
+"project follow-up."
+msgstr "您还可以添加带有特定筛选器的其他视图，方便您跟进建筑项目。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "help@industry-construction.odoo.com"
+msgstr "help@industry-construction.odoo.com"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "info@my-construction-business.com"
+msgstr "info@my-construction-business.com"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "to the <strong><font class=\"text-o-color-1\">CRM</font></strong>."
+msgstr "转到 <strong><font class=\"text-o-color-1\">客户关系管理软件</font></strong>."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "will create a ticket that can be assigned to ensure the follow-up."
+msgstr "将创建一个可以分配的工单以确保后续处理。"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Accounting"
+msgstr "🎓 会计"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Activities"
+msgstr "🎓 活动"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 CRM"
+msgstr "🎓 CRM"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Documents"
+msgstr "🎓 文件管理"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Employees"
+msgstr "🎓 员工"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Field Service"
+msgstr "🎓 现场服务"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Fiscal Positions"
+msgstr "🎓 财务规则"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Fleet"
+msgstr "🎓 车队"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Helpdesk"
+msgstr "🎓 服务台"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Inventory"
+msgstr "🎓 库存"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Invoicing"
+msgstr "🎓 发票"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Maintenance"
+msgstr "🎓 维护保养"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Manufacturing"
+msgstr "🎓 制造"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Project"
+msgstr "🎓 项目"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Purchase"
+msgstr "🎓 采购"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Sign"
+msgstr "🎓 标志"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Timesheets"
+msgstr "🎓 时间表"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Website"
+msgstr "🎓 网站"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓Sales"
+msgstr "🎓销售"

@@ -1,0 +1,960 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * construction
+#
+# Translators:
+# Tiffany Chang, 2024
+# Henri Komulainen <henri.komulainen@web-veistamo.fi>, 2024
+# Jarmo Kortetjärvi <jarmo.kortetjarvi@gmail.com>, 2024
+# Tuomo Aura <tuomo.aura@web-veistamo.fi>, 2024
+# Martin Trigaux, 2024
+# Veikko Väätäjä <veikko.vaataja@gmail.com>, 2024
+# Jessica Jakara, 2025
+# Ossi Mantylahti <ossi.mantylahti@obs-solutions.fi>, 2025
+# "Jessica Tuulia Sade Jäkärä (jtsj)" <jtsj@odoo.com>, 2025.
+# Saara Hakanen <sahak@odoo.com>, 2026.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-10-08 12:51+0000\n"
+"PO-Revision-Date: 2026-09-29 14:33+0000\n"
+"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-18/"
+"construction/fi/>\n"
+"Language: fi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"*This list will, of course, depend on your installed apps and configuration."
+msgstr ""
+"*Tämä luettelo riippuu tietenkin asennetuista sovelluksista ja "
+"määrityksistä."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"<i class=\"o_editor_banner_icon mb-3 fst-normal\" aria-label=\"Banner "
+"Info\">💡</i>"
+msgstr ""
+"<i class=\"o_editor_banner_icon mb-3 fst-normal\" aria-label=\"Banner "
+"Info\">💡</i>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<i class=\"o_editor_banner_icon mb-3 fst-normal\">🚀</i>"
+msgstr "<i class=\"o_editor_banner_icon mb-3 fst-normal\">🚀</i>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<span class=\"h2-fs\"><strong>Employees 🧑‍🤝‍🧑</strong></span>"
+msgstr "<span class=\"h2-fs\"><strong>Työntekijät 🧑‍🤝‍🧑</strong></span>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<span class=\"h2-fs\"><strong>Equipment 🛠️</strong></span>"
+msgstr "<span class=\"h2-fs\"><strong>Laitteet 🛠️</strong></span>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<span class=\"h2-fs\"><strong>Take care of your resources </strong></span>"
+msgstr "<span class=\"h2-fs\"><strong>Huolehdi resursseistasi </strong></span>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<span class=\"h2-fs\">Make your customers happy </span>🆘"
+msgstr "<span class=\"h2-fs\">Tee asiakkaasi onnelliseksi </span>🆘"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<strong><span class=\"h2-fs\">Accounting made easy 🧮</span></strong>"
+msgstr ""
+"<strong><span class=\"h2-fs\">Kirjanpito helppoa kuin ajatus "
+"🧮</span></strong>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"<strong><span class=\"h2-fs\">Create an attractive website 🌐</span></strong>"
+msgstr ""
+"<strong><span class=\"h2-fs\">Luo houkutteleva verkkosivusto "
+"🌐</span></strong>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<strong><span class=\"h2-fs\">Fleet 🚚</span></strong>"
+msgstr "<strong><span class=\"h2-fs\">Kuljetuskalusto 🚚</span></strong>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "<strong><span class=\"h2-fs\">Sell product sets 🔩</span></strong>"
+msgstr "<strong><span class=\"h2-fs\">Myy tuotesarjoja 🔩</span></strong>"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"A good work cannot be achieved without motivated and skilled employees, "
+"reliable equipment nor suitable vehicles."
+msgstr ""
+"Hyvää työtä ei voida tehdä ilman motivoituneita ja ammattitaitoisia "
+"työntekijöitä, luotettavia laitteita tai sopivia ajoneuvoja."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"A link to reach the online quotation from where the customer can confirm and"
+" sign it."
+msgstr ""
+"Linkki verkkotarjoukseen, josta asiakas voi vahvistaa ja allekirjoittaa "
+"tarjouksen."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Accurately track the project 🔍"
+msgstr "Seuraa projektia tarkasti 🔍"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"All these components will give you an accurate overview on the project "
+"profitability."
+msgstr ""
+"Kaikki nämä osat antavat sinulle tarkan yleiskuvan hankeen\n"
+"                                kannattavuudesta."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Amazing employees deserve amazing equipment. Make the sure all your tools are fit and well by tracking their health in the\n"
+"            <strong><font class=\"text-o-color-1\">Maintenance</font></strong> app."
+msgstr ""
+"Upeat työntekijät ansaitsevat upeat laitteet. Varmista, että kaikki työkalusi\n"
+"                                ovat kunnossa seuraamalla niiden kuntoa <strong>\n"
+"                                        <font class=\"text-o-color-1\">Huolto</font>-\n"
+"                                </strong>\n"
+"                                sovelluksessa."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Analytic Items ➡️ Track any cost using Analytic Items from the Accounting "
+"App"
+msgstr ""
+"Laskentakohteet ➡️ Seuraa mitä tahansa kustannuksia Kirjanpito-sovelluksen "
+"laskentakohteiden avulla"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Architect"
+msgstr "Arkkitehti"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"As the first invoicing step, create a down payment from the sales order. This will generate the first invoice in the\n"
+"            <strong><font class=\"text-o-color-1\">Invoicing</font></strong> app. Then, schedule one or several \"Invoicing Schedule\" activities on the sales order with the aim to never forget to send an intermediary invoice in order to sustain\n"
+"            your cash flow."
+msgstr ""
+"Luo ensimmäisenä laskutusvaiheena ennakkomaksu myyntitilauksesta. Tämä luo ensimmäisen laskun\n"
+"            <strong>\n"
+"                <font class=\"text-o-color-1\">Laskutus</font>\n"
+"            </strong>\n"
+"            sovelluksessa. Aikatauluta sitten yksi tai useampi \"Laskutusaikataulu\" -toiminto myyntitilaukseen, jotta et koskaan unohda lähettää välilaskuja kassavirran ylläpitämiseksi."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Assign the tasks to the right responsible and easily check the progress in "
+"the Kanban view."
+msgstr ""
+"Määritä tehtävät oikeille vastuuhenkilöille ja tarkista edistyminen helposti\n"
+"                                kanban-näkymässä."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"At any time, you can create from an opportunity a beautiful and tailor-made "
+"quotation that displays the price, the discount, the unit of measure, and "
+"the tax of each:"
+msgstr ""
+"Voit milloin tahansa luoda tilaisuudesta kauniin ja räätälöidyn tarjouksen, "
+"jossa näkyvät hinta, alennus, mittayksikkö ja vero:"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Basics"
+msgstr "Perusasiat"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Before generating an intermediary invoice in the\n"
+"            <strong><font class=\"text-o-color-1\">Invoicing</font></strong> app, freeze the project status in the <strong><font class=\"text-o-color-1\">Project</font></strong> app to get an overview on the progress in terms of:"
+msgstr ""
+"Ennen välittäjälaskun luomista vuonna\n"
+"            <strong><font class=\"text-o-color-1\">Laskutus</font></strong> sovelluksessa, jäädytä projektin tila <strong><font class=\"text-o-color-1\">Project</font></strong> sovelluksessa, jotta saat yleiskuvan edistymisestä seuraavien asioiden osalta:"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Before starting the project, make sure you have enough stock. The confirmation of the quotation also triggers the creation of a delivery in the <strong><font class=\"text-o-color-1\">Inventory</font></strong>\n"
+"            app where you can check the stock levels of each needed storable product."
+msgstr ""
+"Varmista ennen projektin aloittamista, että sinulla on riittävästi varastoa. \n"
+"                                tarjouksen vahvistaminen käynnistää myös luomisen\n"
+"                                toimituksen <strong>\n"
+"                                        <font class=\"text-o-color-1\">Inventory</font>\n"
+"                                </strong>\n"
+"                                sovelluksessa, jossa voit tarkistaa jokaisen tarvittavan varastoitavan tuotteen varastotasot\n"
+"                                tuotteen."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Bills of Materials"
+msgstr "Materiaaliluettelot"
+
+#. module: construction
+#: model:product.template,name:construction.product_product_5_product_template
+msgid "Building Blocks 39x14x19cm"
+msgstr "Rakennuspalikat 39x14x19cm"
+
+#. module: construction
+#: model:project.task.type,name:construction.planning_project_stage_4
+msgid "Cancelled"
+msgstr "Peruttu"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Centralize all the important information 📝"
+msgstr "Keskitä kaikki tärkeät tiedot 📝"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Construction"
+msgstr "Rakentaminen"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Create an opportunity each time you face a potential customer, receive a "
+"phone call, etc."
+msgstr ""
+"Luo myyntimahdollisuus joka kerta, kun kohtaat potentiaalisen asiakkaan, "
+"saat puhelun jne."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Dashboard ➡️ Your project's status at a glance."
+msgstr "Kojelauta ➡️ Projektin tila yhdellä silmäyksellä."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Do you want to go further?"
+msgstr "Haluatko jatkaa?"
+
+#. module: construction
+#: model:project.task.type,name:construction.planning_project_stage_3
+msgid "Done"
+msgstr "Valmis"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Down Payment"
+msgstr "Ennakkomaksu"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"During and after the construction project, provide a five star customer service by answering the questions from your customer through the\n"
+"            <strong><font class=\"text-o-color-1\">Helpdesk</font></strong> app. All the emails sent to"
+msgstr ""
+"Rakennushankkeen aikana ja sen jälkeen tarjoa viiden tähden asiakaspalvelua vastaamalla asiakkaasi esittämiin kysymyksiin\n"
+"            <strong><font class=\"text-o-color-1\">Helpdesk</font></strong> sovelluksen avulla. Kaikki sähköpostit, jotka lähetetään"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Easily create beautiful quotations 💲"
+msgstr "Luo helposti kauniita tarjouksia 💲"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Efficiently schedule the work 📆"
+msgstr "Aikatauluta työ tehokkaasti 📆"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Enrich the core apps by installing the following ones."
+msgstr "Rikastuta ydinsovelluksia asentamalla seuraavat sovellukset."
+
+#. module: construction
+#: model:account.analytic.account,name:construction.account_analytic_account_2
+msgid "Field Service"
+msgstr "Kenttähuolto"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"For each ordered material, don't forget to fill the analytic distribution in"
+" which you will be able to set for which project it will be used."
+msgstr ""
+"Älä unohda täyttää analyyttistä jakaumaa kunkin tilatun materiaalin osalta\n"
+"                                jossa voit määrittää, mihin projektiin sitä käytetään."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"From WH ➡️ Deliveries from your warehouse to this specific construction site"
+msgstr "WH ➡️ Toimitukset varastostasi tälle tietylle rakennustyömaalle"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"If a technical operation such as a repair is needed, directly create a task in the <strong><font class=\"text-o-color-1\">Field Service</font></strong> project from a ticket. Then assign it and schedule it to quickly solve the\n"
+"            problem. Your employee will be able to use some material to fix the issue. Then these materials and the time spent could be invoiced to the customer."
+msgstr ""
+"Jos tarvitaan teknistä toimenpidettä, kuten korjausta, luo suoraan tehtävä kohtaan <strong><font class=\"text-o-color-1\">Kenttäpalvelu</font></strong> projektissa tukipyynnöstä. Määritä se sitten ja aikatauluta se, jotta voit ratkaista nopeasti\n"
+"            ongelman. Työntekijäsi voi käyttää jonkin verran materiaalia ongelman korjaamiseen. Sitten nämä materiaalit ja käytetty aika voidaan laskuttaa asiakkaalta."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"If the customer replies to the email, the answer is automatically logged in the chatter on the right of the screen. Thereby, all the discussions regarding the quotation, its updates, and its fine tuning are attached, and the history\n"
+"            can be easily consulted by all the involved users"
+msgstr ""
+"Jos asiakas vastaa sähköpostiviestiin, vastaus kirjataan automaattisesti "
+"näytön oikeassa reunassa olevaan keskustelupalstaan. Näin kaikki tarjousta, "
+"sen päivityksiä ja hienosäätöä koskevat keskustelut liitetään mukaan, ja "
+"kaikki osallistuvat käyttäjät voivat helposti tarkastella historiaa"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"If the stock levels are too low, resupply the materials from the\n"
+"            <strong><font class=\"text-o-color-1\">Purchase</font></strong> app by creating a purchase order linked to the right vendor. In the <strong><font class=\"text-o-color-1\">Contact</font></strong> app, you can easily manage all your\n"
+"            preferred vendors and don't hesitate to set a warning to remind if there is a minimum amount to get free transport costs."
+msgstr ""
+"Jos varastotasot ovat liian alhaiset, täydennä materiaalit varastosta <strong>\n"
+"                                        <font class=\"text-o-color-1\">Ostot</font>-\n"
+"                                </strong>\n"
+"                                sovelluksesta luomalla ostotilaus, joka on linkitetty oikeaan myyjään. Tässä <strong>\n"
+"                                        <font class=\"text-o-color-1\">Ota yhteyttä</font>\n"
+"                                </strong>\n"
+"                                sovelluksessa voit helposti hallita kaikkia haluamiasi myyjiä, eikä sinun tarvitse\n"
+"                                asettaa varoituksia muistuttamaan, jos on olemassa vähimmäismäärä, jonka avulla\n"
+"                                saa ilmaisen kuljetuksen."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"If you want to push your quotation building much further and add all the "
+"power of Spreadsheet beneath any line of your Sales Orders, use the quote "
+"calculation feature."
+msgstr ""
+"Jos haluat viedä tarjousten rakentamisen paljon pidemmälle ja lisätä kaiken "
+"Taulukkolaskentaohjelman tehon myyntitilausten minkä tahansa rivin alle, "
+"käytä tarjouslaskentaominaisuutta."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"If your country benefits from a tax rebate under certain conditions, you can"
+" easily apply it to your entire quotation by creating a fiscal position that"
+" will automatically replace the default tax rate by the reduced one"
+msgstr ""
+"Jos maasi hyötyy verohuojennuksista tietyin ehdoin, voit soveltaa sitä "
+"helposti koko tarjoukseesi luomalla verokantasäännön. Se korvaa "
+"automaattisesti oletusverokannan alennetulla verokannalla"
+
+#. module: construction
+#: model:project.task.type,name:construction.planning_project_stage_2
+msgid "In Progress"
+msgstr "Käynnissä"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Increase you visibility and get more leads by creating a beautiful\n"
+"            <strong><font class=\"text-o-color-1\">Website</font></strong>! When a potential customer sends a request through the contact form, it could automatically create an opportunity in the\n"
+"            <strong><font class=\"text-o-color-1\">CRM</font></strong> app."
+msgstr ""
+"Lisää näkyvyyttäsi ja saat enemmän liidejä luomalla kaunis <strong>\n"
+"                                        <font class=\"text-o-color-1\">Verkkosivusto</font></strong>!\n"
+"                                Kun potentiaalinen asiakas lähettää pyynnön yhteydenottolomakkeen kautta,\n"
+"                                se voi automaattisesti luoda myyntimahdollisuuden <strong>\n"
+"                                        <font class=\"text-o-color-1\">CRM</font>-\n"
+"                                </strong>\n"
+"                                sovellukseen."
+
+#. module: construction
+#: model:account.analytic.account,name:construction.account_analytic_account_1
+#: model:project.project,name:construction.project_project_1
+#: model:project.task.type,name:construction.internal_project_default_stage
+msgid "Internal"
+msgstr "Sisäinen"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Invoice at the right time 📈"
+msgstr "Laskuta oikeaan aikaan 📈"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Invoices"
+msgstr "Laskut"
+
+#. module: construction
+#: model:mail.activity.type,name:construction.mail_activity_type_20
+msgid "Invoicing Schedule"
+msgstr "Laskutusaikataulu"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Keep an eye on materials 📦"
+msgstr "Pidä silmällä materiaaleja 📦"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Know the skills of each employee by filling them in the\n"
+"            <strong><font class=\"text-o-color-1\">Employees</font></strong> app. This will help you to find the right person to make a good work."
+msgstr ""
+"Tunne kunkin työntekijän taidot täyttämällä ne lomakkeen <strong>\n"
+"                                        <font class=\"text-o-color-1\">Työntekijät</font>-\n"
+"                                </strong>\n"
+"                                sovellukseen. Tämä auttaa sinua löytämään oikean henkilön, jotta voit tehdä hyvän\n"
+"                                työtä."
+
+#. module: construction
+#: model:product.template,name:construction.product_product_8_product_template
+msgid "Labor hour with equipment"
+msgstr "Työtunti laitteineen"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Make your customers happy 🆘"
+msgstr "Tee asiakkaasi onnelliseksi 🆘"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Manage your vehicles in the\n"
+"            <strong><font class=\"text-o-color-1\">Fleet</font></strong> app."
+msgstr ""
+"Hallitse ajoneuvojasi\n"
+"            <strong><font class=\"text-o-color-1\">Fleet</font></strong> sovelluksessa."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Manufacturing Orders"
+msgstr "Valmistustilaukset"
+
+#. module: construction
+#: model:product.template,name:construction.product_product_6_product_template
+msgid "Masonry mortar 25kg"
+msgstr "Muurauslaasti 25 kg"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Material that will be used to build the project."
+msgstr "Hankkeen rakentamiseen käytettävä materiaali."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Materials purchased."
+msgstr "Ostetut materiaalit."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Materials sold."
+msgstr "Myydyt materiaalit."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Never miss an opportunity 🎯"
+msgstr "Yksikään mahdollisuus ei jää huomaamatta🎯"
+
+#. module: construction
+#: model:project.task.type,name:construction.planning_project_stage_0
+msgid "New"
+msgstr "Uusi"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Odoo empowers you to manage every aspect of your construction projects "
+"effortlessly and efficiently, and its integrated applications ensure "
+"unparalleled success and client satisfaction."
+msgstr ""
+"Odoo antaa sinulle mahdollisuuden hallita rakennusprojektien kaikkia osa-"
+"alueita vaivattomasti ja tehokkaasti, ja sen integroidut sovellukset "
+"takaavat vertaansa vailla olevan menestyksen ja asiakastyytyväisyyden."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Of course, feel free to create all the products you use often. This will "
+"save you time when preparing when preparing your next quotations."
+msgstr ""
+"Voit tietysti vapaasti luoda kaikki tuotteet, joita käytät usein."
+"                                        Näin säästät aikaa valmistellessasi,"
+" kun laadit seuraavia tarjouksia."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Of course, these default tasks can be adapted in the Project Template "
+"according to your personal way of managing a construction project."
+msgstr ""
+"Näitä oletustehtäviä voidaan tietysti mukauttaa projektimallissa oman tapasi"
+" mukaan hallita rakennushanketta."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Once confirmed, the quotation becomes a sales order. All quotations and "
+"sales orders are centralized in the <strong><font class=\"text-o-"
+"color-1\">Sales</font></strong> app."
+msgstr ""
+"Kun tarjous on vahvistettu, siitä tulee myyntitilaus. Kaikki tarjoukset ja "
+"myyntitilaukset keskitetään keskitettyyn <strong><font class=\"text-o-"
+"color-1\">Sales</font></strong> sovellukseen."
+
+#. module: construction
+#: model:uom.uom,name:construction.uom_uom_28
+msgid "Pallet of 48"
+msgstr "48 kpl kuormalava"
+
+#. module: construction
+#: model:uom.uom,name:construction.uom_uom_27
+msgid "Pallet of 96"
+msgstr "96 kpl kuormalava"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Planification"
+msgstr "Suunnittelu"
+
+#. module: construction
+#: model:project.task.type,name:construction.planning_project_stage_1
+msgid "Planned"
+msgstr "Suunniteltu"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Planning"
+msgstr "Suunnittelu"
+
+#. module: construction
+#: model:account.analytic.account,name:construction.account_analytic_account_3
+#: model:project.project,name:construction.project_project_3
+msgid "Project Template"
+msgstr "Projektipohja"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Purchase Orders"
+msgstr "Ostotilaukset"
+
+#. module: construction
+#: model:hr.job,name:construction.hr_job_1
+msgid "Qualified Worker"
+msgstr "Pätevä työntekijä"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Quickly start the construction projects 🏗️"
+msgstr "Aloita rakennushankkeet nopeasti 🏗️"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Receipt"
+msgstr "Vastaanotto"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Record the time spent by your employees on each project by using the\n"
+"            <strong><font class=\"text-o-color-1\">Timesheets</font></strong> app. Don't forget to define a hourly cost on the employee form."
+msgstr ""
+"Kirjaa työntekijöidesi kuluttama aika kuhunkin projektiin käyttämällä lomaketta\n"
+"            <strong><font class=\"text-o-color-1\">Timesheets</font></strong>-sovellusta. Älä unohda määritellä tuntikustannuksia työntekijälomakkeella."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Redirect the emails sent to"
+msgstr "Ohjaa sähköpostit uudelleen osoitteeseen"
+
+#. module: construction
+#: model:account.analytic.account,name:construction.account_analytic_account_4
+#: model:project.project,name:construction.project_project_4
+msgid "S00001 - VDK Project"
+msgstr "S00001 - VDK Hanke"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Sales Orders"
+msgstr "Myyntitilaukset"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Save time by directly sending the quotation by email to your customer. The "
+"personalized email provides:"
+msgstr ""
+"Säästä aikaa lähettämällä tarjous suoraan sähköpostitse asiakkaallesi. "
+"Mukautettu sähköposti tarjoaa:"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Schedule a demo"
+msgstr "Varaa demo"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Service such as labor hours, traveling costs, etc."
+msgstr "Palvelu, kuten työtunnit, matkakulut jne."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Speed up the signing process thanks to the\n"
+"            <strong><font class=\"text-o-color-1\">Sign</font></strong> app. Once again, all the signed documents will be stored in the <strong><font class=\"text-o-color-1\">Documents</font></strong> app."
+msgstr ""
+"Nopeuta allekirjoitusprosessia\n"
+"            <strong><font class=\"text-o-color-1\">Sign</font></strong> sovelluksen avulla. Jälleen kerran kaikki allekirjoitetut asiakirjat tallennetaan osoitteeseen <strong><font class=\"text-o-color-1\">Asiakirjat</font></strong> sovellukseen."
+
+#. module: construction
+#: model:product.template,description_sale:construction.product_product_5_product_template
+msgid ""
+"Standard gray concrete block, hollow, 39x14x19 cm, for all load-bearing and "
+"non-load-bearing masonry, indoors and outdoors. This concrete block meets "
+"the strict quality requirements of the BENOR label."
+msgstr ""
+"Harmaa betoniharkko, ontto, 39x14x19 cm, kaikkiin kantaviin ja ei-kantaviin "
+"muurausrakenteisiin, sisällä ja ulkona. Tämä betoniharkko täyttää BENOR-"
+"merkin tiukat laatuvaatimukset."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Starting a construction project implies a lot of important documents such as contracts, building plans, instructions for use, subcontracting agreements, etc. Instead of scattering them in your emails, storage services or computer,\n"
+"            attach them in the chatter and they will be automatically centralized in the\n"
+"            <strong><font class=\"text-o-color-1\">Documents</font></strong> app."
+msgstr ""
+"Rakennushankkeen aloittaminen edellyttää paljon tärkeitä asiakirjoja, kuten sopimuksia, rakennussuunnitelmia, käyttöohjeita, alihankintasopimuksia jne. Sen sijaan, että hajottaisit ne sähköposteihin, tallennuspalveluihin tai tietokoneen kovalevylle,\n"
+"            liitä ne chatteriin, ja ne keskitetään automaattisesti keskitetysti\n"
+"            <strong><font class=\"text-o-color-1\">Asiakirjat</font></strong> sovellukseen."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Take advantage of every opportunity. The <strong><font class=\"text-o-color-1\">CRM</font></strong> centralizes everything and allows you to ensure the follow-up of each request efficiently. If the request becomes concrete, create the\n"
+"            customer in the <strong><font class=\"text-o-color-1\">Contact</font></strong> app."
+msgstr ""
+"Hyödynnä jokainen tilaisuus. The <strong><font class=\"text-o-color-1\">CRM</font></strong> keskittää kaiken ja mahdollistaa jokaisen pyynnön tehokkaan seurannan. Jos pyyntö konkretisoituu, luo\n"
+"            asiakas <strong><font class=\"text-o-color-1\">Yhteystiedot</font></strong> sovelluksessa."
+
+#. module: construction
+#: model:project.project,label_tasks:construction.project_project_1
+#: model:project.project,label_tasks:construction.project_project_3
+#: model:project.project,label_tasks:construction.project_project_4
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Tasks"
+msgstr "Tehtävät"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Thanks to the invoicing policy set on delivered quantities, the generated "
+"invoice is always the reflect of the reality on the field and it is fair for"
+" the customer."
+msgstr ""
+"Toimitetuille määrille asetetun laskutuskäytännön ansiosta tuotetut\n"
+"                                lasku vastaa aina kentällä vallitsevaa todellisuutta, ja se on aina myös\n"
+"                                oikeudenmukainen asiakkaalle."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"The <font class=\"text-o-color-1\"> <strong>CRM</strong> </font> application"
+" allows you to collect requests from your potential customers by aggregating"
+" several sources:"
+msgstr ""
+"<font class=\"text-o-color-1\"> <strong>CRM</strong> </font>-sovelluksen "
+"avulla voit kerätä potentiaalisilta asiakkailtasi tulevia pyyntöjä "
+"yhdistämällä useita lähteitä:"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "The customer reminders."
+msgstr "Asiakkaan muistutukset."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "The financial reporting."
+msgstr "Taloudellinen raportointi."
+
+#. module: construction
+#: model:product.template,description_sale:construction.product_product_6_product_template
+msgid ""
+"The prepared mortar is a dry, industrially premixed masonry mortar in "
+"strength class M5. The mortar is mainly designed for load-bearing and non-"
+"load-bearing masonry."
+msgstr ""
+"Valmistettu laasti on kuivaa, teollisesti esisekoitettua muurauslaastia "
+"lujuusluokassa M5. Laasti on tarkoitettu pääasiassa kantaviin ja ei-"
+"kantaviin muurauksiin."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"The quotation confirmation automatically triggers the creation of a "
+"dedicated project in the... <strong><font class=\"text-o-"
+"color-1\">Project</font></strong> app! Each project is initiated with "
+"several default tasks, such as:"
+msgstr ""
+"Tarjouksen vahvistus käynnistää automaattisesti erityisen projektin "
+"luomisen.... <strong><font class=\"text-o-"
+"color-1\">Hanke</font></strong>-sovellus! Jokainen projekti käynnistyy "
+"useilla oletustehtävillä, kuten:"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "The quotation in PDF format"
+msgstr "Tarjous PDF-muodossa"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "The synchronisation with the banks."
+msgstr "Synkronointi pankkitilien kanssa."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "The vendor bills payment."
+msgstr "Toimittajalaskujen maksu."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"This industry is tailor-made for construction businesses that excel in managing construction projects. It encompasses the crucial stages of project conceptualization, accurate quotation(s), seamless project kick-off, meticulous\n"
+"            planning, streamlined (re)supply, flawless execution, effective collaboration with third parties, meticulous budget follow-up, prompt invoicing, and exceptional customer service."
+msgstr ""
+"Tämä toimiala on kuin tehty rakennusalan yrityksille, jotka ovat erinomaisia rakennushankkeiden hallinnoinnissa. Siihen kuuluvat ratkaisevan tärkeät vaiheet, kuten projektin ideointi, tarkka tarjous (tarjoukset), saumaton projektin käynnistäminen, huolelliset\n"
+"            suunnittelu, virtaviivainen (uudelleen)toimitus, virheetön toteutus, tehokas yhteistyö kolmansien osapuolten kanssa, huolellinen budjetin seuranta, nopea laskutus ja poikkeuksellinen asiakaspalvelu."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Time spent on the project."
+msgstr "Hankkeeseen käytetty aika."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Timesheets"
+msgstr "Työaikakirjaukset"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "To WH ➡️ Products sent back to your warehouse"
+msgstr "WH ➡️ Tuotteet lähetetään takaisin varastoosi"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"To ease the quotation of usually sold together, the\n"
+"            <strong><font class=\"text-o-color-1\">Manufacturing</font></strong> app allows you to create kits. These can contain several products. When added in a quotation, the kits is displayed as a single line but the delivery order displays\n"
+"            all the components to pick up."
+msgstr ""
+"Tavallisesti yhdessä myytyjen tuotteiden noteerauksen helpottamiseksi\n"
+"            <strong><font class=\"text-o-color-1\">Valmistus</font></strong> sovelluksen avulla voit luoda sarjoja. Nämä voivat sisältää useita tuotteita. Kun paketit lisätään tarjoukseen, ne näytetään yhtenä rivinä, mutta toimitustilauksessa näytetään seuraavat tiedot\n"
+"            kaikki noudettavat komponentit."
+
+#. module: construction
+#: model:product.template,name:construction.product_product_7_product_template
+msgid "Travelling costs"
+msgstr "Matkakulut"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Use the <strong><font class=\"text-o-color-1\">Accounting</font></strong> "
+"app to easily handle:"
+msgstr ""
+"<strong><font class=\"text-o-color-1\">Kirjanpito</font></strong> "
+"sovelluksen avulla voit käsitellä helposti:"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Use the <strong><font class=\"text-o-color-1\">Planning</font></strong> app to organize the work of your employees. Define on which project and when they have to work. Easily manage shift conflicts, workload and replacements in case\n"
+"            of leaves."
+msgstr ""
+"<strong><font class=\"text-o-color-1\">Suunnittelu</font></strong> sovelluksen avulla voit organisoida työntekijöidesi työtä. Määrittele, minkä projektin parissa ja milloin heidän on työskenneltävä. Hallitse helposti työvuororistiriitoja, työmäärää ja sijaisuuksia, jos\n"
+"            lomien yhteydessä."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"Use the Website app to create a contact form that will redirect all the "
+"requests to the <strong><font class=\"text-o-color-1\">CRM</font></strong>."
+msgstr ""
+"Verkkosivusto-sovelluksen avulla voit luoda yhteydenottolomakkeen, joka "
+"ohjaa kaikki pyynnöt osoitteeseen <strong><font class=\"text-o-"
+"color-1\">CRM</font></strong>."
+
+#. module: construction
+#: model_terms:web_tour.tour,rainbow_man_message:construction.knowledge_tour
+msgid "Welcome! Happy exploring."
+msgstr "Tervetuloa! Nauti tutustumisesta."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Work"
+msgstr "Työ"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "Would you like to discuss your Odoo setup with us or go even further?"
+msgstr ""
+"Haluatko keskustella kanssamme Odoo-asetuksestasi tai mennä vielä "
+"pidemmälle?"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"You can adapt your overview for each project by selecting the small \"Sliders\" icon at the top right of your screen. It will allow you to add a bunch of practical views to get the complete overview of your project,\n"
+"                    including*:"
+msgstr ""
+"Voit mukauttaa yleiskatsausta kuhunkin projektiin valitsemalla näytön "
+"oikeassa yläkulmassa olevan pienen \"Sliders\"-kuvakkeen. Sen avulla voit "
+"lisätä joukon käytännöllisiä näkymiä saadaksesi täydellisen yleiskuvan "
+"projektistasi, mukaan lukien* :"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid ""
+"You can add other views with specific filters and ease your construction "
+"project follow-up."
+msgstr ""
+"Voit lisätä muita näkymiä tietyillä suodattimilla ja helpottaa "
+"rakennushankkeen seurantaa."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "help@industry-construction.odoo.com"
+msgstr "help@industry-construction.odoo.com"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "info@my-construction-business.com"
+msgstr "info@my-construction-business.com"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "to the <strong><font class=\"text-o-color-1\">CRM</font></strong>."
+msgstr "osoitteeseen <strong><font class=\"text-o-color-1\">CRM</font></strong>."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "will create a ticket that can be assigned to ensure the follow-up."
+msgstr "luo tukipyynnön, joka voidaan määrittää seurannan varmistamiseksi."
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Accounting"
+msgstr "🎓 Kirjanpito"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Activities"
+msgstr "🎓 Toiminnot"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 CRM"
+msgstr "🎓 CRM"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Documents"
+msgstr "🎓 Asiakirjat"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Employees"
+msgstr "🎓 Työntekijät"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Field Service"
+msgstr "🎓 Kenttäpalvelu"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Fiscal Positions"
+msgstr "🎓 Verokantasäännöt"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Fleet"
+msgstr "🎓 Kuljetuskalusto"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Helpdesk"
+msgstr "🎓 Asiakaspalvelu"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Inventory"
+msgstr "🎓 Varastointi"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Invoicing"
+msgstr "🎓 Laskutus"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Maintenance"
+msgstr "🎓 Huolto"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Manufacturing"
+msgstr "🎓 Tuotanto"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Project"
+msgstr "🎓 Projekti"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Purchase"
+msgstr "🎓 Ostot"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Sign"
+msgstr "🎓 Allekirjoita"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Timesheets"
+msgstr "🎓 Työaikakirjaukset"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓 Website"
+msgstr "🎓 Verkkosivu"
+
+#. module: construction
+#: model_terms:ir.ui.view,arch_db:construction.welcome_article_body
+msgid "🎓Sales"
+msgstr "🎓Myynti"
