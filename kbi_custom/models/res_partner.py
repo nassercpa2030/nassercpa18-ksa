@@ -464,8 +464,9 @@ class Recruiter ( models.Model ) :
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
                                       placeholder="Enter Analytic Plan" )
-    old_vacance_days = fields.Float ( string='رصيد أجــازات سـابق' , compute='_compute_employee_vacance_days' ,
-                                      readonly=False )
+    old_vacance_days = fields.Float ( string='رصيد أجــازات سـابق' , 
+                                     #compute='_compute_employee_vacance_days' ,
+                                      stored=True,readonly=False )
     reversed_vacance_days = fields.Float ( string='رصيد أجــازات باقي' , compute='_compute_employee_vacance_days' ,
                                            readonly=False )
     # compute='_compute_employee_vacance_days',readonly=False)
