@@ -630,12 +630,12 @@ class Recruiter ( models.Model ) :
             else :
                 annual_days = 21 if delta.years < 2 else 30
 
-            if rec.resumption_work_after_leave and rec.resumption_work_after_leave >= fields.Date.from_string (
-                    '2026-07-30' ) :
-                rec.old_vacance_days = 0
+            # if rec.resumption_work_after_leave and rec.resumption_work_after_leave >= fields.Date.from_string (
+            #         '2026-07-30' ) :
+            #     rec.old_vacance_days = 0
 
-            else :
-                continue
+            # else :
+            #     continue
             # الرصيد المستحق حتى اليوم
             rec.vacance_days = (months_of_service * (annual_days / 12)) + rec.old_vacance_days
             rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
