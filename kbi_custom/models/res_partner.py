@@ -457,6 +457,7 @@ class Recruiter ( models.Model ) :
     x_gosi_225 = fields.Boolean ( "تأمينات  %22.5" ,
                                   help="عند إختيار هذا الحقل يتم  إحتساب نسب التأمينات الحديثة للموظف السعودي بنسبة والشركة12.25 % , للموظف %10.25  " ,
                                   store=True );
+    leave_accrual_plan_id = fields.Many2one(comodel_name="hr.leave.accrual.plan", string="خطة إستحقاق الأجازة", tracking=True,  ondelete="restrict")
 
 
 # ---------------- EMPLOYEES  -----------------
