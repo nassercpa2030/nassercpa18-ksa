@@ -455,6 +455,8 @@ class Recruiter ( models.Model ) :
     x_gosi_225 = fields.Boolean ( "تأمينات  %22.5" ,
                                   help="عند إختيار هذا الحقل يتم  إحتساب نسب التأمينات الحديثة للموظف السعودي بنسبة والشركة12.25 % , للموظف %10.25  " ,
                                   store=True );
+    leave_accrual_plan_id = fields.Many2one ( comodel_name="hr.leave.accrual.plan" , string="خطة إستحقاق الأجازة" ,
+                                              tracking=True , ondelete="restrict" )
 
 
 # ---------------- EMPLOYEES  -----------------
@@ -464,7 +466,7 @@ class Recruiter ( models.Model ) :
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
                                       placeholder="Enter Analytic Plan" )
-    old_vacance_days = fields.Float ( string='رصيد أجــازات سـابق' , 
+    old_vacance_days = fields.Float ( string='رصيد أجــازات سـابق' ,
                                      #compute='_compute_employee_vacance_days' ,
                                       stored=True,readonly=False )
     reversed_vacance_days = fields.Float ( string='رصيد أجــازات باقي' , compute='_compute_employee_vacance_days' ,
@@ -535,6 +537,26 @@ class Recruiter ( models.Model ) :
                 ('employee_id' , '=' , employee.id) ,
 
             ] )
+
+    # get employee  vacances allocations
+    def action_list_leaves(self) :
+        self.ensure_one ()
+
+        return {
+            "name" : _ ( "Leave Allocations" ) ,
+            "type" : "ir.actions.act_window" ,
+            "res_model" : "hr.leave.allocation" ,
+            "view_mode" : "list,form" ,
+            "domain" : [
+                ("employee_id" , "=" , self.id) ,
+            ] ,
+            "context" : {
+                "default_employee_id" : self.id ,
+                "search_default_employee_id" : self.id ,
+            } ,
+        }
+    
+
 
 
     def _create_recruitment_interviewers(self) :
