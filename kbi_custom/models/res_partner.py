@@ -234,7 +234,7 @@ class HrPayslip ( models.Model ) :
                                             readonly=False ,
                                             store=False )
     vac_deduction = fields.Monetary ( string="أجازة بدون راتـب" , compute="_compute_gross_salary" , readonly=False ,
-                                        store=False )
+                                      store=False )
     other_deduction = fields.Monetary ( string="خصــومـات أخـــري" , compute="_compute_gross_salary" , readonly=False ,
                                         store=False )
 
@@ -256,8 +256,8 @@ class HrPayslip ( models.Model ) :
             rec.gross_wage = rec.basic_wage + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance + rec.contract_id.l10n_sa_other_allowances
             base = rec._get_contract_wage () + rec.contract_id.l10n_sa_housing_allowance + rec.contract_id.l10n_sa_transportation_allowance
             ###########################################
-            leave90 = rec.worked_days_line_ids.filtered(lambda l: l.code == 'LEAVE90')
-            if leave90:
+            leave90 = rec.worked_days_line_ids.filtered ( lambda l : l.code == 'LEAVE90' )
+            if leave90 :
                 daily_wage = (
                                      rec.contract_id.wage
                                      + rec.contract_id.l10n_sa_housing_allowance
@@ -275,7 +275,7 @@ class HrPayslip ( models.Model ) :
                 rate_company = 0.1225 if rec.contract_id.x_gosi_225 else 0.1175
                 rec.gosi = base * -rate
                 rec.other_gosi = base * rate_company
-                rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction +rec.vac_deduction
+                rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction + rec.vac_deduction
 
             elif rec.employee_id.country_id.code == 'SA' and rec.contract_id.x_gosi_employee_exempt :
 
@@ -286,8 +286,6 @@ class HrPayslip ( models.Model ) :
             elif rec.employee_id.country_id.code != 'SA' :
                 rec.other_gosi = (rec._get_contract_wage () + rec.contract_id.l10n_sa_housing_allowance) * 0.02
                 rec.net_wage = rec.gross_wage - loan + rec.other_deduction + rec.vac_deduction
-
-
 
                 # rec.net_wage = rec.gross_wage - loan + rec.gosi + rec.other_deduction
             if rec.employee_id.contract_id.state == 'open' :
@@ -457,7 +455,8 @@ class Recruiter ( models.Model ) :
     x_gosi_225 = fields.Boolean ( "تأمينات  %22.5" ,
                                   help="عند إختيار هذا الحقل يتم  إحتساب نسب التأمينات الحديثة للموظف السعودي بنسبة والشركة12.25 % , للموظف %10.25  " ,
                                   store=True );
-    leave_accrual_plan_id = fields.Many2one(comodel_name="hr.leave.accrual.plan", string="خطة إستحقاق الأجازة", tracking=True,  ondelete="restrict")
+    leave_accrual_plan_id = fields.Many2one ( comodel_name="hr.leave.accrual.plan" , string="خطة إستحقاق الأجازة" ,
+                                              tracking=True , ondelete="restrict" )
 
 
 # ---------------- EMPLOYEES  -----------------
@@ -467,20 +466,25 @@ class Recruiter ( models.Model ) :
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
                                       placeholder="Enter Analytic Plan" )
-    old_vacance_days = fields.Float (string='رصيد أجــازات سـابق' ,compute='_compute_employee_vacance_days',readonly=False)
-    reversed_vacance_days= fields.Float (string='رصيد أجــازات باقي' ,compute='_compute_employee_vacance_days',readonly=False)
-        #compute='_compute_employee_vacance_days',readonly=False)
+    old_vacance_days = fields.Float ( string='رصيد أجــازات سـابق' ,
+                                      # compute='_compute_employee_vacance_days' ,
+                                      stored=True , readonly=False )
+    reversed_vacance_days = fields.Float ( string='رصيد أجــازات باقي' , compute='_compute_employee_vacance_days' ,
+                                           readonly=False )
+    # compute='_compute_employee_vacance_days',readonly=False)
     resumption_work_after_leave = fields.Date ( string="إستلام العـمل(بعد الإجازة)" , required=True , readonly=False ,
-                                                 )
+                                                )
     vacance_days = fields.Float ( string="عدد أيـام الإجازة" , compute='_compute_employee_vacance_days' ,
-                                  readonly=False  )
-    used_vacance_days= fields.Float ( string=" أيـام الإجازة المستخدمة" , readonly=False  )
-                                     #compute='_compute_employee_vacance_days' ,
-                                  
+                                  readonly=False )
+    used_vacance_days = fields.Float ( string=" أيـام الإجازة المستخدمة" , readonly=False )
+    # compute='_compute_employee_vacance_days' ,
+
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
                                            help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
     request_employee_manager = fields.Many2one ( 'res.users' , string='المـديـر ' , required=True , store=True )
+    
+    total_leave_duration = fields.Float(string="Total Leave Duration",compute="_compute_total_leave_duration",)
     # request_employee_manager = fields.Many2one ( string='المـديـر ' , compute='_compute_request_employee_manager' ,
     #                                              required=True , store=True , readonly=True )
     # parent_id = fields.Many2one ( string='Manager',compute = '_compute_request_employee_manager' , required = True , store = True , readonly = True  )
@@ -489,7 +493,11 @@ class Recruiter ( models.Model ) :
     contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
     residency_visa_number = fields.Integer ( string="رقم الهوية /رقم الإقامة" , store=True )
     border_number = fields.Integer ( string="رقم  الحدود" , store=True )
+    loans_count = fields.Integer ( compute='_compute_employee_counts' , )
+    payslips_count = fields.Integer ( compute='_compute_employee_counts' , )
+    discount_count = fields.Integer ( compute='_compute_employee_counts' , )
     iqama_expiry_date = fields.Date ( string="تاريخ انتهاء الإقامة" , store=True )
+    leave_allocation_count = fields.Integer ( string="Leave Allocations Count" ,compute="_compute_leave_allocation_count" ,)
     start_working_date = fields.Date ( string="تاريخ المباشرة" , compute="_compute_start_working_date" )
     passport_expiry_date = fields.Date ( string="تاريخ انتهاء الجواز" )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
@@ -516,12 +524,107 @@ class Recruiter ( models.Model ) :
     #             employee.request_employee_manager = employee.coach_id.id
     #             employee.parent_id = employee.coach_id.id
 
+    
+            
+    # @api.depends ( 'employee_id' )
+    def _compute_employee_counts(self) :
+        Loan = self.env['hr.salary.attachment']
+        payslip = self.env['hr.payslip']
+
+        for employee in self :
+            # Loans
+            employee.loans_count = Loan.search_count ( [
+                ('employee_ids' , 'in' , employee.id) ,
+            ] )
+            # ==========payslip
+            employee.payslips_count = payslip.search_count ( [
+                ('employee_id' , '=' , employee.id) ,
+
+            ] )
+
+    ###get allocation number ##
+    @api.depends ( "leave_allocation_ids" )
+    def _compute_leave_allocation_count(self) :
+        for employee in self :
+            employee.leave_allocation_count = self.env[
+                "hr.leave.allocation"
+            ].search_count ( [
+                ("employee_id" , "=" , employee.id) ,
+            ] )
+
+
+    # get employee  leaves allocations
+    def action_list_leaves(self) :
+        self.ensure_one ()
+
+        return {
+            "name" : _ ( "Leave Allocations" ) ,
+            "type" : "ir.actions.act_window" ,
+            "res_model" : "hr.leave.allocation" ,
+            "view_mode" : "list,form" ,
+            "domain" : [
+                ("employee_id" , "=" , self.id) ,
+            ] ,
+            "context" : {
+                "default_employee_id" : self.id ,
+                "search_default_employee_id" : self.id ,
+            } ,
+        }
+# get number of days for leaves active
+    @api.depends ()
+    def _compute_total_leave_duration(self) :
+        today = fields.Date.today ()
+
+        for employee in self :
+            leaves = self.env["hr.leave"].search ( [
+                ("employee_id" , "=" , employee.id) ,
+                ("state" , "=" , "validate") ,
+                ("date_to" , "!=" , False) ,
+                ("date_to" , ">" , today) ,
+            ] )
+
+            employee.total_leave_duration = sum (
+                leaves.mapped ( "number_of_days" )
+            )
     def _create_recruitment_interviewers(self) :
         return True
 
     def _remove_recruitment_interviewers(self) :
         return True
 
+    ##### retrive employee loans####
+    def action_view_employee_loans(self) :
+        self.ensure_one ()
+
+        return {
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'Employee Loans' ,
+            'res_model' : 'hr.salary.attachment' ,
+            'view_mode' : 'list,form' ,
+            'domain' : [
+                ('employee_ids' , 'in' , self.id) ,
+            ] ,
+            'context' : {
+                'default_employee_ids' : self.id ,
+            } ,
+        }
+
+    ##### retrive employee payslip####
+    def action_view_employee_payslip(self) :
+        self.ensure_one ()
+
+        return {
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'Employee Payslips' ,
+            'res_model' : 'hr.payslip' ,
+            'view_mode' : 'list,form' ,
+            'domain' : [
+                ('employee_id' , '=' , self.id) ,
+            ] ,
+            'context' : {
+                'default_employee_id' : self.id ,
+            } ,
+        }
 
     def action_open_employee_leaves(self) :
         self.ensure_one ()
@@ -546,7 +649,6 @@ class Recruiter ( models.Model ) :
             "target" : "current" ,
         }
 
-
     @api.onchange ( 'start_working_date' )
     def _onchange_start_working_date(self) :
         if not self.resumption_work_after_leave :
@@ -562,12 +664,12 @@ class Recruiter ( models.Model ) :
             if not rec.resumption_work_after_leave :
                 continue
 
-            if rec.start_working_date:
-               delta_vacance = relativedelta(today, rec.start_working_date)
-       
-            #delta_vacance = relativedelta ( today , rec.start_working_date )
-            #delta = relativedelta ( today , rec.start_working_date )
-            delta=relativedelta ( today , rec.resumption_work_after_leave )
+            if rec.start_working_date :
+                delta_vacance = relativedelta ( today , rec.start_working_date )
+
+            # delta_vacance = relativedelta ( today , rec.start_working_date )
+            # delta = relativedelta ( today , rec.start_working_date )
+            delta = relativedelta ( today , rec.resumption_work_after_leave )
             months_of_service = delta.years * 12 + delta.months
 
             # الموظف سعودي
@@ -578,14 +680,14 @@ class Recruiter ( models.Model ) :
             else :
                 annual_days = 21 if delta.years < 2 else 30
 
-              
-            if rec.resumption_work_after_leave and rec.resumption_work_after_leave >= fields.Date.from_string('2026-07-30'):
-                rec.old_vacance_days=0
-            
-            else:
-              continue
+            # if rec.resumption_work_after_leave and rec.resumption_work_after_leave >= fields.Date.from_string (
+            #         '2026-07-30' ) :
+            #     rec.old_vacance_days = 0
+
+            # else :
+            #     continue
             # الرصيد المستحق حتى اليوم
-            rec.vacance_days =( months_of_service * (annual_days / 12))+ rec.old_vacance_days
+            rec.vacance_days = (months_of_service * (annual_days / 12)) + rec.old_vacance_days
             rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
 
     @api.depends ( 'contract_ids.date_start' )
@@ -604,23 +706,21 @@ class Recruiter ( models.Model ) :
             # rec.housing_allowance = rec.contract_id.l10n_sa_housing_allowance if rec.contract_id else 0.0اً
             # rec.other_allowance = rec.contract_id.l10n_sa_other_allowances if rec.contract_id else 0.0
 
+    class Recruiter ( models.Model ) :
+        _inherit = 'hr.job'
+        recruiter_id = fields.Many2one ( 'hr.employee' , string="Recruiter" , readonly=False )
+        interviewer_ids = fields.Many2many ( 'hr.employee' , string="Interviewers" , readonly=False ,
+                                             domain=lambda self : [
+                                                 ('id' , 'in' , self.env['hr.employee'].sudo ().search ( [] ).ids)] )
 
-
-class Recruiter ( models.Model ) :
-    _inherit = 'hr.job'
-    recruiter_id = fields.Many2one ( 'hr.employee' , string="Recruiter" , readonly=False )
-    interviewer_ids = fields.Many2many ( 'hr.employee' , string="Interviewers" , readonly=False , domain=lambda self : [
-        ('id' , 'in' , self.env['hr.employee'].sudo ().search ( [] ).ids)] )
-
-
-# class Recruiter ( models.Model ) :
-#     _inherit = 'hr.employee'
-# 
-#     def _create_recruitment_interviewers(self) :
-#         return True
-# 
-#     def _remove_recruitment_interviewers(self) :
-#         return True
+    # class Recruiter ( models.Model ) :
+    #     _inherit = 'hr.employee'
+    #
+    #     def _create_recruitment_interviewers(self) :
+    #         return True
+    #
+    #     def _remove_recruitment_interviewers(self) :
+    #         return True
 
 
 ################## HR ATTACHMENTS###################
