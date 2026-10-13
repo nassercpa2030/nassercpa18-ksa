@@ -489,6 +489,7 @@ class Recruiter ( models.Model ) :
     user_partner_id = fields.Many2one ( comodel_name='res.partner' , string='User Partner' ,
                                         related='user_id.partner_id' , store=True , readonly=False )
     contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
+    total_leave_duration = fields.Float(string="Total Leave Duration",compute="_compute_total_leave_duration",)
     residency_visa_number = fields.Integer ( string="رقم الهوية /رقم الإقامة" , store=True )
     border_number = fields.Integer ( string="رقم  الحدود" , store=True )
     loans_count = fields.Integer ( compute='_compute_employee_counts' , )
@@ -566,6 +567,23 @@ class Recruiter ( models.Model ) :
                # "search_default_employee_id" : self.id ,
             } ,
         }
+        
+    # get number of days for leaves active
+    @api.depends ()
+    def _compute_total_leave_duration(self) :
+        today = fields.Date.today ()
+
+        for employee in self :
+            leaves = self.env["hr.leave"].search ( [
+                ("employee_id" , "=" , employee.id) ,
+                ("state" , "=" , "validate") ,
+                ("date_to" , "!=" , False) ,
+                ("date_to" , ">" , today) ,
+            ] )
+
+            employee.total_leave_duration = sum (
+                leaves.mapped ( "number_of_days" )
+            )
 
     def _create_recruitment_interviewers(self) :
         return True
