@@ -543,7 +543,7 @@ class Recruiter ( models.Model ) :
             ] )
 
     ###get allocation number ##
-    @api.depends ( "leave_allocation_ids" )
+    #@api.depends ( "leave_allocation_ids" )
     def _compute_leave_allocation_count(self) :
         for employee in self :
             employee.leave_allocation_count = self.env[
