@@ -563,7 +563,7 @@ class Recruiter ( models.Model ) :
             ] ,
             "context" : {
                 "default_employee_id" : self.id ,
-                "search_default_employee_id" : self.id ,
+               # "search_default_employee_id" : self.id ,
             } ,
         }
 
