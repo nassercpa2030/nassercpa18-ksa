@@ -467,8 +467,8 @@ class Recruiter ( models.Model ) :
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
                                       placeholder="Enter Analytic Plan" )
     old_vacance_days = fields.Float ( string='رصيد أجــازات سـابق' ,
-                                     #compute='_compute_employee_vacance_days' ,
-                                      stored=True,readonly=False )
+                                      # compute='_compute_employee_vacance_days' ,
+                                      stored=True , readonly=False )
     reversed_vacance_days = fields.Float ( string='رصيد أجــازات باقي' , compute='_compute_employee_vacance_days' ,
                                            readonly=False )
     # compute='_compute_employee_vacance_days',readonly=False)
@@ -495,6 +495,7 @@ class Recruiter ( models.Model ) :
     payslips_count = fields.Integer ( compute='_compute_employee_counts' , )
     discount_count = fields.Integer ( compute='_compute_employee_counts' , )
     iqama_expiry_date = fields.Date ( string="تاريخ انتهاء الإقامة" , store=True )
+    leave_allocation_count = fields.Integer ( string="Leave Allocations Count" ,compute="_compute_leave_allocation_count" ,)
     start_working_date = fields.Date ( string="تاريخ المباشرة" , compute="_compute_start_working_date" )
     passport_expiry_date = fields.Date ( string="تاريخ انتهاء الجواز" )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
@@ -521,13 +522,12 @@ class Recruiter ( models.Model ) :
     #             employee.request_employee_manager = employee.coach_id.id
     #             employee.parent_id = employee.coach_id.id
 
-    #@api.depends ( 'employee_id' )
+    # @api.depends ( 'employee_id' )
     def _compute_employee_counts(self) :
         Loan = self.env['hr.salary.attachment']
         payslip = self.env['hr.payslip']
 
         for employee in self :
-
             # Loans
             employee.loans_count = Loan.search_count ( [
                 ('employee_ids' , 'in' , employee.id) ,
@@ -538,6 +538,17 @@ class Recruiter ( models.Model ) :
 
             ] )
 
+    ###get allocation number ##
+    @api.depends ( "leave_allocation_ids" )
+    def _compute_leave_allocation_count(self) :
+        for employee in self :
+            employee.leave_allocation_count = self.env[
+                "hr.leave.allocation"
+            ].search_count ( [
+                ("employee_id" , "=" , employee.id) ,
+            ] )
+            
+            
     # get employee  vacances allocations
     def action_list_leaves(self) :
         self.ensure_one ()
@@ -555,9 +566,6 @@ class Recruiter ( models.Model ) :
                 "search_default_employee_id" : self.id ,
             } ,
         }
-    
-
-
 
     def _create_recruitment_interviewers(self) :
         return True
