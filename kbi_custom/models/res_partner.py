@@ -577,8 +577,8 @@ class Recruiter ( models.Model ) :
             leaves = self.env["hr.leave"].search ( [
                 ("employee_id" , "=" , employee.id) ,
                 ("state" , "=" , "validate") ,
-                ("date_to" , "!=" , False) ,
-                ("date_to" , ">" , today) ,
+                ("requested_date_from" , "<=" , today) ,
+                ("request_date_to" , ">=" , today) ,
             ] )
 
             employee.total_leave_duration = sum (
