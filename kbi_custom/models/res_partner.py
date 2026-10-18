@@ -573,37 +573,28 @@ class Recruiter ( models.Model ) :
     def action_create_leave_allocation(self) :
         Allocation = self.env['hr.leave.allocation']
         allocations = Allocation
+        today = fields.Date.context_today ( self )
 
         for employee in self :
-            # منع إنشاء مخصصات جديدة إذا كان هناك مخصصات موجودة
             if employee.leave_allocation_count > 0 :
                 raise UserError (
                     f"تم إنشاء مخصصات الإجازة للموظف {employee.name} بالفعل."
                 )
 
             contract = employee.contract_id
-
             if not contract :
-                raise UserError (
-                    "لا يوجد عقد مرتبط بالموظف."
-                )
+                raise UserError ( "لا يوجد عقد مرتبط بالموظف." )
 
             if not contract.leave_accrual_plan_id :
-                raise UserError (
-                    "يجب تحديد خطة استحقاق الإجازة في العقد."
-                )
+                raise UserError ( "يجب تحديد خطة استحقاق الإجازة في العقد." )
 
-            if not employee.resumption_work_after_leave :
-                raise UserError (
-                    "يجب تحديد تاريخ استلام العمل بعد الإجازة."
-                )
+            start_date = employee.resumption_work_after_leave
+            if not start_date :
+                raise UserError ( "يجب تحديد تاريخ استلام العمل بعد الإجازة." )
 
             leave_type = self.env['hr.leave.type'].browse ( 1 ).exists ()
-
             if not leave_type :
-                raise UserError (
-                    "نوع الإجازة بالرقم ID = 1 غير موجود."
-                )
+                raise UserError ( "نوع الإجازة بالرقم ID = 1 غير موجود." )
 
             allocation = Allocation.create ( {
                 'name' : f'Accrual Allocation - {employee.name}' ,
@@ -611,10 +602,9 @@ class Recruiter ( models.Model ) :
                 'holiday_status_id' : leave_type.id ,
                 'allocation_type' : 'accrual' ,
                 'accrual_plan_id' : contract.leave_accrual_plan_id.id ,
-                'date_from' : employee.resumption_work_after_leave ,
+                'date_from' : start_date ,
             } )
 
-            # الاعتماد الأول ثم الاعتماد النهائي
             if allocation.state == 'confirm' :
                 allocation.action_approve ()
 
@@ -627,6 +617,17 @@ class Recruiter ( models.Model ) :
                     f"الحالة الحالية: {allocation.state}"
                 )
 
+            # إعادة قراءة السجل بعد الاعتماد
+            allocation.invalidate_recordset ()
+
+            # حساب فرق الأيام بين اليوم وتاريخ استلام العمل
+            days_difference = (today - start_date).days
+
+            # تعيين الفرق في حقل مدة المخصص
+            allocation.write ( {
+                'number_of_days' : days_difference ,
+            } )
+
             allocations |= allocation
 
         return {
@@ -637,6 +638,7 @@ class Recruiter ( models.Model ) :
             'domain' : [('id' , 'in' , allocations.ids)] ,
             'target' : 'current' ,
         }
+    
 
     # get number of days for leaves active
     @api.depends ()
@@ -734,8 +736,8 @@ class Recruiter ( models.Model ) :
                 continue
 
             if rec.start_working_date :
-               rec.vacance_days = rec.leave_allocation_count + rec.old_vacance_days
-               rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
+                rec.vacance_days = rec.leave_allocation_count + rec.old_vacance_days
+                rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
             #     delta_vacance = relativedelta ( today , rec.start_working_date )
 
             # # delta_vacance = relativedelta ( today , rec.start_working_date )
@@ -758,8 +760,7 @@ class Recruiter ( models.Model ) :
             # else :
             #     continue
             # الرصيد المستحق حتى اليوم
-            #rec.vacance_days = (months_of_service * (annual_days / 12)) + rec.old_vacance_days
-           
+            # rec.vacance_days = (months_of_service * (annual_days / 12)) + rec.old_vacance_days
 
     @api.depends ( 'contract_ids.date_start' )
     def _compute_start_working_date(self) :
