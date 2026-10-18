@@ -468,7 +468,7 @@ class Recruiter ( models.Model ) :
                                       placeholder="Enter Analytic Plan" )
     old_vacance_days = fields.Float ( string='رصيد أجــازات سـابق' ,
                                       # compute='_compute_employee_vacance_days' ,
-                                      stored=True , readonly=False )
+                                      store=True , readonly=False )
     reversed_vacance_days = fields.Float ( string='رصيد أجــازات باقي' , compute='_compute_employee_vacance_days' ,
                                            readonly=False )
     # compute='_compute_employee_vacance_days',readonly=False)
