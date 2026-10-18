@@ -483,8 +483,8 @@ class Recruiter ( models.Model ) :
                                            help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
     request_employee_manager = fields.Many2one ( 'res.users' , string='المـديـر ' , required=True , store=True )
-    
-    total_leave_duration = fields.Float(string="Total Leave Duration",compute="_compute_total_leave_duration",)
+
+    total_leave_duration = fields.Float ( string="Total Leave Duration" , compute="_compute_total_leave_duration" , )
     # request_employee_manager = fields.Many2one ( string='المـديـر ' , compute='_compute_request_employee_manager' ,
     #                                              required=True , store=True , readonly=True )
     # parent_id = fields.Many2one ( string='Manager',compute = '_compute_request_employee_manager' , required = True , store = True , readonly = True  )
@@ -497,7 +497,8 @@ class Recruiter ( models.Model ) :
     payslips_count = fields.Integer ( compute='_compute_employee_counts' , )
     discount_count = fields.Integer ( compute='_compute_employee_counts' , )
     iqama_expiry_date = fields.Date ( string="تاريخ انتهاء الإقامة" , store=True )
-    leave_allocation_count = fields.Integer ( string="Leave Allocations Count" ,compute="_compute_leave_allocation_count" ,)
+    leave_allocation_count = fields.Integer ( string="Leave Allocations Count" ,
+                                              compute="_compute_leave_allocation_count" , )
     start_working_date = fields.Date ( string="تاريخ المباشرة" , compute="_compute_start_working_date" )
     passport_expiry_date = fields.Date ( string="تاريخ انتهاء الجواز" )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
@@ -524,8 +525,6 @@ class Recruiter ( models.Model ) :
     #             employee.request_employee_manager = employee.coach_id.id
     #             employee.parent_id = employee.coach_id.id
 
-    
-            
     # @api.depends ( 'employee_id' )
     def _compute_employee_counts(self) :
         Loan = self.env['hr.salary.attachment']
@@ -543,7 +542,7 @@ class Recruiter ( models.Model ) :
             ] )
 
     ###get allocation number ##
-    #@api.depends ( "leave_allocation_ids" )
+    # @api.depends ( "leave_allocation_ids" )
     def _compute_leave_allocation_count(self) :
         for employee in self :
             employee.leave_allocation_count = self.env[
@@ -551,7 +550,6 @@ class Recruiter ( models.Model ) :
             ].search_count ( [
                 ("employee_id" , "=" , employee.id) ,
             ] )
-
 
     # get employee  leaves allocations
     def action_list_leaves(self) :
@@ -570,7 +568,59 @@ class Recruiter ( models.Model ) :
                 "search_default_employee_id" : self.id ,
             } ,
         }
-# get number of days for leaves active
+    
+    ### create allocation for employee ####
+    def action_create_leave_allocation(self) :
+        Allocation = self.env['hr.leave.allocation']
+
+        for employee in self :
+            contract = employee.contract_id
+
+            if not contract :
+                raise UserError (
+                    "لا يوجد عقد مرتبط بالموظف."
+                )
+
+            if not contract.leave_accural_plan_id :
+                raise UserError (
+                    "يجب تحديد خطة استحقاق الإجازة في العقد."
+                )
+
+            if not employee.resumption_work_after_leave :
+                raise UserError (
+                    "يجب تحديد تاريخ استلام العمل بعد الإجازة."
+                )
+
+            leave_type = self.env['hr.leave.type'].browse ( 1 ).exists ()
+
+            if not leave_type :
+                raise UserError (
+                    "نوع الإجازة بالرقم ID = 1 غير موجود."
+                )
+
+            allocation = Allocation.create ( {
+                'name' : f'Accrual Allocation - {employee.name}' ,
+                'employee_id' : employee.id ,
+                'holiday_status_id' : leave_type.id ,
+                'allocation_type' : 'accrual' ,
+                'accrual_plan_id' : contract.leave_accural_plan_id.id ,
+                'date_from' : employee.resumption_work_after_leave ,
+            } )
+
+            allocation.action_validate ()
+
+            return {
+                'type' : 'ir.actions.act_window' ,
+                'name' : 'Leave Allocation' ,
+                'res_model' : 'hr.leave.allocation' ,
+                'view_mode' : 'form' ,
+                'res_id' : allocation.id ,
+                'target' : 'current' ,
+            }
+
+
+
+    # get number of days for leaves active
     @api.depends ()
     def _compute_total_leave_duration(self) :
         today = fields.Date.today ()
@@ -586,6 +636,7 @@ class Recruiter ( models.Model ) :
             employee.total_leave_duration = sum (
                 leaves.mapped ( "number_of_days" )
             )
+
     def _create_recruitment_interviewers(self) :
         return True
 
