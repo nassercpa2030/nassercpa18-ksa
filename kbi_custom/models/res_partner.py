@@ -575,6 +575,12 @@ class Recruiter ( models.Model ) :
         allocations = Allocation
 
         for employee in self :
+            # منع إنشاء مخصصات جديدة إذا كان هناك مخصصات موجودة
+            if employee.leave_allocation_count > 0 :
+                raise UserError (
+                    f"تم إنشاء مخصصات الإجازة للموظف {employee.name} بالفعل."
+                )
+
             contract = employee.contract_id
 
             if not contract :
@@ -608,11 +614,10 @@ class Recruiter ( models.Model ) :
                 'date_from' : employee.resumption_work_after_leave ,
             } )
 
-            # First approval
+            # الاعتماد الأول ثم الاعتماد النهائي
             if allocation.state == 'confirm' :
                 allocation.action_approve ()
 
-            # Final validation
             if allocation.state == 'validate1' :
                 allocation.action_validate ()
 
