@@ -575,12 +575,6 @@ class Recruiter ( models.Model ) :
         allocations = Allocation
         today = fields.Date.context_today ( self )
 
-        # الاستحقاق الشهري
-        monthly_days = 2.5
-
-        # الاستحقاق اليومي على أساس شهر 30 يومًا
-        daily_days = monthly_days / 30.0
-
         for employee in self :
             if employee.leave_allocation_count > 0 :
                 raise UserError (
@@ -609,8 +603,29 @@ class Recruiter ( models.Model ) :
                 'allocation_type' : 'accrual' ,
                 'accrual_plan_id' : contract.leave_accrual_plan_id.id ,
                 'date_from' : start_date ,
+
+                # منع القيمة الافتراضية 1
+                'number_of_days' : 0.0 ,
             } )
 
+            # محاكاة حساب Odoo الأصلي عند اختيار خطة الاستحقاق
+            allocation.update (
+                allocation._get_initialize_accrual_plan_values ( start_date )
+            )
+
+            # حساب الاستحقاق من تاريخ البداية حتى اليوم
+            allocation._process_accrual_plans ( date_to=today )
+
+            # تحديث القيمة المحسوبة بعد معالجة خطة الاستحقاق
+            allocation.invalidate_recordset ( [
+                'number_of_days' ,
+                'number_of_days_display' ,
+                'number_of_hours_display' ,
+                'nextcall' ,
+                'lastcall' ,
+            ] )
+
+            # الاعتماد بعد تجهيز رصيد الاستحقاق
             if allocation.state == 'confirm' :
                 allocation.action_approve ()
 
@@ -623,17 +638,13 @@ class Recruiter ( models.Model ) :
                     f"الحالة الحالية: {allocation.state}"
                 )
 
-            # عدد الأيام المنقضية من تاريخ استلام العمل
-            days_difference = max ( (today - start_date).days , 0 )
-
-            # الاستحقاق النظري حتى اليوم
-            accrued_days = round ( days_difference * daily_days , 2 )
-
-            # إعادة قراءة السجل بعد الاعتماد
+            # قراءة القيمة النهائية المحسوبة
             allocation.invalidate_recordset ()
-
-            # لا نكتب في number_of_days أو number_of_days_display،
-            # لأنهما مرتبطان بمنطق حساب المخصصات في Odoo.
+            allocation.read ( [
+                'number_of_days' ,
+                'number_of_days_display' ,
+                'number_of_hours_display' ,
+            ] )
 
             allocations |= allocation
 
@@ -645,8 +656,8 @@ class Recruiter ( models.Model ) :
             'domain' : [('id' , 'in' , allocations.ids)] ,
             'target' : 'current' ,
         }
-    
-    
+
+
     # get number of days for leaves active
     @api.depends ()
     def _compute_total_leave_duration(self) :
