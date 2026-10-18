@@ -568,7 +568,7 @@ class Recruiter ( models.Model ) :
                 "search_default_employee_id" : self.id ,
             } ,
         }
-    
+
     ### create allocation for employee ####
     def action_create_leave_allocation(self) :
         Allocation = self.env['hr.leave.allocation']
@@ -581,7 +581,7 @@ class Recruiter ( models.Model ) :
                     "لا يوجد عقد مرتبط بالموظف."
                 )
 
-            if not contract.leave_accrual_plan_id:
+            if not contract.leave_accrual_plan_id :
                 raise UserError (
                     "يجب تحديد خطة استحقاق الإجازة في العقد."
                 )
@@ -609,15 +609,20 @@ class Recruiter ( models.Model ) :
 
             allocation.action_validate ()
 
-            return {
-                'type' : 'ir.actions.act_window' ,
-                'name' : 'Leave Allocation' ,
-                'res_model' : 'hr.leave.allocation' ,
-                'view_mode' : 'form' ,
-                'res_id' : allocation.id ,
-                'target' : 'current' ,
-            }
+            if allocation.state != 'validate' :
+                raise UserError (
+                    f"لم يتم اعتماد مخصصات الإجازة للموظف {employee.name}. "
+                    f"الحالة الحالية: {allocation.state}"
+                )
 
+        return {
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'Leave Allocation' ,
+            'res_model' : 'hr.leave.allocation' ,
+            'view_mode' : 'list,form' ,
+            'domain' : [('id' , 'in' , allocation.ids)] ,
+            'target' : 'current' ,
+        }
 
 
     # get number of days for leaves active
