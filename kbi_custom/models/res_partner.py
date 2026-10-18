@@ -734,20 +734,22 @@ class Recruiter ( models.Model ) :
                 continue
 
             if rec.start_working_date :
-                delta_vacance = relativedelta ( today , rec.start_working_date )
+               rec.vacance_days = rec.leave_allocation_count + rec.old_vacance_days
+               rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
+            #     delta_vacance = relativedelta ( today , rec.start_working_date )
 
-            # delta_vacance = relativedelta ( today , rec.start_working_date )
-            # delta = relativedelta ( today , rec.start_working_date )
-            delta = relativedelta ( today , rec.resumption_work_after_leave )
-            months_of_service = delta.years * 12 + delta.months
+            # # delta_vacance = relativedelta ( today , rec.start_working_date )
+            # # delta = relativedelta ( today , rec.start_working_date )
+            # delta = relativedelta ( today , rec.resumption_work_after_leave )
+            # months_of_service = delta.years * 12 + delta.months
 
-            # الموظف سعودي
-            if rec.country_id.code == 'SA' :
-                annual_days = 21 if delta.years < 5 else 30
+            # # الموظف سعودي
+            # if rec.country_id.code == 'SA' :
+            #     annual_days = 21 if delta.years < 5 else 30
 
-            # الموظف غير سعودي
-            else :
-                annual_days = 21 if delta.years < 2 else 30
+            # # الموظف غير سعودي
+            # else :
+            #     annual_days = 21 if delta.years < 2 else 30
 
             # if rec.resumption_work_after_leave and rec.resumption_work_after_leave >= fields.Date.from_string (
             #         '2026-07-30' ) :
@@ -756,8 +758,8 @@ class Recruiter ( models.Model ) :
             # else :
             #     continue
             # الرصيد المستحق حتى اليوم
-            rec.vacance_days = (months_of_service * (annual_days / 12)) + rec.old_vacance_days
-            rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
+            #rec.vacance_days = (months_of_service * (annual_days / 12)) + rec.old_vacance_days
+           
 
     @api.depends ( 'contract_ids.date_start' )
     def _compute_start_working_date(self) :
