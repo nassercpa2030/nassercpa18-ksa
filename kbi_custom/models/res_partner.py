@@ -609,7 +609,7 @@ class Recruiter ( models.Model ) :
 
             allocation.action_validate ()
 
-            if allocation.state != 'validate' :
+            if allocation.state != 'validate1' :
                 raise UserError (
                     f"لم يتم اعتماد مخصصات الإجازة للموظف {employee.name}. "
                     f"الحالة الحالية: {allocation.state}"
