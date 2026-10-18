@@ -468,7 +468,7 @@ class Recruiter ( models.Model ) :
                                       placeholder="Enter Analytic Plan" )
     old_vacance_days = fields.Float ( string='رصيد أجــازات سـابق' ,
                                       # compute='_compute_employee_vacance_days' ,
-                                      store=True , readonly=False )
+                                      stored=True , readonly=False )
     reversed_vacance_days = fields.Float ( string='رصيد أجــازات باقي' , compute='_compute_employee_vacance_days' ,
                                            readonly=False )
     # compute='_compute_employee_vacance_days',readonly=False)
@@ -572,6 +572,7 @@ class Recruiter ( models.Model ) :
     ### create allocation for employee ####
     def action_create_leave_allocation(self) :
         Allocation = self.env['hr.leave.allocation']
+        allocations = Allocation
 
         for employee in self :
             contract = employee.contract_id
@@ -607,23 +608,30 @@ class Recruiter ( models.Model ) :
                 'date_from' : employee.resumption_work_after_leave ,
             } )
 
-            allocation.action_validate ()
+            # First approval
+            if allocation.state == 'confirm' :
+                allocation.action_approve ()
 
-            if allocation.state != 'validate1' :
+            # Final validation
+            if allocation.state == 'validate1' :
+                allocation.action_validate ()
+
+            if allocation.state != 'validate' :
                 raise UserError (
                     f"لم يتم اعتماد مخصصات الإجازة للموظف {employee.name}. "
                     f"الحالة الحالية: {allocation.state}"
                 )
 
+            allocations |= allocation
+
         return {
             'type' : 'ir.actions.act_window' ,
-            'name' : 'Leave Allocation' ,
+            'name' : 'Leave Allocations' ,
             'res_model' : 'hr.leave.allocation' ,
             'view_mode' : 'list,form' ,
-            'domain' : [('id' , 'in' , allocation.ids)] ,
+            'domain' : [('id' , 'in' , allocations.ids)] ,
             'target' : 'current' ,
         }
-
 
     # get number of days for leaves active
     @api.depends ()
