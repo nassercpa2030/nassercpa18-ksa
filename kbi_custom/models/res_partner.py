@@ -569,11 +569,17 @@ class Recruiter ( models.Model ) :
             } ,
         }
 
-    ### create allocation for employee ####
+    ### create allocation for employee ###
     def action_create_leave_allocation(self) :
         Allocation = self.env['hr.leave.allocation']
         allocations = Allocation
         today = fields.Date.context_today ( self )
+
+        # الاستحقاق الشهري
+        monthly_days = 2.5
+
+        # الاستحقاق اليومي على أساس شهر 30 يومًا
+        daily_days = monthly_days / 30.0
 
         for employee in self :
             if employee.leave_allocation_count > 0 :
@@ -617,16 +623,17 @@ class Recruiter ( models.Model ) :
                     f"الحالة الحالية: {allocation.state}"
                 )
 
+            # عدد الأيام المنقضية من تاريخ استلام العمل
+            days_difference = max ( (today - start_date).days , 0 )
+
+            # الاستحقاق النظري حتى اليوم
+            accrued_days = round ( days_difference * daily_days , 2 )
+
             # إعادة قراءة السجل بعد الاعتماد
             allocation.invalidate_recordset ()
 
-            # حساب فرق الأيام بين اليوم وتاريخ استلام العمل
-            days_difference = (today - start_date).days
-
-            # تعيين الفرق في حقل مدة المخصص
-            allocation.write ( {
-                'number_of_days' : days_difference ,
-            } )
+            # لا نكتب في number_of_days أو number_of_days_display،
+            # لأنهما مرتبطان بمنطق حساب المخصصات في Odoo.
 
             allocations |= allocation
 
@@ -639,7 +646,7 @@ class Recruiter ( models.Model ) :
             'target' : 'current' ,
         }
     
-
+    
     # get number of days for leaves active
     @api.depends ()
     def _compute_total_leave_duration(self) :
