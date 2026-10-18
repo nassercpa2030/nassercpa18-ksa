@@ -581,7 +581,7 @@ class Recruiter ( models.Model ) :
                     "لا يوجد عقد مرتبط بالموظف."
                 )
 
-            if not contract.leave_accural_plan_id :
+            if not contract.leave_accrual_plan_id:
                 raise UserError (
                     "يجب تحديد خطة استحقاق الإجازة في العقد."
                 )
@@ -603,7 +603,7 @@ class Recruiter ( models.Model ) :
                 'employee_id' : employee.id ,
                 'holiday_status_id' : leave_type.id ,
                 'allocation_type' : 'accrual' ,
-                'accrual_plan_id' : contract.leave_accural_plan_id.id ,
+                'accrual_plan_id' : contract.leave_accrual_plan_id.id ,
                 'date_from' : employee.resumption_work_after_leave ,
             } )
 
