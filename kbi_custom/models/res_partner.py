@@ -755,7 +755,7 @@ class Recruiter ( models.Model ) :
 
             if rec.start_working_date :
                 
-                rec.vacance_days = float(employee.allocation_display or 0.0) + rec.old_vacance_days
+                rec.vacance_days = float(rec.allocation_display or 0.0) + rec.old_vacance_days
                 rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
             #     delta_vacance = relativedelta ( today , rec.start_working_date )
 
