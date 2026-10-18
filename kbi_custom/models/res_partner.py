@@ -489,14 +489,15 @@ class Recruiter ( models.Model ) :
     user_partner_id = fields.Many2one ( comodel_name='res.partner' , string='User Partner' ,
                                         related='user_id.partner_id' , store=True , readonly=False )
     contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
-    total_leave_duration = fields.Float(string="Total Leave Duration",compute="_compute_total_leave_duration",)
+    total_leave_duration = fields.Float ( string="Total Leave Duration" , compute="_compute_total_leave_duration" , )
     residency_visa_number = fields.Integer ( string="رقم الهوية /رقم الإقامة" , store=True )
     border_number = fields.Integer ( string="رقم  الحدود" , store=True )
     loans_count = fields.Integer ( compute='_compute_employee_counts' , )
     payslips_count = fields.Integer ( compute='_compute_employee_counts' , )
     discount_count = fields.Integer ( compute='_compute_employee_counts' , )
     iqama_expiry_date = fields.Date ( string="تاريخ انتهاء الإقامة" , store=True )
-    leave_allocation_count = fields.Integer ( string="Leave Allocations Count" ,compute="_compute_leave_allocation_count" ,)
+    leave_allocation_count = fields.Integer ( string="Leave Allocations Count" ,
+                                              compute="_compute_leave_allocation_count" , )
     start_working_date = fields.Date ( string="تاريخ المباشرة" , compute="_compute_start_working_date" )
     passport_expiry_date = fields.Date ( string="تاريخ انتهاء الجواز" )
     analytic_account_id = fields.Many2one ( 'account.analytic.account' , string='Analytic Account' ,
@@ -512,6 +513,78 @@ class Recruiter ( models.Model ) :
     transportation_allowance = fields.Monetary ( 'بدل المواصلات' , related="contract_id.transportation_allowance" ,
                                                  help="Same field as housing allowance for employee contract" ,
                                                  readonly=False , store=True )
+
+
+
+
+    ### create allocation for employee ####
+    def action_create_leave_allocation(self) :
+        Allocation = self.env['hr.leave.allocation']
+        allocations = Allocation
+
+        for employee in self :
+            # منع إنشاء مخصصات جديدة إذا كان هناك مخصصات موجودة
+            if employee.leave_allocation_count > 0 :
+                raise UserError (
+                    f"تم إنشاء مخصصات الإجازة للموظف {employee.name} بالفعل."
+                )
+
+            contract = employee.contract_id
+
+            if not contract :
+                raise UserError (
+                    "لا يوجد عقد مرتبط بالموظف."
+                )
+
+            if not contract.leave_accrual_plan_id :
+                raise UserError (
+                    "يجب تحديد خطة استحقاق الإجازة في العقد."
+                )
+
+            if not employee.resumption_work_after_leave :
+                raise UserError (
+                    "يجب تحديد تاريخ استلام العمل بعد الإجازة."
+                )
+
+            leave_type = self.env['hr.leave.type'].browse ( 1 ).exists ()
+
+            if not leave_type :
+                raise UserError (
+                    "نوع الإجازة بالرقم ID = 1 غير موجود."
+                )
+
+            allocation = Allocation.create ( {
+                'name' : f'Accrual Allocation - {employee.name}' ,
+                'employee_id' : employee.id ,
+                'holiday_status_id' : leave_type.id ,
+                'allocation_type' : 'accrual' ,
+                'accrual_plan_id' : contract.leave_accrual_plan_id.id ,
+                'date_from' : employee.resumption_work_after_leave ,
+            } )
+
+            # الاعتماد الأول ثم الاعتماد النهائي
+            if allocation.state == 'confirm' :
+                allocation.action_approve ()
+
+            if allocation.state == 'validate1' :
+                allocation.action_validate ()
+
+            if allocation.state != 'validate' :
+                raise UserError (
+                    f"لم يتم اعتماد مخصصات الإجازة للموظف {employee.name}. "
+                    f"الحالة الحالية: {allocation.state}"
+                )
+
+            allocations |= allocation
+
+        return {
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'Leave Allocations' ,
+            'res_model' : 'hr.leave.allocation' ,
+            'view_mode' : 'list,form' ,
+            'domain' : [('id' , 'in' , allocations.ids)] ,
+            'target' : 'current' ,
+        }
 
     # @api.depends ( 'coach_id' )
     # def _compute_request_employee_manager(self) :
@@ -540,7 +613,7 @@ class Recruiter ( models.Model ) :
             ] )
 
     ###get allocation number ##
-    #@api.depends ( "leave_allocation_ids" )
+    # @api.depends ( "leave_allocation_ids" )
     def _compute_leave_allocation_count(self) :
         for employee in self :
             employee.leave_allocation_count = self.env[
@@ -548,8 +621,7 @@ class Recruiter ( models.Model ) :
             ].search_count ( [
                 ("employee_id" , "=" , employee.id) ,
             ] )
-            
-            
+
     # get employee  vacances allocations
     def action_list_leaves(self) :
         self.ensure_one ()
@@ -564,10 +636,10 @@ class Recruiter ( models.Model ) :
             ] ,
             "context" : {
                 "default_employee_id" : self.id ,
-               # "search_default_employee_id" : self.id ,
+                # "search_default_employee_id" : self.id ,
             } ,
         }
-        
+
     # get number of days for leaves active
     @api.depends ()
     def _compute_total_leave_duration(self) :
