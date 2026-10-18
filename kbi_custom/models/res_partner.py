@@ -593,14 +593,15 @@ class Recruiter ( models.Model ) :
 
             allocations |= allocation
 
-        return {
-            'type' : 'ir.actions.act_window' ,
-            'name' : 'Leave Allocations' ,
-            'res_model' : 'hr.leave.allocation' ,
-            'view_mode' : 'list,form' ,
-            'domain' : [('id' , 'in' , allocations.ids)] ,
-            'target' : 'current' ,
-        }
+        return True
+        # {
+        #     'type' : 'ir.actions.act_window' ,
+        #     'name' : 'Leave Allocations' ,
+        #     'res_model' : 'hr.leave.allocation' ,
+        #     'view_mode' : 'list,form' ,
+        #     'domain' : [('id' , 'in' , allocations.ids)] ,
+        #     'target' : 'current' ,
+        # }
 
     # @api.depends ( 'coach_id' )
     # def _compute_request_employee_manager(self) :
