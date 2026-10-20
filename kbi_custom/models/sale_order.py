@@ -157,9 +157,9 @@ class SaleOrder ( models.Model ) :
                                    store=True )
     broker_amount = fields.Float ( string='Broker Amount' , tracking=True )
     broker_invoiced_amount = fields.Float ( string='قيمة إستحقاق فاتورة المسوق' ,
-                                            compute="_compute_broker_invoiced_amount" , searchable=True )
+                                            compute="_compute_broker_invoiced_amount" , search='_search_broker_invoiced_amount',sortable=True )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
-                                              compute="_compute_broker_invoiced_amount" , searchable=True )
+                                              compute="_compute_broker_invoiced_amount" , searchable=True ,)
     broker_invoice_payment_state = fields.Selection (
         [('not_paid' , 'غيرمدفوع') , ('partial' , 'مدفوع جزئي') , ('paid' , 'مدفوع كلي') , ('blocked' , 'محظور') ,
          ('reversed' , 'مرتجع') , ('in_payment' , 'للدفع') ,
@@ -746,7 +746,7 @@ class SaleOrder ( models.Model ) :
                     } )
 
                     wizard.close_entry_deffered ()
-                   
+
 
         elif not 'archive_signiture' in vals and 'archive_signiture_exception' in vals :
 
@@ -1492,6 +1492,8 @@ class SaleOrder2 ( models.Model ) :
             'target' : 'current' ,
         }
 
+
+
     def _compute_broker_invoiced_amount(self) :
         for rec in self :
             moves = self.env['account.move'].search ( [('broker_sale_id' , '=' , rec.id)] )
@@ -1511,6 +1513,41 @@ class SaleOrder2 ( models.Model ) :
                 rec.broker_invoiced_amount = 0
                 rec.broker_uninvoiced_amount = rec.broker_amount
                 rec.broker_invoice_payment_state = 'not_paid'
+
+
+
+    ##search method
+    def _search_broker_invoiced_amount(self , operator , value) :
+        allowed_operators = {
+            '=' , '!=' , '>' , '>=' , '<' , '<=' ,
+        }
+
+        if operator not in allowed_operators :
+            return NotImplemented
+
+        brokers = self.search ( [] )
+        matching_ids = []
+
+        for broker in brokers :
+            moves = self.env['account.move'].search ( [
+                ('broker_sale_id' , '=' , broker.id) ,
+            ] )
+
+            amount = sum ( moves.mapped ( 'amount_untaxed' ) )
+
+            if (
+                    (operator == '=' and amount == value)
+                    or (operator == '!=' and amount != value)
+                    or (operator == '>' and amount > value)
+                    or (operator == '>=' and amount >= value)
+                    or (operator == '<' and amount < value)
+                    or (operator == '<=' and amount <= value)
+            ) :
+                matching_ids.append ( broker.id )
+
+        return [('id' , 'in' , matching_ids)]
+
+
 
     def action_update_and_open_projects(self) :
         for record in self :
