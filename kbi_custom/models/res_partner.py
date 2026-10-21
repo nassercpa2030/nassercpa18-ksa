@@ -189,7 +189,7 @@ class EmployeeLeaveWizard(models.TransientModel):
         self.write({'state': 'rejected'})
 
         return {'type': 'ir.actions.act_window_close'}
-    
+
 ############
 
 class EmployeeLeaveWizard(models.TransientModel):
@@ -354,11 +354,11 @@ class EmployeeLeaveWizard(models.TransientModel):
         self.write({'state': 'rejected'})
 
         return {'type': 'ir.actions.act_window_close'}
-    
-    
 
 
-    
+
+
+
 class ResCity ( models.Model ) :
     _inherit = 'res.users'
 
