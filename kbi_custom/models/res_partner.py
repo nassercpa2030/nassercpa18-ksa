@@ -27,7 +27,338 @@ class ResCity ( models.Model ) :
     name = fields.Char ( string='Name' , required=True )
     code = fields.Char ( string='Code' )
 
+class EmployeeLeaveWizard(models.TransientModel):
+    _name = 'employee.leave.wizard'
+    _description = 'Employee Leave Request Wizard'
 
+    employee_id = fields.Many2one(
+        'hr.employee',
+        string='Employee',
+        required=True,
+    )
+
+    date_from = fields.Date(
+        string='Start Date',
+        required=True,
+    )
+
+    date_to = fields.Date(
+        string='End Date',
+        required=True,
+    )
+
+    number_of_days = fields.Integer(
+        string='Number of Days',
+        compute='_compute_number_of_days',
+    )
+
+    state = fields.Selection(
+        [
+            ('draft', 'Draft'),
+            ('approved', 'Approved'),
+            ('rejected', 'Rejected'),
+        ],
+        default='draft',
+        readonly=True,
+    )
+
+    paid_leave_id = fields.Many2one(
+        'hr.leave',
+        string='Paid Leave',
+        readonly=True,
+    )
+
+    unpaid_leave_id = fields.Many2one(
+        'hr.leave',
+        string='Unpaid Leave',
+        readonly=True,
+    )
+
+    @api.depends('date_from', 'date_to')
+    def _compute_number_of_days(self):
+        for rec in self:
+            if rec.date_from and rec.date_to:
+                rec.number_of_days = (
+                    rec.date_to - rec.date_from
+                ).days + 1
+            else:
+                rec.number_of_days = 0
+
+    @api.constrains('date_from', 'date_to')
+    def _check_dates(self):
+        for rec in self:
+            if rec.date_from and rec.date_to:
+                if rec.date_to < rec.date_from:
+                    raise UserError(
+                        _('End date must be on or after start date.')
+                    )
+
+    def _get_calendar_days(self):
+        self.ensure_one()
+        return (self.date_to - self.date_from).days + 1
+
+    def _create_and_validate_leave(
+        self, leave_type, start_date, end_date
+    ):
+        self.ensure_one()
+
+        leave = self.env['hr.leave'].create({
+            'name': _('Leave - %s') % self.employee_id.name,
+            'employee_id': self.employee_id.id,
+            'holiday_status_id': leave_type.id,
+            'request_date_from': start_date,
+            'request_date_to': end_date,
+        })
+
+        if leave.state in ('draft', 'confirm'):
+            leave.action_validate()
+
+        return leave
+
+    def action_approve(self):
+        self.ensure_one()
+
+        if self.state != 'draft':
+            raise UserError(_('This request has already been processed.'))
+
+        if self.date_to < self.date_from:
+            raise UserError(_('End date cannot be before start date.'))
+
+        paid_type = self.env['hr.leave.type'].browse(1).exists()
+        unpaid_type = self.env['hr.leave.type'].browse(4).exists()
+
+        if not paid_type or not unpaid_type:
+            raise UserError(
+                _('Paid leave type ID 1 or unpaid leave type ID 4 was not found.')
+            )
+
+        total_days = self._get_calendar_days()
+
+        # Get the available paid balance for the employee.
+        balance_data = paid_type.get_days([self.employee_id.id])
+
+        employee_balance = balance_data.get(self.employee_id.id, {})
+        remaining_days = max(
+            0,
+            employee_balance.get('virtual_remaining_leaves', 0),
+        )
+
+        paid_days = min(total_days, int(remaining_days))
+        unpaid_days = total_days - paid_days
+
+        start_date = self.date_from
+        paid_leave = self.env['hr.leave']
+        unpaid_leave = self.env['hr.leave']
+
+        # Create the paid leave first.
+        if paid_days:
+            paid_end_date = start_date + timedelta(days=paid_days - 1)
+
+            paid_leave = self._create_and_validate_leave(
+                paid_type,
+                start_date,
+                paid_end_date,
+            )
+
+        # The remaining period becomes unpaid leave.
+        if unpaid_days:
+            unpaid_start_date = (
+                start_date + timedelta(days=paid_days)
+            )
+
+            unpaid_leave = self._create_and_validate_leave(
+                unpaid_type,
+                unpaid_start_date,
+                self.date_to,
+            )
+
+        self.write({
+            'state': 'approved',
+            'paid_leave_id': paid_leave.id or False,
+            'unpaid_leave_id': unpaid_leave.id or False,
+        })
+
+        return {'type': 'ir.actions.act_window_close'}
+
+    def action_reject(self):
+        self.ensure_one()
+
+        if self.state != 'draft':
+            raise UserError(_('This request has already been processed.'))
+
+        self.write({'state': 'rejected'})
+
+        return {'type': 'ir.actions.act_window_close'}
+    
+############
+
+class EmployeeLeaveWizard(models.TransientModel):
+    _name = 'employee.leave.wizard'
+    _description = 'Employee Leave Request Wizard'
+
+    employee_id = fields.Many2one(
+        'hr.employee',
+        string='Employee',
+        required=True,
+    )
+
+    date_from = fields.Date(
+        string='Start Date',
+        required=True,
+    )
+
+    date_to = fields.Date(
+        string='End Date',
+        required=True,
+    )
+
+    number_of_days = fields.Integer(
+        string='Number of Days',
+        compute='_compute_number_of_days',
+    )
+
+    state = fields.Selection(
+        [
+            ('draft', 'Draft'),
+            ('approved', 'Approved'),
+            ('rejected', 'Rejected'),
+        ],
+        default='draft',
+        readonly=True,
+    )
+
+    paid_leave_id = fields.Many2one(
+        'hr.leave',
+        string='Paid Leave',
+        readonly=True,
+    )
+
+    unpaid_leave_id = fields.Many2one(
+        'hr.leave',
+        string='Unpaid Leave',
+        readonly=True,
+    )
+
+    @api.depends('date_from', 'date_to')
+    def _compute_number_of_days(self):
+        for rec in self:
+            if rec.date_from and rec.date_to:
+                rec.number_of_days = (
+                    rec.date_to - rec.date_from
+                ).days + 1
+            else:
+                rec.number_of_days = 0
+
+    @api.constrains('date_from', 'date_to')
+    def _check_dates(self):
+        for rec in self:
+            if rec.date_from and rec.date_to:
+                if rec.date_to < rec.date_from:
+                    raise UserError(
+                        _('End date must be on or after start date.')
+                    )
+
+    def _get_calendar_days(self):
+        self.ensure_one()
+        return (self.date_to - self.date_from).days + 1
+
+    def _create_and_validate_leave(
+        self, leave_type, start_date, end_date
+    ):
+        self.ensure_one()
+
+        leave = self.env['hr.leave'].create({
+            'name': _('Leave - %s') % self.employee_id.name,
+            'employee_id': self.employee_id.id,
+            'holiday_status_id': leave_type.id,
+            'request_date_from': start_date,
+            'request_date_to': end_date,
+        })
+
+        if leave.state in ('draft', 'confirm'):
+            leave.action_validate()
+
+        return leave
+
+    def action_approve(self):
+        self.ensure_one()
+
+        if self.state != 'draft':
+            raise UserError(_('This request has already been processed.'))
+
+        if self.date_to < self.date_from:
+            raise UserError(_('End date cannot be before start date.'))
+
+        paid_type = self.env['hr.leave.type'].browse(1).exists()
+        unpaid_type = self.env['hr.leave.type'].browse(4).exists()
+
+        if not paid_type or not unpaid_type:
+            raise UserError(
+                _('Paid leave type ID 1 or unpaid leave type ID 4 was not found.')
+            )
+
+        total_days = self._get_calendar_days()
+
+        # Get the available paid balance for the employee.
+        balance_data = paid_type.get_days([self.employee_id.id])
+
+        employee_balance = balance_data.get(self.employee_id.id, {})
+        remaining_days = max(
+            0,
+            employee_balance.get('virtual_remaining_leaves', 0),
+        )
+
+        paid_days = min(total_days, int(remaining_days))
+        unpaid_days = total_days - paid_days
+
+        start_date = self.date_from
+        paid_leave = self.env['hr.leave']
+        unpaid_leave = self.env['hr.leave']
+
+        # Create the paid leave first.
+        if paid_days:
+            paid_end_date = start_date + timedelta(days=paid_days - 1)
+
+            paid_leave = self._create_and_validate_leave(
+                paid_type,
+                start_date,
+                paid_end_date,
+            )
+
+        # The remaining period becomes unpaid leave.
+        if unpaid_days:
+            unpaid_start_date = (
+                start_date + timedelta(days=paid_days)
+            )
+
+            unpaid_leave = self._create_and_validate_leave(
+                unpaid_type,
+                unpaid_start_date,
+                self.date_to,
+            )
+
+        self.write({
+            'state': 'approved',
+            'paid_leave_id': paid_leave.id or False,
+            'unpaid_leave_id': unpaid_leave.id or False,
+        })
+
+        return {'type': 'ir.actions.act_window_close'}
+
+    def action_reject(self):
+        self.ensure_one()
+
+        if self.state != 'draft':
+            raise UserError(_('This request has already been processed.'))
+
+        self.write({'state': 'rejected'})
+
+        return {'type': 'ir.actions.act_window_close'}
+    
+    
+
+
+    
 class ResCity ( models.Model ) :
     _inherit = 'res.users'
 
@@ -657,7 +988,6 @@ class Recruiter ( models.Model ) :
             'target' : 'current' ,
         }
 
-
     # get number of days for leaves active
     @api.depends ()
     def _compute_total_leave_duration(self) :
@@ -754,8 +1084,7 @@ class Recruiter ( models.Model ) :
                 continue
 
             if rec.start_working_date :
-                
-                rec.vacance_days = float(rec.allocation_display or 0.0) + rec.old_vacance_days
+                rec.vacance_days = float ( rec.allocation_display or 0.0 ) + rec.old_vacance_days
                 rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
             #     delta_vacance = relativedelta ( today , rec.start_working_date )
 
