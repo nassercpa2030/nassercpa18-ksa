@@ -479,7 +479,7 @@ class Recruiter ( models.Model ) :
                                   readonly=False )
     used_vacance_days = fields.Float ( string="أيـام الإجازة المستخدمة" , readonly=True , tracking=True ,
                                        compute='_compute_employee_vacance_days' , )
-    active_vacances = fields.integer ( string="عدد الأجازات الحالية " , tracking="True" ,
+    active_vacances = fields.Integer ( string="عدد الأجازات الحالية " , tracking="True" ,
                                        compute='_compute_employee_vacance_days' , readonly=True )
     # compute='_compute_employee_vacance_days' ,
 
