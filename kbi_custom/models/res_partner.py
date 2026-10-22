@@ -775,8 +775,6 @@ class Recruiter ( models.Model ) :
 
         for rec in self :
             rec.vacance_days = 0
-            rec.used_vacance_days = 0
-            rec.active_vacances = 0
 
             leaves = self.env['hr.leave'].search ( [
                 ('employee_id' , '=' , rec.id) ,
