@@ -13,7 +13,7 @@ class AccountMove ( models.Model ) :
     x_studio_auto_code = fields.Char ( string="order name" )
     sale_order_id_finance = fields.Many2one (
         'sale.order' , string='أمر البيع' , compute='_compute_sale_order_id' ,
-        readonly=False , index=True
+        readonly=False , search="_search_sale_order_id_finance",
     )
     vendor_attachment = fields.Binary (
         string='Attachment' , compute='compute_vendor_attachements' , store=True , readonly=False
