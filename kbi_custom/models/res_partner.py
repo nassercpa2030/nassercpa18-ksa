@@ -769,7 +769,7 @@ class Recruiter ( models.Model ) :
             self.resumption_work_after_leave = self.start_working_date
 
 
-    @api.depends ( 'resumption_work_after_leave' , 'country_id' )
+   # @api.depends ( 'resumption_work_after_leave' , 'country_id' )
     def _compute_employee_vacance_days(self) :
         today = fields.Date.today ()
 
@@ -795,18 +795,12 @@ class Recruiter ( models.Model ) :
 
                     rec.used_vacance_days += days
 
-            if not rec.resumption_work_after_leave :
-                continue
+            # if not rec.resumption_work_after_leave :
+            #     continue
 
             if rec.start_working_date :
-                rec.vacance_days = (
-                        float ( rec.allocation_display or 0.0 )
-                        + rec.old_vacance_days
-                )
-
-                rec.reversed_vacance_days = (
-                        rec.vacance_days - rec.used_vacance_days
-                )
+                rec.vacance_days = (+rec.old_vacance_days)
+                rec.reversed_vacance_days = (rec.vacance_days - rec.used_vacance_days)
 
             #     delta_vacance = relativedelta ( today , rec.start_working_date )
 
