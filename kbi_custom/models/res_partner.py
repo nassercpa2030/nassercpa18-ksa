@@ -469,14 +469,18 @@ class Recruiter ( models.Model ) :
     old_vacance_days = fields.Float ( string='رصيد أجــازات سـابق' ,
                                       # compute='_compute_employee_vacance_days' ,
                                       stored=True , readonly=False )
-    reversed_vacance_days = fields.Float ( string='رصيد أجــازات باقي' , compute='_compute_employee_vacance_days' ,
+    reversed_vacance_days = fields.Float ( string='رصيد أجــازات باقي (بعد الأجازة)' ,
+                                           compute='_compute_employee_vacance_days' ,
                                            readonly=False )
     # compute='_compute_employee_vacance_days',readonly=False)
-    resumption_work_after_leave = fields.Date ( string="إستلام العـمل(بعد الإجازة)" , required=True , readonly=False ,
+    resumption_work_after_leave = fields.Date ( string="إستلام العـمل(بعد الأجازة)" , required=True , readonly=False ,
                                                 )
-    vacance_days = fields.Float ( string="عدد أيـام الإجازة" , compute='_compute_employee_vacance_days' ,
+    vacance_days = fields.Float ( string="رصيد الأجازات الحالي" , compute='_compute_employee_vacance_days' ,
                                   readonly=False )
-    used_vacance_days = fields.Float ( string=" أيـام الإجازة المستخدمة" , readonly=False )
+    used_vacance_days = fields.Float ( string="أيـام الإجازة المستخدمة" , readonly=True , tracking=True ,
+                                       compute='_compute_employee_vacance_days' , )
+    active_vacances = fields.integer ( string="عدد الأجازات الحالية " , tracking="True" ,
+                                       compute='_compute_employee_vacance_days' , readonly=True )
     # compute='_compute_employee_vacance_days' ,
 
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
@@ -748,13 +752,38 @@ class Recruiter ( models.Model ) :
 
         for rec in self :
             rec.vacance_days = 0
+            rec.used_vacance_days = 0
+            rec.active_vacances = 0
+            leaves = self.env['hr.leave'].search ( [
+                ('employee_id' , '=' , rec.id) ,
+                ('state' , '=' , 'validate') ,
+                '|' ,
+                ('request_date_to' , '>=' , today) ,
+                ('request_date_from' , '>=' , today) ,
+            ] )
+            ## number of active days
+            rec.active_vacances=len(leaves)
+
+            for leave in leaves :
+                # مجموع الأيام المسجلة في Odoo
+                rec.used_vacance_days += leave.number_of_days
+
+                # حساب الأيام بين البداية والنهاية شامل اليومين
+                if leave.request_date_from and leave.request_date_to :
+                    days = (
+                                   leave.request_date_to - leave.request_date_from
+                           ).days + 1
+
+                    ## number of active vacances days
+                    rec.used_vacance_days += days
 
             if not rec.resumption_work_after_leave :
                 continue
 
             if rec.start_working_date :
-               rec.vacance_days = float(rec.allocation_display or 0.0) + rec.old_vacance_days
-               rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
+                rec.vacance_days = float ( rec.allocation_display or 0.0 ) + rec.old_vacance_days
+                rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
+
             #     delta_vacance = relativedelta ( today , rec.start_working_date )
 
             # # delta_vacance = relativedelta ( today , rec.start_working_date )
