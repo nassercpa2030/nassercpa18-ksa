@@ -458,10 +458,32 @@ class Recruiter ( models.Model ) :
     leave_accrual_plan_id = fields.Many2one ( comodel_name="hr.leave.accrual.plan" , string="خطة إستحقاق الأجازة" ,
                                               tracking=True , ondelete="restrict" )
 
+# ---------------- EMPLOYEES leaves  -----------------
+class leave_computing ( models.Model ) :
+    _inherit = 'hr.leave'
+    number_of_days = fields.Float (  readonly=True ,   store=True,
+        tracking=True,)
+    # get number of days for leaves active
+    @api.depends('request_date_from', 'request_date_to')
+    def _compute_no_days(self):
+        for rec in self:
+            if rec.request_date_from and rec.request_date_to:
+                rec.number_of_days = (
+                    rec.request_date_to - rec.request_date_from
+                ).days + 1
+            else:
+                rec.number_of_days = 0.0
+
+
+       
+    
+    
+
 
 # ---------------- EMPLOYEES  -----------------
 class Recruiter ( models.Model ) :
     _inherit = 'hr.employee'
+    
 
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
