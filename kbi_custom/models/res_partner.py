@@ -499,10 +499,10 @@ class Recruiter ( models.Model ) :
                                                 )
     vacance_days = fields.Float ( string="رصيد الأجازات الحالي" , compute='_compute_employee_vacance_days' ,
                                   readonly=False )
-    used_vacance_days = fields.Float ( string="أيـام الإجازة المستخدمة" , readonly=True , tracking=True ,
+    used_vacance_days = fields.Float ( string="أيـام الإجازة المستخدمة" , readonly=False , tracking=True ,
                                        compute='_compute_employee_vacance_days' , )
     active_vacances = fields.Integer ( string="عدد الأجازات الحالية " , tracking=True ,
-                                       compute='_compute_employee_vacance_days' , readonly=True )
+                                       compute='_compute_employee_vacance_days' , readonly=False )
     # compute='_compute_employee_vacance_days' ,
 
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
