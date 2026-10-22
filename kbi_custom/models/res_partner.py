@@ -479,7 +479,7 @@ class Recruiter ( models.Model ) :
                                   readonly=False )
     used_vacance_days = fields.Float ( string="أيـام الإجازة المستخدمة" , readonly=True , tracking=True ,
                                        compute='_compute_employee_vacance_days' , )
-    active_vacances = fields.Integer ( string="عدد الأجازات الحالية " , tracking="True" ,
+    active_vacances = fields.Integer ( string="عدد الأجازات الحالية " , tracking=True ,
                                        compute='_compute_employee_vacance_days' , readonly=True )
     # compute='_compute_employee_vacance_days' ,
 
@@ -746,6 +746,7 @@ class Recruiter ( models.Model ) :
         if not self.resumption_work_after_leave :
             self.resumption_work_after_leave = self.start_working_date
 
+
     @api.depends ( 'resumption_work_after_leave' , 'country_id' )
     def _compute_employee_vacance_days(self) :
         today = fields.Date.today ()
@@ -754,6 +755,7 @@ class Recruiter ( models.Model ) :
             rec.vacance_days = 0
             rec.used_vacance_days = 0
             rec.active_vacances = 0
+
             leaves = self.env['hr.leave'].search ( [
                 ('employee_id' , '=' , rec.id) ,
                 ('state' , '=' , 'validate') ,
@@ -761,28 +763,30 @@ class Recruiter ( models.Model ) :
                 ('request_date_to' , '>=' , today) ,
                 ('request_date_from' , '>=' , today) ,
             ] )
-            ## number of active days
-            rec.active_vacances=len(leaves)
+
+            # عدد الإجازات الحالية
+            rec.active_vacances = len ( leaves )
 
             for leave in leaves :
-                # مجموع الأيام المسجلة في Odoo
-                rec.used_vacance_days += leave.number_of_days
-
-                # حساب الأيام بين البداية والنهاية شامل اليومين
                 if leave.request_date_from and leave.request_date_to :
                     days = (
                                    leave.request_date_to - leave.request_date_from
                            ).days + 1
 
-                    ## number of active vacances days
                     rec.used_vacance_days += days
 
             if not rec.resumption_work_after_leave :
                 continue
 
             if rec.start_working_date :
-                rec.vacance_days = float ( rec.allocation_display or 0.0 ) + rec.old_vacance_days
-                rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
+                rec.vacance_days = (
+                        float ( rec.allocation_display or 0.0 )
+                        + rec.old_vacance_days
+                )
+
+                rec.reversed_vacance_days = (
+                        rec.vacance_days - rec.used_vacance_days
+                )
 
             #     delta_vacance = relativedelta ( today , rec.start_working_date )
 
