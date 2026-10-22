@@ -34,6 +34,8 @@ class AccountMove ( models.Model ) :
         readonly=False
     )
 
+
+
     ### count refrence number ######
     def _compute_ref_count(rec) :
         for rec in self :
@@ -107,16 +109,14 @@ class AccountMove ( models.Model ) :
     def action_post(self) :
         # منع infinite loop إذا تم استدعاء الفاتورة من داخل الكود
         if self.env.context.get ( 'skip_auto_invoice' ) :
-            #return super(AccountMove, self).action_post()
+            # return super(AccountMove, self).action_post()
             return super ().action_post ()
 
         # 1️⃣ ترحيل الفاتورة الأساسي أولًا مع تجاوز E-Invoicing
-        
-        #res = super ( AccountMove , self.with_context ( disable_sa_edi_checks=True ) ).action_post ()
-        self = self.with_context(disable_sa_edi_checks=True)
-        res = super().action_post()
-        
-        
+
+        # res = super ( AccountMove , self.with_context ( disable_sa_edi_checks=True ) ).action_post ()
+        self = self.with_context ( disable_sa_edi_checks=True )
+        res = super ().action_post ()
 
         for move in self :
             sale_order = move.sale_order_id
@@ -246,6 +246,30 @@ class AccountMove ( models.Model ) :
         return res
 
     ##########end post function ##############
+
+    ### search sale_order_finance####
+    def _search_sale_order_id_finance(self , operator , value) :
+        allowed_operators = {'=' , '!=' , 'in' , 'not in'}
+
+        if operator not in allowed_operators :
+            return NotImplemented
+
+        moves = self.search ( [] )
+        matching_ids = []
+
+        for move in moves :
+            sale_order = move.sale_order_id_finance
+            sale_order_id = sale_order.id if sale_order else False
+
+            if (
+                    (operator == '=' and sale_order_id == value)
+                    or (operator == '!=' and sale_order_id != value)
+                    or (operator == 'in' and sale_order_id in value)
+                    or (operator == 'not in' and sale_order_id not in value)
+            ) :
+                matching_ids.append ( move.id )
+
+        return [('id' , 'in' , matching_ids)]
 
     ## create function for creating new customer invoice####
     def action_create_new_invoice(self) :
@@ -907,8 +931,8 @@ class AccountMove ( models.Model ) :
         store=True ,
         readonly=False
     )
-    
-    @api.depends('analytic_distribution')
+
+    @api.depends ( 'analytic_distribution' )
     def _compute_analytic_distribution_asset(self) :
         Analytic = self.env['account.analytic.account']
 
@@ -923,8 +947,7 @@ class AccountMove ( models.Model ) :
                     result.append ( f"{analytic.name} ({percentage}%)" )
 
             rec.analytic_acc_desc = " - ".join ( result )
-            
-            
+
 
 class AnalyticDistributuion ( models.Model ) :
     _inherit = 'account.analytic.line'
@@ -1141,7 +1164,7 @@ class AnalyticDistributuion ( models.Model ) :
             # ==================== المالية ====================
             if rec.x_plan98_id and amt :
                 rec.finance_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
-                            amt * (user.finance923_perc_101 or 0.0) / 100)
+                        amt * (user.finance923_perc_101 or 0.0) / 100)
                 # rec.finance_101_distribution_amount = amt * (user.finance923_perc_101 or 0.0) / 100
                 rec.finance_104_distribution_amount = amt * (user.finance923_perc_104 or 0.0) / 100
                 rec.finance_110_distribution_amount = amt * (user.finance923_perc_110 or 0.0) / 100
@@ -1159,7 +1182,7 @@ class AnalyticDistributuion ( models.Model ) :
             # ==================== الجودة ====================
             if rec.x_plan91_id and amt :
                 rec.quality901_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
-                            amt * (user.quality901_perc_101 or 0.0) / 100)
+                        amt * (user.quality901_perc_101 or 0.0) / 100)
                 # rec.quality901_perc_101_distribution_amount = amt * (user.quality901_perc_101 or 0.0) / 100
                 rec.quality901_perc_104_distribution_amount = amt * (user.quality901_perc_104 or 0.0) / 100
                 rec.quality901_perc_110_distribution_amount = amt * (user.quality901_perc_110 or 0.0) / 100
@@ -1177,7 +1200,7 @@ class AnalyticDistributuion ( models.Model ) :
             # ==================== الدعم التشغيلي ====================
             if rec.x_plan92_id and amt :
                 rec.oper_supp902_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
-                            amt * (user.oper_supp902_perc_101 or 0.0) / 100)
+                        amt * (user.oper_supp902_perc_101 or 0.0) / 100)
                 # rec.oper_supp902_101_distribution_amount = amt * (user.oper_supp902_perc_101 or 0.0) / 100
                 rec.oper_supp902_104_distribution_amount = amt * (user.oper_supp902_perc_104 or 0.0) / 100
                 rec.oper_supp902_110_distribution_amount = amt * (user.oper_supp902_perc_110 or 0.0) / 100
@@ -1195,7 +1218,7 @@ class AnalyticDistributuion ( models.Model ) :
             # ==================== التسويق العام ====================
             if rec.x_plan95_id and amt :
                 rec.sale_gen911_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
-                            amt * (user.sale_gen911_perc_101 or 0.0) / 100)
+                        amt * (user.sale_gen911_perc_101 or 0.0) / 100)
                 # rec.sale_gen911_101_distribution_amount = amt * (user.sale_gen911_perc_101 or 0.0) / 100
                 rec.sale_gen911_104_distribution_amount = amt * (user.sale_gen911_perc_104 or 0.0) / 100
                 rec.sale_gen911_110_distribution_amount = amt * (user.sale_gen911_perc_110 or 0.0) / 100
@@ -1213,7 +1236,7 @@ class AnalyticDistributuion ( models.Model ) :
             # ==================== المستلزمات المكتبية ====================
             if rec.x_plan100_id and amt :
                 rec.office_supp_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
-                            amt * (user.office_supp_perc_101 or 0.0) / 100)
+                        amt * (user.office_supp_perc_101 or 0.0) / 100)
                 # rec.office_supp_perc_101_distribution_amount = amt * (user.office_supp_perc_101 or 0.0) / 100
                 rec.office_supp_perc_104_distribution_amount = amt * (user.office_supp_perc_104 or 0.0) / 100
                 rec.office_supp_perc_110_distribution_amount = amt * (user.office_supp_perc_110 or 0.0) / 100
@@ -1231,7 +1254,7 @@ class AnalyticDistributuion ( models.Model ) :
             # ==================== الشئون الإدارية ====================
             if rec.x_plan97_id and amt :
                 rec.manage_921_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
-                            amt * (user.manage_921_perc_101 or 0.0) / 100)
+                        amt * (user.manage_921_perc_101 or 0.0) / 100)
                 rec.manage_921_perc_104_distribution_amount = amt * (user.manage_921_perc_104 or 0.0) / 100
                 rec.manage_921_perc_110_distribution_amount = amt * (user.manage_921_perc_110 or 0.0) / 100
                 rec.manage_921_perc_111_distribution_amount = amt * (user.manage_921_perc_111 or 0.0) / 100
@@ -1248,7 +1271,7 @@ class AnalyticDistributuion ( models.Model ) :
             # ==================== التقنية ====================
             if rec.x_plan99_id and amt :
                 rec.it_922_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
-                            amt * (user.it_922_perc_101 or 0.0) / 100)
+                        amt * (user.it_922_perc_101 or 0.0) / 100)
                 rec.it_922_perc_104_distribution_amount = amt * (user.it_922_perc_104 or 0.0) / 100
                 rec.it_922_perc_110_distribution_amount = amt * (user.it_922_perc_110 or 0.0) / 100
                 rec.it_922_perc_111_distribution_amount = amt * (user.it_922_perc_111 or 0.0) / 100
@@ -1265,7 +1288,7 @@ class AnalyticDistributuion ( models.Model ) :
             # ==================== المباني والمرافق ====================
             if rec.x_plan101_id and amt :
                 rec.build_facil950_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
-                            amt * (user.build_facil950_perc_101 or 0.0) / 100)
+                        amt * (user.build_facil950_perc_101 or 0.0) / 100)
                 rec.build_facil950_perc_104_distribution_amount = amt * (user.build_facil950_perc_104 or 0.0) / 100
                 rec.build_facil950_perc_110_distribution_amount = amt * (user.build_facil950_perc_110 or 0.0) / 100
                 rec.build_facil950_perc_111_distribution_amount = amt * (user.build_facil950_perc_111 or 0.0) / 100
@@ -1282,7 +1305,7 @@ class AnalyticDistributuion ( models.Model ) :
             # ==================== القهوة والضيافة ====================
             if rec.x_plan104_id and amt :
                 rec.coff_clean_ryd_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
-                            amt * (user.coff_clean_ryd_perc_101 or 0.0) / 100)
+                        amt * (user.coff_clean_ryd_perc_101 or 0.0) / 100)
                 rec.coff_clean_ryd_perc_104_distribution_amount = amt * (user.coff_clean_ryd_perc_104 or 0.0) / 100
                 rec.coff_clean_ryd_perc_110_distribution_amount = amt * (user.coff_clean_ryd_perc_110 or 0.0) / 100
                 rec.coff_clean_ryd_perc_111_distribution_amount = amt * (user.coff_clean_ryd_perc_111 or 0.0) / 100
@@ -1299,7 +1322,7 @@ class AnalyticDistributuion ( models.Model ) :
             # ==================== التوطين العام ====================
             if rec.x_plan93_id and amt :
                 rec.pub_loc903_perc_101_distribution_amount = 0.0 if rec.user_id.id != 8 else (
-                            amt * (user.pub_loc903_perc_101 or 0.0) / 100)
+                        amt * (user.pub_loc903_perc_101 or 0.0) / 100)
                 rec.pub_loc903_perc_104_distribution_amount = amt * (user.pub_loc903_perc_104 or 0.0) / 100
                 rec.pub_loc903_perc_110_distribution_amount = amt * (user.pub_loc903_perc_110 or 0.0) / 100
                 rec.pub_loc903_perc_111_distribution_amount = amt * (user.pub_loc903_perc_111 or 0.0) / 100
