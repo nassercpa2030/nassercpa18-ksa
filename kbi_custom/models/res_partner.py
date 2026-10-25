@@ -1202,7 +1202,65 @@ class ResPartner ( models.Model ) :
     def _compute_manager_name(self) :
         for rec in self :
             rec.manager_name = rec.manager_id if rec.manager_id else False
-            
+
+    def action_merge_specific_duplicates(self) :
+        """
+        دمج كل الشركاء المكررة بناءً على الاسم فقط.
+        السجل الأول يصبح الرئيسي، والباقي يتم دمجهم فيه.
+        """
+        # الحصول على الأسماء المكررة
+        self._cr.execute ( """
+            SELECT name
+            FROM res_partner
+            WHERE active=TRUE
+            GROUP BY name
+            HAVING COUNT(*) > 1
+        """ )
+        duplicate_names = [row[0] for row in self._cr.fetchall ()]
+        if not duplicate_names :
+            return {'type' : 'ir.actions.act_window_close'}
+
+        for name in duplicate_names :
+            # جميع الشركاء بنفس الاسم
+            partners = self.env['res.partner'].search ( [('name' , '=' , name) , ('active' , '=' , True)] )
+            main_partner = partners[0]  # السجل الرئيسي
+            for dup in partners[1 :] :
+                # تحديث كل المراجع على السجل الرئيسي
+                self.env['account.move'].search ( [('partner_id' , '=' , dup.id)] ).write (
+                    {'partner_id' : main_partner.id} )
+                self.env['sale.order'].search ( [('partner_id' , '=' , dup.id)] ).write (
+                    {'partner_id' : main_partner.id} )
+                self.env['purchase.order'].search ( [('partner_id' , '=' , dup.id)] ).write (
+                    {'partner_id' : main_partner.id} )
+                # نقل الـ child partners إذا وجدت
+                dup.child_ids.write ( {'parent_id' : main_partner.id} )
+                # حذف السجل المكرر
+                dup.unlink ()
+
+        return {'type' : 'ir.actions.act_window_close'}
+
+
+### class of new employee leave
+class EmployeeLeaveWizard ( models.TransientModel ) :
+    _name = 'employee.leave.wizard'
+    _description = 'Create Employee Leave'
+
+    employee_id = fields.Many2one (
+        'hr.employee' ,
+        required=True ,
+        readonly=True ,
+
+    )
+
+    date_from = fields.Date (
+        string='Start Date' ,
+        required=True ,
+    )
+
+    date_to = fields.Date (
+        string='End Date' ,
+        required=True ,
+    )
 
     def action_create_leave(self) :
         self.ensure_one ()
