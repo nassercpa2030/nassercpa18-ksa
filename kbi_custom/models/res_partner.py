@@ -27,337 +27,6 @@ class ResCity ( models.Model ) :
     name = fields.Char ( string='Name' , required=True )
     code = fields.Char ( string='Code' )
 
-class EmployeeLeaveWizard(models.TransientModel):
-    _name = 'employee.leave.wizard'
-    _description = 'Employee Leave Request Wizard'
-
-    employee_id = fields.Many2one(
-        'hr.employee',
-        string='Employee',
-        required=True,
-    )
-
-    date_from = fields.Date(
-        string='Start Date',
-        required=True,
-    )
-
-    date_to = fields.Date(
-        string='End Date',
-        required=True,
-    )
-
-    number_of_days = fields.Integer(
-        string='Number of Days',
-        compute='_compute_number_of_days',
-    )
-
-    state = fields.Selection(
-        [
-            ('draft', 'Draft'),
-            ('approved', 'Approved'),
-            ('rejected', 'Rejected'),
-        ],
-        default='draft',
-        readonly=True,
-    )
-
-    paid_leave_id = fields.Many2one(
-        'hr.leave',
-        string='Paid Leave',
-        readonly=True,
-    )
-
-    unpaid_leave_id = fields.Many2one(
-        'hr.leave',
-        string='Unpaid Leave',
-        readonly=True,
-    )
-
-    @api.depends('date_from', 'date_to')
-    def _compute_number_of_days(self):
-        for rec in self:
-            if rec.date_from and rec.date_to:
-                rec.number_of_days = (
-                    rec.date_to - rec.date_from
-                ).days + 1
-            else:
-                rec.number_of_days = 0
-
-    @api.constrains('date_from', 'date_to')
-    def _check_dates(self):
-        for rec in self:
-            if rec.date_from and rec.date_to:
-                if rec.date_to < rec.date_from:
-                    raise UserError(
-                        _('End date must be on or after start date.')
-                    )
-
-    def _get_calendar_days(self):
-        self.ensure_one()
-        return (self.date_to - self.date_from).days + 1
-
-    def _create_and_validate_leave(
-        self, leave_type, start_date, end_date
-    ):
-        self.ensure_one()
-
-        leave = self.env['hr.leave'].create({
-            'name': _('Leave - %s') % self.employee_id.name,
-            'employee_id': self.employee_id.id,
-            'holiday_status_id': leave_type.id,
-            'request_date_from': start_date,
-            'request_date_to': end_date,
-        })
-
-        if leave.state in ('draft', 'confirm'):
-            leave.action_validate()
-
-        return leave
-
-    def action_approve(self):
-        self.ensure_one()
-
-        if self.state != 'draft':
-            raise UserError(_('This request has already been processed.'))
-
-        if self.date_to < self.date_from:
-            raise UserError(_('End date cannot be before start date.'))
-
-        paid_type = self.env['hr.leave.type'].browse(1).exists()
-        unpaid_type = self.env['hr.leave.type'].browse(4).exists()
-
-        if not paid_type or not unpaid_type:
-            raise UserError(
-                _('Paid leave type ID 1 or unpaid leave type ID 4 was not found.')
-            )
-
-        total_days = self._get_calendar_days()
-
-        # Get the available paid balance for the employee.
-        balance_data = paid_type.get_days([self.employee_id.id])
-
-        employee_balance = balance_data.get(self.employee_id.id, {})
-        remaining_days = max(
-            0,
-            employee_balance.get('virtual_remaining_leaves', 0),
-        )
-
-        paid_days = min(total_days, int(remaining_days))
-        unpaid_days = total_days - paid_days
-
-        start_date = self.date_from
-        paid_leave = self.env['hr.leave']
-        unpaid_leave = self.env['hr.leave']
-
-        # Create the paid leave first.
-        if paid_days:
-            paid_end_date = start_date + timedelta(days=paid_days - 1)
-
-            paid_leave = self._create_and_validate_leave(
-                paid_type,
-                start_date,
-                paid_end_date,
-            )
-
-        # The remaining period becomes unpaid leave.
-        if unpaid_days:
-            unpaid_start_date = (
-                start_date + timedelta(days=paid_days)
-            )
-
-            unpaid_leave = self._create_and_validate_leave(
-                unpaid_type,
-                unpaid_start_date,
-                self.date_to,
-            )
-
-        self.write({
-            'state': 'approved',
-            'paid_leave_id': paid_leave.id or False,
-            'unpaid_leave_id': unpaid_leave.id or False,
-        })
-
-        return {'type': 'ir.actions.act_window_close'}
-
-    def action_reject(self):
-        self.ensure_one()
-
-        if self.state != 'draft':
-            raise UserError(_('This request has already been processed.'))
-
-        self.write({'state': 'rejected'})
-
-        return {'type': 'ir.actions.act_window_close'}
-
-############
-
-class EmployeeLeaveWizard(models.TransientModel):
-    _name = 'employee.leave.wizard'
-    _description = 'Employee Leave Request Wizard'
-
-    employee_id = fields.Many2one(
-        'hr.employee',
-        string='Employee',
-        required=True,
-    )
-
-    date_from = fields.Date(
-        string='Start Date',
-        required=True,
-    )
-
-    date_to = fields.Date(
-        string='End Date',
-        required=True,
-    )
-
-    number_of_days = fields.Integer(
-        string='Number of Days',
-        compute='_compute_number_of_days',
-    )
-
-    state = fields.Selection(
-        [
-            ('draft', 'Draft'),
-            ('approved', 'Approved'),
-            ('rejected', 'Rejected'),
-        ],
-        default='draft',
-        readonly=True,
-    )
-
-    paid_leave_id = fields.Many2one(
-        'hr.leave',
-        string='Paid Leave',
-        readonly=True,
-    )
-
-    unpaid_leave_id = fields.Many2one(
-        'hr.leave',
-        string='Unpaid Leave',
-        readonly=True,
-    )
-
-    @api.depends('date_from', 'date_to')
-    def _compute_number_of_days(self):
-        for rec in self:
-            if rec.date_from and rec.date_to:
-                rec.number_of_days = (
-                    rec.date_to - rec.date_from
-                ).days + 1
-            else:
-                rec.number_of_days = 0
-
-    @api.constrains('date_from', 'date_to')
-    def _check_dates(self):
-        for rec in self:
-            if rec.date_from and rec.date_to:
-                if rec.date_to < rec.date_from:
-                    raise UserError(
-                        _('End date must be on or after start date.')
-                    )
-
-    def _get_calendar_days(self):
-        self.ensure_one()
-        return (self.date_to - self.date_from).days + 1
-
-    def _create_and_validate_leave(
-        self, leave_type, start_date, end_date
-    ):
-        self.ensure_one()
-
-        leave = self.env['hr.leave'].create({
-            'name': _('Leave - %s') % self.employee_id.name,
-            'employee_id': self.employee_id.id,
-            'holiday_status_id': leave_type.id,
-            'request_date_from': start_date,
-            'request_date_to': end_date,
-        })
-
-        if leave.state in ('draft', 'confirm'):
-            leave.action_validate()
-
-        return leave
-
-    def action_approve(self):
-        self.ensure_one()
-
-        if self.state != 'draft':
-            raise UserError(_('This request has already been processed.'))
-
-        if self.date_to < self.date_from:
-            raise UserError(_('End date cannot be before start date.'))
-
-        paid_type = self.env['hr.leave.type'].browse(1).exists()
-        unpaid_type = self.env['hr.leave.type'].browse(4).exists()
-
-        if not paid_type or not unpaid_type:
-            raise UserError(
-                _('Paid leave type ID 1 or unpaid leave type ID 4 was not found.')
-            )
-
-        total_days = self._get_calendar_days()
-
-        # Get the available paid balance for the employee.
-        balance_data = paid_type.get_days([self.employee_id.id])
-
-        employee_balance = balance_data.get(self.employee_id.id, {})
-        remaining_days = max(
-            0,
-            employee_balance.get('virtual_remaining_leaves', 0),
-        )
-
-        paid_days = min(total_days, int(remaining_days))
-        unpaid_days = total_days - paid_days
-
-        start_date = self.date_from
-        paid_leave = self.env['hr.leave']
-        unpaid_leave = self.env['hr.leave']
-
-        # Create the paid leave first.
-        if paid_days:
-            paid_end_date = start_date + timedelta(days=paid_days - 1)
-
-            paid_leave = self._create_and_validate_leave(
-                paid_type,
-                start_date,
-                paid_end_date,
-            )
-
-        # The remaining period becomes unpaid leave.
-        if unpaid_days:
-            unpaid_start_date = (
-                start_date + timedelta(days=paid_days)
-            )
-
-            unpaid_leave = self._create_and_validate_leave(
-                unpaid_type,
-                unpaid_start_date,
-                self.date_to,
-            )
-
-        self.write({
-            'state': 'approved',
-            'paid_leave_id': paid_leave.id or False,
-            'unpaid_leave_id': unpaid_leave.id or False,
-        })
-
-        return {'type': 'ir.actions.act_window_close'}
-
-    def action_reject(self):
-        self.ensure_one()
-
-        if self.state != 'draft':
-            raise UserError(_('This request has already been processed.'))
-
-        self.write({'state': 'rejected'})
-
-        return {'type': 'ir.actions.act_window_close'}
-
-
-
-
 
 class ResCity ( models.Model ) :
     _inherit = 'res.users'
@@ -789,10 +458,32 @@ class Recruiter ( models.Model ) :
     leave_accrual_plan_id = fields.Many2one ( comodel_name="hr.leave.accrual.plan" , string="خطة إستحقاق الأجازة" ,
                                               tracking=True , ondelete="restrict" )
 
+# ---------------- EMPLOYEES leaves  -----------------
+class leave_computing ( models.Model ) :
+    _inherit = 'hr.leave'
+    number_of_days = fields.Float (  readonly=True ,   store=True,
+        tracking=True,)
+    # get number of days for leaves active
+    @api.depends('request_date_from', 'request_date_to')
+    def _compute_no_days(self):
+        for rec in self:
+            if rec.request_date_from and rec.request_date_to:
+                rec.number_of_days = (
+                    rec.request_date_to - rec.request_date_from
+                ).days + 1
+            else:
+                rec.number_of_days = 0.0
+
+
+       
+    
+    
+
 
 # ---------------- EMPLOYEES  -----------------
 class Recruiter ( models.Model ) :
     _inherit = 'hr.employee'
+    
 
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
@@ -800,28 +491,31 @@ class Recruiter ( models.Model ) :
     old_vacance_days = fields.Float ( string='رصيد أجــازات سـابق' ,
                                       # compute='_compute_employee_vacance_days' ,
                                       stored=True , readonly=False )
-    reversed_vacance_days = fields.Float ( string='رصيد أجــازات باقي' , compute='_compute_employee_vacance_days' ,
+    reversed_vacance_days = fields.Float ( string='رصيد أجــازات باقي (بعد الأجازة)' ,
+                                           compute='_compute_employee_vacance_days' ,
                                            readonly=False )
     # compute='_compute_employee_vacance_days',readonly=False)
-    resumption_work_after_leave = fields.Date ( string="إستلام العـمل(بعد الإجازة)" , required=True , readonly=False ,
+    resumption_work_after_leave = fields.Date ( string="إستلام العـمل(بعد الأجازة)" , required=True , readonly=False ,
                                                 )
-    vacance_days = fields.Float ( string="عدد أيـام الإجازة" , compute='_compute_employee_vacance_days' ,
+    vacance_days = fields.Float ( string="رصيد الأجازات الحالي" , compute='_compute_employee_vacance_days' ,
                                   readonly=False )
-    used_vacance_days = fields.Float ( string=" أيـام الإجازة المستخدمة" , readonly=False )
+    used_vacance_days = fields.Float ( string="أيـام الإجازة المستخدمة" , readonly=False , tracking=True ,
+                                       compute='_compute_employee_vacance_days' , )
+    active_vacances = fields.Integer ( string="عدد الأجازات الحالية " , tracking=True ,
+                                       compute='_compute_employee_vacance_days' , readonly=False )
     # compute='_compute_employee_vacance_days' ,
 
     related_partner_id = fields.Many2one ( 'res.partner' , string='Related Partner' , store=True ,
                                            help="this field get partner from contact" , readonly=False ,
                                            placeholder="Enter Related Contact" )
     request_employee_manager = fields.Many2one ( 'res.users' , string='المـديـر ' , required=True , store=True )
-
-    total_leave_duration = fields.Float ( string="Total Leave Duration" , compute="_compute_total_leave_duration" , )
     # request_employee_manager = fields.Many2one ( string='المـديـر ' , compute='_compute_request_employee_manager' ,
     #                                              required=True , store=True , readonly=True )
     # parent_id = fields.Many2one ( string='Manager',compute = '_compute_request_employee_manager' , required = True , store = True , readonly = True  )
     user_partner_id = fields.Many2one ( comodel_name='res.partner' , string='User Partner' ,
                                         related='user_id.partner_id' , store=True , readonly=False )
     contract_state = fields.Selection ( related='contract_id.state' , string='حالة العقد' , store=True )
+    total_leave_duration = fields.Float ( string="Total Leave Duration" , compute="_compute_total_leave_duration" , )
     residency_visa_number = fields.Integer ( string="رقم الهوية /رقم الإقامة" , store=True )
     border_number = fields.Integer ( string="رقم  الحدود" , store=True )
     loans_count = fields.Integer ( compute='_compute_employee_counts' , )
@@ -845,60 +539,6 @@ class Recruiter ( models.Model ) :
     transportation_allowance = fields.Monetary ( 'بدل المواصلات' , related="contract_id.transportation_allowance" ,
                                                  help="Same field as housing allowance for employee contract" ,
                                                  readonly=False , store=True )
-
-    # @api.depends ( 'coach_id' )
-    # def _compute_request_employee_manager(self) :
-    #     for employee in self :
-    #         employee.request_employee_manager = False
-    #         employee.parent_id = False
-
-    #         if employee.coach_id and employee.coach_id.id :
-    #             employee.request_employee_manager = employee.coach_id.id
-    #             employee.parent_id = employee.coach_id.id
-
-    # @api.depends ( 'employee_id' )
-    def _compute_employee_counts(self) :
-        Loan = self.env['hr.salary.attachment']
-        payslip = self.env['hr.payslip']
-
-        for employee in self :
-            # Loans
-            employee.loans_count = Loan.search_count ( [
-                ('employee_ids' , 'in' , employee.id) ,
-            ] )
-            # ==========payslip
-            employee.payslips_count = payslip.search_count ( [
-                ('employee_id' , '=' , employee.id) ,
-
-            ] )
-
-    ###get allocation number ##
-    # @api.depends ( "leave_allocation_ids" )
-    def _compute_leave_allocation_count(self) :
-        for employee in self :
-            employee.leave_allocation_count = self.env[
-                "hr.leave.allocation"
-            ].search_count ( [
-                ("employee_id" , "=" , employee.id) ,
-            ] )
-
-    # get employee  leaves allocations
-    def action_list_leaves(self) :
-        self.ensure_one ()
-
-        return {
-            "name" : _ ( "Leave Allocations" ) ,
-            "type" : "ir.actions.act_window" ,
-            "res_model" : "hr.leave.allocation" ,
-            "view_mode" : "list,form" ,
-            "domain" : [
-                ("employee_id" , "=" , self.id) ,
-            ] ,
-            "context" : {
-                "default_employee_id" : self.id ,
-                "search_default_employee_id" : self.id ,
-            } ,
-        }
 
     ### create allocation for employee ###
     def action_create_leave_allocation(self) :
@@ -979,13 +619,68 @@ class Recruiter ( models.Model ) :
 
             allocations |= allocation
 
+        return True
+        # {
+        #     'type' : 'ir.actions.act_window' ,
+        #     'name' : 'Leave Allocations' ,
+        #     'res_model' : 'hr.leave.allocation' ,
+        #     'view_mode' : 'list,form' ,
+        #     'domain' : [('id' , 'in' , allocations.ids)] ,
+        #     'target' : 'current' ,
+        # }
+
+    # @api.depends ( 'coach_id' )
+    # def _compute_request_employee_manager(self) :
+    #     for employee in self :
+    #         employee.request_employee_manager = False
+    #         employee.parent_id = False
+
+    #         if employee.coach_id and employee.coach_id.id :
+    #             employee.request_employee_manager = employee.coach_id.id
+    #             employee.parent_id = employee.coach_id.id
+
+    # @api.depends ( 'employee_id' )
+    def _compute_employee_counts(self) :
+        Loan = self.env['hr.salary.attachment']
+        payslip = self.env['hr.payslip']
+
+        for employee in self :
+            # Loans
+            employee.loans_count = Loan.search_count ( [
+                ('employee_ids' , 'in' , employee.id) ,
+            ] )
+            # ==========payslip
+            employee.payslips_count = payslip.search_count ( [
+                ('employee_id' , '=' , employee.id) ,
+
+            ] )
+
+    ###get allocation number ##
+    # @api.depends ( "leave_allocation_ids" )
+    def _compute_leave_allocation_count(self) :
+        for employee in self :
+            employee.leave_allocation_count = self.env[
+                "hr.leave.allocation"
+            ].search_count ( [
+                ("employee_id" , "=" , employee.id) ,
+            ] )
+
+    # get employee  vacances allocations
+    def action_list_leaves(self) :
+        self.ensure_one ()
+
         return {
-            'type' : 'ir.actions.act_window' ,
-            'name' : 'Leave Allocations' ,
-            'res_model' : 'hr.leave.allocation' ,
-            'view_mode' : 'list,form' ,
-            'domain' : [('id' , 'in' , allocations.ids)] ,
-            'target' : 'current' ,
+            "name" : _ ( "Leave Allocations" ) ,
+            "type" : "ir.actions.act_window" ,
+            "res_model" : "hr.leave.allocation" ,
+            "view_mode" : "list,form" ,
+            "domain" : [
+                ("employee_id" , "=" , self.id) ,
+            ] ,
+            "context" : {
+                "default_employee_id" : self.id ,
+                # "search_default_employee_id" : self.id ,
+            } ,
         }
 
     # get number of days for leaves active
@@ -997,8 +692,8 @@ class Recruiter ( models.Model ) :
             leaves = self.env["hr.leave"].search ( [
                 ("employee_id" , "=" , employee.id) ,
                 ("state" , "=" , "validate") ,
-                ("date_to" , "!=" , False) ,
-                ("date_to" , ">" , today) ,
+                ("requested_date_from" , "<=" , today) ,
+                ("request_date_to" , ">=" , today) ,
             ] )
 
             employee.total_leave_duration = sum (
@@ -1073,19 +768,40 @@ class Recruiter ( models.Model ) :
         if not self.resumption_work_after_leave :
             self.resumption_work_after_leave = self.start_working_date
 
-    @api.depends ( 'resumption_work_after_leave' , 'country_id' )
+
+   # @api.depends ( 'resumption_work_after_leave' , 'country_id' )
     def _compute_employee_vacance_days(self) :
         today = fields.Date.today ()
 
         for rec in self :
             rec.vacance_days = 0
 
-            if not rec.resumption_work_after_leave :
-                continue
+            leaves = self.env['hr.leave'].search ( [
+                ('employee_id' , '=' , rec.id) ,
+                ('state' , '=' , 'validate') ,
+                '|' ,
+                ('request_date_to' , '>=' , today) ,
+                ('request_date_from' , '>=' , today) ,
+            ] )
+
+            # عدد الإجازات الحالية
+            rec.active_vacances = len ( leaves )
+
+            for leave in leaves :
+                if leave.request_date_from and leave.request_date_to :
+                    days = (
+                                   leave.request_date_to - leave.request_date_from
+                           ).days + 1
+
+                    rec.used_vacance_days += days
+
+            # if not rec.resumption_work_after_leave :
+            #     continue
 
             if rec.start_working_date :
-                rec.vacance_days = float ( rec.allocation_display or 0.0 ) + rec.old_vacance_days
-                rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
+                rec.vacance_days = ( float ( rec.allocation_display or 0.0 )+rec.old_vacance_days)
+                rec.reversed_vacance_days = (rec.vacance_days - rec.used_vacance_days)
+
             #     delta_vacance = relativedelta ( today , rec.start_working_date )
 
             # # delta_vacance = relativedelta ( today , rec.start_working_date )
@@ -1109,6 +825,7 @@ class Recruiter ( models.Model ) :
             #     continue
             # الرصيد المستحق حتى اليوم
             # rec.vacance_days = (months_of_service * (annual_days / 12)) + rec.old_vacance_days
+            # rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
 
     @api.depends ( 'contract_ids.date_start' )
     def _compute_start_working_date(self) :
