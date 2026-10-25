@@ -646,7 +646,7 @@ class Recruiter ( models.Model ) :
             'res_model' : 'employee.leave.wizard' ,
             'view_mode' : 'form' ,
             'view_id' : self.env.ref (
-                'YOUR_MODULE.view_employee_leave_wizard_form'
+                'kbi_custom.view_employee_leave_wizard_form'
             ).id ,
             'target' : 'new' ,
             'context' : {
