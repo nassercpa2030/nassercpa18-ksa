@@ -4,7 +4,7 @@ import logging
 from odoo.exceptions import UserError , ValidationError
 import re
 from dateutil.relativedelta import relativedelta
-
+from datetime import timedelta
 
 class HrPayrollStructure ( models.Model ) :
     _inherit = 'hr.payroll.structure'
