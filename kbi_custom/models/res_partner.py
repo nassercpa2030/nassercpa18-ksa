@@ -828,7 +828,7 @@ class Recruiter ( models.Model ) :
             # لا يوجد تخصيص معتمد، أو توجد إجازة حالية/مستقبلية
             if not allocations or leaves :
                 rec.vacance_days = 0.0
-                rec.old_vacance_days = 0.0
+                #rec.old_vacance_days = 0.0
                 rec.reversed_vacance_days = 0.0
                 continue
 
