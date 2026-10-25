@@ -52,6 +52,7 @@ class ProductSupplierInfo ( models.Model ) :
     scientific_name_sell = fields.Char ( string="الأسم العلمي" , store=True )
     concentration_sell = fields.Char ( string="التركيز" )
     shape_sell = fields.Char ( string="الشكل" )
+    x_studio_char_field_864_1k4699f9k_1 = fields.Char( string="المورد ", readonly=False , store=True,tracking=True)
     package_contents_sell = fields.Char ( string="العبــوة" )
     discount_sell = fields.Char ( string="" )
     prediscount_money_sell = fields.Float ( string="السعر قبل الخصم" )
