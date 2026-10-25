@@ -1270,6 +1270,10 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
         if not employee :
             raise UserError ( _ ( 'Employee is required.' ) )
 
+        # Save the original balances BEFORE creating the leave.
+        vacance_days_before = employee.vacance_days
+        reversed_days_before = employee.reversed_vacance_days
+
         if not self.date_from or not self.date_to :
             raise UserError ( _ (
                 'Start date and end date are required.'
@@ -1421,10 +1425,10 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
 
             allocation._update_accrual ()
 
-        # Reset the employee's old leave balance.
+        # Save the original balance minus the original reversed balance.
         employee.write ( {
-            'old_vacance_days' : employee.vacance_days - total_days ,
-            # 'old_vacance_days' : 0.0 ,
+            'old_vacance_days' :
+                vacance_days_before - reversed_days_before ,
         } )
 
         employee.invalidate_recordset ( [
@@ -1434,7 +1438,9 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
         ] )
 
         return {
-            'type' : 'ir.actions.act_window_close' ,
+            'type' : 'ir.actions.client' ,
+            'tag' : 'reload' ,
+            #'type' : 'ir.actions.act_window_close' ,
         }
 
     # def action_create_leave(self) :
