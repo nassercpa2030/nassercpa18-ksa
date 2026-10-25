@@ -1271,72 +1271,63 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
             raise UserError ( _ ( 'Employee is required.' ) )
 
         if not self.date_from or not self.date_to :
-            raise UserError ( _ ( 'يجب تحديد تاريخ بداية ونهاية الإجازة.' ) )
+            raise UserError ( _ ( 'Start date and end date are required.' ) )
 
         if self.date_to < self.date_from :
-            raise UserError (
-                _ ( 'تاريخ نهاية الإجازة يجب أن يكون بعد أو يساوي تاريخ البداية.' )
-            )
+            raise UserError ( _ ( 'End date must be after start date.' ) )
 
-        today = fields.Date.context_today ( self )
+        today = fields.Date.today ()
 
-        # منع إنشاء إجازة جديدة إذا كانت هناك إجازة غير مدفوعة معتمدة لم تنتهِ
-        existing_unpaid_leave = self.env['hr.leave'].search ( [
-            ('employee_id' , '=' , employee.id) ,
-            ('holiday_status_id' , '=' , 4) ,
-            ('state' , '=' , 'validate') ,
-            ('request_date_to' , '>=' , today) ,
-        ] , limit=1 )
+        Leave = self.env['hr.leave']
+        Allocation = self.env['hr.leave.allocation']
 
-        if existing_unpaid_leave :
-            raise UserError ( _ (
-                'لا يمكن إنشاء إجازة جديدة لهذا الموظف؛ '
-                'لديه بالفعل إجازة غير مدفوعة معتمدة تنتهي بتاريخ %s.'
-            ) % existing_unpaid_leave.request_date_to )
-
-        total_days = (self.date_to - self.date_from).days + 1
-
+        # أنواع الإجازات
         paid_type = self.env['hr.leave.type'].browse ( 1 ).exists ()
         unpaid_type = self.env['hr.leave.type'].browse ( 4 ).exists ()
 
         if not paid_type or not unpaid_type :
             raise UserError ( _ (
-                'نوع الإجازة المدفوعة ID=1 أو غير المدفوعة ID=4 غير موجود.'
+                'Paid leave type ID 1 or unpaid leave type ID 4 does not exist.'
             ) )
 
-        # قراءة الرصيد القديم
-        old_balance = employee.old_vacance_days or 0.0
+        # منع إجازة غير مدفوعة جديدة إذا توجد إجازة غير مدفوعة معتمدة لم تنتهِ
+        existing_unpaid = Leave.search ( [
+            ('employee_id' , '=' , employee.id) ,
+            ('holiday_status_id' , '=' , unpaid_type.id) ,
+            ('state' , '=' , 'validate') ,
+            ('request_date_to' , '>=' , today) ,
+        ] , limit=1 )
 
-        # الرصيد القديم الموجب يُستهلك أولًا
-        old_days_available = max ( 0.0 , old_balance )
-        old_days_used = min ( float ( total_days ) , old_days_available )
+        if existing_unpaid :
+            raise UserError ( _ (
+                'لا يمكن إنشاء إجازة جديدة؛ توجد إجازة غير مدفوعة '
+                'معتمدة للموظف ولم تنتهِ بعد.'
+            ) )
 
-        # الأيام التي لم يغطها الرصيد القديم
-        remaining_days = total_days - int ( old_days_used )
+        # حساب الأيام التقويمية شامل تاريخ البداية والنهاية
+        total_days = (self.date_to - self.date_from).days + 1
 
-        # قراءة الرصيد المتبقي في أودوو
-        paid_type_employee = paid_type.with_context (
-            employee_id=employee.id ,
-            default_employee_id=employee.id ,
-        )
+        # تحديث قراءة الرصيد المحسوب
+        employee.invalidate_recordset ( [
+            'vacance_days' ,
+            'allocation_display' ,
+            'old_vacance_days' ,
+        ] )
 
-        odoo_remaining = max (
-            0.0 ,
-            paid_type_employee.virtual_remaining_leaves or 0.0 ,
-        )
+        # الاعتماد على vacance_days فقط
+        # vacance_days = allocation_display + old_vacance_days
+        available_balance = float ( employee.vacance_days or 0.0 )
 
-        # تقسيم الأيام المتبقية بين مدفوعة وغير مدفوعة
-        paid_odoo_days = min ( remaining_days , int ( odoo_remaining ) )
-        unpaid_days = remaining_days - paid_odoo_days
+        # لا نسمح باستخدام الرصيد إذا كان صفرًا أو سالبًا
+        available_days = max ( 0 , int ( available_balance ) )
 
-        total_paid_days = int ( old_days_used ) + paid_odoo_days
-
-        Leave = self.env['hr.leave']
-        created_leaves = Leave
+        # تقسيم الإجازة إلى مدفوعة وغير مدفوعة
+        paid_days = min ( total_days , available_days )
+        unpaid_days = total_days - paid_days
 
         def create_leave(leave_type , start_date , days) :
             if days <= 0 :
-                return Leave
+                return
 
             end_date = start_date + timedelta ( days=days - 1 )
 
@@ -1348,6 +1339,7 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
                 'request_date_to' : end_date ,
             } )
 
+            # اعتماد الإجازة
             if leave.state == 'confirm' :
                 leave.action_approve ()
 
@@ -1359,63 +1351,47 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
                     'لم يتم اعتماد الإجازة بالكامل. الحالة الحالية: %s'
                 ) % leave.state )
 
-            return leave
-
-        # إنشاء الإجازة المدفوعة
-        if total_paid_days > 0 :
-            created_leaves |= create_leave (
+        # إنشاء الإجازة المدفوعة أولًا
+        if paid_days > 0 :
+            create_leave (
                 paid_type ,
                 self.date_from ,
-                total_paid_days ,
+                paid_days ,
             )
 
         # إنشاء الإجازة غير المدفوعة للأيام المتبقية
         if unpaid_days > 0 :
-            unpaid_start = self.date_from + timedelta ( days=total_paid_days )
+            unpaid_start = self.date_from + timedelta ( days=paid_days )
 
-            created_leaves |= create_leave (
+            create_leave (
                 unpaid_type ,
                 unpaid_start ,
                 unpaid_days ,
             )
 
-        # تحديث الرصيد بعد اعتماد الإجازة
-        if created_leaves and all (
-                leave.state == 'validate' for leave in created_leaves
-        ) :
-            # خصم الأيام المدفوعة من الرصيد القديم والسماح بالسالب
-            employee.write ( {
-                'old_vacance_days' : old_balance - total_paid_days ,
-            } )
+        # إيقاف الاستحقاق التراكمي الحالي كما في الكود الأصلي
+        allocations = Allocation.search ( [
+            ('employee_id' , '=' , employee.id) ,
+            ('holiday_status_id' , '=' , paid_type.id) ,
+            ('allocation_type' , '=' , 'accrual') ,
+            ('state' , '=' , 'validate') ,
+            ('date_from' , '<=' , today) ,
+            '|' ,
+            ('date_to' , '=' , False) ,
+            ('date_to' , '>=' , today) ,
+        ] )
 
-            # إنهاء التخصيصات التراكمية الحالية والمستقبلية
-            Allocation = self.env['hr.leave.allocation']
+        allocations.write ( {
+            'date_to' : today ,
+        } )
 
-            allocations = Allocation.search ( [
-                ('employee_id' , '=' , employee.id) ,
-                ('holiday_status_id' , '=' , paid_type.id) ,
-                ('allocation_type' , '=' , 'accrual') ,
-                ('state' , '=' , 'validate') ,
-            ] )
-
-            for allocation in allocations :
-                if allocation.date_from and allocation.date_from <= today :
-                    if not allocation.date_to or allocation.date_to > today :
-                        allocation.write ( {
-                            'date_to' : today ,
-                        } )
-
-                elif allocation.date_from and allocation.date_from > today :
-                    allocation.action_refuse ()
-
-            employee.invalidate_recordset ( [
-                'old_vacance_days' ,
-                'allocation_display' ,
-                'vacance_days' ,
-                'reversed_vacance_days' ,
-                'used_vacance_days' ,
-                'active_vacances' ,
-            ] )
+        # تحديث الحقول المحسوبة بعد إنشاء الإجازة
+        employee.invalidate_recordset ( [
+            'vacance_days' ,
+            'allocation_display' ,
+            'old_vacance_days' ,
+            'reversed_vacance_days' ,
+        ] )
 
         return {'type' : 'ir.actions.act_window_close'}
 
