@@ -458,32 +458,28 @@ class Recruiter ( models.Model ) :
     leave_accrual_plan_id = fields.Many2one ( comodel_name="hr.leave.accrual.plan" , string="خطة إستحقاق الأجازة" ,
                                               tracking=True , ondelete="restrict" )
 
+
 # ---------------- EMPLOYEES leaves  -----------------
 class leave_computing ( models.Model ) :
     _inherit = 'hr.leave'
-    number_of_days = fields.Float (  readonly=True ,   store=True,
-        tracking=True,)
+    number_of_days = fields.Float ( readonly=True , store=True ,
+                                    tracking=True , )
+
     # get number of days for leaves active
-    @api.depends('request_date_from', 'request_date_to')
-    def _compute_no_days(self):
-        for rec in self:
-            if rec.request_date_from and rec.request_date_to:
+    @api.depends ( 'request_date_from' , 'request_date_to' )
+    def _compute_no_days(self) :
+        for rec in self :
+            if rec.request_date_from and rec.request_date_to :
                 rec.number_of_days = (
-                    rec.request_date_to - rec.request_date_from
-                ).days + 1
-            else:
+                                             rec.request_date_to - rec.request_date_from
+                                     ).days + 1
+            else :
                 rec.number_of_days = 0.0
-
-
-       
-    
-    
 
 
 # ---------------- EMPLOYEES  -----------------
 class Recruiter ( models.Model ) :
     _inherit = 'hr.employee'
-    
 
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
@@ -638,6 +634,26 @@ class Recruiter ( models.Model ) :
     #         if employee.coach_id and employee.coach_id.id :
     #             employee.request_employee_manager = employee.coach_id.id
     #             employee.parent_id = employee.coach_id.id
+    
+
+
+    def action_open_employee_leave_wizard(self) :
+        self.ensure_one ()
+
+        return {
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'Create Leave' ,
+            'res_model' : 'employee.leave.wizard' ,
+            'view_mode' : 'form' ,
+            'view_id' : self.env.ref (
+                'YOUR_MODULE.view_employee_leave_wizard_form'
+            ).id ,
+            'target' : 'new' ,
+            'context' : {
+                'default_employee_id' : self.id ,
+            } ,
+        }
+
 
     # @api.depends ( 'employee_id' )
     def _compute_employee_counts(self) :
@@ -768,8 +784,7 @@ class Recruiter ( models.Model ) :
         if not self.resumption_work_after_leave :
             self.resumption_work_after_leave = self.start_working_date
 
-
-   # @api.depends ( 'resumption_work_after_leave' , 'country_id' )
+    # @api.depends ( 'resumption_work_after_leave' , 'country_id' )
     def _compute_employee_vacance_days(self) :
         today = fields.Date.today ()
 
@@ -799,7 +814,7 @@ class Recruiter ( models.Model ) :
             #     continue
 
             if rec.start_working_date :
-                rec.vacance_days = ( float ( rec.allocation_display or 0.0 )+rec.old_vacance_days)
+                rec.vacance_days = (float ( rec.allocation_display or 0.0 ) + rec.old_vacance_days)
                 rec.reversed_vacance_days = (rec.vacance_days - rec.used_vacance_days)
 
             #     delta_vacance = relativedelta ( today , rec.start_working_date )
@@ -1166,3 +1181,118 @@ class ResPartner ( models.Model ) :
                 dup.unlink ()
 
         return {'type' : 'ir.actions.act_window_close'}
+
+
+### class of new employee leave
+class EmployeeLeaveWizard(models.TransientModel):
+    _name = 'employee.leave.wizard'
+    _description = 'Create Employee Leave'
+
+    employee_id = fields.Many2one(
+        'hr.employee',
+        required=True,
+        readonly=True,
+
+    )
+
+    date_from = fields.Date(
+        string='Start Date',
+        required=True,
+    )
+
+    date_to = fields.Date(
+        string='End Date',
+        required=True,
+    )
+
+    def action_create_leave(self):
+        self.ensure_one()
+
+        employee = self.employee_id
+
+        if not employee:
+            raise UserError(_('Employee is required.'))
+
+        if self.date_to < self.date_from:
+            raise UserError(_('End date must be after start date.'))
+
+        # Calendar days, including both start and end dates.
+        total_days = (self.date_to - self.date_from).days + 1
+
+        paid_type = self.env['hr.leave.type'].browse(1).exists()
+        unpaid_type = self.env['hr.leave.type'].browse(4).exists()
+
+        if not paid_type or not unpaid_type:
+            raise UserError(
+                _('Leave type ID 1(Paid leave type) or ID 4 (not paid leave type) does not exist.')
+            )
+
+        # Read the employee's available paid leave balance.
+        balance = paid_type.get_days(employee.id)
+        remaining = max(
+            0.0,
+            balance.get('virtual_remaining_leaves', 0.0),
+        )
+
+        # Split into whole calendar days.
+        paid_days = min(total_days, int(remaining))
+        unpaid_days = total_days - paid_days
+
+        Leave = self.env['hr.leave']
+
+        def create_leave(leave_type, start_date, days):
+            end_date = start_date + timedelta(days=days - 1)
+
+            leave = Leave.create({
+                'name': _('Employee Leave - %s') % employee.name,
+                'employee_id': employee.id,
+                'holiday_status_id': leave_type.id,
+                'request_date_from': start_date,
+                'request_date_to': end_date,
+            })
+
+            # Confirm and approve according to the leave workflow.
+            leave.action_confirm()
+
+            if leave.state == 'confirm':
+                leave.action_approve()
+
+            if leave.state == 'validate1':
+                leave.action_validate()
+
+            if leave.state != 'validate':
+                raise UserError(
+                    _(
+                        'The leave was not fully approved. '
+                        'Check the leave type approval settings.'
+                    )
+                )
+
+            # Set the calendar-day duration explicitly.
+            leave.write({
+                'number_of_days': days,
+            })
+
+            return leave
+
+        # Paid leave first.
+        if paid_days:
+            create_leave(
+                paid_type,
+                self.date_from,
+                paid_days,
+            )
+
+        # Any remaining days become unpaid leave.
+        if unpaid_days:
+            unpaid_start = self.date_from + timedelta(
+                days=paid_days
+            )
+
+            create_leave(
+                unpaid_type,
+                unpaid_start,
+                unpaid_days,
+            )
+
+        return {'type': 'ir.actions.act_window_close'}
