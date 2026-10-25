@@ -4,7 +4,6 @@ import logging
 from odoo.exceptions import UserError , ValidationError
 import re
 from dateutil.relativedelta import relativedelta
-from datetime import timedelta
 
 
 class HrPayrollStructure ( models.Model ) :
@@ -1247,59 +1246,106 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
 
         Leave = self.env['hr.leave']
 
-        def create_leave(leave_type , start_date , days) :
-            end_date = start_date + timedelta ( days=days - 1 )
+        def create_leave(leave_type, start_date, days):
+            end_date = start_date + timedelta(days=days - 1)
 
-            leave = Leave.create ( {
-                'name' : _ ( 'Employee Leave - %s' ) % employee.name ,
-                'employee_id' : employee.id ,
-                'holiday_status_id' : leave_type.id ,
-                'request_date_from' : start_date ,
-                'request_date_to' : end_date ,
-            } )
+            leave = Leave.create({
+                'name': _('Employee Leave - %s') % employee.name,
+                'employee_id': employee.id,
+                'holiday_status_id': leave_type.id,
+                'request_date_from': start_date,
+                'request_date_to': end_date,
+            })
 
-            # Confirm and approve according to the leave workflow.
-            leave.action_confirm ()
+            # Approve the leave according to Odoo 18 workflow.
+            if leave.state == 'confirm':
+                leave.action_approve()
 
-            if leave.state == 'confirm' :
-                leave.action_approve ()
+            if leave.state == 'validate1':
+                leave.action_validate()
 
-            if leave.state == 'validate1' :
-                leave.action_validate ()
-
-            if leave.state != 'validate' :
-                raise UserError (
-                    _ (
-                        'The leave was not fully approved. '
-                        'Check the leave type approval settings.'
-                    )
-                )
-
-            # Set the calendar-day duration explicitly.
-            leave.write ( {
-                'number_of_days' : days ,
-            } )
+            if leave.state != 'validate':
+                raise UserError(_(
+                    'The leave was not fully approved. '
+                    'Current state: %s' % leave.state
+                ))
 
             return leave
 
         # Paid leave first.
-        if paid_days :
-            create_leave (
-                paid_type ,
-                self.date_from ,
-                paid_days ,
+        if paid_days:
+            create_leave(
+                paid_type,
+                self.date_from,
+                paid_days,
             )
 
-        # Any remaining days become unpaid leave.
-        if unpaid_days :
-            unpaid_start = self.date_from + timedelta (
-                days=paid_days
+        # Remaining days become unpaid leave.
+        if unpaid_days:
+            unpaid_start = self.date_from + timedelta(days=paid_days)
+
+            create_leave(
+                unpaid_type,
+                unpaid_start,
+                unpaid_days,
             )
 
-            create_leave (
-                unpaid_type ,
-                unpaid_start ,
-                unpaid_days ,
-            )
+        return {'type': 'ir.actions.act_window_close'}
 
-        return {'type' : 'ir.actions.act_window_close'}
+        #
+        # def create_leave(leave_type , start_date , days) :
+        #     end_date = start_date + timedelta ( days=days - 1 )
+        #
+        #     leave = Leave.create ( {
+        #         'name' : _ ( 'Employee Leave - %s' ) % employee.name ,
+        #         'employee_id' : employee.id ,
+        #         'holiday_status_id' : leave_type.id ,
+        #         'request_date_from' : start_date ,
+        #         'request_date_to' : end_date ,
+        #     } )
+        #
+        #     # Confirm and approve according to the leave workflow.
+        #     leave.action_confirm ()
+        #
+        #     if leave.state == 'confirm' :
+        #         leave.action_approve ()
+        #
+        #     if leave.state == 'validate1' :
+        #         leave.action_validate ()
+        #
+        #     if leave.state != 'validate' :
+        #         raise UserError (
+        #             _ (
+        #                 'The leave was not fully approved. '
+        #                 'Check the leave type approval settings.'
+        #             )
+        #         )
+        #
+        #     # Set the calendar-day duration explicitly.
+        #     leave.write ( {
+        #         'number_of_days' : days ,
+        #     } )
+        #
+        #     return leave
+        #
+        # # Paid leave first.
+        # if paid_days :
+        #     create_leave (
+        #         paid_type ,
+        #         self.date_from ,
+        #         paid_days ,
+        #     )
+        #
+        # # Any remaining days become unpaid leave.
+        # if unpaid_days :
+        #     unpaid_start = self.date_from + timedelta (
+        #         days=paid_days
+        #     )
+        #
+        #     create_leave (
+        #         unpaid_type ,
+        #         unpaid_start ,
+        #         unpaid_days ,
+        #     )
+        #
+        # return {'type' : 'ir.actions.act_window_close'}
