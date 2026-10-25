@@ -1270,7 +1270,7 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
         if not employee :
             raise UserError ( _ ( 'Employee is required.' ) )
 
-        # Save the original balances BEFORE creating the leave.
+        # Save original balances before creating the leave.
         vacance_days_before = employee.vacance_days
         reversed_days_before = employee.reversed_vacance_days
 
@@ -1323,7 +1323,7 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
             paid_type_employee.virtual_remaining_leaves ,
         )
 
-        # Calculate the projected accrual until the leave start date.
+        # Calculate projected accrual until the leave start date.
         today = fields.Date.today ()
         leave_start = self.date_from
 
@@ -1347,7 +1347,6 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
         daily_rate = levels[0].added_value
 
         projected_accrual = days_until_leave * daily_rate
-
         projected_balance = remaining + projected_accrual
 
         # Split the leave into paid and unpaid calendar days.
@@ -1437,11 +1436,15 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
             'old_vacance_days' ,
         ] )
 
+        # Reload the Odoo page.
         return {
             'type' : 'ir.actions.client' ,
             'tag' : 'reload' ,
-            #'type' : 'ir.actions.act_window_close' ,
+
+        #'type' : 'ir.actions.act_window_close' ,
         }
+
+
 
     # def action_create_leave(self) :
     #     self.ensure_one ()
