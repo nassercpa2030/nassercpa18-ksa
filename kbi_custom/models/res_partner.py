@@ -1281,7 +1281,6 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
         Leave = self.env['hr.leave']
         Allocation = self.env['hr.leave.allocation']
 
-        # أنواع الإجازات
         paid_type = self.env['hr.leave.type'].browse ( 1 ).exists ()
         unpaid_type = self.env['hr.leave.type'].browse ( 4 ).exists ()
 
@@ -1290,7 +1289,7 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
                 'Paid leave type ID 1 or unpaid leave type ID 4 does not exist.'
             ) )
 
-        # منع إجازة غير مدفوعة جديدة إذا توجد إجازة غير مدفوعة معتمدة لم تنتهِ
+        # منع إجازة غير مدفوعة ثانية ما دامت الأولى معتمدة ولم تنتهِ
         existing_unpaid = Leave.search ( [
             ('employee_id' , '=' , employee.id) ,
             ('holiday_status_id' , '=' , unpaid_type.id) ,
@@ -1304,24 +1303,21 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
                 'معتمدة للموظف ولم تنتهِ بعد.'
             ) )
 
-        # حساب الأيام التقويمية شامل تاريخ البداية والنهاية
+        # الأيام التقويمية شاملة تاريخ البداية والنهاية
         total_days = (self.date_to - self.date_from).days + 1
 
-        # تحديث قراءة الرصيد المحسوب
+        # الرصيد الوحيد المستخدم في التقسيم هو vacance_days
         employee.invalidate_recordset ( [
             'vacance_days' ,
             'allocation_display' ,
             'old_vacance_days' ,
         ] )
 
-        # الاعتماد على vacance_days فقط
-        # vacance_days = allocation_display + old_vacance_days
         available_balance = float ( employee.vacance_days or 0.0 )
 
-        # لا نسمح باستخدام الرصيد إذا كان صفرًا أو سالبًا
+        # الصفر أو السالب لا يسمح بإجازة مدفوعة
         available_days = max ( 0 , int ( available_balance ) )
 
-        # تقسيم الإجازة إلى مدفوعة وغير مدفوعة
         paid_days = min ( total_days , available_days )
         unpaid_days = total_days - paid_days
 
@@ -1339,7 +1335,6 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
                 'request_date_to' : end_date ,
             } )
 
-            # اعتماد الإجازة
             if leave.state == 'confirm' :
                 leave.action_approve ()
 
@@ -1351,16 +1346,18 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
                     'لم يتم اعتماد الإجازة بالكامل. الحالة الحالية: %s'
                 ) % leave.state )
 
-        # إنشاء الإجازة المدفوعة أولًا
-        if paid_days > 0 :
+            return leave
+
+        # الإجازة المدفوعة أولاً
+        if paid_days :
             create_leave (
                 paid_type ,
                 self.date_from ,
                 paid_days ,
             )
 
-        # إنشاء الإجازة غير المدفوعة للأيام المتبقية
-        if unpaid_days > 0 :
+        # المتبقي إجازة غير مدفوعة
+        if unpaid_days :
             unpaid_start = self.date_from + timedelta ( days=paid_days )
 
             create_leave (
@@ -1385,7 +1382,6 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
             'date_to' : today ,
         } )
 
-        # تحديث الحقول المحسوبة بعد إنشاء الإجازة
         employee.invalidate_recordset ( [
             'vacance_days' ,
             'allocation_display' ,
