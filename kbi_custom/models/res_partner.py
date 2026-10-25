@@ -1288,6 +1288,25 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
                 'ID 4 (Unpaid leave) does not exist.'
             ) )
 
+        # Check current validated unpaid leave covering today.
+        today = fields.Date.today ()
+
+        current_unpaid_leave = self.env['hr.leave'].search ( [
+            ('employee_id' , '=' , employee.id) ,
+            ('holiday_status_id' , '=' , unpaid_type.id) ,
+            ('state' , '=' , 'validate') ,
+            ('request_date_from' , '<=' , today) ,
+            ('request_date_to' , '>=' , today) ,
+        ] , limit=1 )
+
+        # Reject only if balance is zero or negative
+        # AND the employee currently has unpaid leave.
+        if employee.vacance_days <= 0 and current_unpaid_leave :
+            raise UserError ( _ (
+                'لا يمكن إنشاء إجازة جديدة لأن الموظف لديه '
+                'إجازة غير مدفوعة حالية ورصيد الإجازات يساوي صفر أو أقل.'
+            ) )
+
         # Use vacance_days ONLY to determine paid leave days.
         available_paid_days = max (
             0 ,
@@ -1342,7 +1361,7 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
                 unpaid_days ,
             )
 
-        # Stop accrual allocations from the leave start date.
+        # Stop current accrual allocations from the leave start date.
         leave_start = self.date_from
 
         allocations = self.env['hr.leave.allocation'].search ( [
@@ -1365,11 +1384,11 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
 
         # Reset only the previous leave balance.
         employee.write ( {
-            'old_vacance_days' : 0.0 ,
+            'old_vacance_days' : employee.vacance_days - total_days ,
+            # 'old_vacance_days' : 0.0 ,
         } )
 
-        # Invalidate computed fields so Odoo recalculates them.
-        # Do not manually assign zero to reversed_vacance_days.
+        # Recalculate employee leave balance fields.
         employee.invalidate_recordset ( [
             'vacance_days' ,
             'reversed_vacance_days' ,
