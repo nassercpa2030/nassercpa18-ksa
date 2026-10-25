@@ -4,7 +4,6 @@ import logging
 from odoo.exceptions import UserError , ValidationError
 import re
 from dateutil.relativedelta import relativedelta
-from datetime import timedelta
 
 
 class HrPayrollStructure ( models.Model ) :
@@ -1240,6 +1239,11 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
             0.0 ,
             paid_type_employee.virtual_remaining_leaves
         )
+        if remaining <= 0 :
+            raise UserError ( _ (
+                'الموظف لا يملك رصيد إجازة مدفوعة كافٍ. '
+                'يمكنك تسجيل إجازة غير مدفوعة إذا كان ذلك مسموحًا.'
+            ) )
 
         # Split into whole calendar days.
         paid_days = min ( total_days , int ( remaining ) )
