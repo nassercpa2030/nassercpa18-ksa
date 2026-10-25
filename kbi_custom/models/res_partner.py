@@ -1271,12 +1271,16 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
             raise UserError ( _ ( 'Employee is required.' ) )
 
         if not self.date_from or not self.date_to :
-            raise UserError ( _ ( 'Start date and end date are required.' ) )
+            raise UserError ( _ (
+                'Start date and end date are required.'
+            ) )
 
         if self.date_to < self.date_from :
-            raise UserError ( _ ( 'End date must be after start date.' ) )
+            raise UserError ( _ (
+                'End date must be after start date.'
+            ) )
 
-        # Calculate total calendar days, including both dates.
+        # Calendar days, including both start and end dates.
         total_days = (self.date_to - self.date_from).days + 1
 
         paid_type = self.env['hr.leave.type'].browse ( 1 ).exists ()
@@ -1288,32 +1292,66 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
                 'ID 4 (Unpaid leave) does not exist.'
             ) )
 
-        # Check current validated unpaid leave covering today.
-        today = fields.Date.today ()
+        # Get the current contract of the same employee.
+        contract = employee.contract_id
 
-        current_unpaid_leave = self.env['hr.leave'].search ( [
-            ('employee_id' , '=' , employee.id) ,
-            ('holiday_status_id' , '=' , unpaid_type.id) ,
-            ('state' , '=' , 'validate') ,
-            ('request_date_from' , '<=' , today) ,
-            ('request_date_to' , '>=' , today) ,
-        ] , limit=1 )
-
-        # Reject only if balance is zero or negative
-        # AND the employee currently has unpaid leave.
-        if employee.vacance_days <= 0 and current_unpaid_leave :
+        if not contract :
             raise UserError ( _ (
-                'لا يمكن إنشاء إجازة جديدة لأن الموظف لديه '
-                'إجازة غير مدفوعة حالية ورصيد الإجازات يساوي صفر أو أقل.'
-            ) )
+                'لا يوجد عقد حالي للموظف %s.'
+            ) % employee.name )
 
-        # Use vacance_days ONLY to determine paid leave days.
-        available_paid_days = max (
-            0 ,
-            int ( employee.vacance_days ) ,
+        # Get the accrual plan from this employee's contract.
+        plan = contract.leave_accrual_plan_id
+
+        if not plan :
+            raise UserError ( _ (
+                'لا توجد خطة استحقاق إجازات في عقد الموظف %s.'
+            ) % employee.name )
+
+        # Read the current paid leave balance.
+        paid_type_employee = paid_type.with_context (
+            employee_id=employee.id ,
+            default_employee_id=employee.id ,
         )
 
-        paid_days = min ( total_days , available_paid_days )
+        remaining = max (
+            0.0 ,
+            paid_type_employee.virtual_remaining_leaves ,
+        )
+
+        # Calculate the projected accrual until the leave start date.
+        today = fields.Date.today ()
+        leave_start = self.date_from
+
+        days_until_leave = max (
+            0 ,
+            (leave_start - today).days ,
+        )
+
+        # Read daily accrual levels from the contract plan.
+        levels = plan.level_ids.filtered (
+            lambda level : level.frequency == 'daily'
+        ).sorted ( 'sequence' )
+
+        if not levels :
+            raise UserError ( _ (
+                'خطة الإجازة الموجودة في عقد الموظف لا تحتوي '
+                'على مستوى استحقاق يومي.'
+            ) )
+
+        # Use the daily rate configured in the contract plan.
+        daily_rate = levels[0].added_value
+
+        projected_accrual = days_until_leave * daily_rate
+
+        projected_balance = remaining + projected_accrual
+
+        # Split the leave into paid and unpaid calendar days.
+        paid_days = min (
+            total_days ,
+            int ( projected_balance ) ,
+        )
+
         unpaid_days = total_days - paid_days
 
         Leave = self.env['hr.leave']
@@ -1329,7 +1367,7 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
                 'request_date_to' : end_date ,
             } )
 
-            # Approve the leave according to Odoo 18 workflow.
+            # Approve according to the Odoo leave workflow.
             if leave.state == 'confirm' :
                 leave.action_approve ()
 
@@ -1338,22 +1376,25 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
 
             if leave.state != 'validate' :
                 raise UserError ( _ (
-                    'The leave was not fully approved. Current state: %s'
+                    'The leave was not fully approved. '
+                    'Current state: %s'
                 ) % leave.state )
 
             return leave
 
         # Create paid leave first.
-        if paid_days > 0 :
+        if paid_days :
             create_leave (
                 paid_type ,
                 self.date_from ,
                 paid_days ,
             )
 
-        # Remaining days become unpaid leave.
-        if unpaid_days > 0 :
-            unpaid_start = self.date_from + timedelta ( days=paid_days )
+        # Create unpaid leave for the remaining days.
+        if unpaid_days :
+            unpaid_start = self.date_from + timedelta (
+                days=paid_days
+            )
 
             create_leave (
                 unpaid_type ,
@@ -1362,8 +1403,6 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
             )
 
         # Stop current accrual allocations from the leave start date.
-        leave_start = self.date_from
-
         allocations = self.env['hr.leave.allocation'].search ( [
             ('employee_id' , '=' , employee.id) ,
             ('holiday_status_id' , '=' , paid_type.id) ,
@@ -1382,20 +1421,17 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
 
             allocation._update_accrual ()
 
-        # Reset only the previous leave balance.
+        # Reset the employee's old leave balance.
         employee.write ( {
             'old_vacance_days' : employee.vacance_days - total_days ,
             # 'old_vacance_days' : 0.0 ,
         } )
 
-        # Recalculate employee leave balance fields.
         employee.invalidate_recordset ( [
             'vacance_days' ,
             'reversed_vacance_days' ,
             'old_vacance_days' ,
         ] )
-
-        employee._compute_employee_vacance_days ()
 
         return {
             'type' : 'ir.actions.act_window_close' ,
