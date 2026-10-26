@@ -798,6 +798,7 @@ class Recruiter ( models.Model ) :
             self.resumption_work_after_leave = self.start_working_date
 
     ### calculate leave days  then edit if there is a leave ###
+
     @api.depends (
         'resumption_work_after_leave' ,
         'old_vacance_days' ,
@@ -826,11 +827,11 @@ class Recruiter ( models.Model ) :
 
             rec.active_vacances = len ( leaves )
 
-            # جميع الإجازات المدفوعة المعتمدة، بما فيها السابقة
-            all_paid_leaves = Leave.search ( [
+            # جميع الإجازات المدفوعة وغير المدفوعة المعتمدة، بما فيها السابقة
+            all_employee_leaves = Leave.search ( [
                 ('employee_id' , '=' , rec.id) ,
                 ('state' , '=' , 'validate') ,
-                ('holiday_status_id' , '=' , 1) ,
+                ('holiday_status_id' , 'in' , [1 , 4]) ,
                 ('date_from' , '!=' , False) ,
                 ('date_to' , '!=' , False) ,
             ] )
@@ -838,7 +839,7 @@ class Recruiter ( models.Model ) :
             # حساب الأيام التقويمية شاملًا البداية والنهاية
             used_days = 0.0
 
-            for leave in all_paid_leaves :
+            for leave in all_employee_leaves :
                 start_date = fields.Date.to_date ( leave.date_from )
                 end_date = fields.Date.to_date ( leave.date_to )
 
@@ -847,7 +848,7 @@ class Recruiter ( models.Model ) :
 
             rec.used_vacance_days = used_days
 
-            # جميع التخصيصات المعتمدة للإجازة المدفوعة
+            # جميع التخصيصات المعتمدة للإجازة المدفوعة فقط
             allocations = Allocation.search ( [
                 ('employee_id' , '=' , rec.id) ,
                 ('holiday_status_id' , '=' , 1) ,
@@ -866,7 +867,7 @@ class Recruiter ( models.Model ) :
 
             rec.vacance_days = total_days
 
-            # الرصيد المتبقي بعد خصم جميع الإجازات المدفوعة
+            # الرصيد المتبقي بعد خصم جميع الإجازات المدفوعة وغير المدفوعة
             rec.reversed_vacance_days = (
                     total_days - rec.used_vacance_days
             )
