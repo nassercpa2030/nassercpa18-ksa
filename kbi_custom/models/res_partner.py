@@ -4,6 +4,7 @@ import logging
 from odoo.exceptions import UserError , ValidationError
 import re
 from dateutil.relativedelta import relativedelta
+from datetime import timedelta
 
 
 class HrPayrollStructure ( models.Model ) :
@@ -458,32 +459,28 @@ class Recruiter ( models.Model ) :
     leave_accrual_plan_id = fields.Many2one ( comodel_name="hr.leave.accrual.plan" , string="خطة إستحقاق الأجازة" ,
                                               tracking=True , ondelete="restrict" )
 
+
 # ---------------- EMPLOYEES leaves  -----------------
 class leave_computing ( models.Model ) :
     _inherit = 'hr.leave'
-    number_of_days = fields.Float (  readonly=True ,   store=True,
-        tracking=True,)
+    number_of_days = fields.Float ( readonly=True , store=True ,
+                                    tracking=True , )
+
     # get number of days for leaves active
-    @api.depends('request_date_from', 'request_date_to')
-    def _compute_no_days(self):
-        for rec in self:
-            if rec.request_date_from and rec.request_date_to:
+    @api.depends ( 'request_date_from' , 'request_date_to' )
+    def _compute_no_days(self) :
+        for rec in self :
+            if rec.request_date_from and rec.request_date_to :
                 rec.number_of_days = (
-                    rec.request_date_to - rec.request_date_from
-                ).days + 1
-            else:
+                                             rec.request_date_to - rec.request_date_from
+                                     ).days + 1
+            else :
                 rec.number_of_days = 0.0
-
-
-       
-    
-    
 
 
 # ---------------- EMPLOYEES  -----------------
 class Recruiter ( models.Model ) :
     _inherit = 'hr.employee'
-    
 
     analytic_plan = fields.Many2one ( 'account.analytic.plan' , string='Anaytic Plan' ,
                                       help="Same field as in Journal Entry (account.move) for analytic distribution" ,
@@ -541,9 +538,9 @@ class Recruiter ( models.Model ) :
                                                  readonly=False , store=True )
 
     ### create allocation for employee ###
+
     def action_create_leave_allocation(self) :
         Allocation = self.env['hr.leave.allocation']
-        allocations = Allocation
         today = fields.Date.context_today ( self )
 
         for employee in self :
@@ -552,9 +549,21 @@ class Recruiter ( models.Model ) :
                     f"تم إنشاء مخصصات الإجازة للموظف {employee.name} بالفعل."
                 )
 
-            contract = employee.contract_id
+            #contract = employee.contract_id
+            contract = employee.env['hr.contract'].search ( [
+                ('employee_id' , '=' , employee.id) ,
+                ('state' , '=' , 'open') ,
+                '|' ,
+                ('date_end' , '=' , False) ,
+                ('date_end' , '>=' , fields.Date.today ()) ,
+            ] , limit=1 , order='date_start desc' )
+
             if not contract :
-                raise UserError ( "لا يوجد عقد مرتبط بالموظف." )
+                raise UserError ( _ (
+                    'لا يوجد عقد حالي وساري للموظف %s.'
+                ) % employee.name )
+            # if not contract :
+            #     raise UserError ( "لا يوجد عقد مرتبط بالموظف." )
 
             if not contract.leave_accrual_plan_id :
                 raise UserError ( "يجب تحديد خطة استحقاق الإجازة في العقد." )
@@ -563,9 +572,16 @@ class Recruiter ( models.Model ) :
             if not start_date :
                 raise UserError ( "يجب تحديد تاريخ استلام العمل بعد الإجازة." )
 
+            if start_date > today :
+                raise UserError (
+                    "تاريخ استلام العمل بعد الإجازة لا يمكن أن يكون في المستقبل."
+                )
+
             leave_type = self.env['hr.leave.type'].browse ( 1 ).exists ()
             if not leave_type :
-                raise UserError ( "نوع الإجازة بالرقم ID = 1 غير موجود." )
+                raise UserError (
+                    "نوع الإجازة بالرقم ID = 1 (Paid Time Off) غير موجود."
+                )
 
             allocation = Allocation.create ( {
                 'name' : f'Accrual Allocation - {employee.name}' ,
@@ -574,20 +590,15 @@ class Recruiter ( models.Model ) :
                 'allocation_type' : 'accrual' ,
                 'accrual_plan_id' : contract.leave_accrual_plan_id.id ,
                 'date_from' : start_date ,
-
-                # منع القيمة الافتراضية 1
                 'number_of_days' : 0.0 ,
             } )
 
-            # محاكاة حساب Odoo الأصلي عند اختيار خطة الاستحقاق
             allocation.update (
                 allocation._get_initialize_accrual_plan_values ( start_date )
             )
 
-            # حساب الاستحقاق من تاريخ البداية حتى اليوم
             allocation._process_accrual_plans ( date_to=today )
 
-            # تحديث القيمة المحسوبة بعد معالجة خطة الاستحقاق
             allocation.invalidate_recordset ( [
                 'number_of_days' ,
                 'number_of_days_display' ,
@@ -596,7 +607,6 @@ class Recruiter ( models.Model ) :
                 'lastcall' ,
             ] )
 
-            # الاعتماد بعد تجهيز رصيد الاستحقاق
             if allocation.state == 'confirm' :
                 allocation.action_approve ()
 
@@ -609,17 +619,19 @@ class Recruiter ( models.Model ) :
                     f"الحالة الحالية: {allocation.state}"
                 )
 
-            # قراءة القيمة النهائية المحسوبة
             allocation.invalidate_recordset ()
-            allocation.read ( [
-                'number_of_days' ,
-                'number_of_days_display' ,
-                'number_of_hours_display' ,
+
+            employee.invalidate_recordset ( [
+                'old_vacance_days' ,
+                'allocation_display' ,
+                'vacance_days' ,
+                'reversed_vacance_days' ,
+                'used_vacance_days' ,
+                'active_vacances' ,
             ] )
 
-            allocations |= allocation
-
         return True
+
         # {
         #     'type' : 'ir.actions.act_window' ,
         #     'name' : 'Leave Allocations' ,
@@ -638,6 +650,23 @@ class Recruiter ( models.Model ) :
     #         if employee.coach_id and employee.coach_id.id :
     #             employee.request_employee_manager = employee.coach_id.id
     #             employee.parent_id = employee.coach_id.id
+
+    def action_open_employee_leave_wizard(self) :
+        self.ensure_one ()
+
+        return {
+            'type' : 'ir.actions.act_window' ,
+            'name' : 'Create Leave' ,
+            'res_model' : 'employee.leave.wizard' ,
+            'view_mode' : 'form' ,
+            'view_id' : self.env.ref (
+                'kbi_custom.view_employee_leave_wizard_form'
+            ).id ,
+            'target' : 'new' ,
+            'context' : {
+                'default_employee_id' : self.id ,
+            } ,
+        }
 
     # @api.depends ( 'employee_id' )
     def _compute_employee_counts(self) :
@@ -768,15 +797,27 @@ class Recruiter ( models.Model ) :
         if not self.resumption_work_after_leave :
             self.resumption_work_after_leave = self.start_working_date
 
+    ### calculate leave days  then edit if there is a leave ###
 
-   # @api.depends ( 'resumption_work_after_leave' , 'country_id' )
+    @api.depends (
+        'resumption_work_after_leave' ,
+        'old_vacance_days' ,
+        'allocation_display' ,
+        'start_working_date' ,
+    )
     def _compute_employee_vacance_days(self) :
         today = fields.Date.today ()
+        Allocation = self.env['hr.leave.allocation']
+        Leave = self.env['hr.leave']
 
         for rec in self :
-            rec.vacance_days = 0
+            rec.vacance_days = 0.0
+            rec.reversed_vacance_days = 0.0
+            rec.used_vacance_days = 0.0
+            rec.active_vacances = 0
 
-            leaves = self.env['hr.leave'].search ( [
+            # الإجازات الحالية والمستقبلية لاحتساب العدد المعروض
+            leaves = Leave.search ( [
                 ('employee_id' , '=' , rec.id) ,
                 ('state' , '=' , 'validate') ,
                 '|' ,
@@ -784,48 +825,159 @@ class Recruiter ( models.Model ) :
                 ('request_date_from' , '>=' , today) ,
             ] )
 
-            # عدد الإجازات الحالية
             rec.active_vacances = len ( leaves )
 
-            for leave in leaves :
-                if leave.request_date_from and leave.request_date_to :
-                    days = (
-                                   leave.request_date_to - leave.request_date_from
-                           ).days + 1
+            # جميع الإجازات المدفوعة وغير المدفوعة المعتمدة، بما فيها السابقة
+            all_employee_leaves = Leave.search ( [
+                ('employee_id' , '=' , rec.id) ,
+                ('state' , '=' , 'validate') ,
+                ('holiday_status_id' , 'in' , [1 , 4]) ,
+                ('date_from' , '!=' , False) ,
+                ('date_to' , '!=' , False) ,
+            ] )
 
-                    rec.used_vacance_days += days
+            # حساب الأيام التقويمية شاملًا البداية والنهاية
+            used_days = 0.0
 
-            # if not rec.resumption_work_after_leave :
-            #     continue
+            for leave in all_employee_leaves :
+                start_date = fields.Date.to_date ( leave.date_from )
+                end_date = fields.Date.to_date ( leave.date_to )
 
-            if rec.start_working_date :
-                rec.vacance_days = ( float ( rec.allocation_display or 0.0 )+rec.old_vacance_days)
-                rec.reversed_vacance_days = (rec.vacance_days - rec.used_vacance_days)
+                if start_date and end_date and end_date >= start_date :
+                    used_days += (end_date - start_date).days + 1
 
-            #     delta_vacance = relativedelta ( today , rec.start_working_date )
+            rec.used_vacance_days = used_days
 
-            # # delta_vacance = relativedelta ( today , rec.start_working_date )
-            # # delta = relativedelta ( today , rec.start_working_date )
-            # delta = relativedelta ( today , rec.resumption_work_after_leave )
-            # months_of_service = delta.years * 12 + delta.months
+            # جميع التخصيصات المعتمدة للإجازة المدفوعة فقط
+            allocations = Allocation.search ( [
+                ('employee_id' , '=' , rec.id) ,
+                ('holiday_status_id' , '=' , 1) ,
+                ('state' , '=' , 'validate') ,
+            ] )
 
-            # # الموظف سعودي
-            # if rec.country_id.code == 'SA' :
-            #     annual_days = 21 if delta.years < 5 else 30
+            allocation_days = sum (
+                allocations.mapped ( 'number_of_days' )
+            )
 
-            # # الموظف غير سعودي
-            # else :
-            #     annual_days = 21 if delta.years < 2 else 30
+            # إجمالي الرصيد = التخصيصات المعتمدة + الرصيد القديم
+            total_days = (
+                    float ( allocation_days or 0.0 )
+                    + float ( rec.old_vacance_days or 0.0 )
+            )
 
-            # if rec.resumption_work_after_leave and rec.resumption_work_after_leave >= fields.Date.from_string (
-            #         '2026-07-30' ) :
-            #     rec.old_vacance_days = 0
+            rec.vacance_days = total_days
 
-            # else :
-            #     continue
-            # الرصيد المستحق حتى اليوم
-            # rec.vacance_days = (months_of_service * (annual_days / 12)) + rec.old_vacance_days
-            # rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
+            # الرصيد المتبقي بعد خصم جميع الإجازات المدفوعة وغير المدفوعة
+            rec.reversed_vacance_days = (
+                    total_days - rec.used_vacance_days
+            )
+
+    # def _compute_employee_vacance_days(self) :
+    #     today = fields.Date.today ()
+    #     Allocation = self.env['hr.leave.allocation']
+    #     Leave = self.env['hr.leave']
+    #
+    #     for rec in self :
+    #         rec.vacance_days = 0.0
+    #         rec.reversed_vacance_days = 0.0
+    #         rec.used_vacance_days = 0.0
+    #         rec.active_vacances = 0
+    #
+    #         leaves = Leave.search ( [
+    #             ('employee_id' , '=' , rec.id) ,
+    #             ('state' , '=' , 'validate') ,
+    #             '|' ,
+    #             ('request_date_to' , '>=' , today) ,
+    #             ('request_date_from' , '>=' , today) ,
+    #         ] )
+    #
+    #         rec.active_vacances = len ( leaves )
+    #
+    #         for leave in leaves :
+    #             if leave.request_date_from and leave.request_date_to :
+    #                 rec.used_vacance_days += (
+    #                                                  leave.request_date_to - leave.request_date_from
+    #                                          ).days + 1
+    #
+    #         allocations = Allocation.search ( [
+    #             ('employee_id' , '=' , rec.id) ,
+    #             ('holiday_status_id' , '=' , 1) ,
+    #             ('state' , '=' , 'validate') ,
+    #         ] , limit=1 )
+    #
+    #         # لا يوجد تخصيص معتمد، أو توجد إجازة حالية/مستقبلية
+    #         if not allocations or leaves :
+    #             rec.vacance_days = 0.0
+    #             # rec.old_vacance_days = 0.0
+    #             rec.reversed_vacance_days = 0.0
+    #             continue
+    #
+    #         if rec.start_working_date :
+    #             rec.vacance_days = (
+    #                     float ( rec.allocation_display or 0.0 )
+    #                     + float ( rec.old_vacance_days or 0.0 )
+    #             )
+    #             rec.reversed_vacance_days = (
+    #                     rec.vacance_days - rec.used_vacance_days
+    #             )
+
+    # @api.depends ( 'resumption_work_after_leave' , 'country_id' )
+    # def _compute_employee_vacance_days(self) :
+    #     today = fields.Date.today ()
+    #
+    #     for rec in self :
+    #         rec.vacance_days = 0
+    #
+    #         leaves = self.env['hr.leave'].search ( [
+    #             ('employee_id' , '=' , rec.id) ,
+    #             ('state' , '=' , 'validate') ,
+    #             '|' ,
+    #             ('request_date_to' , '>=' , today) ,
+    #             ('request_date_from' , '>=' , today) ,
+    #         ] )
+    #
+    #         # عدد الإجازات الحالية
+    #         rec.active_vacances = len ( leaves )
+    #
+    #         for leave in leaves :
+    #             if leave.request_date_from and leave.request_date_to :
+    #                 days = (
+    #                                leave.request_date_to - leave.request_date_from
+    #                        ).days + 1
+    #
+    #                 rec.used_vacance_days += days
+    #
+    #         # if not rec.resumption_work_after_leave :
+    #         #     continue
+    #
+    #         if rec.start_working_date :
+    #             rec.vacance_days = (float ( rec.allocation_display or 0.0 ) + rec.old_vacance_days)
+    #             rec.reversed_vacance_days = (rec.vacance_days - rec.used_vacance_days)
+
+    #     delta_vacance = relativedelta ( today , rec.start_working_date )
+
+    # # delta_vacance = relativedelta ( today , rec.start_working_date )
+    # # delta = relativedelta ( today , rec.start_working_date )
+    # delta = relativedelta ( today , rec.resumption_work_after_leave )
+    # months_of_service = delta.years * 12 + delta.months
+
+    # # الموظف سعودي
+    # if rec.country_id.code == 'SA' :
+    #     annual_days = 21 if delta.years < 5 else 30
+
+    # # الموظف غير سعودي
+    # else :
+    #     annual_days = 21 if delta.years < 2 else 30
+
+    # if rec.resumption_work_after_leave and rec.resumption_work_after_leave >= fields.Date.from_string (
+    #         '2026-07-30' ) :
+    #     rec.old_vacance_days = 0
+
+    # else :
+    #     continue
+    # الرصيد المستحق حتى اليوم
+    # rec.vacance_days = (months_of_service * (annual_days / 12)) + rec.old_vacance_days
+    # rec.reversed_vacance_days = rec.vacance_days - rec.used_vacance_days
 
     @api.depends ( 'contract_ids.date_start' )
     def _compute_start_working_date(self) :
@@ -1166,3 +1318,334 @@ class ResPartner ( models.Model ) :
                 dup.unlink ()
 
         return {'type' : 'ir.actions.act_window_close'}
+
+
+### class of new employee leave
+class EmployeeLeaveWizard ( models.TransientModel ) :
+    _name = 'employee.leave.wizard'
+    _description = 'Create Employee Leave'
+
+    employee_id = fields.Many2one (
+        'hr.employee' ,
+        required=True ,
+        readonly=True ,
+
+    )
+
+    date_from = fields.Date (
+        string='Start Date' ,
+        required=True ,
+    )
+
+    date_to = fields.Date (
+        string='End Date' ,
+        required=True ,
+    )
+
+    def action_create_leave(self) :
+        self.ensure_one ()
+
+        employee = self.employee_id
+
+        if not employee :
+            raise UserError ( _ ( 'Employee is required.' ) )
+
+        # Save original balances before creating the leave.
+        vacance_days_before = employee.vacance_days
+        reversed_days_before = employee.reversed_vacance_days
+
+        if not self.date_from or not self.date_to :
+            raise UserError ( _ (
+                'Start date and end date are required.'
+            ) )
+
+        if self.date_to < self.date_from :
+            raise UserError ( _ (
+                'End date must be after start date.'
+            ) )
+
+        # Calendar days, including both start and end dates.
+        total_days = (self.date_to - self.date_from).days + 1
+
+        paid_type = self.env['hr.leave.type'].browse ( 1 ).exists ()
+        unpaid_type = self.env['hr.leave.type'].browse ( 4 ).exists ()
+
+        if not paid_type or not unpaid_type :
+            raise UserError ( _ (
+                'Leave type ID 1 (Paid leave) or '
+                'ID 4 (Unpaid leave) does not exist.'
+            ) )
+
+        # Get the current contract of the same employee.
+        contract = self.env['hr.contract'].search ( [
+            ('employee_id' , '=' , employee.id) ,
+            ('state' , '=' , 'open') ,
+            '|' ,
+            ('date_end' , '=' , False) ,
+            ('date_end' , '>=' , fields.Date.today ()) ,
+        ] , limit=1 , order='date_start desc' )
+
+        if not contract :
+            raise UserError ( _ (
+                'لا يوجد عقد حالي وساري للموظف %s.'
+            ) % employee.name )
+
+        # Get the accrual plan from this employee's contract.
+        plan = contract.leave_accrual_plan_id
+
+        if not plan :
+            raise UserError ( _ (
+                'لا توجد خطة استحقاق إجازات في عقد الموظف %s.'
+            ) % employee.name )
+
+        # Read the current paid leave balance.
+        paid_type_employee = paid_type.with_context (
+            employee_id=employee.id ,
+            default_employee_id=employee.id ,
+        )
+
+        remaining = max (
+            0.0 ,
+            paid_type_employee.virtual_remaining_leaves ,
+        )
+
+        # Calculate projected accrual until the leave start date.
+        today = fields.Date.today ()
+        leave_start = self.date_from
+
+        days_until_leave = max (
+            0 ,
+            (leave_start - today).days ,
+        )
+
+        # Read daily accrual levels from the contract plan.
+        levels = plan.level_ids.filtered (
+            lambda level : level.frequency == 'daily'
+        ).sorted ( 'sequence' )
+
+        if not levels :
+            raise UserError ( _ (
+                'خطة الإجازة الموجودة في عقد الموظف لا تحتوي '
+                'على مستوى استحقاق يومي.'
+            ) )
+
+        # Use the daily rate configured in the contract plan.
+        daily_rate = levels[0].added_value
+
+        projected_accrual = days_until_leave * daily_rate
+        projected_balance = remaining + projected_accrual
+
+        # Split the leave into paid and unpaid calendar days.
+        paid_days = min (
+            total_days ,
+            int ( projected_balance ) ,
+        )
+
+        unpaid_days = total_days - paid_days
+
+        Leave = self.env['hr.leave']
+
+        def create_leave(leave_type , start_date , days) :
+            end_date = start_date + timedelta ( days=days - 1 )
+
+            leave = Leave.create ( {
+                'name' : _ ( 'Employee Leave - %s' ) % employee.name ,
+                'employee_id' : employee.id ,
+                'holiday_status_id' : leave_type.id ,
+                'request_date_from' : start_date ,
+                'request_date_to' : end_date ,
+            } )
+
+            # Approve according to the Odoo leave workflow.
+            if leave.state == 'confirm' :
+                leave.action_approve ()
+
+            if leave.state == 'validate1' :
+                leave.action_validate ()
+
+            if leave.state != 'validate' :
+                raise UserError ( _ (
+                    'The leave was not fully approved. '
+                    'Current state: %s'
+                ) % leave.state )
+
+            return leave
+
+        # Create paid leave first.
+        if paid_days :
+            create_leave (
+                paid_type ,
+                self.date_from ,
+                paid_days ,
+            )
+
+        # Create unpaid leave for the remaining days.
+        if unpaid_days :
+            unpaid_start = self.date_from + timedelta (
+                days=paid_days
+            )
+
+            create_leave (
+                unpaid_type ,
+                unpaid_start ,
+                unpaid_days ,
+            )
+
+        # Stop current accrual allocations from the leave start date.
+        allocations = self.env['hr.leave.allocation'].search ( [
+            ('employee_id' , '=' , employee.id) ,
+            ('holiday_status_id' , '=' , paid_type.id) ,
+            ('allocation_type' , '=' , 'accrual') ,
+            ('state' , '=' , 'validate') ,
+            ('date_from' , '<=' , leave_start) ,
+            '|' ,
+            ('date_to' , '=' , False) ,
+            ('date_to' , '>=' , leave_start) ,
+        ] )
+
+        for allocation in allocations :
+            allocation.write ( {
+                'date_to' : leave_start ,
+            } )
+
+            allocation._update_accrual ()
+
+        # Save the original balance minus the original reversed balance.
+        employee.write ( {
+            'old_vacance_days' :
+                vacance_days_before - reversed_days_before ,
+        } )
+
+        employee.invalidate_recordset ( [
+            'vacance_days' ,
+            'reversed_vacance_days' ,
+            'old_vacance_days' ,
+        ] )
+
+        # Reload the Odoo page.
+        return {
+            'type' : 'ir.actions.client' ,
+            'tag' : 'reload' ,
+        }
+
+
+
+    # def action_create_leave(self) :
+    #     self.ensure_one ()
+    #
+    #     employee = self.employee_id
+    #
+    #     if not employee :
+    #         raise UserError ( _ ( 'Employee is required.' ) )
+    #
+    #     if self.date_to < self.date_from :
+    #         raise UserError ( _ ( 'End date must be after start date.' ) )
+    #
+    #     # Calendar days, including both start and end dates.
+    #     total_days = (self.date_to - self.date_from).days + 1
+    #
+    #     paid_type = self.env['hr.leave.type'].browse ( 1 ).exists ()
+    #     unpaid_type = self.env['hr.leave.type'].browse ( 4 ).exists ()
+    #
+    #     if not paid_type or not unpaid_type :
+    #         raise UserError (
+    #             _ ( 'Leave type ID 1(Paid leave type) or ID 4 (not paid leave type) does not exist.' )
+    #         )
+    #
+    #     # Read the employee's available paid leave balance.
+    #     # balance = paid_type.get_days(employee.id)
+    #     # remaining = max(
+    #     #     0.0,
+    #     #     balance.get('virtual_remaining_leaves', 0.0),
+    #     # )
+    #     paid_type_employee = paid_type.with_context (
+    #         employee_id=employee.id ,
+    #         default_employee_id=employee.id ,
+    #     )
+    #
+    #     remaining = max (
+    #         0.0 ,
+    #         paid_type_employee.virtual_remaining_leaves
+    #     )
+    #     if remaining <= 0 :
+    #         raise UserError ( _ (
+    #             'الموظف لا يملك رصيد إجازة مدفوعة كافٍ. '
+    #             'يمكنك تسجيل إجازة غير مدفوعة إذا كان ذلك مسموحًا.'
+    #         ) )
+    #
+    #     # Split into whole calendar days.
+    #     paid_days = min ( total_days , int ( remaining ) )
+    #     unpaid_days = total_days - paid_days
+    #
+    #     Leave = self.env['hr.leave']
+    #
+    #     def create_leave(leave_type , start_date , days) :
+    #         end_date = start_date + timedelta ( days=days - 1 )
+    #
+    #         leave = Leave.create ( {
+    #             'name' : _ ( 'Employee Leave - %s' ) % employee.name ,
+    #             'employee_id' : employee.id ,
+    #             'holiday_status_id' : leave_type.id ,
+    #             'request_date_from' : start_date ,
+    #             'request_date_to' : end_date ,
+    #         } )
+    #
+    #         # Approve the leave according to Odoo 18 workflow.
+    #         if leave.state == 'confirm' :
+    #             leave.action_approve ()
+    #
+    #         if leave.state == 'validate1' :
+    #             leave.action_validate ()
+    #
+    #         if leave.state != 'validate' :
+    #             raise UserError ( _ (
+    #                 'The leave was not fully approved. '
+    #                 'Current state: %s' % leave.state
+    #             ) )
+    #
+    #         return leave
+    #
+    #     # Paid leave first.
+    #     if paid_days :
+    #         create_leave (
+    #             paid_type ,
+    #             self.date_from ,
+    #             paid_days ,
+    #         )
+    #
+    #     # Remaining days become unpaid leave.
+    #     if unpaid_days :
+    #         unpaid_start = self.date_from + timedelta ( days=paid_days )
+    #
+    #         create_leave (
+    #             unpaid_type ,
+    #             unpaid_start ,
+    #             unpaid_days ,
+    #         )
+    #
+    #     # إيقاف الاستحقاق التراكمي بعد إنشاء الإجازة
+    #     today = fields.Date.today ()
+    #
+    #     allocations = self.env['hr.leave.allocation'].search ( [
+    #         ('employee_id' , '=' , employee.id) ,
+    #         ('holiday_status_id' , '=' , 1) ,
+    #         ('allocation_type' , '=' , 'accrual') ,
+    #         ('state' , '=' , 'validate') ,
+    #         ('date_from' , '<=' , today) ,
+    #     ] )
+    #
+    #     allocations.write ( {
+    #         'date_to' : today ,
+    #     } )
+    #
+    #     # تصفير الأرصدة بعد إنشاء الإجازة
+    #     employee.write ( {
+    #         'old_vacance_days' : 0.0 ,
+    #     } )
+    #     employee.invalidate_recordset ( [
+    #         'vacance_days' ,
+    #         'reversed_vacance_days' ,
+    #         'old_vacance_days' ,
+    #     ] )
+    #
+    #     return {'type' : 'ir.actions.act_window_close'}
