@@ -15,3 +15,4 @@ access_kbi_custom_product_report_template,kbi_custom.product_report_template,mod
 access_kbi_custom_account_payment_sale,kbi_custom.account_payment_sale,model_account_payment_sale,base.group_user,1,1,1,1
 access_kbi_analytic_profit_loss_wizard,kbi.analytic.profit.loss.wizard,model_kbi_analytic_profit_loss_wizard,base.group_user,1,1,1,1
 access_kbi_analytic_profit_loss_line,kbi.analytic.profit.loss.line,model_kbi_analytic_profit_loss_line,base.group_user,1,1,1,1
+access_employee_leave_wizard_user,employee.leave.wizard user,model_employee_leave_wizard,base.group_user,1,1,1,1
