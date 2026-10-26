@@ -549,9 +549,21 @@ class Recruiter ( models.Model ) :
                     f"تم إنشاء مخصصات الإجازة للموظف {employee.name} بالفعل."
                 )
 
-            contract = employee.contract_id
+            #contract = employee.contract_id
+            contract = employee.env['hr.contract'].search ( [
+                ('employee_id' , '=' , employee.id) ,
+                ('state' , '=' , 'open') ,
+                '|' ,
+                ('date_end' , '=' , False) ,
+                ('date_end' , '>=' , fields.Date.today ()) ,
+            ] , limit=1 , order='date_start desc' )
+
             if not contract :
-                raise UserError ( "لا يوجد عقد مرتبط بالموظف." )
+                raise UserError ( _ (
+                    'لا يوجد عقد حالي وساري للموظف %s.'
+                ) % employee.name )
+            # if not contract :
+            #     raise UserError ( "لا يوجد عقد مرتبط بالموظف." )
 
             if not contract.leave_accrual_plan_id :
                 raise UserError ( "يجب تحديد خطة استحقاق الإجازة في العقد." )
