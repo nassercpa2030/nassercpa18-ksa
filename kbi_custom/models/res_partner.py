@@ -803,7 +803,7 @@ class Recruiter ( models.Model ) :
             rec.used_vacance_days = 0.0
             rec.active_vacances = 0
 
-            # الإجازات المعتمدة الحالية أو المستقبلية
+            # الإجازات الحالية والمستقبلية لاحتساب العدد المعروض
             leaves = Leave.search ( [
                 ('employee_id' , '=' , rec.id) ,
                 ('state' , '=' , 'validate') ,
@@ -814,16 +814,26 @@ class Recruiter ( models.Model ) :
 
             rec.active_vacances = len ( leaves )
 
-            # حساب أيام الإجازات المدفوعة فقط
-            for leave in leaves :
-                if (
-                        leave.holiday_status_id.id == 1
-                        and leave.request_date_from
-                        and leave.request_date_to
-                ) :
-                    rec.used_vacance_days += (
-                                                     leave.request_date_to - leave.request_date_from
-                                             ).days + 1
+            # جميع الإجازات المدفوعة المعتمدة، بما فيها السابقة
+            all_paid_leaves = Leave.search ( [
+                ('employee_id' , '=' , rec.id) ,
+                ('state' , '=' , 'validate') ,
+                ('holiday_status_id' , '=' , 1) ,
+                ('date_from' , '!=' , False) ,
+                ('date_to' , '!=' , False) ,
+            ] )
+
+            # حساب الأيام التقويمية شاملًا البداية والنهاية
+            used_days = 0.0
+
+            for leave in all_paid_leaves :
+                start_date = fields.Date.to_date ( leave.date_from )
+                end_date = fields.Date.to_date ( leave.date_to )
+
+                if start_date and end_date and end_date >= start_date :
+                    used_days += (end_date - start_date).days + 1
+
+            rec.used_vacance_days = used_days
 
             # جميع التخصيصات المعتمدة للإجازة المدفوعة
             allocations = Allocation.search ( [
@@ -836,14 +846,15 @@ class Recruiter ( models.Model ) :
                 allocations.mapped ( 'number_of_days' )
             )
 
-            # الرصيد الإجمالي = التخصيصات المعتمدة + الرصيد القديم
+            # إجمالي الرصيد = التخصيصات المعتمدة + الرصيد القديم
             total_days = (
                     float ( allocation_days or 0.0 )
                     + float ( rec.old_vacance_days or 0.0 )
             )
 
-            # الرصيد المتبقي = الإجمالي - الإجازات المدفوعة المستخدمة
             rec.vacance_days = total_days
+
+            # الرصيد المتبقي بعد خصم جميع الإجازات المدفوعة
             rec.reversed_vacance_days = (
                     total_days - rec.used_vacance_days
             )
@@ -852,13 +863,13 @@ class Recruiter ( models.Model ) :
     #     today = fields.Date.today ()
     #     Allocation = self.env['hr.leave.allocation']
     #     Leave = self.env['hr.leave']
-    # 
+    #
     #     for rec in self :
     #         rec.vacance_days = 0.0
     #         rec.reversed_vacance_days = 0.0
     #         rec.used_vacance_days = 0.0
     #         rec.active_vacances = 0
-    # 
+    #
     #         leaves = Leave.search ( [
     #             ('employee_id' , '=' , rec.id) ,
     #             ('state' , '=' , 'validate') ,
@@ -866,28 +877,28 @@ class Recruiter ( models.Model ) :
     #             ('request_date_to' , '>=' , today) ,
     #             ('request_date_from' , '>=' , today) ,
     #         ] )
-    # 
+    #
     #         rec.active_vacances = len ( leaves )
-    # 
+    #
     #         for leave in leaves :
     #             if leave.request_date_from and leave.request_date_to :
     #                 rec.used_vacance_days += (
     #                                                  leave.request_date_to - leave.request_date_from
     #                                          ).days + 1
-    # 
+    #
     #         allocations = Allocation.search ( [
     #             ('employee_id' , '=' , rec.id) ,
     #             ('holiday_status_id' , '=' , 1) ,
     #             ('state' , '=' , 'validate') ,
     #         ] , limit=1 )
-    # 
+    #
     #         # لا يوجد تخصيص معتمد، أو توجد إجازة حالية/مستقبلية
     #         if not allocations or leaves :
     #             rec.vacance_days = 0.0
     #             # rec.old_vacance_days = 0.0
     #             rec.reversed_vacance_days = 0.0
     #             continue
-    # 
+    #
     #         if rec.start_working_date :
     #             rec.vacance_days = (
     #                     float ( rec.allocation_display or 0.0 )
