@@ -463,8 +463,7 @@ class Recruiter ( models.Model ) :
 # ---------------- EMPLOYEES leaves  -----------------
 class leave_computing ( models.Model ) :
     _inherit = 'hr.leave'
-    number_of_days = fields.Float ( readonly=True , store=True ,
-                                    tracking=True , )
+    number_of_days = fields.Float ( string="عدد أيام الأجازة",compute="_compute_no_days" ,tracking=True  )
 
     # get number of days for leaves active
     @api.depends ( 'request_date_from' , 'request_date_to' )
