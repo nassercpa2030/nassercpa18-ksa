@@ -463,16 +463,16 @@ class Recruiter ( models.Model ) :
 # ---------------- EMPLOYEES leaves  -----------------
 class leave_computing ( models.Model ) :
     _inherit = 'hr.leave'
-    allocation_days = fields.Float ( string="عدد أيام الأجازة",compute="_compute_no_days" ,tracking=True ,store=True  )
+    allocation_days = fields.Float ( string="عدد أيام الأجازة",compute="_compute_no_days" ,tracking=True   )
 
     # get number of days for leaves active
     @api.depends ( 'request_date_from' , 'request_date_to' )
     def _compute_no_days(self) :
         for rec in self :
             if rec.request_date_from and rec.request_date_to :
-                rec.number_of_days = (rec.request_date_to - rec.request_date_from).days + 1
+                rec.allocation_days = (rec.request_date_to - rec.request_date_from).days + 1
             else :
-                rec.number_of_days = 0.0
+                rec.allocation_days = 0.0
 
 
 # ---------------- EMPLOYEES  -----------------
@@ -588,6 +588,7 @@ class Recruiter ( models.Model ) :
                 'accrual_plan_id' : contract.leave_accrual_plan_id.id ,
                 'date_from' : start_date ,
                 'number_of_days' : 0.0 ,
+                'allocation_days' : 0.0 ,
             } )
 
             allocation.update (
