@@ -335,3 +335,6 @@ class CloseEntryWizard ( models.TransientModel ) :
                 sale_order.journal_entry_count_finance = sale_order.journal_entry_count_finance + 1
             # تحديث المشاريع المرتبطة بالـ Sale Order
             sale_order.project_ids.write ( {'has_closed_entry' : True} )
+            ###update project state of sale order
+            sale_order.project_id_id.id = 20
+    
