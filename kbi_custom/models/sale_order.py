@@ -180,7 +180,7 @@ class SaleOrder ( models.Model ) :
     first_payment_original = fields.Float ( string="first_payment_original" , readonly=False , required=False ,
                                             store=True )
     project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
-                                         related='project_ids.stage_id' , store=True , groups='base.group_user' )
+                                         related='project_ids.stage_id' , store=True , groups='base.group_user' ,tracking=True)
     # close_type = fields.Char(comodel_name='project.project.close_type',string='Close_type', related='close_type', store=True)
     from_crm = fields.Boolean ( string='From CRM' )
     can_edit_analytic = fields.Boolean ( string='Can Edit Analytic Account' , compute='compute_can_edit_analytic' , )
