@@ -716,7 +716,7 @@ class SaleOrder ( models.Model ) :
                         not old_archive[sale_order.id]
                         and sale_order.archive_signiture
                 ) :
-                    sale_order.project_ids.stage_id = 24
+                   sale_order.project_ids.sudo().write({'stage_id': 24,})
                     sale_order.project_ids.files_state = "done"
                     wizard = self.env['close.entry.wizard'].with_context (
                         active_id=sale_order.id ,
@@ -735,7 +735,7 @@ class SaleOrder ( models.Model ) :
                         not old_archive_handeled[sale_order.id]
                         and sale_order.archive_signiture_handeld
                 ) :
-                    sale_order.project_ids.stage_id = 24
+                    sale_order.project_ids.sudo().write({'stage_id': 24,})
                     sale_order.project_ids.files_state = "done"
                     wizard = self.env['close.entry.wizard'].with_context (
                         active_id=sale_order.id ,
