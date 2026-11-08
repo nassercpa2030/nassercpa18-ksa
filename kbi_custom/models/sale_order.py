@@ -1089,7 +1089,7 @@ class SaleOrder ( models.Model ) :
     # rec.analytic_account_id = False
     # else :
     # rec.analytic_account_id = False
-    analytic_plan_id = fields.Many2one (
+    analytic_plan_id = fields.Many2many (
         'account.analytic.plan' ,
         compute='_compute_analytic_plan_id' ,
         store=False ,
