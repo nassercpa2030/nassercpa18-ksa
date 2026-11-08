@@ -1115,6 +1115,13 @@ class SaleOrder ( models.Model ) :
         readonly=False ,
         domain="[('plan_id', '=', analytic_plan_id)]" ,
     )
+    
+    @api.onchange('review_manager_id')
+    def _onchange_review_manager_id(self):
+        for rec in self:
+           if rec.review_manager_id.id == 18:
+              rec.analytic_account_id_assigned = 10296
+               
 
     # @api.depends ( 'project_type_id' , 'order_line' , 'review_manager_id' )
     # @api.onchange ( 'project_type_id' , 'order_line' , 'review_manager_id' )
