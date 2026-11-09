@@ -716,8 +716,8 @@ class SaleOrder ( models.Model ) :
                         not old_archive[sale_order.id]
                         and sale_order.archive_signiture
                 ) :
-                    sale_order.project_ids.sudo().write({'stage_id': 24,})
-                    sale_order.project_ids.files_state = "done"
+                    sale_order.project_ids.stage_id = 24
+                    sale_order.project_ids.files_state = "last_done"
                     wizard = self.env['close.entry.wizard'].with_context (
                         active_id=sale_order.id ,
                         active_model='sale.order'
@@ -735,8 +735,8 @@ class SaleOrder ( models.Model ) :
                         not old_archive_handeled[sale_order.id]
                         and sale_order.archive_signiture_handeld
                 ) :
-                    sale_order.project_ids.sudo().write({'stage_id': 24,})
-                    sale_order.project_ids.files_state = "done"
+                    sale_order.project_ids.stage_id = 24
+                    sale_order.project_ids.files_state = "last_done"
                     wizard = self.env['close.entry.wizard'].with_context (
                         active_id=sale_order.id ,
                         active_model='sale.order'
@@ -773,10 +773,10 @@ class SaleOrder ( models.Model ) :
                         not old_archive_exception_complete[sale_order.id]
                         and sale_order.archive_signiture_exception_complete
                 ) :
-                    #sale_order.project_ids.stage_id = 24
+                    sale_order.project_ids.stage_id = 24
+                    sale_order.project_ids.files_state = "last_done"
                    # sale_order.project_ids.sudo().write({'stage_id': 24,})
-                    sale_order.project_ids.sudo().write({'files_state': 'last_done',})
-                    #sale_order.project_ids.files_state = "last_done"
+                    #sale_order.project_ids.sudo().write({'files_state': 'last_done',})
                     wizard = self.env['close.entry.wizard'].with_context (
                         active_id=sale_order.id ,
 
