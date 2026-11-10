@@ -244,8 +244,8 @@ class SaleOrder ( models.Model ) :
                                           store=True , readonly=False )
 
     project_name_en = fields.Char ( string="Project Name (EN)" )
-    project_ids = fields.Many2many ( 'project.project' , 'sale_order_project_rel' , 'sale_order_id' , 'project_id' ,
-                                     string='Projects' )
+    # project_ids = fields.Many2many ( 'project.project' , 'sale_order_project_rel' , 'sale_order_id' , 'project_id' ,
+    #                                  string='Projects' )
     project_count = fields.Integer (
         string="Project Count" ,
         compute="_compute_project_count" ,
