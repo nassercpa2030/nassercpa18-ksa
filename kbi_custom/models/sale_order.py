@@ -244,8 +244,8 @@ class SaleOrder ( models.Model ) :
                                           store=True , readonly=False )
 
     project_name_en = fields.Char ( string="Project Name (EN)" )
-    # project_ids = fields.Many2many ( 'project.project' , 'sale_order_project_rel' , 'sale_order_id' , 'project_id' ,
-    #                                  string='Projects' )
+    project_ids = fields.Many2many ( 'project.project' , 'sale_order_project_rel' , 'sale_order_id' , 'project_id' ,
+                                     string='Projects' )
     project_count = fields.Integer (
         string="Project Count" ,
         compute="_compute_project_count" ,
@@ -716,7 +716,7 @@ class SaleOrder ( models.Model ) :
                         not old_archive[sale_order.id]
                         and sale_order.archive_signiture
                 ) :
-                    sale_order.sudo().project_ids.sudo().write({'stage_id': 24,})
+                    sale_order.sudo().project_id.sudo().write({'stage_id': 24,})
                     sale_order.project_ids.files_state = "done"
                     wizard = self.env['close.entry.wizard'].with_context (
                         active_id=sale_order.id ,
@@ -736,7 +736,7 @@ class SaleOrder ( models.Model ) :
                         and sale_order.archive_signiture_handeld
                 ) :
                     #sale_order.project_ids.stage_id = 24
-                    sale_order.sudo().project_ids.sudo().write({'stage_id': 24,})
+                    sale_order.sudo().project_id.sudo().write({'stage_id': 24,})
                     sale_order.project_ids.files_state = "done"
                     wizard = self.env['close.entry.wizard'].with_context (
                         active_id=sale_order.id ,
