@@ -90,10 +90,10 @@ class SaleOrder ( models.Model ) :
     agreement_id = fields.Many2one ( 'kbi.sale.agreement' , string='Agreement' )
     payment_ids = fields.Many2many ( 'account.payment' , string='Payments' , compute='_compute_payment_ids' )
     payment_count = fields.Integer ( string="Payment Count" , compute="_compute_payment_count" )
-    paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count" , searchable=True )
-    unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count" , searchable=True )
+    paid_total = fields.Float ( string="Paid Total" , compute="_compute_payment_count" ,  )
+    unpaid_total = fields.Float ( string="Unpaid Total" , compute="_compute_payment_count" ,  )
     unpaid_total_untaxed = fields.Float ( string="Unpaid Total Untaxed" , compute="_compute_payment_count" ,
-                                          searchable=True )
+                                           )
     paid_percent = fields.Float ( string="Paid %" , compute="_compute_payment_count" , sorted=True )
     finance_signiture = fields.Boolean ( string=' توقيع المالية للختم ' , readonly=False , store=True )
     archive_signiture = fields.Boolean ( string='توقيع الأرشيف للختم (مشـروع مكـتمل) ' , default=False ,
@@ -159,12 +159,12 @@ class SaleOrder ( models.Model ) :
     broker_invoiced_amount = fields.Float ( string='قيمة إستحقاق فاتورة المسوق' ,
                                             compute="_compute_broker_invoiced_amount" , search='_search_broker_invoiced_amount',sortable=True )
     broker_uninvoiced_amount = fields.Float ( string='Broker Unpaid Amount' ,
-                                              compute="_compute_broker_invoiced_amount" , searchable=True ,)
+                                              compute="_compute_broker_invoiced_amount"  ,)
     broker_invoice_payment_state = fields.Selection (
         [('not_paid' , 'غيرمدفوع') , ('partial' , 'مدفوع جزئي') , ('paid' , 'مدفوع كلي') , ('blocked' , 'محظور') ,
          ('reversed' , 'مرتجع') , ('in_payment' , 'للدفع') ,
          ('invoicing_legacy' , 'Invoicing App Legacy')] , string='حالة دفع فاتورة المسوق' ,
-        compute="_compute_broker_invoiced_amount" , store=True , searchable=True , )
+        compute="_compute_broker_invoiced_amount" , store=True  , )
     first_payment_id = fields.Many2one ( 'account.payment' , string="First Payment" ,
                                          compute="_compute_first_payment_id" )
     first_payment_code = fields.Char ( string="First Payment Code" , compute="_compute_payment_count" )
@@ -180,7 +180,7 @@ class SaleOrder ( models.Model ) :
     first_payment_original = fields.Float ( string="first_payment_original" , readonly=False , required=False ,
                                             store=True )
     project_stage_id = fields.Many2one ( comodel_name='project.project.stage' , string='Project Stage' ,
-                                         related='project_ids.stage_id' , store=True , groups='base.group_user' ,tracking=True)
+                                         related='project_ids.stage_id' , store=True , groups='base.group_user' )
     # close_type = fields.Char(comodel_name='project.project.close_type',string='Close_type', related='close_type', store=True)
     from_crm = fields.Boolean ( string='From CRM' )
     can_edit_analytic = fields.Boolean ( string='Can Edit Analytic Account' , compute='compute_can_edit_analytic' , )
@@ -197,7 +197,7 @@ class SaleOrder ( models.Model ) :
         ('not_done' , '(مستثني)غير مكتمل') ,
         ('last_done' , '(مستثني) مكتمل-مدفوع') ,
         ('last_notdone' , '( مستثني ) مكتمل-غيرمدفوع') ,
-    ] , string="Project Files State" , store=True , searchable=True )
+    ] , string="Project Files State" , store=True ,  )
     # identifying new variable not signed by _customer
     state = fields.Selection (
         [('draft' , 'Quotation') , ('to approve' , 'To Approve') , ('done' , 'Locked') , ('sale' , 'Sales Order') ,
@@ -716,8 +716,8 @@ class SaleOrder ( models.Model ) :
                         not old_archive[sale_order.id]
                         and sale_order.archive_signiture
                 ) :
-                    sale_order.project_ids.stage_id = 24
-                    sale_order.project_ids.files_state = "last_done"
+                    sale_order.sudo().project_ids.sudo().write({'stage_id': 24,})
+                    sale_order.project_ids.files_state = "done"
                     wizard = self.env['close.entry.wizard'].with_context (
                         active_id=sale_order.id ,
                         active_model='sale.order'
@@ -735,8 +735,9 @@ class SaleOrder ( models.Model ) :
                         not old_archive_handeled[sale_order.id]
                         and sale_order.archive_signiture_handeld
                 ) :
-                    sale_order.project_ids.stage_id = 24
-                    sale_order.project_ids.files_state = "last_done"
+                    #sale_order.project_ids.stage_id = 24
+                    sale_order.sudo().project_ids.sudo().write({'stage_id': 24,})
+                    sale_order.project_ids.files_state = "done"
                     wizard = self.env['close.entry.wizard'].with_context (
                         active_id=sale_order.id ,
                         active_model='sale.order'
@@ -775,8 +776,6 @@ class SaleOrder ( models.Model ) :
                 ) :
                     sale_order.project_ids.stage_id = 24
                     sale_order.project_ids.files_state = "last_done"
-                   # sale_order.project_ids.sudo().write({'stage_id': 24,})
-                    #sale_order.project_ids.sudo().write({'files_state': 'last_done',})
                     wizard = self.env['close.entry.wizard'].with_context (
                         active_id=sale_order.id ,
 
@@ -1091,7 +1090,7 @@ class SaleOrder ( models.Model ) :
     # rec.analytic_account_id = False
     # else :
     # rec.analytic_account_id = False
-    analytic_plan_id = fields.Many2many (
+    analytic_plan_id = fields.Many2one (
         'account.analytic.plan' ,
         compute='_compute_analytic_plan_id' ,
         store=False ,
@@ -1117,13 +1116,6 @@ class SaleOrder ( models.Model ) :
         readonly=False ,
         domain="[('plan_id', '=', analytic_plan_id)]" ,
     )
-    
-    @api.onchange('review_manager_id')
-    def _onchange_review_manager_id(self):
-        for rec in self:
-           if rec.review_manager_id.id == 18:
-              rec.analytic_account_id_assigned = 10296
-               
 
     # @api.depends ( 'project_type_id' , 'order_line' , 'review_manager_id' )
     # @api.onchange ( 'project_type_id' , 'order_line' , 'review_manager_id' )
@@ -1309,11 +1301,11 @@ class SaleOrder2 ( models.Model ) :
     uuid = fields.Char ( string='UUID' )
 
     final_close_entry = fields.Char ( string="قيد الايراد" , compute='_compute_final_close_entry_date' ,
-                                      readonly=False , index=True , searchable=True )
+                                      readonly=False , index=True ,  )
     close_entry_date = fields.Date ( string="تاريخ قيد الايراد" , compute='_compute_final_close_entry_date' ,
                                      readonly=False )
     final_close_entry_date = fields.Date ( string=" تاريخ قيد الايراد" , compute='_compute_final_close_entry_date' ,
-                                           index=True , searchable=True , store=True )
+                                           index=True ,  store=True )
     close_entry_year = fields.Integer ( string="Close Entry Year" , store=True , readonly=False , searchable=True )
     validity_date = fields.Date ( string='Validity Date' ,
                                   default=fields.Date.today () + datetime.timedelta ( days=30 ) )
