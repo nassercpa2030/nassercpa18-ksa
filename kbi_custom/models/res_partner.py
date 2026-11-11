@@ -588,7 +588,7 @@ class Recruiter ( models.Model ) :
                 'accrual_plan_id' : contract.leave_accrual_plan_id.id ,
                 'date_from' : start_date ,
                 'number_of_days' : 0.0 ,
-                # 'allocation_days' : 0.0 ,
+                'allocation_days' : 0.0 ,
             } )
 
             allocation.update (
