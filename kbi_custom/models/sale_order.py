@@ -1113,27 +1113,27 @@ class SaleOrder ( models.Model ) :
         'account.analytic.account' ,
         string='Assigned Analytic Account' ,
         readonly=False ,
-        domain='_get_analytic_account_domain' ,
     )
 
     @api.onchange ( 'review_manager_id' )
-    def _get_analytic_account_domain(self) :
-        self.ensure_one ()
+    def _onchange_review_manager_analytic_accounts(self) :
+        for rec in self :
+            if rec.review_manager_id :
+                if rec.review_manager_id.id == 18 :
+                    domain = [('id' , '=' , 10296)]
+                else :
+                    domain = [
+                        ('id' , 'in' ,
+                         rec.review_manager_id.analytic_account_ids.ids)
+                    ]
+            else :
+                domain = [('id' , '=' , False)]
 
-        if self.review_manager_id and self.review_manager_id.id == 18 :
             return {
                 'domain' : {
-                    'analytic_account_id_assigned' : [('id' , '=' , 10296)]
+                    'analytic_account_id_assigned' : domain
                 }
             }
-
-        return {
-            'domain' : {
-                'analytic_account_id_assigned' : [
-                    ('id' , 'in' , self.review_manager_id.analytic_account_ids.ids)
-                ] if self.review_manager_id else [('id' , '=' , False)]
-            }
-        }
 
     # @api.depends ( 'project_type_id' , 'order_line' , 'review_manager_id' )
     # @api.onchange ( 'project_type_id' , 'order_line' , 'review_manager_id' )
