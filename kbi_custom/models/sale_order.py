@@ -1109,7 +1109,7 @@ class SaleOrder ( models.Model ) :
             rec.analytic_plan_id = rec.review_manager_id.analytic_plan_ids
             # rec.project_type_id = rec.user_id.analytic_plan_ids
 
-    analytic_account_id_assigned = fields.Many2many (
+    analytic_account_id_assigned = fields.Many2one (
         'account.analytic.account' ,
         string='Assigned Analytic Account' ,
         readonly=False ,
