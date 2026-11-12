@@ -1112,25 +1112,29 @@ class SaleOrder ( models.Model ) :
     analytic_account_id_assigned = fields.Many2one (
         'account.analytic.account' ,
         string='Assigned Analytic Account' ,
-        compute='_compute_analytic_account_id_assigned' ,
-        store=True ,
         readonly=False ,
-        # domain="[('plan_id', '=', analytic_plan_id)]" ,
+        domain='_get_analytic_account_domain' ,
     )
 
-    @api.depends (
-        'review_manager_id' ,
-        'review_manager_id.analytic_account_ids'
-    )
-    def _compute_analytic_account_id_assigned(self) :
-        for rec in self :
-            if rec.review_manager_id and rec.review_manager_id.id == 18 :
-                rec.analytic_account_id_assigned = [(6 , 0 , [10296])]
-            else :
-                rec.analytic_account_id_assigned = [
-                    (6 , 0 , rec.review_manager_id.analytic_account_ids.ids)
-                ] if rec.review_manager_id else [(5 , 0 , 0)]
-                
+    @api.onchange ( 'review_manager_id' )
+    def _get_analytic_account_domain(self) :
+        self.ensure_one ()
+
+        if self.review_manager_id and self.review_manager_id.id == 18 :
+            return {
+                'domain' : {
+                    'analytic_account_id_assigned' : [('id' , '=' , 10296)]
+                }
+            }
+
+        return {
+            'domain' : {
+                'analytic_account_id_assigned' : [
+                    ('id' , 'in' , self.review_manager_id.analytic_account_ids.ids)
+                ] if self.review_manager_id else [('id' , '=' , False)]
+            }
+        }
+
     # @api.depends ( 'project_type_id' , 'order_line' , 'review_manager_id' )
     # @api.onchange ( 'project_type_id' , 'order_line' , 'review_manager_id' )
     # def _compute_analytic_account_id(self) :
