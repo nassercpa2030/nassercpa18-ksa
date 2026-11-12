@@ -1109,31 +1109,31 @@ class SaleOrder ( models.Model ) :
             rec.analytic_plan_id = rec.review_manager_id.analytic_plan_ids
             # rec.project_type_id = rec.user_id.analytic_plan_ids
 
-    analytic_account_id_assigned = fields.Many2one (
+    analytic_account_id_assigned = fields.Many2many (
         'account.analytic.account' ,
         string='Assigned Analytic Account' ,
         readonly=False ,
     )
 
-    @api.onchange ( 'review_manager_id' )
-    def _onchange_review_manager_analytic_accounts(self) :
-        for rec in self :
-            if rec.review_manager_id :
-                if rec.review_manager_id.id == 18 :
-                    domain = [('id' , '=' , 10296)]
-                else :
-                    domain = [
-                        ('id' , 'in' ,
-                         rec.review_manager_id.analytic_account_ids.ids)
-                    ]
-            else :
-                domain = [('id' , '=' , False)]
+    # @api.onchange ( 'review_manager_id' )
+    # def _onchange_review_manager_analytic_accounts(self) :
+    #     for rec in self :
+    #         if rec.review_manager_id :
+    #             if rec.review_manager_id.id == 18 :
+    #                 domain = [('id' , '=' , 10296)]
+    #             else :
+    #                 domain = [
+    #                     ('id' , 'in' ,
+    #                      rec.review_manager_id.analytic_account_ids.ids)
+    #                 ]
+    #         else :
+    #             domain = [('id' , '=' , False)]
 
-            return {
-                'domain' : {
-                    'analytic_account_id_assigned' : domain
-                }
-            }
+    #         return {
+    #             'domain' : {
+    #                 'analytic_account_id_assigned' : domain
+    #             }
+    #         }
 
     # @api.depends ( 'project_type_id' , 'order_line' , 'review_manager_id' )
     # @api.onchange ( 'project_type_id' , 'order_line' , 'review_manager_id' )
