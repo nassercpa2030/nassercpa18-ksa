@@ -190,8 +190,7 @@ class CloseEntryWizard ( models.TransientModel ) :
 
     #         if not debit_account :
     #             raise ValidationError ( f"Missing account for line: {line.name}" )
-            
-            
+
     #         journal_to_use = wizard.journal_id2.id if wizard.use_account_id1 else wizard.journal_id1.id
 
     #         for line in sale_order.order_line :
@@ -258,52 +257,88 @@ class CloseEntryWizard ( models.TransientModel ) :
 
     #         return move
 
-
     def close_entry(self) :
         AccountMove = self.env['account.move']
 
         for wizard in self :
             if not wizard.account_id :
-                raise ValidationError ( "Aggregate Account is missing on the wizard." )
+                raise ValidationError (
+                    "Aggregate Account is missing on the wizard."
+                )
+
+            sale_order = wizard.sale_order_id
+
+            if not sale_order :
+                raise ValidationError (
+                    "Sale Order is missing on the wizard."
+                )
+
+            if not sale_order.order_line :
+                raise ValidationError (
+                    "No products found in Sale Order to create journal entries."
+                )
+
+            # تحديد الحساب المدين بشكل آمن
+            if wizard.use_account_id1 :
+                if not wizard.account_id1 :
+                    raise ValidationError (
+                        "Account 1 is missing. Please configure the debit account."
+                    )
+                debit_account = wizard.account_id1.id
+                journal = wizard.journal_id2
+            else :
+                debit_accounts = wizard.invoice_lines.mapped ( 'account_id' )
+
+                if not debit_accounts :
+                    raise ValidationError (
+                        "No debit account found in invoice lines."
+                    )
+
+                if len ( debit_accounts ) > 1 :
+                    raise ValidationError (
+                        "Multiple debit accounts found in invoice lines. "
+                        "Please configure a single debit account."
+                    )
+
+                debit_account = debit_accounts.id
+                journal = wizard.journal_id1
+
+            if not journal :
+                raise ValidationError (
+                    "Journal is missing. Please configure the journal."
+                )
 
             move_lines = []
 
-            # تحديد الحساب والـ journal بناء على use_account_id1
-            for line in wizard.invoice_lines :
-                debit_account = wizard.account_id1.id if wizard.use_account_id1 else line.account_id.id
-            journal_to_use = wizard.journal_id2.id if wizard.use_account_id1 else wizard.journal_id1.id
+            partner = sale_order.partner_id.id or False
 
-            sale_order = wizard.sale_order_id
-            if not sale_order.order_line :
-                raise ValidationError ( "No products found in Sale Order to create journal entries." )
+            analytic_distribution = {}
+            if sale_order.analytic_account_id :
+                analytic_distribution = {
+                    sale_order.analytic_account_id.id : 100.0
+                }
 
             for line in sale_order.order_line :
-                if not line.product_id :
-                    continue  # تجاهل أي خط بدون منتج
 
-                total_price = line.price_subtotal  # استخدام السعر من Sale Order Line
-                if total_price == 0 :
+                if not line.product_id :
                     continue
 
-                analytic_distribution = {}
-                if sale_order.analytic_account_id :
-                    analytic_distribution = {sale_order.analytic_account_id.id : 100.0}
-                    partner = sale_order.partner_id.id
+                total_price = line.price_subtotal
 
-                # إضافة خطوط القيد
+                if not total_price :
+                    continue
+
                 move_lines += [
                     (0 , 0 , {
                         'debit' : total_price ,
                         'credit' : 0.0 ,
                         'name' : f'Reversal of {line.name}' ,
                         'account_id' : debit_account ,
-                        'journal_id' : journal_to_use ,
                         'product_id' : line.product_id.id ,
                         'quantity' : line.product_uom_qty ,
                         'analytic_distribution' : analytic_distribution ,
                         'partner_id' : partner ,
                         'sale_order_id' : sale_order.id ,
-
                     }) ,
                     (0 , 0 , {
                         'debit' : 0.0 ,
@@ -318,12 +353,15 @@ class CloseEntryWizard ( models.TransientModel ) :
                     }) ,
                 ]
 
-            # إنشاء القيد ونشره
+            if not move_lines :
+                raise ValidationError (
+                    "No valid journal lines could be generated."
+                )
+
             move_vals = {
                 'move_type' : 'entry' ,
-                # 'date': fields.Date.today(),
                 'date' : wizard.journal_entry_date ,
-                'journal_id' : journal_to_use ,
+                'journal_id' : journal.id ,
                 'invoice_origin' : sale_order.name ,
                 'line_ids' : move_lines ,
                 'ref' : f'Reversal for {sale_order.name}' ,
@@ -331,7 +369,89 @@ class CloseEntryWizard ( models.TransientModel ) :
 
             move = AccountMove.create ( move_vals )
             move.action_post ()
+
             if move.state == 'posted' :
-                sale_order.journal_entry_count_finance = sale_order.journal_entry_count_finance + 1
-            # تحديث المشاريع المرتبطة بالـ Sale Order
-            sale_order.project_ids.write ( {'has_closed_entry' : True} )
+                sale_order.journal_entry_count_finance = (
+                        sale_order.journal_entry_count_finance + 1
+                )
+
+                sale_order.project_ids.write ( {
+                    'has_closed_entry' : True
+                } )
+
+    # def close_entry(self) :
+    #     AccountMove = self.env['account.move']
+    #
+    #     for wizard in self :
+    #         if not wizard.account_id :
+    #             raise ValidationError ( "Aggregate Account is missing on the wizard." )
+    #
+    #         move_lines = []
+    #
+    #         # تحديد الحساب والـ journal بناء على use_account_id1
+    #         for line in wizard.invoice_lines :
+    #             debit_account = wizard.account_id1.id if wizard.use_account_id1 else line.account_id.id
+    #         journal_to_use = wizard.journal_id2.id if wizard.use_account_id1 else wizard.journal_id1.id
+    #
+    #         sale_order = wizard.sale_order_id
+    #         if not sale_order.order_line :
+    #             raise ValidationError ( "No products found in Sale Order to create journal entries." )
+    #
+    #         for line in sale_order.order_line :
+    #             if not line.product_id :
+    #                 continue  # تجاهل أي خط بدون منتج
+    #
+    #             total_price = line.price_subtotal  # استخدام السعر من Sale Order Line
+    #             if total_price == 0 :
+    #                 continue
+    #
+    #             analytic_distribution = {}
+    #             if sale_order.analytic_account_id :
+    #                 analytic_distribution = {sale_order.analytic_account_id.id : 100.0}
+    #                 partner = sale_order.partner_id.id
+    #
+    #             # إضافة خطوط القيد
+    #             move_lines += [
+    #                 (0 , 0 , {
+    #                     'debit' : total_price ,
+    #                     'credit' : 0.0 ,
+    #                     'name' : f'Reversal of {line.name}' ,
+    #                     'account_id' : debit_account ,
+    #                     'journal_id' : journal_to_use ,
+    #                     'product_id' : line.product_id.id ,
+    #                     'quantity' : line.product_uom_qty ,
+    #                     'analytic_distribution' : analytic_distribution ,
+    #                     'partner_id' : partner ,
+    #                     'sale_order_id' : sale_order.id ,
+    #
+    #                 }) ,
+    #                 (0 , 0 , {
+    #                     'debit' : 0.0 ,
+    #                     'credit' : total_price ,
+    #                     'name' : f'Reversal aggregate for {line.name}' ,
+    #                     'account_id' : wizard.account_id.id ,
+    #                     'product_id' : line.product_id.id ,
+    #                     'quantity' : line.product_uom_qty ,
+    #                     'analytic_distribution' : analytic_distribution ,
+    #                     'partner_id' : partner ,
+    #                     'sale_order_id' : sale_order.id ,
+    #                 }) ,
+    #             ]
+    #
+    #         # إنشاء القيد ونشره
+    #         move_vals = {
+    #             'move_type' : 'entry' ,
+    #             # 'date': fields.Date.today(),
+    #             'date' : wizard.journal_entry_date ,
+    #             'journal_id' : journal_to_use ,
+    #             'invoice_origin' : sale_order.name ,
+    #             'line_ids' : move_lines ,
+    #             'ref' : f'Reversal for {sale_order.name}' ,
+    #         }
+    #
+    #         move = AccountMove.create ( move_vals )
+    #         move.action_post ()
+    #         if move.state == 'posted' :
+    #             sale_order.journal_entry_count_finance = sale_order.journal_entry_count_finance + 1
+    #         # تحديث المشاريع المرتبطة بالـ Sale Order
+    #         sale_order.project_ids.write ( {'has_closed_entry' : True} )
