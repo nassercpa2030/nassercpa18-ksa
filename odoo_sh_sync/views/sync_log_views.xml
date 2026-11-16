@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Odoo.sh Sync Log Form View -->
+    <record id="view_odoo_sh_sync_log_form" model="ir.ui.view">
+        <field name="name">odoo.sh.sync.log.form</field>
+        <field name="model">odoo.sh.sync.log</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Configuration">
+                            <field name="config_id"/>
+                        </group>
+                        <group string="Timing">
+                            <field name="sync_start" readonly="1"/>
+                            <field name="sync_end" readonly="1"/>
+                            <field name="duration" readonly="1" widget="float_time"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Results" name="results">
+                        <group>
+                            <field name="total_records" readonly="1"/>
+                            <field name="success_records" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="error_records" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Sync Details" name="sync_details">
+                        <field name="sync_details" readonly="1" nolabel="1"/>
+                    </group>
+
+                    <group string="Error Log" name="error_log" invisible="error_records == 0">
+                        <field name="error_log" readonly="1" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Odoo.sh Sync Log List View -->
+    <record id="view_odoo_sh_sync_log_list" model="ir.ui.view">
+        <field name="name">odoo.sh.sync.log.list</field>
+        <field name="model">odoo.sh.sync.log</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="create_date"/>
+                <field name="config_id"/>
+                <field name="status" decoration-success="status=='success'" decoration-danger="status=='error'" decoration-warning="status=='partial'"/>
+                <field name="total_records"/>
+                <field name="success_records"/>
+                <field name="error_records"/>
+                <field name="duration" widget="float_time"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Odoo.sh Sync Log Search View -->
+    <record id="view_odoo_sh_sync_log_search" model="ir.ui.view">
+        <field name="name">odoo.sh.sync.log.search</field>
+        <field name="model">odoo.sh.sync.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="config_id" string="Configuration"/>
+                <field name="status"/>
+                <filter string="Success" name="success" domain="[('status', '=', 'success')]"/>
+                <filter string="Error" name="error" domain="[('status', '=', 'error')]"/>
+                <filter string="Partial" name="partial" domain="[('status', '=', 'partial')]"/>
+                <separator/>
+                <filter string="Today" name="today" domain="[('create_date', '>=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Last 7 Days" name="last_7_days" domain="[('create_date', '>=', (context_today() - relativedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_by_status" context="{'group_by': 'status'}"/>
+                    <filter string="Configuration" name="group_by_config" context="{'group_by': 'config_id'}"/>
+                    <filter string="Date" name="group_by_date" context="{'group_by': 'create_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action for Sync Log -->
+    <record id="action_odoo_sh_sync_log" model="ir.actions.act_window">
+        <field name="name">Sync History</field>
+        <field name="res_model">odoo.sh.sync.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No sync history yet. Sync configurations will appear here once started.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item for Logs -->
+    <menuitem id="menu_odoo_sh_sync_log" name="Sync History" parent="menu_odoo_sh_sync_config" 
+              action="action_odoo_sh_sync_log" sequence="2"/>
+
+</odoo>

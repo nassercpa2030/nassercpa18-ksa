@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Odoo.sh Sync Config Form View -->
+    <record id="view_odoo_sh_sync_config_form" model="ir.ui.view">
+        <field name="name">odoo.sh.sync.config.form</field>
+        <field name="model">odoo.sh.sync.config</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="test_connection" type="object" string="Test Connection" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Configuration Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Configuration" name="config">
+                            <field name="active"/>
+                            <field name="sync_direction"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Online Source Connection" name="connection">
+                            <group string="Online Server Details">
+                                <field name="odoo_sh_url"/>
+                                <field name="odoo_sh_database"/>
+                                <field name="odoo_sh_username"/>
+                                <field name="odoo_sh_password" password="True"/>
+                            </group>
+                        </page>
+                        
+                        <page string="Local Companies" name="companies">
+                            <field name="local_company_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                </list>
+                            </field>
+                            <group>
+                                <p class="text-muted">
+                                    <strong>Note:</strong> All companies will sync to Odoo.sh with their original IDs (Company 1 → Company 1, Company 2 → Company 2, etc.)
+                                </p>
+                            </group>
+                        </page>
+                        
+                        <page string="Models to Sync" name="models">
+                            <group string="Online → Odoo.sh (HR &amp; Approvals)">
+                                <field name="inbound_models" nolabel="1" placeholder="hr.department&#10;hr.job&#10;hr.employee&#10;approval.category&#10;approval.request&#10;approval.approver"/>
+                                <p class="text-muted">Import order is handled automatically. Keep this list limited to HR and Approvals models.</p>
+                            </group>
+                            <group string="Odoo.sh → Online (Existing)">
+                                <field name="sync_models" nolabel="1"/>
+                            </group>
+                            <group>
+                                <p class="text-muted">
+                                    Enter one model per line (e.g., res.partner, sale.order, stock.picking)
+                                </p>
+                            </group>
+                        </page>
+                        
+                        <page string="Schedule &amp; Options" name="schedule">
+                            <group string="Scheduling">
+                                <field name="sync_time" help="Hour of day to sync (0 = midnight, 12 = noon)"/>
+                                <field name="last_sync_date" readonly="1"/>
+                                <field name="inbound_last_sync_date" readonly="1"/>
+                            </group>
+                            <group string="Sync Options">
+                                <field name="merge_duplicates"/>
+                                <field name="sync_batch_size"/>
+                            </group>
+                            <group string="Users To Sync As Unknown">
+                                <field name="unknown_local_user_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                <p class="text-muted">
+                                    Select only the local users that should always sync as the fallback remote user `Unknown`.
+                                    All other users will try to match automatically on Odoo.sh by login or name.
+                                </p>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Odoo.sh Sync Config List View -->
+    <record id="view_odoo_sh_sync_config_list" model="ir.ui.view">
+        <field name="name">odoo.sh.sync.config.list</field>
+        <field name="model">odoo.sh.sync.config</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="odoo_sh_url"/>
+                <field name="active"/>
+                            <field name="sync_direction"/>
+                <field name="last_sync_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Odoo.sh Sync Config Search View -->
+    <record id="view_odoo_sh_sync_config_search" model="ir.ui.view">
+        <field name="name">odoo.sh.sync.config.search</field>
+        <field name="model">odoo.sh.sync.config</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Configuration"/>
+                <field name="odoo_sh_url"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Never Synced" name="never_synced" domain="[('last_sync_date', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action for Sync Config -->
+    <record id="action_odoo_sh_sync_config" model="ir.actions.act_window">
+        <field name="name">Odoo.sh Sync Configurations</field>
+        <field name="res_model">odoo.sh.sync.config</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new sync configuration to connect your local Odoo with Odoo.sh
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_odoo_sh_sync_config" name="Odoo.sh Sync" parent="base.menu_administration" sequence="100"/>
+    <menuitem id="menu_odoo_sh_sync_config_main" name="Sync Configurations" parent="menu_odoo_sh_sync_config" 
+              action="action_odoo_sh_sync_config" sequence="1"/>
+
+</odoo>

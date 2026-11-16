@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_odoo_sh_sync_config_admin,odoo_sh_sync_config admin,model_odoo_sh_sync_config,base.group_system,1,1,1,1
+access_odoo_sh_sync_log_admin,odoo_sh_sync_log admin,model_odoo_sh_sync_log,base.group_system,1,1,1,1
+access_odoo_sh_sync_map_admin,odoo_sh_sync_map admin,model_odoo_sh_sync_map,base.group_system,1,1,1,1
+access_odoo_sh_sync_user_map_admin,odoo_sh_sync_user_map admin,model_odoo_sh_sync_user_map,base.group_system,1,1,1,1
+access_odoo_sh_sync_manual_wizard_admin,odoo_sh_sync_manual_wizard admin,model_odoo_sh_sync_manual_wizard,base.group_system,1,1,1,1
+access_odoo_sh_sync_config_user,odoo_sh_sync_config user,model_odoo_sh_sync_config,base.group_user,1,1,1,0
+access_odoo_sh_sync_log_user,odoo_sh_sync_log user,model_odoo_sh_sync_log,base.group_user,1,0,0,0
+access_odoo_sh_sync_map_user,odoo_sh_sync_map user,model_odoo_sh_sync_map,base.group_user,1,0,0,0
+access_odoo_sh_sync_user_map_user,odoo_sh_sync_user_map user,model_odoo_sh_sync_user_map,base.group_user,1,1,1,0
+access_odoo_sh_sync_manual_wizard_user,odoo_sh_sync_manual_wizard user,model_odoo_sh_sync_manual_wizard,base.group_user,1,1,1,1

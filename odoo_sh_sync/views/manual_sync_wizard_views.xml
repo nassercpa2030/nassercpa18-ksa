@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Manual Sync Wizard Form -->
+    <record id="view_odoo_sh_sync_manual_wizard_form" model="ir.ui.view">
+        <field name="name">odoo.sh.sync.manual_wizard.form</field>
+        <field name="model">odoo.sh.sync.manual_wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="config_id"/>
+                </group>
+                <footer>
+                    <button name="action_sync_now" type="object" string="Sync Now" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Manual Sync Wizard Action -->
+    <record id="action_odoo_sh_sync_manual_wizard" model="ir.actions.act_window">
+        <field name="name">Manual Sync</field>
+        <field name="res_model">odoo.sh.sync.manual_wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menu Item for Manual Sync -->
+    <menuitem id="menu_odoo_sh_sync_manual" name="Sync Now (Manual)" parent="menu_odoo_sh_sync_config" 
+              action="action_odoo_sh_sync_manual_wizard" sequence="3"/>
+
+</odoo>
