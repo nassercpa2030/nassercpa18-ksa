@@ -1318,6 +1318,86 @@ class ResPartner ( models.Model ) :
         return {'type' : 'ir.actions.act_window_close'}
 
 
+### approval request ###
+class ApprovalRequest(models.Model):
+    _inherit = 'approval.request'
+
+    def send_to_manager(self):
+        Employee = self.env['hr.employee']
+        Approver = self.env['approval.approver']
+
+        for request in self:
+            owner = request.request_owner_id
+
+            if not owner:
+                raise UserError(_("Request owner is missing."))
+
+            employee = Employee.search([
+                ('user_id', '=', owner.id),
+                ('company_id', '=', request.company_id.id),
+            ], limit=1)
+
+            if not employee:
+                employee = Employee.search([
+                    ('user_id', '=', owner.id),
+                ], limit=1)
+
+            if not employee or not employee.parent_id:
+                raise UserError(_(
+                    "Employee or direct manager was not found."
+                ))
+
+            manager = employee.parent_id
+            manager_user = manager.user_id
+
+            if not manager_user:
+                raise UserError(_(
+                    "The employee's manager has no linked system user."
+                ))
+
+            # إضافة المدير كموافق إلزامي
+            existing = request.approver_ids.filtered(
+                lambda approver: approver.user_id == manager_user
+            )
+
+            if existing:
+                existing.write({'required': True})
+            else:
+                Approver.create({
+                    'request_id': request.id,
+                    'user_id': manager_user.id,
+                    'required': True,
+                    'status': 'pending',
+                    'sequence': 1,
+                })
+
+            # إرسال إشعار للمدير
+            request.message_subscribe(
+                partner_ids=[manager_user.partner_id.id]
+            )
+
+            request.message_post(
+                body=_(
+                    "Approval Required: This request was submitted by %s "
+                    "and requires your approval."
+                ) % owner.name,
+                partner_ids=[manager_user.partner_id.id],
+                message_type='notification',
+                subtype_xmlid='mail.mt_note',
+            )
+
+            # إنشاء Activity للمدير
+            request.activity_schedule(
+                'mail.mail_activity_data_todo',
+                user_id=manager_user.id,
+                summary=_("Approval Required"),
+                note=_("Please review and approve this request."),
+            )
+
+        return True
+
+
+
 ### class of new employee leave
 class EmployeeLeaveWizard ( models.TransientModel ) :
     _name = 'employee.leave.wizard'
@@ -1525,6 +1605,9 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
             'type' : 'ir.actions.client' ,
             'tag' : 'reload' ,
         }
+
+
+
 
 
 
