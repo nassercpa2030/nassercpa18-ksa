@@ -1333,7 +1333,28 @@ class ApprovalRequest ( models.Model ) :
     monthly_deduction = fields.Float (  string="Monthly Deduction" ,  compute="_compute_loan_details" ,  store=True ,   digits=(16 , 2) , )
 
     employee_open_loans_amount = fields.Float ( string="Total Outstanding Employee Loans" ,  compute="_compute_employee_open_loans_amount" ,  digits=(16 , 2) , )
-    project_code = fields.Char( string='Project Code',  default=""   ,store=True,)
+
+    employee_name = fields.Char( string='Employee Name',  compute='_compute_employee_details', store=True, )
+
+    identification_id = fields.Char( string='Identification ID',  compute='_compute_employee_details',  store=True,  )
+
+    start_working_date = fields.Date( string='Start Working Date',   compute='_compute_employee_details',  store=True, )
+
+    @api.depends (
+        'request_owner_employee_id' ,
+        'request_owner_employee_id.name' ,
+        'request_owner_employee_id.identification_id' ,
+        'request_owner_employee_id.start_working_date' ,
+    )
+    def _compute_employee_details(self) :
+        for record in self :
+            employee = record.request_owner_employee_id[:1]
+
+            record.employee_name = employee.name if employee else False
+            record.identification_id = employee.identification_id if employee else False
+            record.start_working_date = employee.start_working_date if employee else False
+            
+
 
     def send_to_manager(self) :
         Employee = self.env['hr.employee']
