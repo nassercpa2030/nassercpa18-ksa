@@ -1333,6 +1333,7 @@ class ApprovalRequest ( models.Model ) :
     monthly_deduction = fields.Float (  string="Monthly Deduction" ,  compute="_compute_loan_details" ,  store=True ,   digits=(16 , 2) , )
 
     employee_open_loans_amount = fields.Float ( string="Total Outstanding Employee Loans" ,  compute="_compute_employee_open_loans_amount" ,  digits=(16 , 2) , )
+    project_code = fields.Char( string='Project Code',  default=""   store=True,)
 
     def send_to_manager(self) :
         Employee = self.env['hr.employee']
