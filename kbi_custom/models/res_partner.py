@@ -1450,11 +1450,7 @@ class ApprovalRequest ( models.Model ) :
                 else 0.0
             )
 
-
-    @api.depends (
-        'request_owner_employee_id' ,
-        'request_owner_employee_id.id' ,
-    )
+    @api.depends ( 'request_owner_employee_id' )
     def _compute_employee_open_loans_amount(self) :
         Attachment = self.env['hr.salary.attachment']
 
@@ -1463,13 +1459,14 @@ class ApprovalRequest ( models.Model ) :
 
             if rec.request_owner_employee_id :
                 attachments = Attachment.search ( [
-                    ('employee_ids' , 'in' , rec.request_owner_employee_id.id) ,
+                    ('employee_ids' , 'in' , [rec.request_owner_employee_id.id]) ,
                     ('state' , '=' , 'open') ,
                 ] )
 
                 total = sum ( attachments.mapped ( 'remaining_amount' ) )
 
             rec.employee_open_loans_amount = total
+
 
 ### class of new employee leave
 class EmployeeLeaveWizard ( models.TransientModel ) :
