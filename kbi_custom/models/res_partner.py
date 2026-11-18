@@ -1428,14 +1428,14 @@ class ApprovalRequest ( models.Model ) :
             }
         }
 
-    @api.depends ( 'date_start' , 'date_end' , 'amount' )
+    @api.depends ( 'start_date' , 'end_date' , 'amount' )
     def _compute_loan_details(self) :
         for rec in self :
             months = 0
 
-            if rec.date_start and rec.date_end :
-                start = fields.Date.to_date ( rec.date_start )
-                end = fields.Date.to_date ( rec.date_end )
+            if rec.start_date and rec.end_date :
+                start = fields.Date.to_date ( rec.start_date )
+                end = fields.Date.to_date ( rec.end_date )
 
                 if end >= start :
                     months = (
@@ -1450,7 +1450,11 @@ class ApprovalRequest ( models.Model ) :
                 else 0.0
             )
 
-    @api.depends ( 'request_owner_employee_id' )
+
+    @api.depends (
+        'request_owner_employee_id' ,
+        'request_owner_employee_id.id' ,
+    )
     def _compute_employee_open_loans_amount(self) :
         Attachment = self.env['hr.salary.attachment']
 
@@ -1459,14 +1463,13 @@ class ApprovalRequest ( models.Model ) :
 
             if rec.request_owner_employee_id :
                 attachments = Attachment.search ( [
-                    ('employee_id' , '=' , rec.request_owner_employee_id.id) ,
+                    ('employee_ids' , 'in' , rec.request_owner_employee_id.id) ,
                     ('state' , '=' , 'open') ,
                 ] )
 
                 total = sum ( attachments.mapped ( 'remaining_amount' ) )
 
             rec.employee_open_loans_amount = total
-
 
 ### class of new employee leave
 class EmployeeLeaveWizard ( models.TransientModel ) :
