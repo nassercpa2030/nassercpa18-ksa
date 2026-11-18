@@ -463,7 +463,7 @@ class Recruiter ( models.Model ) :
 # ---------------- EMPLOYEES leaves  -----------------
 class leave_computing ( models.Model ) :
     _inherit = 'hr.leave'
-    allocation_days = fields.Float ( string="عدد أيام الأجازة",compute="_compute_no_days" ,tracking=True   )
+    allocation_days = fields.Float ( string="عدد أيام الأجازة" , compute="_compute_no_days" , tracking=True )
 
     # get number of days for leaves active
     @api.depends ( 'request_date_from' , 'request_date_to' )
@@ -546,7 +546,7 @@ class Recruiter ( models.Model ) :
                     f"تم إنشاء مخصصات الإجازة للموظف {employee.name} بالفعل."
                 )
 
-            #contract = employee.contract_id
+            # contract = employee.contract_id
             contract = employee.env['hr.contract'].search ( [
                 ('employee_id' , '=' , employee.id) ,
                 ('state' , '=' , 'open') ,
@@ -1319,8 +1319,20 @@ class ResPartner ( models.Model ) :
 
 
 ### approval request ###
-class ApprovalRequest(models.Model):
+class ApprovalRequest ( models.Model ) :
     _inherit = 'approval.request'
+
+    request_owner_identification_id = fields.Char ( string="Employee Identification ID" ,
+                                                    related="request_owner_employee_id.identification_id" , store=True ,
+                                                    readonly=True , )
+    request_owner_starting_working_date = fields.Date ( string="Starting Working Date" ,
+                                                        related="request_owner_employee_id.start_working_date" ,
+                                                        store=True , readonly=True , )
+    loan_months = fields.Integer (string="Loan Duration (Months)" , compute="_compute_loan_details" , store=True , )
+
+    monthly_deduction = fields.Float (  string="Monthly Deduction" ,  compute="_compute_loan_details" ,  store=True ,   digits=(16 , 2) , )
+
+    employee_open_loans_amount = fields.Float ( string="Total Outstanding Employee Loans" ,  compute="_compute_employee_open_loans_amount" ,  digits=(16 , 2) , )
 
     def send_to_manager(self) :
         Employee = self.env['hr.employee']
@@ -1415,6 +1427,45 @@ class ApprovalRequest(models.Model):
                 } ,
             }
         }
+
+    @api.depends ( 'date_start' , 'date_end' , 'amount' )
+    def _compute_loan_details(self) :
+        for rec in self :
+            months = 0
+
+            if rec.date_start and rec.date_end :
+                start = fields.Date.to_date ( rec.date_start )
+                end = fields.Date.to_date ( rec.date_end )
+
+                if end >= start :
+                    months = (
+                            (end.year - start.year) * 12
+                            + end.month - start.month + 1
+                    )
+
+            rec.loan_months = months
+            rec.monthly_deduction = (
+                rec.amount / months
+                if months > 0 and rec.amount
+                else 0.0
+            )
+
+    @api.depends ( 'request_owner_employee_id' )
+    def _compute_employee_open_loans_amount(self) :
+        Attachment = self.env['hr.salary.attachment']
+
+        for rec in self :
+            total = 0.0
+
+            if rec.request_owner_employee_id :
+                attachments = Attachment.search ( [
+                    ('employee_id' , '=' , rec.request_owner_employee_id.id) ,
+                    ('state' , '=' , 'open') ,
+                ] )
+
+                total = sum ( attachments.mapped ( 'remaining_amount' ) )
+
+            rec.employee_open_loans_amount = total
 
 
 ### class of new employee leave
@@ -1624,11 +1675,6 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
             'type' : 'ir.actions.client' ,
             'tag' : 'reload' ,
         }
-
-
-
-
-
 
     # def action_create_leave(self) :
     #     self.ensure_one ()
