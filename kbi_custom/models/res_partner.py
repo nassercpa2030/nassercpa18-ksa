@@ -1335,6 +1335,7 @@ class ApprovalRequest ( models.Model ) :
     employee_open_loans_amount = fields.Float ( string="Total Outstanding Employee Loans" ,  compute="_compute_employee_open_loans_amount" ,  digits=(16 , 2) , )
 
     employee_name = fields.Char( string='Employee Name',  compute='_compute_employee_details', store=True, )
+    project_code = fields.Char( string='Code_',  default="", store=True, )
 
     identification_id = fields.Char( string='Identification ID',  compute='_compute_employee_details',  store=True,  )
 
