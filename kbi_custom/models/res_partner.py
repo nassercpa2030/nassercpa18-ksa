@@ -1428,14 +1428,14 @@ class ApprovalRequest ( models.Model ) :
             }
         }
 
-    @api.depends ( 'start_date' , 'end_date' , 'amount' )
+    @api.depends ( 'date_start' , 'date_end' , 'amount' )
     def _compute_loan_details(self) :
         for rec in self :
             months = 0
 
-            if rec.start_date and rec.end_date :
-                start = fields.Date.to_date ( rec.start_date )
-                end = fields.Date.to_date ( rec.end_date )
+            if rec.date_start and rec.date_end :
+                start = fields.Date.to_date ( rec.date_start )
+                end = fields.Date.to_date ( rec.date_end )
 
                 if end >= start :
                     months = (
@@ -1734,7 +1734,7 @@ class EmployeeLeaveWizard ( models.TransientModel ) :
     #             'holiday_status_id' : leave_type.id ,
     #             'request_date_from' : start_date ,
     #             'request_date_to' : end_date ,
-    #         } )
+    #         } )https://github.com/nassercpa2030/nassercpa18-ksa/blob/stage1/kbi_custom/models/res_partner.py
     #
     #         # Approve the leave according to Odoo 18 workflow.
     #         if leave.state == 'confirm' :
