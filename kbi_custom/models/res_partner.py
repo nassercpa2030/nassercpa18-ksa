@@ -1321,6 +1321,10 @@ class ResPartner ( models.Model ) :
 ### approval request ###
 class ApprovalRequest(models.Model):
     _inherit = 'approval.request'
+    
+    request_owner_identification_id = fields.Char(string="Employee Identification ID", related="request_owner_employee_id.identification_id", store=True, readonly=True,)
+    request_owner_starting_working_date = fields.Date( string="Starting Working Date", related="request_owner_employee_id.starting_working_date", store=True, readonly=True,)
+    
 
     def send_to_manager(self) :
         Employee = self.env['hr.employee']
