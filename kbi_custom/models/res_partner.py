@@ -1428,7 +1428,7 @@ class ApprovalRequest ( models.Model ) :
             }
         }
 
-    @api.depends ( 'date_start' , 'end_date' , 'amount' )
+    @api.depends ( 'date_start' , 'date_end' , 'amount' )
     def _compute_loan_details(self) :
         for rec in self :
             months = 0
