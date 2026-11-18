@@ -1428,14 +1428,14 @@ class ApprovalRequest ( models.Model ) :
             }
         }
 
-    @api.depends ( 'start_date' , 'end_date' , 'amount' )
+    @api.depends ( 'date_start' , 'end_date' , 'amount' )
     def _compute_loan_details(self) :
         for rec in self :
             months = 0
 
-            if rec.start_date and rec.end_date :
-                start = fields.Date.to_date ( rec.start_date )
-                end = fields.Date.to_date ( rec.end_date )
+            if rec.date_start and rec.date_end :
+                start = fields.Date.to_date ( rec.date_start )
+                end = fields.Date.to_date ( rec.date_end )
 
                 if end >= start :
                     months = (
