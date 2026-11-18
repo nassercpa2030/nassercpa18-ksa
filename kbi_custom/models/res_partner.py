@@ -1459,7 +1459,7 @@ class ApprovalRequest ( models.Model ) :
 
             if rec.request_owner_employee_id :
                 attachments = Attachment.search ( [
-                    ('employee_id' , '=' , rec.request_owner_employee_id.id) ,
+                    ('employee_ids' , 'in' , [rec.request_owner_employee_id.id]) ,
                     ('state' , '=' , 'open') ,
                 ] )
 
