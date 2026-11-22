@@ -1399,6 +1399,58 @@ class OdooShSyncEngine(models.AbstractModel):
         'approval.approver',
     ]
 
+    def _send_new_approval_request_to_manager(self, request):
+        """Run the SH-side manager workflow once for a newly imported request."""
+        request = request.sudo().exists()
+        if not request:
+            return False
+
+        if not request.request_owner_employee_id:
+            _logger.warning(
+                "Imported approval request %s has no request_owner_employee_id; "
+                "automatic manager submission skipped.",
+                request.id,
+            )
+            return False
+
+        employee = request.request_owner_employee_id
+        manager = employee.parent_id
+        if not manager or not manager.user_id:
+            _logger.warning(
+                "Imported approval request %s: employee %s has no manager with a linked user; "
+                "automatic manager submission skipped.",
+                request.id, employee.display_name,
+            )
+            return False
+
+        send_method = getattr(request, 'send_to_manager', None)
+        if not callable(send_method):
+            _logger.warning(
+                "Imported approval request %s: send_to_manager() is unavailable.",
+                request.id,
+            )
+            return False
+
+        # The custom SH method handles assigning the manager, creating/updating the
+        # approver line, subscribing the manager, posting the notification, and
+        # scheduling the activity. Calling it directly runs those server-side
+        # effects; its UI popup/action return value is intentionally not used here.
+        try:
+            send_method()
+            _logger.info(
+                "Imported approval request %s was automatically sent to manager %s (user %s).",
+                request.id, manager.display_name, manager.user_id.id,
+            )
+            return True
+        except Exception:
+            # Do not fail/roll back the Online import just because the SH manager
+            # submission method failed. Keep the request imported and log details.
+            _logger.exception(
+                "Automatic send_to_manager() failed for imported approval request %s.",
+                request.id,
+            )
+            return False
+
     def _execute_inbound_sync(self, config):
         """Import employees and actual employee-created approval requests from Online."""
         lock_key = self._sync_lock_key(config.id)
@@ -1485,6 +1537,14 @@ class OdooShSyncEngine(models.AbstractModel):
                 if model_name == 'approval.request' and 'request_owner_id' in remote_fields:
                     if 'request_owner_id' not in wanted_fields:
                         wanted_fields.append('request_owner_id')
+
+                # Read advance date fields explicitly, even if Online marks them
+                # readonly. Their names may differ between Online and Odoo.sh.
+                if model_name == 'approval.request':
+                    for date_field in ('start_date', 'date_start', 'end_date', 'date_end'):
+                        date_info = remote_fields.get(date_field, {})
+                        if date_info.get('type') in ('date', 'datetime') and date_field not in wanted_fields:
+                            wanted_fields.append(date_field)
                 # Odoo requires name_get/display_name separately; read only stored fields.
                 # Incremental import plus backfill: fetch changed records AND any
                 # Online records that do not yet have an inbound mapping. This makes
@@ -1530,6 +1590,10 @@ class OdooShSyncEngine(models.AbstractModel):
                                     config, model_name, row, remote_fields,
                                     remote_uid, remote_obj
                                 )
+                                if model_name == 'approval.request':
+                                    vals.update(self._prepare_inbound_advance_dates(
+                                        local_model, row, remote_fields
+                                    ))
                                 if model_name == 'hr.employee':
                                     # Never alter employee/user linkage or trigger trust-state changes.
                                     vals.pop('user_id', None)
@@ -1581,11 +1645,13 @@ class OdooShSyncEngine(models.AbstractModel):
                                     local_model.browse(mapping.remote_res_id).exists()
                                     if mapping else local_model.browse()
                                 )
-                                # Remember whether this Online request is genuinely new on SH.
-                                # The manager workflow is triggered only once, after creation.
-                                is_new_inbound_request = (
+                                # Only newly created SH approval requests are sent to
+                                # their manager. Updates on later sync runs must not
+                                # repeat the notification/activity or duplicate approver.
+                                is_new_approval_request = (
                                     model_name == 'approval.request' and not local_record
                                 )
+
 
                                 # Creating an approval.request can generate approver lines
                                 # from its category automatically. The Online import then
@@ -1715,28 +1781,12 @@ class OdooShSyncEngine(models.AbstractModel):
                                         'last_write_date': fields.Datetime.now(),
                                     })
 
-                                # Automatically send newly imported approval requests to
-                                # their employee manager, but never re-send on later syncs.
-                                if is_new_inbound_request and local_record:
-                                    if hasattr(local_record, 'send_to_manager'):
-                                        try:
-                                            local_record.send_to_manager()
-                                            details.append(
-                                                f"approval.request Online ID {row.get('id')}: send_to_manager executed on SH"
-                                            )
-                                        except Exception as manager_error:
-                                            _logger.exception(
-                                                'send_to_manager failed for newly imported approval.request SH ID %s',
-                                                local_record.id,
-                                            )
-                                            error_lines.append(
-                                                f"approval.request Online ID {row.get('id')}: manager notification failed: {manager_error}"
-                                            )
-                                    else:
-                                        _logger.warning(
-                                            'approval.request SH ID %s has no send_to_manager method; skipping manager auto-send',
-                                            local_record.id,
-                                        )
+                                # Automatically run the manager workflow for new SH
+                                # approval requests after their inbound mapping is
+                                # saved. Existing requests are never re-submitted.
+                                if is_new_approval_request:
+                                    self._send_new_approval_request_to_manager(local_record)
+
 
                             model_ok += 1
                             success += 1
@@ -2144,6 +2194,38 @@ class OdooShSyncEngine(models.AbstractModel):
                 duplicates.unlink()
                 removed += len(duplicate_ids)
         return removed
+
+    def _prepare_inbound_advance_dates(self, local_model, row, remote_fields):
+        """Copy Online advance start/end dates to stored SH date fields."""
+        result = {}
+        date_specs = (
+            ('start', ('start_date', 'date_start'), ('start_date', 'date_start')),
+            ('end', ('end_date', 'date_end'), ('end_date', 'date_end')),
+        )
+        for label, source_candidates, target_candidates in date_specs:
+            source_name = next((name for name in source_candidates
+                if name in row and remote_fields.get(name, {}).get('type') in ('date', 'datetime')), False)
+            target_name = next((name for name in target_candidates
+                if name in local_model._fields
+                and local_model._fields[name].type in ('date', 'datetime')
+                and local_model._fields[name].store
+                and not local_model._fields[name].compute
+                and not local_model._fields[name].related), False)
+            if not source_name or not target_name:
+                continue
+            source_type = remote_fields[source_name].get('type')
+            target_type = local_model._fields[target_name].type
+            value = row.get(source_name)
+            if value in (False, None, ''):
+                result[target_name] = False
+            elif source_type == target_type:
+                result[target_name] = value
+            elif source_type == 'datetime' and target_type == 'date':
+                result[target_name] = str(value)[:10]
+            elif source_type == 'date' and target_type == 'datetime':
+                result[target_name] = str(value)[:10] + ' 00:00:00'
+        return result
+
 
     def _prepare_inbound_values(self, config, model_name, row, remote_fields, uid, obj):
         local_model = self.env[model_name].sudo()
