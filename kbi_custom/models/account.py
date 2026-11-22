@@ -870,7 +870,7 @@ class AccountPayment ( models.Model ) :
                     # rec.destination_account_id = self.env['account.account'].browse(1142)
                     # rec.destination_account_id = 1142
                     # rec.partner_id = 417103
-                    rec.destination_account_id = self.env['account.account'].browse ( 1142 )
+                    rec.destination_account_id = self.env['account.account'].browse ( 62 )
             else :
                 rec.destination_account_id = False
 
