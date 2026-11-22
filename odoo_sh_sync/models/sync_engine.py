@@ -2201,36 +2201,67 @@ class OdooShSyncEngine(models.AbstractModel):
         return removed
 
     def _prepare_inbound_advance_dates(self, local_model, row, remote_fields):
-        """Map Online advance start/end into SH period_from/period_to fields."""
+        """Map Online advance start/end dates to SH date_start (From) and date_end (To) fields.
+
+
+        Prefer non-empty Online values: an empty start_date must never mask a
+        populated date_start (and likewise for end_date/date_end).
+        """
         result = {}
+
+        def usable_target(field_name):
+            field = local_model._fields.get(field_name)
+            return bool(
+                field
+                and field.type in ('date', 'datetime')
+                and field.store
+                and not field.compute
+                and not field.related
+            )
+
+
+
+        # First resolve by technical field names; if a customized database uses
+        # different names, resolve by the visible Period From / Period To labels.
         date_specs = (
-            # Online normally stores these as start_date/end_date. Prefer them,
-            # but accept alternate names to support customized Online databases.
-            ('period_from', ('start_date', 'date_start', 'period_from'), ('period_from', 'start_date', 'date_start')),
-            ('period_to', ('end_date', 'date_end', 'period_to'), ('period_to', 'end_date', 'date_end')),
+            # SH's visible From field is approval.request.date_start.
+            ('date_start', ('start_date', 'date_start', 'period_from', 'period_from_date', 'from_date'),
+             ('date_start', 'start_date', 'period_from', 'period_from_date', 'from_date'),
+             ('from', 'from date', 'date start', 'start date')),
+            # SH's visible To field is approval.request.date_end.
+            ('date_end', ('end_date', 'date_end', 'period_to', 'period_to_date', 'to_date'),
+             ('date_end', 'end_date', 'period_to', 'period_to_date', 'to_date'),
+             ('to', 'to date', 'date end', 'end date')),
         )
-        for target_label, source_candidates, target_candidates in date_specs:
+
+        for target_key, source_candidates, target_candidates, target_labels in date_specs:
+            # Pick the first source candidate with a real value. If every source
+            # field is empty, do not write False and erase an existing SH value.
             source_name = next((name for name in source_candidates
-                if name in row and remote_fields.get(name, {}).get('type') in ('date', 'datetime')), False)
-            target_name = next((name for name in target_candidates
-                if name in local_model._fields
-                and local_model._fields[name].type in ('date', 'datetime')
-                and local_model._fields[name].store
-                and not local_model._fields[name].compute
-                and not local_model._fields[name].related), False)
-            if not source_name or not target_name:
+                if name in row
+                and remote_fields.get(name, {}).get('type') in ('date', 'datetime')
+                and row.get(name) not in (False, None, '')), False)
+            if not source_name:
                 continue
+
+            target_name = next((name for name in target_candidates if usable_target(name)), False)
+            if not target_name:
+                target_name = next((name for name, field in local_model._fields.items()
+                    if usable_target(name)
+                    and (str(getattr(field, 'string', '') or '').strip().lower() in target_labels)), False)
+            if not target_name:
+                continue
+
             source_type = remote_fields[source_name].get('type')
             target_type = local_model._fields[target_name].type
-            value = row.get(source_name)
-            if value in (False, None, ''):
-                result[target_name] = False
-            elif source_type == target_type:
+            value = row[source_name]
+            if source_type == target_type:
                 result[target_name] = value
             elif source_type == 'datetime' and target_type == 'date':
                 result[target_name] = str(value)[:10]
             elif source_type == 'date' and target_type == 'datetime':
                 result[target_name] = str(value)[:10] + ' 00:00:00'
+
         return result
 
 
