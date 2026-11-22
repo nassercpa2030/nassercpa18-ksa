@@ -1541,7 +1541,12 @@ class OdooShSyncEngine(models.AbstractModel):
                 # Read advance date fields explicitly, even if Online marks them
                 # readonly. Their names may differ between Online and Odoo.sh.
                 if model_name == 'approval.request':
-                    for date_field in ('start_date', 'date_start', 'end_date', 'date_end'):
+                    # Read both Online's advance-date field names and SH's
+                    # period fields explicitly, even if Online marks them readonly.
+                    for date_field in (
+                        'start_date', 'date_start', 'end_date', 'date_end',
+                        'period_from', 'period_to', 'date', 'date_confirmed',
+                    ):
                         date_info = remote_fields.get(date_field, {})
                         if date_info.get('type') in ('date', 'datetime') and date_field not in wanted_fields:
                             wanted_fields.append(date_field)
@@ -2196,13 +2201,15 @@ class OdooShSyncEngine(models.AbstractModel):
         return removed
 
     def _prepare_inbound_advance_dates(self, local_model, row, remote_fields):
-        """Copy Online advance start/end dates to stored SH date fields."""
+        """Map Online advance start/end into SH period_from/period_to fields."""
         result = {}
         date_specs = (
-            ('start', ('start_date', 'date_start'), ('start_date', 'date_start')),
-            ('end', ('end_date', 'date_end'), ('end_date', 'date_end')),
+            # Online normally stores these as start_date/end_date. Prefer them,
+            # but accept alternate names to support customized Online databases.
+            ('period_from', ('start_date', 'date_start', 'period_from'), ('period_from', 'start_date', 'date_start')),
+            ('period_to', ('end_date', 'date_end', 'period_to'), ('period_to', 'end_date', 'date_end')),
         )
-        for label, source_candidates, target_candidates in date_specs:
+        for target_label, source_candidates, target_candidates in date_specs:
             source_name = next((name for name in source_candidates
                 if name in row and remote_fields.get(name, {}).get('type') in ('date', 'datetime')), False)
             target_name = next((name for name in target_candidates
@@ -2231,7 +2238,13 @@ class OdooShSyncEngine(models.AbstractModel):
         local_model = self.env[model_name].sudo()
         values = {}
         for field_name, value in row.items():
-            if field_name not in local_model._fields or field_name == 'id' or value in (False, None):
+            if (
+                field_name not in local_model._fields
+                or field_name == 'id'
+                or value in (False, None)
+                # Confirmation date must be generated locally by the SH Confirm action.
+                or (model_name == 'approval.request' and field_name == 'date_confirmed')
+            ):
                 continue
             field = local_model._fields[field_name]
             remote_info = remote_fields.get(field_name, {})
