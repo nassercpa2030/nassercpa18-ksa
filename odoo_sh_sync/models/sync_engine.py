@@ -1399,6 +1399,58 @@ class OdooShSyncEngine(models.AbstractModel):
         'approval.approver',
     ]
 
+    def _send_new_approval_request_to_manager(self, request):
+        """Run the SH-side manager workflow once for a newly imported request."""
+        request = request.sudo().exists()
+        if not request:
+            return False
+
+        if not request.request_owner_employee_id:
+            _logger.warning(
+                "Imported approval request %s has no request_owner_employee_id; "
+                "automatic manager submission skipped.",
+                request.id,
+            )
+            return False
+
+        employee = request.request_owner_employee_id
+        manager = employee.parent_id
+        if not manager or not manager.user_id:
+            _logger.warning(
+                "Imported approval request %s: employee %s has no manager with a linked user; "
+                "automatic manager submission skipped.",
+                request.id, employee.display_name,
+            )
+            return False
+
+        send_method = getattr(request, 'send_to_manager', None)
+        if not callable(send_method):
+            _logger.warning(
+                "Imported approval request %s: send_to_manager() is unavailable.",
+                request.id,
+            )
+            return False
+
+        # The custom SH method handles assigning the manager, creating/updating the
+        # approver line, subscribing the manager, posting the notification, and
+        # scheduling the activity. Calling it directly runs those server-side
+        # effects; its UI popup/action return value is intentionally not used here.
+        try:
+            send_method()
+            _logger.info(
+                "Imported approval request %s was automatically sent to manager %s (user %s).",
+                request.id, manager.display_name, manager.user_id.id,
+            )
+            return True
+        except Exception:
+            # Do not fail/roll back the Online import just because the SH manager
+            # submission method failed. Keep the request imported and log details.
+            _logger.exception(
+                "Automatic send_to_manager() failed for imported approval request %s.",
+                request.id,
+            )
+            return False
+
     def _execute_inbound_sync(self, config):
         """Import employees and actual employee-created approval requests from Online."""
         lock_key = self._sync_lock_key(config.id)
@@ -1581,6 +1633,13 @@ class OdooShSyncEngine(models.AbstractModel):
                                     local_model.browse(mapping.remote_res_id).exists()
                                     if mapping else local_model.browse()
                                 )
+                                # Only newly created SH approval requests are sent to
+                                # their manager. Updates on later sync runs must not
+                                # repeat the notification/activity or duplicate approver.
+                                is_new_approval_request = (
+                                    model_name == 'approval.request' and not local_record
+                                )
+
 
                                 # Creating an approval.request can generate approver lines
                                 # from its category automatically. The Online import then
@@ -1709,6 +1768,13 @@ class OdooShSyncEngine(models.AbstractModel):
                                         'remote_res_id': local_record.id,
                                         'last_write_date': fields.Datetime.now(),
                                     })
+
+                                # Automatically run the manager workflow for new SH
+                                # approval requests after their inbound mapping is
+                                # saved. Existing requests are never re-submitted.
+                                if is_new_approval_request:
+                                    self._send_new_approval_request_to_manager(local_record)
+
 
                             model_ok += 1
                             success += 1
