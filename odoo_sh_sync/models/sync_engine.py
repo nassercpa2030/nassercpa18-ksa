@@ -1581,6 +1581,11 @@ class OdooShSyncEngine(models.AbstractModel):
                                     local_model.browse(mapping.remote_res_id).exists()
                                     if mapping else local_model.browse()
                                 )
+                                # Remember whether this Online request is genuinely new on SH.
+                                # The manager workflow is triggered only once, after creation.
+                                is_new_inbound_request = (
+                                    model_name == 'approval.request' and not local_record
+                                )
 
                                 # Creating an approval.request can generate approver lines
                                 # from its category automatically. The Online import then
@@ -1709,6 +1714,29 @@ class OdooShSyncEngine(models.AbstractModel):
                                         'remote_res_id': local_record.id,
                                         'last_write_date': fields.Datetime.now(),
                                     })
+
+                                # Automatically send newly imported approval requests to
+                                # their employee manager, but never re-send on later syncs.
+                                if is_new_inbound_request and local_record:
+                                    if hasattr(local_record, 'send_to_manager'):
+                                        try:
+                                            local_record.send_to_manager()
+                                            details.append(
+                                                f"approval.request Online ID {row.get('id')}: send_to_manager executed on SH"
+                                            )
+                                        except Exception as manager_error:
+                                            _logger.exception(
+                                                'send_to_manager failed for newly imported approval.request SH ID %s',
+                                                local_record.id,
+                                            )
+                                            error_lines.append(
+                                                f"approval.request Online ID {row.get('id')}: manager notification failed: {manager_error}"
+                                            )
+                                    else:
+                                        _logger.warning(
+                                            'approval.request SH ID %s has no send_to_manager method; skipping manager auto-send',
+                                            local_record.id,
+                                        )
 
                             model_ok += 1
                             success += 1
