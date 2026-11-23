@@ -454,8 +454,10 @@ class Recruiter ( models.Model ) :
     other_allowance = fields.Monetary ( 'بدلات أخري ' , help="Same field as Other allowance for employee contract" ,
                                         readonly=False , store=True )
     x_gosi_225 = fields.Boolean ( "تأمينات  %22.5" ,
-                                  help="عند إختيار هذا الحقل يتم  إحتساب نسب التأمينات الحديثة للموظف السعودي بنسبة والشركة12.25 % , للموظف %10.25  " ,
+                                  help="عند إختيار هذا الحقل يتم  إحتساب نسب التأمينات الحديثة للموظف السعودي بنسبة والشركة12.25 % , للموظف %10.25  " ,Tracking=True,
                                   store=True );
+    vacation_allowance_removal = fields.Boolean ( "إزالة بدل الإجازة" ,help="عند إختيار هذا الحقل يتم حذف بدل الإجازة  للموظف  " ,Tracking=True ,store=True, );
+    end_service_allowance removal = fields.Boolean ( "إزالة بدل نهاية الخدمة" ,help="عند إختيار هذا الحقل يتم حذف بدل نهاية الخدمة للموظف  " ,Tracking=True,store=True );
     leave_accrual_plan_id = fields.Many2one ( comodel_name="hr.leave.accrual.plan" , string="خطة إستحقاق الأجازة" ,
                                               tracking=True , ondelete="restrict" )
 
